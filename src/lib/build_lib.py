@@ -35,12 +35,12 @@ def layout_tiers():
     """layout key -> tier in ep_tokens.jinja (EP_TIER): the screen a page definition puts the layout on (pages/*.yaml
     layouts) and that screen's tier (derive_tokens.SCREEN_OF, next to the panel facts)"""
     sys.path.insert(0, str(LIB))
-    import pageyaml
+    import pages
     from derive_tokens import SCREEN_OF
     tier_of = {scr: t for t, scr in SCREEN_OF.items()}
     out = {}
-    for f in sorted((LIB.parent / 'pages').glob('[!_]*.yaml')):
-        for scr, lay in (pageyaml.load(open(f, encoding='utf-8')).get('layouts') or {}).items():
+    for name in pages.names():
+        for scr, lay in (pages.load(name).get('layouts') or {}).items():
             spec, tier = lay['spec'], tier_of[str(scr)]
             if out.setdefault(spec, tier) != tier:
                 sys.exit(f'{spec}: on two tiers ({out[spec]}, {tier}) in the page definitions')
@@ -101,10 +101,10 @@ def ink_template():
 def input_names():
     """Every input the drawing can be handed, across the blueprints: each blueprint's own variables (outside its actions) that are a plain
     !input and the keys of its ds_in (the inputs dict ep_draw receives), as the generator writes them (lib/generate.py)."""
-    import generate, pageyaml
+    import generate, pageyaml, pages
     names = set()
-    for f in sorted((LIB.parent / 'pages').glob('[!_]*.yaml')):
-        page = pageyaml.load(open(f, encoding='utf-8'))
+    for name in pages.names():
+        page = pages.load(name)
         for scr in page['layouts']:
             for k, v in generate.variables(*generate.merged(page, scr)).items():
                 if k == 'ds_in':
@@ -121,11 +121,11 @@ def layout_passed():
     """layout -> the computed variables (not inputs) its blueprint hands the drawing: what the generator passes to ep_draw
     (lib/generate.py draw_args: what the layout's payloads and the kit read, among the blueprint's variables), less the
     inputs. Weather layouts get theirs from the weather data model instead."""
-    import generate, pageyaml
+    import generate, pages
     inputs = set(input_names()) | {'ds_devs', 'font_dir'}
     out = {}
-    for f in sorted((LIB.parent / 'pages').glob('[!_]*.yaml')):
-        page = pageyaml.load(open(f, encoding='utf-8'))
+    for name in pages.names():
+        page = pages.load(name)
         for scr, lay0 in page['layouts'].items():
             p, lay = generate.merged(page, scr)
             data = p['data']
@@ -322,10 +322,11 @@ def check_texts(com, pages):
 def page_texts():
     """EP_TXT (page -> language -> texts, with the shared day and month lists it uses), EP_DAYS_SHORT and EP_MONTHS_SHORT,
     from the page definitions (pages/<page>.yaml, `texts`; the shared day and month lists in pages/_shared.yaml): every page's texts in one place instead of a copy in each blueprint."""
-    com = yaml.load((ROOT / 'pages' / '_shared.yaml').read_text(encoding='utf-8'), Loader=harness.Loader)['texts']
+    import pages
+    com = pages.shared()['texts']
     t = {'pages': {}}
-    for f in sorted((ROOT / 'pages').glob('[a-z]*.yaml')):
-        p = yaml.load(f.read_text(encoding='utf-8'), Loader=harness.Loader)
+    for name in pages.names():
+        p = pages.load(name)
         if p.get('texts'):
             t['pages'][p['page']] = p['texts']
     check_texts(com, t['pages'])

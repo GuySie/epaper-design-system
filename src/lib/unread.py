@@ -12,7 +12,7 @@ report one that is read.
 """
 import glob, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import pageyaml
+import pageyaml, pages
 from jinja2 import Environment, meta
 
 SRC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -85,8 +85,7 @@ def unread_inputs(path):
 def sources():
     """every source a key can be read from, the page definitions without their texts"""
     out = []
-    for p in sorted(glob.glob(os.path.join(SRC, 'pages', '*.yaml'))):
-        d = pageyaml.load(open(p).read())
+    for d in [pages.load(n) for n in pages.names()] + [pages.shared()]:
         d.pop('texts', None)
         out.append(pageyaml.dump(d, width=100000))
     for p in sorted(glob.glob(os.path.join(SRC, 'specs', '*.py'))) + [os.path.join(SRC, f) for f in (
@@ -101,11 +100,9 @@ def main(pkg):
         for i in unread_inputs(p):
             bad.append(f'{os.path.basename(p)}: input `{i}` is read by nothing')
     text = sources()
-    for p in sorted(glob.glob(os.path.join(SRC, 'pages', '*.yaml'))):
-        d = pageyaml.load(open(p).read())
-        page = os.path.basename(p)
-        if page == '_shared.yaml':
-            continue
+    for name in pages.names():
+        d = pages.load(name)
+        page = name + '.yaml'
         keys = set()
         for lang, v in (d.get('texts') or {}).items():
             if isinstance(v, dict):

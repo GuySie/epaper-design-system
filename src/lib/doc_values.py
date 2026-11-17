@@ -76,8 +76,8 @@ def tight():
 
 
 def page_def(page):
-    import pageyaml
-    return pageyaml.load(open(SRC / 'pages' / f'{page}.yaml', encoding='utf-8'))
+    import pages
+    return pages.load(page)
 
 
 def input_default(page, name):

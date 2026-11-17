@@ -34,23 +34,23 @@ def naming(page_name, screen_name):
 
 @functools.lru_cache(maxsize=None)
 def layouts():
-    import pageyaml, yaml
+    import pages, yaml
     from derive_tokens import KNOWN, SCREEN_OF
     reg = yaml.safe_load((SRC / 'registry.yaml').read_text(encoding='utf-8'))
     tier_of = {s: t for t, s in SCREEN_OF.items()}
     out, seen = [], {}
-    for f in sorted((SRC / 'pages').glob('[!_]*.yaml')):
-        for scr, lay in (pageyaml.load(f.read_text(encoding='utf-8')).get('layouts') or {}).items():
+    for page in pages.names():
+        for scr, lay in (pages.load(page).get('layouts') or {}).items():
             scr = str(scr)
-            key = lay.get('key') or f"{f.stem.replace('-', '_')}_{scr}"
+            key = lay.get('key') or f"{page.replace('-', '_')}_{scr}"
             # a page definition gives a layout only its drawing (spec); a mock-up names itself (lib/preview.py)
-            title, bp = naming((reg['pages'].get(f.stem) or {}).get('name', f.stem), reg['screen_names'].get(scr, scr))
+            title, bp = naming((reg['pages'].get(page) or {}).get('name', page), reg['screen_names'].get(scr, scr))
             title, bp = lay.get('name') or title, lay.get('blueprint') or bp
             public = lay.get('layout') or key
             for what, v in (('key', key), ('spec', lay['spec']), ('blueprint', bp), ('layout', public)):
                 if seen.setdefault((what, v), key) != key:
-                    sys.exit(f'{f.name}: {what} {v} is used by two layouts')
-            out.append({'key': key, 'page': f.stem, 'screen': scr, 'spec': lay['spec'], 'name': public, 'title': title,
+                    sys.exit(f'pages/{page}.yaml: {what} {v} is used by two layouts')
+            out.append({'key': key, 'page': page, 'screen': scr, 'spec': lay['spec'], 'name': public, 'title': title,
                         'blueprint': bp, 'source_url': lay.get('source_url') or SOURCE + bp,
                         'tier': tier_of[scr], 'canvas': tuple(KNOWN[tier_of[scr]][:2])})
     return tuple(out)

@@ -425,12 +425,13 @@ def lint(doc, pkg=PKG):
             errs.append(f'generated block {m.group(2)} edited by hand: run registry.py write')
     import doc_values
     seen = {}                               # *Thresholds*: the same data has the same inputs, names and defaults everywhere
-    for f in sorted((pathlib.Path(__file__).resolve().parent.parent / 'pages').glob('[a-z]*.yaml')):
-        for i in doc_values.page_def(f.stem).get('inputs') or []:
+    import pages
+    for page in pages.names():
+        for i in pages.load(page).get('inputs') or []:
             if i['name'].startswith(('warning_', 'severe_')):
                 if i['name'] in seen and seen[i['name']][1] != i.get('default'):
-                    errs.append(f"threshold {i['name']}: default {i.get('default')!r} on {f.stem}, {seen[i['name']][1]!r} on {seen[i['name']][0]}")
-                seen.setdefault(i['name'], (f.stem, i.get('default')))
+                    errs.append(f"threshold {i['name']}: default {i.get('default')!r} on {page}, {seen[i['name']][1]!r} on {seen[i['name']][0]}")
+                seen.setdefault(i['name'], (page, i.get('default')))
     for m in INLINE.finditer(s):
         try:
             if m.group(3) != doc_values.value(m.group(2)):
