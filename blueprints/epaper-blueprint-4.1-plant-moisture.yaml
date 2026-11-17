@@ -511,7 +511,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'mdoixr'
+  ds_set: 'nldrls'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'

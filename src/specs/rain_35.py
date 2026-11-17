@@ -35,10 +35,7 @@ PAYLOAD_MAIN = r'''
 '''
 
 PAYLOAD_ERR = r'''
-{#- the rain chart is 384 px wide and as high as the panel height input: 184 (3.5") or 168 (2.7"), each with its own tier's tokens -#}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, ds_title, as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, language_map[weekday_lang]['no_data'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['no_data']) -}}
 '''
 
 PAYLOADS = [PAYLOAD_MAIN, PAYLOAD_ERR]

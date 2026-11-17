@@ -21,8 +21,6 @@ PAYLOAD_MAIN = WXM + r'''
 {%- endif -%}
 '''
 PAYLOAD_ERR = r'''
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, (header_title if header_title else ds_otxt['title']), as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, ds_otxt['none'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, (header_title if header_title else ds_otxt['title']), ds_otxt['none']) -}}
 '''
 PAYLOADS = [PAYLOAD_MAIN, PAYLOAD_ERR]

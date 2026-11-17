@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'mdoixr' -%}
+{%- set EP_SET = 'nldrls' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -921,6 +921,13 @@
 {{- R(ns, P - sx, y0, W - P - 1 + sx, y1 - 1, color.severe) -}}
 {%- set ns.el = ns.el + [{'type': 'text', 'value': (msg | string | upper), 'x': (W // 2), 'y': ((y0 + y1) // 2), 'font': FONT[tt[0]], 'size': tt[1], 'color': color.onSevere, 'anchor': 'mm', 'align': 'center', 'max_width': (W - 2 * P - 2 * sx), 'spacing': sx}] -%}
 {%- endmacro -%}
+{#- ERRPAGE: a page in its Error state: the title row with the time of this redraw (there is no data whose time to show)
+     and the error block under it -#}
+{%- macro ERRPAGE(ns, title, msg) -%}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{{- TITLE(ns, title, as_timestamp(now()), W, P, TH) -}}
+{{- ERRBLOCK(ns, msg, W, H, P, TH) -}}
+{%- endmacro -%}
 {#- EMPTY: the empty statement, one centred uppercase text line where a module has nothing to say, in the strong type.primary
      cut, one step down to type.data when it doesn't fit (or where a tier has no primary), centred in the box x0..x1,
      y0..y1; only text too long even for type.data is cut short -#}
@@ -1765,9 +1772,7 @@
 {%- set events_data = c.events_data -%}
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, header_title_display, as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, language_map[weekday_lang]['no_calendars'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_calendars']) -}}
 {%- elif layout == 'appointment_41' and view == 'main' -%}
 {%- set events_data = c.events_data -%}
 {%- set header_title_display = c.header_title_display -%}
@@ -1779,9 +1784,7 @@
 {%- set events_data = c.events_data -%}
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, header_title_display, as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, language_map[weekday_lang]['no_calendars'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_calendars']) -}}
 {%- elif layout == 'appointment_426' and view == 'main' -%}
 {%- set events_data = c.events_data -%}
 {%- set header_title_display = c.header_title_display -%}
@@ -1793,9 +1796,7 @@
 {%- set events_data = c.events_data -%}
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, header_title_display, as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, language_map[weekday_lang]['no_calendars'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_calendars']) -}}
 {%- elif layout == 'calendar_41' and view == 'main' -%}
 {%- set days = c.days -%}
 {%- set header_title_display = c.header_title_display -%}
@@ -1822,9 +1823,7 @@
 {%- set language_map = c.language_map -%}
 {%- set months_short_map = c.months_short_map -%}
 {%- set weekday_short_map = c.weekday_short_map -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, header_title_display, as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, language_map[weekday_lang]['no_calendars'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_calendars']) -}}
 {%- elif layout == 'calendar_426' and view == 'main' -%}
 {%- set days = c.days -%}
 {%- set header_title_display = c.header_title_display -%}
@@ -1851,9 +1850,7 @@
 {%- set language_map = c.language_map -%}
 {%- set months_short_map = c.months_short_map -%}
 {%- set weekday_short_map = c.weekday_short_map -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, header_title_display, as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, language_map[weekday_lang]['no_calendars'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_calendars']) -}}
 {%- elif layout == 'claude_35' and view == 'main' -%}
 {%- set bars = c.bars -%}
 {%- set ds_last_ts = c.ds_last_ts -%}
@@ -1895,9 +1892,7 @@
 {%- set ds_stale = c.ds_stale -%}
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, header_title_display, as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, language_map[weekday_lang]['no_bars'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_bars']) -}}
 {%- elif layout == 'co2_35' and view == 'main' -%}
 {%- set ds_bucket = c.ds_bucket -%}
 {%- set ds_last_ts = c.ds_last_ts -%}
@@ -1934,9 +1929,7 @@
 {%- set ds_t1 = c.ds_t1 -%}
 {%- set ds_title = c.ds_title -%}
 {%- set language_map = c.language_map -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, ds_title, as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, language_map[weekday_lang]['no_data'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['no_data']) -}}
 {%- elif layout == 'doors_windows_14' and view == 'main' -%}
 {%- set ds_open = c.ds_open -%}
 {%- set ds_otxt = c.ds_otxt -%}
@@ -1961,9 +1954,7 @@
 {%- elif layout == 'doors_windows_14' and view == 'error' -%}
 {%- set ds_open = c.ds_open -%}
 {%- set ds_otxt = c.ds_otxt -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, (header_title if header_title else ds_otxt['title']), as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, ds_otxt['none'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, (header_title if header_title else ds_otxt['title']), ds_otxt['none']) -}}
 {%- elif layout == 'entities_35' and view == 'main' -%}
 {%- set ds_last_ts = c.ds_last_ts -%}
 {%- set ds_rows = c.ds_rows -%}
@@ -1983,9 +1974,7 @@
 {%- set ds_unavail_msg = c.ds_unavail_msg -%}
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, header_title_display, as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, language_map[weekday_lang]['no_entities'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_entities']) -}}
 {%- elif layout == 'medication_27l' and view == 'main' -%}
 {%- set ds_date = c.ds_date -%}
 {%- set ds_overdue_k = c.ds_overdue_k -%}
@@ -2049,9 +2038,7 @@
 {%- set ds_stale = c.ds_stale -%}
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, header_title_display, as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, language_map[weekday_lang]['no_plants'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_plants']) -}}
 {%- elif layout == 'rain_27l' and view == 'main' -%}
 {%- set buckets = c.buckets -%}
 {%- set ds_last_ts = c.ds_last_ts -%}
@@ -2097,10 +2084,7 @@
 {%- set ds_title = c.ds_title -%}
 {%- set ds_txt = c.ds_txt -%}
 {%- set language_map = c.language_map -%}
-{#- the rain chart is 384 px wide and as high as the panel height input: 184 (3.5") or 168 (2.7"), each with its own tier's tokens -#}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, ds_title, as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, language_map[weekday_lang]['no_data'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['no_data']) -}}
 {%- elif layout == 'rain_35' and view == 'main' -%}
 {%- set buckets = c.buckets -%}
 {%- set ds_last_ts = c.ds_last_ts -%}
@@ -2146,10 +2130,7 @@
 {%- set ds_title = c.ds_title -%}
 {%- set ds_txt = c.ds_txt -%}
 {%- set language_map = c.language_map -%}
-{#- the rain chart is 384 px wide and as high as the panel height input: 184 (3.5") or 168 (2.7"), each with its own tier's tokens -#}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, ds_title, as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, language_map[weekday_lang]['no_data'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['no_data']) -}}
 {%- elif layout == 'sun_moon_35' and view == 'main' -%}
 {%- set ds_txt = c.ds_txt -%}
 {%- set header_title_display = c.header_title_display -%}
@@ -2181,9 +2162,7 @@
 {%- set moon_icon = c.moon_icon -%}
 {%- set moon_phase_available = c.moon_phase_available -%}
 {%- set moon_position_available = c.moon_position_available -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, header_title_display, as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, language_map[weekday_lang]['no_sun'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_sun']) -}}
 {%- elif layout == 'weather_27l' and view == 'main' -%}
 {%- set stale = (stale_after | int(0)) > 0 and wx.last > 0 and (as_timestamp(now()) - wx.last) > (stale_after | int(0)) * 60 -%}
 {%- set right = wx.last if stale else as_timestamp(now()) -%}
@@ -2195,9 +2174,7 @@
      [[ds_wtxt['rain'], MM(wx.mm_today), wx.mm_today_k], [ds_wtxt['wind'], WIND(), wx.wind_k], [ds_wtxt['hilo'], wx.hi ~ '° / ' ~ wx.lo ~ '°', wx.hilo_k]], [1, 2, 0],
      [ds_wtxt['rain'], ds_wtxt['wind'], ds_wtxt['hilo']], [MM(99), MM(9.9), DECIMAL(100) ~ '¦' ~ wx.wind_unit, '-10° / -15°'], 4, 0, false, [1, 2, 0]) -}}
 {%- elif layout == 'weather_27l' and view == 'error' -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, (header_title if header_title else ds_wtxt['title']), as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, ds_wtxt['nodata'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, (header_title if header_title else ds_wtxt['title']), ds_wtxt['nodata']) -}}
 {%- elif layout == 'weather_27p' and view == 'main' -%}
 {%- set stale = (stale_after | int(0)) > 0 and wx.last > 0 and (as_timestamp(now()) - wx.last) > (stale_after | int(0)) * 60 -%}
 {%- set right = wx.last if stale else as_timestamp(now()) -%}
@@ -2206,9 +2183,7 @@
 {#- Hero dashboard with forecast strips, portrait: the hero group over the forecast table -#}
 {{- WXPORT(ns, (header_title if header_title else ds_wtxt['title']), right, stale, wind_or_precipitation == 'windspeed') -}}
 {%- elif layout == 'weather_27p' and view == 'error' -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, (header_title if header_title else ds_wtxt['title']), as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, ds_wtxt['nodata'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, (header_title if header_title else ds_wtxt['title']), ds_wtxt['nodata']) -}}
 {%- elif layout == 'weather_35' and view == 'main' -%}
 {%- set stale = (stale_after | int(0)) > 0 and wx.last > 0 and (as_timestamp(now()) - wx.last) > (stale_after | int(0)) * 60 -%}
 {%- set right = wx.last if stale else as_timestamp(now()) -%}
@@ -2219,9 +2194,7 @@
      [[ds_wtxt['rain'], MM(wx.mm_today), wx.mm_today_k], [ds_wtxt['wind'], WIND(), wx.wind_k], [ds_wtxt['hum'], (wx.hum | string) ~ '%' if wx.hum is not none else '—', false], [ds_wtxt['hilo'], wx.hi ~ '° / ' ~ wx.lo ~ '°', wx.hilo_k]], [2, 1, 3, 0],
      [ds_wtxt['rain'], ds_wtxt['wind'], ds_wtxt['hum'], ds_wtxt['hilo']], [MM(99), MM(9.9), DECIMAL(100) ~ '¦' ~ wx.wind_unit, '100%', '-10° / -15°'], 4, 0, false, [2, 1, 3, 0]) -}}
 {%- elif layout == 'weather_35' and view == 'error' -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, (header_title if header_title else ds_wtxt['title']), as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, ds_wtxt['nodata'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, (header_title if header_title else ds_wtxt['title']), ds_wtxt['nodata']) -}}
 {%- elif layout == 'weather_41' and view == 'main' -%}
 {%- set stale = (stale_after | int(0)) > 0 and wx.last > 0 and (as_timestamp(now()) - wx.last) > (stale_after | int(0)) * 60 -%}
 {%- set right = wx.last if stale else as_timestamp(now()) -%}
@@ -2232,9 +2205,7 @@
      [[ds_wtxt['rain'], MM(wx.mm_today), wx.mm_today_k], [ds_wtxt['wind'], WIND(), wx.wind_k], [ds_wtxt['hum'], ((wx.hum | string) ~ '%') if wx.hum is not none else '—', false]], [2, 1, 0],
      [ds_wtxt['rain'], ds_wtxt['wind'], ds_wtxt['hum']], [MM(99), MM(9.9), DECIMAL(100) ~ '¦' ~ wx.wind_unit, '100%'], 4, 5, true, [2, 1, 0]) -}}
 {%- elif layout == 'weather_41' and view == 'error' -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, (header_title if header_title else ds_wtxt['title']), as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, ds_wtxt['nodata'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, (header_title if header_title else ds_wtxt['title']), ds_wtxt['nodata']) -}}
 {%- elif layout == 'weather_426' and view == 'main' -%}
 {%- set stale = (stale_after | int(0)) > 0 and wx.last > 0 and (as_timestamp(now()) - wx.last) > (stale_after | int(0)) * 60 -%}
 {%- set right = wx.last if stale else as_timestamp(now()) -%}
@@ -2245,9 +2216,7 @@
      [[ds_wtxt['rain'], MM(wx.mm_today), wx.mm_today_k], [ds_wtxt['wind'], WIND(), wx.wind_k], [ds_wtxt['pres_l'], ((wx.pres | string) ~ '¦' ~ wx.pres_unit) if wx.pres is not none else '—', false], [ds_wtxt['rise_l'], wx.rise, false], [ds_wtxt['set_l'], wx.set, false], [ds_wtxt['hilo'], wx.hi ~ '° / ' ~ wx.lo ~ '°', wx.hilo_k]], [2, 1, 5],
      [ds_wtxt['rain'], ds_wtxt['wind'], ds_wtxt['pres_l'], ds_wtxt['rise_l'], ds_wtxt['set_l'], ds_wtxt['hilo']], [MM(99), MM(9.9), DECIMAL(100) ~ '¦' ~ wx.wind_unit, '1050¦' ~ wx.pres_unit, '12:00 PM' if time_format == '12h' else '00:00', '-10° / -15°'], 6, 5, false, [2, 1, 5]) -}}
 {%- elif layout == 'weather_426' and view == 'error' -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, (header_title if header_title else ds_wtxt['title']), as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, ds_wtxt['nodata'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, (header_title if header_title else ds_wtxt['title']), ds_wtxt['nodata']) -}}
 {%- elif layout == 'weather_75' and view == 'main' -%}
 {%- set stale = (stale_after | int(0)) > 0 and wx.last > 0 and (as_timestamp(now()) - wx.last) > (stale_after | int(0)) * 60 -%}
 {%- set right = wx.last if stale else as_timestamp(now()) -%}
@@ -2258,9 +2227,7 @@
      [[ds_wtxt['rain'], MM(wx.mm_today), wx.mm_today_k], [ds_wtxt['wind'], WIND(), wx.wind_k], [ds_wtxt['pres_l'], ((wx.pres | string) ~ '¦' ~ wx.pres_unit) if wx.pres is not none else '—', false], [ds_wtxt['rise_l'], wx.rise, false], [ds_wtxt['set_l'], wx.set, false], [ds_wtxt['hilo'], wx.hi ~ '° / ' ~ wx.lo ~ '°', wx.hilo_k]], [2, 1, 5],
      [ds_wtxt['rain'], ds_wtxt['wind'], ds_wtxt['pres_l'], ds_wtxt['rise_l'], ds_wtxt['set_l'], ds_wtxt['hilo']], [MM(99), MM(9.9), DECIMAL(100) ~ '¦' ~ wx.wind_unit, '1050¦' ~ wx.pres_unit, '12:00 PM' if time_format == '12h' else '00:00', '-10° / -15°'], 6, 5, false, [2, 1, 5]) -}}
 {%- elif layout == 'weather_75' and view == 'error' -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, (header_title if header_title else ds_wtxt['title']), as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, ds_wtxt['nodata'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, (header_title if header_title else ds_wtxt['title']), ds_wtxt['nodata']) -}}
 {%- elif layout == 'weather_75p' and view == 'main' -%}
 {%- set stale = (stale_after | int(0)) > 0 and wx.last > 0 and (as_timestamp(now()) - wx.last) > (stale_after | int(0)) * 60 -%}
 {%- set right = wx.last if stale else as_timestamp(now()) -%}
@@ -2271,9 +2238,7 @@
      [[ds_wtxt['rain'], MM(wx.mm_today), wx.mm_today_k], [ds_wtxt['wind'], WIND(), wx.wind_k], [ds_wtxt['pres_l'], ((wx.pres | string) ~ '¦' ~ wx.pres_unit) if wx.pres is not none else '—', false], [ds_wtxt['rise_l'], wx.rise, false], [ds_wtxt['set_l'], wx.set, false], [ds_wtxt['hilo'], wx.hi ~ '° / ' ~ wx.lo ~ '°', wx.hilo_k]], [2, 1, 5],
      [ds_wtxt['rain'], ds_wtxt['wind'], ds_wtxt['pres_l'], ds_wtxt['rise_l'], ds_wtxt['set_l'], ds_wtxt['hilo']], [MM(99), MM(9.9), DECIMAL(100) ~ '¦' ~ wx.wind_unit, '1050¦' ~ wx.pres_unit, '12:00 PM' if time_format == '12h' else '00:00', '-10° / -15°'], 5, 5, true, [2, 1, 5]) -}}
 {%- elif layout == 'weather_75p' and view == 'error' -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, (header_title if header_title else ds_wtxt['title']), as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, ds_wtxt['nodata'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, (header_title if header_title else ds_wtxt['title']), ds_wtxt['nodata']) -}}
 {%- elif layout == 'weather_calendar_75p' and view == 'main' -%}
 {%- set calendar_entities = c.calendar_entities -%}
 {%- set days = c.days -%}
@@ -2367,9 +2332,7 @@
 {{- SECOND(ns, W // 2, y, FONT[EP_TK.type.secondary[0]], EP_TK.type.secondary[1], 0, W - 2 * P) -}}
 {%- endcall -%}
 {%- elif layout == 'weather_glance_14' and view == 'error' -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, (header_title if header_title else ds_wtxt['title']), as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, ds_wtxt['nodata'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, (header_title if header_title else ds_wtxt['title']), ds_wtxt['nodata']) -}}
 {%- elif layout == 'weather_glance_35' and view == 'main' -%}
 {%- set stale = (stale_after | int(0)) > 0 and wx.last > 0 and (as_timestamp(now()) - wx.last) > (stale_after | int(0)) * 60 -%}
 {%- set right = wx.last if stale else as_timestamp(now()) -%}
@@ -2398,9 +2361,7 @@
 {{- SECOND(ns, W // 2, y, FONT[EP_TK.type.secondary[0]], EP_TK.type.secondary[1], 0, W - 2 * P) -}}
 {%- endcall -%}
 {%- elif layout == 'weather_glance_35' and view == 'error' -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, (header_title if header_title else ds_wtxt['title']), as_timestamp(now()), W, P, TH) -}}
-{{- ERRBLOCK(ns, ds_wtxt['nodata'], W, H, P, TH) -}}
+{{- ERRPAGE(ns, (header_title if header_title else ds_wtxt['title']), ds_wtxt['nodata']) -}}
 {%- endif -%}
 {{- OMERGE(ns) -}}
 {%- do returns(ns.el) -%}

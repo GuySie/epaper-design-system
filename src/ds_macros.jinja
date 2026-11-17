@@ -614,6 +614,13 @@
 {{- R(ns, P - sx, y0, W - P - 1 + sx, y1 - 1, color.severe) -}}
 {%- set ns.el = ns.el + [{'type': 'text', 'value': (msg | string | upper), 'x': (W // 2), 'y': ((y0 + y1) // 2), 'font': FONT[tt[0]], 'size': tt[1], 'color': color.onSevere, 'anchor': 'mm', 'align': 'center', 'max_width': (W - 2 * P - 2 * sx), 'spacing': sx}] -%}
 {%- endmacro -%}
+{#- ERRPAGE: a page in its Error state: the title row with the time of this redraw (there is no data whose time to show)
+     and the error block under it -#}
+{%- macro ERRPAGE(ns, title, msg) -%}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{{- TITLE(ns, title, as_timestamp(now()), W, P, TH) -}}
+{{- ERRBLOCK(ns, msg, W, H, P, TH) -}}
+{%- endmacro -%}
 {#- EMPTY: the empty statement, one centred uppercase text line where a module has nothing to say, in the strong type.primary
      cut, one step down to type.data when it doesn't fit (or where a tier has no primary), centred in the box x0..x1,
      y0..y1; only text too long even for type.data is cut short -#}

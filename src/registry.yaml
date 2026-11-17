@@ -166,7 +166,7 @@ modules:
   Hero block:        {macros: [HBLOCK, HERO_BLOCK_Y]}
   Hero band:         {macros: [HBAND]}
   Footer:            {macros: [FOOT]}
-  Error block:       {macros: [ERRBLOCK]}
+  Error block:       {macros: [ERRBLOCK, ERRPAGE]}
   Detail rows:       {macros: [DROWS, DCOLW]}
   Strip:             {macros: [HSTRIP, DSTRIP, STRIPY, CELLH]}
   Forecast table:    {macros: [RROW]}

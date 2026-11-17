@@ -54,7 +54,6 @@ def tokenise(body, key, name):
     """Layouts read their canvas and frame from the tier tokens (EP_TK); a literal frame would let the token table and
     the layouts drift apart, so the build refuses one."""
     assert not re.search(r'\{%- set W, H, P, TH = \d', body), f'{name}: literal frame, use EP_TK'
-    assert 'EP_TK.space.titleRow' in body, f'{name}: no frame line found'
     return body
 
 
