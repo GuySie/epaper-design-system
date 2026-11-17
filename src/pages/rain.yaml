@@ -73,7 +73,7 @@ data:
   - has_any_data: |
       {% set raw1 = state_attr(buienalarm_entity, 'data') %} {% set raw2 = state_attr(buienradar_entity, 'data') %} {% set d1 = raw1 is mapping and raw1.get('success', False) and (raw1.get('precip', []) | length > 0) %} {% set d2 = raw2 is string and (raw2 | trim | length > 0) %} {{ d1 or d2 }}
   - buckets: |
-      {% set ns = namespace(list=[]) %} {% set cap = 50 %} {% set threshold = severe_rain_hour | float(10) %} {% set now_ts = now().timestamp() %} {% set now_5_ts = (now_ts // 300) * 300 %}
+      {% set ns = namespace(list=[]) %} {% set cap = rain_top %} {% set threshold = severe_rain_hour | float(10) %} {% set now_ts = now().timestamp() %} {% set now_5_ts = (now_ts // 300) * 300 %}
       {% set raw1 = state_attr(buienalarm_entity, 'data') %} {% set has_data1 = raw1 is mapping and raw1.get('success', False) and (raw1.get('precip', []) | length > 0) %} {% if has_data1 %}
         {% set start1 = raw1.start | float %}
         {% set start1 = (start1 / 1000) if start1 > 10000000000 else start1 %}
@@ -96,7 +96,7 @@ data:
         {% endfor %}
         {% set parsed2 = ns2.list %}
       {% endif %}
-      {% for i in range(24) %}
+      {% for i in range(rain_bars) %}
         {% set bucket_ts = now_5_ts + (i * 300) %}
         {% set mm1 = namespace(v=0) %}
         {% if has_data1 %}

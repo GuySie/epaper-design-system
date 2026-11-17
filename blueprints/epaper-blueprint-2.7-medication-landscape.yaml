@@ -217,7 +217,7 @@ trigger:
   - unknown
 conditions: !input 'automation_conditions'
 variables:
-  ds_set: 'boseaa'
+  ds_set: 'qtekll'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'

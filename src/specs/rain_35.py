@@ -1,4 +1,7 @@
 BARS, TICK_EVERY = 24, 6     # 5-minute bars over two hours; a tick every 30 minutes (*Style choices*, Axis ticks)
+SCALE_TOP = 50               # mm/h: the top of the logarithmic scale, violent rain (*Chart frame (all charts)*, *Fixed y-scale*)
+# the page's data follows the chart: as many 5-minute buckets as bars, each scaled against the same top
+VARIABLES = {'rain_bars': BARS, 'rain_top': SCALE_TOP}
 TICKS = '[' + ', '.join(f'[{i}, CLOCK(buckets[{i}].ts, h12, true)]' for i in range(0, BARS, TICK_EVERY)) + ']'
 PAYLOAD_MAIN = r'''
 {#- the rain chart fills its tier's canvas: 384 x 184 (3.5"), or 384 x 168 on the 2.7" (specs/rain_27l.py) -#}
@@ -28,10 +31,10 @@ PAYLOAD_MAIN = r'''
 {%- set foot = [(ds_txt['rain'] | upper) ~ ' ' ~ CLOCK_SPAN(st.first, st.last + 300, h12), (ds_txt['peak'] | upper) ~ ' ' ~ pk ~ '¦ · ' ~ CLOCK(st.peak_ts, h12), none] -%}
 {%- else -%}{%- set foot = ['', '', none] -%}{%- endif -%}
 {%- set ticks = ''' + TICKS + r''' -%}
-{%- set endtxt = CLOCK(buckets[23].ts + 300, h12, true) -%}
-{%- set dry = (ds_txt['dry'] | upper) ~ ' ' ~ CLOCK(buckets[23].ts + 300, h12) -%}
-{#- pattern 'Bar chart' with thresholds: 24 five-minute bars on a log scale; a wet bar is at least 3 x line.base high -#}
-{{- BARCHART(ns, ds_title, right, 24, bl.l, lines, ticks, endtxt, foot, dry, ds_stale, 50, 0, 3, flag) -}}
+{%- set endtxt = CLOCK(buckets[''' + str(BARS - 1) + r'''].ts + 300, h12, true) -%}
+{%- set dry = (ds_txt['dry'] | upper) ~ ' ' ~ CLOCK(buckets[''' + str(BARS - 1) + r'''].ts + 300, h12) -%}
+{#- pattern 'Bar chart' with thresholds: BARS five-minute bars on a log scale up to SCALE_TOP; a wet bar is at least 3 x line.base high -#}
+{{- BARCHART(ns, ds_title, right, ''' + str(BARS) + r''', bl.l, lines, ticks, endtxt, foot, dry, ds_stale, ''' + str(SCALE_TOP) + r''', 0, 3, flag) -}}
 '''
 
 PAYLOAD_ERR = r'''

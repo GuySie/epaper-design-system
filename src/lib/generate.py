@@ -187,6 +187,9 @@ def variables(p, lay):
             v['months_short_map'] = PY.load(shared.TEXTS['months_short_map'])
     for k, x in (lay.get('constants') or {}).items():
         v[k] = x
+    # what the layout's spec fixes and the page's data must follow (a chart's number of bars, its scale's top)
+    for k, x in (getattr(load_spec(lay['spec']), 'VARIABLES', None) or {}).items():
+        v[k] = x
     for c in p['data'].get('variables') or []:
         v.update(c)
     if isinstance(p.get('stale'), list):

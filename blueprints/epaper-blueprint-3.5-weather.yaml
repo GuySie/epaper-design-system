@@ -437,7 +437,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'boseaa'
+  ds_set: 'qtekll'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'
