@@ -1,7 +1,6 @@
 import datetime as dt
 TZ = dt.timezone(dt.timedelta(hours=1))
 NOW = dt.datetime(2026, 8, 1, 20, 45, tzinfo=TZ)
-SIZE = (384, 184)
 STATES = {
  'sensor.s': {'state': '38', 'attributes': {'friendly_name': 'Claude Usage (Sam - Max) Session Usage', 'resets_at': '2026-08-01T22:00:00+01:00'}, 'last_updated': NOW - dt.timedelta(minutes=2)},
  'sensor.w': {'state': '92', 'attributes': {'friendly_name': 'Claude Usage (Sam - Max) Week Usage', 'resets_at': '2026-08-03T09:00:00+01:00'}},

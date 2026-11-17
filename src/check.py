@@ -145,10 +145,10 @@ def kind(el):
 
 def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
     sf = ROOT / 'scen' / f'{scen}.py'
-    if sized:          # a weather extra: drawn at the layout's canvas size
-        tf = pathlib.Path(CHECK_PNG).with_name(f'{os.getpid()}_{bp}_{scen}.py')
-        tf.write_text(f"exec(open({str(sf)!r}).read())\nSIZE={SIZES[bp]}\n")
-        sf = tf
+    # every case is drawn at its layout's canvas size (a scenario has none of its own; a weather extra runs on several)
+    tf = pathlib.Path(CHECK_PNG).with_name(f'{os.getpid()}_{bp}_{scen}.py')
+    tf.write_text(f"exec(open({str(sf)!r}).read())\nSIZE={SIZES[bp]}\n")
+    sf = tf
     with contextlib.redirect_stdout(io.StringIO()):
         payload = harness.run(str(pathlib.Path(out_dir) / B[bp]), str(sf), CHECK_PNG)
     W, H = Image.open(CHECK_PNG).size

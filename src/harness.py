@@ -299,6 +299,17 @@ def render_value(env, tmpl, ctx):
     return tmpl
 
 
+def canvas_of(bp_path):
+    """the canvas of the blueprint's layout (lib/layouts.py): a scenario doesn't carry a size"""
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
+    from layouts import layouts
+    name = os.path.basename(bp_path)
+    for l in layouts():
+        if l['blueprint'] == name:
+            return l['canvas']
+    raise SystemExit(f'{name}: no layout draws this blueprint, and the scenario sets no SIZE')
+
+
 def run(bp_path, sc_path, out_png, choose_index=None):
     spec = importlib.util.spec_from_file_location('sc', sc_path)
     sc = importlib.util.module_from_spec(spec); spec.loader.exec_module(sc)
@@ -370,7 +381,7 @@ def run(bp_path, sc_path, out_png, choose_index=None):
                 if isinstance(e.get('value'), str):
                     e['value'] = e['value'].replace(m.group(1).upper(), sc.MASK_SET)
     from odl_renderer import generate_image
-    W, H = sc.SIZE
+    W, H = getattr(sc, 'SIZE', None) or canvas_of(bp_path)
     img = asyncio.run(generate_image(width=W, height=H, elements=payload, background=data.get('background', 'white'),
                                      accent_color=getattr(sc, 'ACCENT', 'red'), font_dirs=[os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fonts')]))
     img.save(out_png)

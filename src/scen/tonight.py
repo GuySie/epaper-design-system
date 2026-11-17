@@ -1,7 +1,6 @@
 import datetime as dt
 TZ = dt.timezone(dt.timedelta(hours=1))
 NOW = dt.datetime(2026, 8, 3, 20, 30, tzinfo=TZ)
-SIZE = (384, 184)
 ACCENT = 'red'
 cond = ['fog', 'fog', 'fog', 'fog', 'fog', 'clear-night', 'clear-night', 'clear-night']
 temps = [4, 4, 4, 3, 3, 2, 2, 2]

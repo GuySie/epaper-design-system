@@ -1,7 +1,6 @@
 import datetime as dt
 TZ = dt.timezone(dt.timedelta(hours=1))
 NOW = dt.datetime(2026, 2, 1, 14, 10, tzinfo=TZ)
-SIZE = (384, 184)
 STATES = {
  'sun.sun': {'state': 'above_horizon', 'attributes': {'azimuth': 210.0, 'elevation': 14.5,
    'next_dawn': '2026-02-02T06:38:00+00:00', 'next_rising': '2026-02-02T07:12:00+00:00', 'next_noon': '2026-02-02T11:28:00+00:00',

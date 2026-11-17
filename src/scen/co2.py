@@ -1,7 +1,6 @@
 import datetime as dt, math
 TZ = dt.timezone(dt.timedelta(hours=1))
 NOW = dt.datetime(2026, 8, 2, 20, 47, tzinfo=TZ)
-SIZE = (384, 184)
 E = 'sensor.studio_co2'
 AREAS = {E: 'Studio'}
 def series(hours=12, f=None, skip=()):

@@ -1,7 +1,6 @@
 import datetime as dt
 TZ = dt.timezone(dt.timedelta(hours=1))
 NOW = dt.datetime(2026, 8, 3, 8, 5, tzinfo=TZ)
-SIZE = (200, 200)
 MODELS = {'dev1': '1.4" BWRY'}
 def S(state, dc, name): return {'state': state, 'attributes': {'device_class': dc, 'friendly_name': name}}
 STATES = {

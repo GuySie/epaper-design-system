@@ -1,7 +1,6 @@
 import datetime as dt
 TZ = dt.timezone(dt.timedelta(hours=1))
 NOW = dt.datetime(2026, 8, 1, 10, 20, tzinfo=TZ)
-SIZE = (400, 300)
 STATES = {'calendar.home': {'state': 'on', 'attributes': {}}}
 def ev(d, s, e, t): return {'start': f'2026-08-0{d}T{s}:00+01:00', 'end': f'2026-08-0{d}T{e}:00+01:00', 'summary': t}
 CALENDAR_RESPONSE = {'calendar.home': {'events': [

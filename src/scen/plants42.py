@@ -1,7 +1,6 @@
 import datetime as dt
 TZ = dt.timezone(dt.timedelta(hours=1))
 NOW = dt.datetime(2026, 8, 1, 20, 45, tzinfo=TZ)
-SIZE = (400, 300)
 P = [('Basil', 9), ('Calathea', 14), ('Pilea', 21), ('Fern', 24), ('Monstera', 31), ('Ficus', 34), ('Kentia', 36),
      ('Sansevieria trifasciata', 38), ('Aloe vera', 39), ('Zamioculcas', 41), ('Hoya', 'unavailable'), ('Peperomia', 44), ('Olive tree', 45),
      ('Strelitzia', 47), ('Alocasia', 48), ('Pothos', 50), ('Philodendron', 52), ('Lemon tree', 53), ('Coffee plant', 55),

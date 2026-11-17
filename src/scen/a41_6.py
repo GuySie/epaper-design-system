@@ -1,7 +1,6 @@
 import datetime as dt
 TZ = dt.timezone(dt.timedelta(hours=1))
 NOW = dt.datetime(2026, 8, 3, 9, 40, tzinfo=TZ)
-SIZE = (400, 300)
 STATES = {'calendar.work': {'state': 'on', 'attributes': {}}}
 def ev(s, e, t): return {'start': s, 'end': e, 'summary': t}
 EV = [

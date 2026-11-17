@@ -7,4 +7,3 @@ CAL_NOW = NOW
 STATES, INPUTS, NOW = {**STATES, **_w}, {**INPUTS, **_wi}, _now
 if _m:
     MODELS = _m
-SIZE = (480, 800)
