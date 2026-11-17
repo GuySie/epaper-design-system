@@ -109,9 +109,8 @@ def write(tiers, lays, fits=None):
 
 
 def build(out, keys):
-    for cmd in (['lib/build_lib.py', out, keys], ['lib/generate.py', out], ['lib/inputs_std.py', out],
-                ['lib/shared.py', out], ['lib/vocab_apply.py', 'package', out]):
-        subprocess.run([sys.executable, *cmd], cwd=SRC, check=True, stdout=subprocess.DEVNULL)
+    import build as pipeline          # the one build (lib/build.py); the fit needs no set id
+    pipeline.build(out, keys, set_id=False)
 
 
 # sources that never reach a render or the fit: the document's tables, the reference tools, the case lists (a layout's

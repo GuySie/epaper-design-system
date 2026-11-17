@@ -139,11 +139,9 @@ def main():
 
     # build only this blueprint, then draw each scenario at the screen's canvas size
     pkg = tmp / 'pkg'
-    for cmd in (['lib/build_lib.py', str(pkg), name], ['lib/generate.py', str(pkg)], ['lib/inputs_std.py', str(pkg)],
-                ['lib/shared.py', str(pkg)], ['lib/vocab_apply.py', 'package', str(pkg)], ['lib/set_id.py', str(pkg)]):
-        r = subprocess.run([sys.executable, *cmd], cwd=T, env=env, capture_output=True, text=True)
-        if r.returncode:
-            sys.exit(f'building the mock-up failed at {cmd[0]}:\n{r.stdout[-1500:]}{r.stderr[-1500:]}')
+    r = subprocess.run([sys.executable, 'lib/build.py', str(pkg), name], cwd=T, env=env, capture_output=True, text=True)
+    if r.returncode:
+        sys.exit(f'building the mock-up failed:\n{r.stdout[-1500:]}{r.stderr[-2500:]}')
     os.environ.update(EP_ROOT=str(T), EP_CT=str(pkg / 'custom_templates'))
     import harness
     from PIL import Image, ImageDraw, ImageFont

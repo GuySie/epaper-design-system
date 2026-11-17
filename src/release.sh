@@ -15,13 +15,7 @@ T0=$SECONDS; TL=$SECONDS
 lap() { echo "[$1: $((SECONDS - TL)) s, total $((SECONDS - T0)) s]"; TL=$SECONDS; }   # how long each step takes
 KEYS=$(python3 lib/layouts.py)   # every layout, from the page definitions
 build() {   # build DIR: the whole package, from the sources
-  mkdir -p "$1"
-  python3 lib/build_lib.py "$1" $KEYS >/dev/null
-  python3 lib/generate.py "$1" >/dev/null
-  python3 lib/inputs_std.py "$1" >/dev/null
-  python3 lib/shared.py "$1" >/dev/null
-  python3 lib/vocab_apply.py package "$1" >/dev/null
-  python3 lib/set_id.py "$1" >/dev/null       # the set id, last: a hash of the templates as built
+  python3 lib/build.py "$1" "$KEYS"           # templates, blueprints, input scheme, shared parts, vocabulary, set id
 }
 [ -e "$OUT" ] && mv "$OUT" "$TMP/previous-build"
 python3 lib/vocab_apply.py code >/dev/null
