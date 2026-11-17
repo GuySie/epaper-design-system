@@ -301,13 +301,11 @@ def c7_checks(payload, items, W, H):
 
 def _layouts(test):
     """the layouts (check keys) of the pages in registry.yaml that pass test(page definition, page's pattern)"""
-    import pageyaml
+    import pages
     from registry import load
-    root = pathlib.Path(__file__).parent
     out = []
     for page, v in load()['pages'].items():
-        f = root / 'pages' / f'{page}.yaml'
-        if v.get('blueprints') and f.exists() and test(pageyaml.load(open(f, encoding='utf-8')), v['uses']):
+        if v.get('blueprints') and page in pages.names() and test(pages.load(page), v['uses']):
             out += v['blueprints']
     return out
 

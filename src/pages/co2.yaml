@@ -41,7 +41,8 @@ inputs:
 - name: flag_co2
   section: thresholds
   label: 'CO2: flag it'
-  help: Off, nothing is flagged and the graph shows no threshold lines. The severe value below still sets the height of the graph.
+  help: Off, nothing is flagged and the graph shows no threshold lines. The severe value below still sets the height of the
+    graph.
   selector:
     boolean: {}
   default: true

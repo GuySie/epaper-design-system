@@ -36,8 +36,8 @@ bind:
 - days_ahead
 data:
   variables:
-  - text_strip_pattern: '[^ -ɏ‐-‧‰-※€™]'
-  - header_title_display: '{{ header_title if header_title else language_map[weekday_lang][''default_title''] }}'
+  - include: event_text_pattern
+  - include: default_title
   draw:
     kind: choose
     when:
@@ -87,9 +87,9 @@ texts:
     weekdays: weekdays
     months: months
   en:
-    until: "until"
-    free_until: "free until"
-    free_from: "free from"
+    until: until
+    free_until: free until
+    free_from: free from
     today: Today
     tomorrow: Tomorrow
     now_label: Now
@@ -97,9 +97,9 @@ texts:
     no_calendars: No calendar chosen
     default_title: Next Appointment
   de:
-    until: "bis"
-    free_until: "frei bis"
-    free_from: "frei ab"
+    until: bis
+    free_until: frei bis
+    free_from: frei ab
     today: Heute
     tomorrow: Morgen
     now_label: Jetzt
@@ -107,9 +107,9 @@ texts:
     no_calendars: Kein Kalender ausgewählt
     default_title: Nächster Termin
   nl:
-    until: "tot"
-    free_until: "vrij tot"
-    free_from: "vrij vanaf"
+    until: tot
+    free_until: vrij tot
+    free_from: vrij vanaf
     today: Vandaag
     tomorrow: Morgen
     now_label: Nu
@@ -117,9 +117,9 @@ texts:
     no_calendars: Geen agenda gekozen
     default_title: Volgende Afspraak
   fr:
-    until: "jusqu'à"
-    free_until: "libre jusqu'à"
-    free_from: "libre dès"
+    until: jusqu'à
+    free_until: libre jusqu'à
+    free_from: libre dès
     today: Aujourd'hui
     tomorrow: Demain
     now_label: En cours
@@ -127,9 +127,9 @@ texts:
     no_calendars: Aucun calendrier choisi
     default_title: Prochain Rendez-vous
   es:
-    until: "hasta"
-    free_until: "libre hasta"
-    free_from: "libre desde"
+    until: hasta
+    free_until: libre hasta
+    free_from: libre desde
     today: Hoy
     tomorrow: Mañana
     now_label: Ahora
@@ -137,9 +137,9 @@ texts:
     no_calendars: Ningún calendario elegido
     default_title: Próxima Cita
   pl:
-    until: "do"
-    free_until: "wolne do"
-    free_from: "wolne od"
+    until: do
+    free_until: wolne do
+    free_from: wolne od
     today: Dziś
     tomorrow: Jutro
     now_label: Teraz
@@ -147,9 +147,9 @@ texts:
     no_calendars: Nie wybrano kalendarza
     default_title: Następne Spotkanie
   hr:
-    until: "do"
-    free_until: "slobodno do"
-    free_from: "slobodno od"
+    until: do
+    free_until: slobodno do
+    free_from: slobodno od
     today: Danas
     tomorrow: Sutra
     now_label: Sada
@@ -157,9 +157,9 @@ texts:
     no_calendars: Nije odabran kalendar
     default_title: Sljedeći Sastanak
   sv:
-    until: "till"
-    free_until: "ledig till"
-    free_from: "ledig från"
+    until: till
+    free_until: ledig till
+    free_from: ledig från
     today: Idag
     tomorrow: Imorgon
     now_label: Nu

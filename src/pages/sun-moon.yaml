@@ -63,11 +63,11 @@ data:
   variables:
   - moon_phase_entity: '{{ moon_phase_sensor if (moon_phase_sensor | default('''') | trim != '''') else ((integration_entities(''moon'')
       | first) | default(''notfound'')) }}'
-  - header_title_display: '{{ header_title if header_title else language_map[weekday_lang][''default_title''] }}'
+  - include: default_title
   - sun_available: '{{ states(''sun.sun'') not in [''unknown'', ''unavailable''] }}'
   - moon_position_available: '{{ (moon_azimuth_sensor | default('''') | trim != '''') and (moon_altitude_sensor | default('''')
-      | trim != '''') and states(moon_azimuth_sensor) not in [''unknown'', ''unavailable''] and states(moon_altitude_sensor) not
-      in [''unknown'', ''unavailable''] }}'
+      | trim != '''') and states(moon_azimuth_sensor) not in [''unknown'', ''unavailable''] and states(moon_altitude_sensor)
+      not in [''unknown'', ''unavailable''] }}'
   - moon_phase_available: '{{ states(moon_phase_entity) not in [''unknown'', ''unavailable''] }}'
   - moon_icon: |-
       {% set moon_phase = states(moon_phase_entity) %} {% if moon_phase == 'new_moon' %}

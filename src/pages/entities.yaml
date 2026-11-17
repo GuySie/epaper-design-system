@@ -236,7 +236,7 @@ data:
           }] %}
         {% endif %}
       {% endfor %} {{ ns.list }}
-  - header_title_display: '{{ header_title if header_title else language_map[weekday_lang][''default_title''] }}'
+  - include: default_title
   - ds_unavail_msg: |-
       {{ {'en': 'Most values unavailable.', 'de': 'Die meisten Werte nicht verfügbar.', 'nl': 'Meeste waarden niet beschikbaar.',
           'fr': 'La plupart des valeurs indisponibles.', 'es': 'La mayoría de los valores no disponibles.',

@@ -221,7 +221,7 @@ bind:
 - bar_4_period_hours
 data:
   variables:
-  - header_title_display: '{{ header_title if header_title else language_map[weekday_lang][''default_title''] }}'
+  - include: default_title
   - bars: |
       {% set ns = namespace(list=[]) %} {% set lang = language_map[weekday_lang] %} {% set slots = [
         {'entity': bar_1, 'label': bar_1_label, 'reset_entity': bar_1_reset, 'period_hours': bar_1_period_hours},

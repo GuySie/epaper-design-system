@@ -58,7 +58,8 @@ data:
   - ds_date: '{% set t = as_local(as_datetime(ds_press_ts | float(0))) %}{{ weekday_short_map[weekday_lang][t.weekday()] }}
       {{ t.day }} {{ months_short_map[weekday_lang][t.month - 1] }}'
   - ds_overdue_k: '{% set h = (as_timestamp(now()) - (ds_press_ts | float(0))) / 3600 %} {% set w, sv = warning_late | float(0),
-      severe_late | float(0) %} {% set on = flag_late | default(true) %} {{ ''sev'' if (on and h >= sv) else (''warn'' if (on and h >= w) else '''') }}'
+      severe_late | float(0) %} {% set on = flag_late | default(true) %} {{ ''sev'' if (on and h >= sv) else (''warn'' if
+      (on and h >= w) else '''') }}'
   steps:
   - condition: template
     value_template: '{{ trigger.id != ''press'' or trigger.to_state.attributes.get(''event_type'') in [''button_down'', ''button_up'']
@@ -79,12 +80,12 @@ data:
   triggers:
   - trigger: template
     id: overdue
-    value_template: '{{ ds_flag_late and states(ds_btn_t) not in [''unknown'', ''unavailable''] and as_timestamp(now())
-      - as_timestamp(states(ds_btn_t), 0) >= (ds_warn_h | float(0)) * 3600 }}'
+    value_template: '{{ ds_flag_late and states(ds_btn_t) not in [''unknown'', ''unavailable''] and as_timestamp(now()) -
+      as_timestamp(states(ds_btn_t), 0) >= (ds_warn_h | float(0)) * 3600 }}'
   - trigger: template
     id: overdue
-    value_template: '{{ ds_flag_late and states(ds_btn_t) not in [''unknown'', ''unavailable''] and as_timestamp(now())
-      - as_timestamp(states(ds_btn_t), 0) >= (ds_sev_h | float(0)) * 3600 }}'
+    value_template: '{{ ds_flag_late and states(ds_btn_t) not in [''unknown'', ''unavailable''] and as_timestamp(now()) -
+      as_timestamp(states(ds_btn_t), 0) >= (ds_sev_h | float(0)) * 3600 }}'
   - trigger: homeassistant
     event: start
     id: redraw
@@ -107,36 +108,36 @@ texts:
     weekdays: weekdays
     months: months
   en:
-    overdue: "Overdue"
-    missed: "Missed"
+    overdue: Overdue
+    missed: Missed
     default_title: Medication
   de:
-    overdue: "Überfällig"
-    missed: "Verpasst"
+    overdue: Überfällig
+    missed: Verpasst
     default_title: Medikament
   nl:
-    overdue: "Te laat"
-    missed: "Gemist"
+    overdue: Te laat
+    missed: Gemist
     default_title: Medicatie
   fr:
-    overdue: "En retard"
-    missed: "Oublié"
+    overdue: En retard
+    missed: Oublié
     default_title: Médicament
   es:
-    overdue: "Atrasado"
-    missed: "Olvidado"
+    overdue: Atrasado
+    missed: Olvidado
     default_title: Medicación
   pl:
-    overdue: "Spóźnione"
-    missed: "Pominięte"
+    overdue: Spóźnione
+    missed: Pominięte
     default_title: Lek
   hr:
-    overdue: "Kasni"
-    missed: "Propušteno"
+    overdue: Kasni
+    missed: Propušteno
     default_title: Lijek
   sv:
-    overdue: "Försenad"
-    missed: "Missad"
+    overdue: Försenad
+    missed: Missad
     default_title: Medicin
 layouts:
   27l:

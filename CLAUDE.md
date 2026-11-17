@@ -48,6 +48,7 @@ The design system is prescriptive: the document says what is drawn, the code fol
 
 - `blueprints/` and `custom_templates/` are **generated**. Never edit them; change `src/` and run `src/release.sh`.
 - A blueprint = its page definition (`src/pages/<page>.yaml`) + the layout for its screen (`src/specs/<layout>.py`) + the shared parts (`src/pages/_shared.yaml`, `src/lib/shared.py`). `src/lib/generate.py` writes it.
+- What several page definitions share is written once, as a group in `src/pages/_shared.yaml` (`groups`: the weather inputs and thresholds, the calendar texts, a few data templates). A page names it with `include: <group>`, as an item of a list or a key of a mapping. Every tool reads the page definitions through `src/lib/pages.py`, which resolves the groups and stops on a key a page definition doesn't have.
 - The macro files come from `src/ds_macros.jinja` (drawing kit, pattern macros), `src/lib/ep_tokens.jinja` (tokens per screen tier), the specs, `src/wx_steps.yaml`/`src/wx_txt.yaml` (weather), and the page texts. `src/lib/build_lib.py` writes them.
 - `src/registry.yaml` is the index of patterns, pages, components, modules and terms. `python3 lib/registry.py write ../docs/design-system.md build` regenerates the tables between `registry` markers in the design system; `... lint ...` must report 0 problems.
 - `docs/design-system.md` is edited directly, except its values: those are generated (see *Ground rules*).

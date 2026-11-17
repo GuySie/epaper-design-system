@@ -519,7 +519,7 @@ data:
           }] %}
         {% endif %}
       {% endfor %} {{ ns.list }}
-  - header_title_display: '{{ header_title if header_title else language_map[weekday_lang][''default_title''] }}'
+  - include: default_title
   - ds_plants: |
       {% set ok = plants | selectattr('ok') | list %} {% set bad = plants | rejectattr('ok') | list %} {{ ((ok | sort(attribute='pct')) + bad) if sort_driest_first else plants }}
   draw:
