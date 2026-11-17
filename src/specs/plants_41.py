@@ -1,8 +1,9 @@
+from _defaults import default
 PAYLOAD_MAIN = r'''
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
-{%- set sev = severe_moisture_low | int(14) -%}
-{%- set warn = warning_moisture_low | int(25) -%}
+{%- set sev = severe_moisture_low | int(''' + str(default('plants', 'severe_moisture_low')) + r''') -%}
+{%- set warn = warning_moisture_low | int(''' + str(default('plants', 'warning_moisture_low')) + r''') -%}
 {#- the switch (*Thresholds*): off, no plant is flagged -#}
 {%- if not (flag_moisture_low | default(true)) -%}{%- set sev, warn = -1, -1 -%}{%- endif -%}
 {%- set it = namespace(l=[]) -%}

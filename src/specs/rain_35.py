@@ -1,3 +1,4 @@
+from _defaults import default
 BARS, TICK_EVERY = 24, 6     # 5-minute bars over two hours; a tick every 30 minutes (*Style choices*, Axis ticks)
 SCALE_TOP = 50               # mm/h: the top of the logarithmic scale, violent rain (*Chart frame (all charts)*, *Fixed y-scale*)
 # the page's data follows the chart: as many 5-minute buckets as bars, each scaled against the same top
@@ -8,8 +9,8 @@ PAYLOAD_MAIN = r'''
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set h12 = time_format != '24h' -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
-{%- set warn = warning_rain_hour | float(2.5) -%}
-{%- set sev = severe_rain_hour | float(10) -%}
+{%- set warn = warning_rain_hour | float(''' + str(default('rain', 'warning_rain_hour')) + r''') -%}
+{%- set sev = severe_rain_hour | float(''' + str(default('rain', 'severe_rain_hour')) + r''') -%}
 {#- the switch off: no bar is flagged, no threshold is drawn, the footer states the rain without a chip -#}
 {%- set flag = flag_rain_hour | default(true) -%}
 {#- the bars, the threshold lines with their labels, and the footer's conclusion in clock times -#}

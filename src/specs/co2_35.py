@@ -1,9 +1,10 @@
+from _defaults import default
 SCALE_FROM = 400        # ppm: outdoor air, which indoor air rarely goes below (*Chart frame (all charts)*, *Fixed y-scale*)
 PAYLOAD_MAIN = r'''
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set h12 = time_format != '24h' -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
-{%- set warn, sev = warning_co2 | float(1000), severe_co2 | float(1400) -%}
+{%- set warn, sev = warning_co2 | float(''' + str(default('co2', 'warning_co2')) + r'''), severe_co2 | float(''' + str(default('co2', 'severe_co2')) + r''') -%}
 {#- scale, set by the CO2 page: from outdoor air (SCALE_FROM) up to EP_CHART.top x the severe value -#}
 {%- set lo = ''' + str(SCALE_FROM) + r''' -%}
 {%- set hi = [sev * EP_CHART.top, lo + 100] | max -%}
