@@ -2,7 +2,8 @@
 
   names()      every page, by file name, in order
   load(page)   a page definition as data: its `include: <group>` entries replaced by the group they name
-               (pages/_shared.yaml, `groups`), its keys checked
+               (pages/_shared.yaml, `groups`), its `repeat` entries written out (a list item `repeat: {from, to,
+               items}` stands for its items once per number, `{n}` replaced by the number), its keys checked
   shared()     pages/_shared.yaml
 
 Every tool reads the page definitions through here, so a key a page may have is listed once (KEYS) and a misspelt one
@@ -28,6 +29,17 @@ def _read(name):
     return pageyaml.load((PAGES / f'{name}.yaml').read_text(encoding='utf-8'))
 
 
+def _numbered(node, n):
+    """a repeat's items for one number: `{n}` replaced in every text"""
+    if isinstance(node, str):
+        return node.replace('{n}', str(n))
+    if isinstance(node, list):
+        return [_numbered(x, n) for x in node]
+    if isinstance(node, dict):
+        return type(node)((_numbered(k, n), _numbered(v, n)) for k, v in node.items())
+    return node
+
+
 def _expand(node, groups, page):
     """`include: <group>` resolved: as a list item the group's items take its place, as a mapping key the group's keys do"""
     import pageyaml
@@ -42,6 +54,10 @@ def _expand(node, groups, page):
         for x in node:
             if isinstance(x, dict) and list(x) == ['include']:
                 out.extend(_expand(group(x['include'], list), groups, page))
+            elif isinstance(x, dict) and list(x) == ['repeat']:
+                r = x['repeat']
+                for n in range(int(r['from']), int(r['to']) + 1):
+                    out.extend(_expand(_numbered(r['items'], n), groups, page))
             else:
                 out.append(_expand(x, groups, page))
         return out
