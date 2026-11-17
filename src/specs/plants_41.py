@@ -1,6 +1,6 @@
 PAYLOAD_MAIN = r'''
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{%- set right = (ds_last_ts | float(0)) if ds_stale else as_timestamp(now()) -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
 {%- set sev = severe_moisture_low | int(14) -%}
 {%- set warn = warning_moisture_low | int(25) -%}
 {#- the switch (*Thresholds*): off, no plant is flagged -#}

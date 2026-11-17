@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'nldrls' -%}
+{%- set EP_SET = 'boseaa' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -921,6 +921,8 @@
 {{- R(ns, P - sx, y0, W - P - 1 + sx, y1 - 1, color.severe) -}}
 {%- set ns.el = ns.el + [{'type': 'text', 'value': (msg | string | upper), 'x': (W // 2), 'y': ((y0 + y1) // 2), 'font': FONT[tt[0]], 'size': tt[1], 'color': color.onSevere, 'anchor': 'mm', 'align': 'center', 'max_width': (W - 2 * P - 2 * sx), 'spacing': sx}] -%}
 {%- endmacro -%}
+{#- STAMP_AT: the time the update stamp shows: this redraw's, or the newest data's while the data is stale (*Title row*) -#}
+{%- macro STAMP_AT(last, stale) -%}{{ (last | float(0)) if stale else as_timestamp(now()) }}{%- endmacro -%}
 {#- ERRPAGE: a page in its Error state: the title row with the time of this redraw (there is no data whose time to show)
      and the error block under it -#}
 {%- macro ERRPAGE(ns, title, msg) -%}
@@ -1858,8 +1860,7 @@
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{%- set fmt = '%H:%M' if time_format == '24h' else '%-I:%M' -%}
-{%- set right = (ds_last_ts | float(0)) if ds_stale else as_timestamp(now()) -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
 {%- set n = bars | length -%}
 {#- drop the words every bar label shares, so the part that differs is visible -#}
 {%- set labs = bars | map(attribute='label') | map('string') | list -%}
@@ -1904,7 +1905,7 @@
 {%- set language_map = c.language_map -%}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set h12 = time_format != '24h' -%}
-{%- set right = (ds_last_ts | float(0)) if ds_stale else as_timestamp(now()) -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
 {%- set warn, sev = warning_co2 | float(1000), severe_co2 | float(1400) -%}
 {#- scale, set by the CO2 page: from outdoor air (SCALE_FROM) up to EP_CHART.top x the severe value -#}
 {%- set lo = 400 -%}
@@ -1963,7 +1964,7 @@
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{%- set right = (ds_last_ts | float(0)) if ds_stale else as_timestamp(now()) -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
 {#- pattern 'Key-value list': one column with lines while every row fits, else two columns of equal length; the error state when most values are unavailable -#}
 {%- set it = namespace(l=[]) -%}{%- for r in ds_rows -%}{%- set it.l = it.l + [[r.label, r.value, none]] -%}{%- endfor -%}
 {{- KVPAGE(ns, header_title_display, right, it.l, ds_stale, ds_rows | rejectattr('ok') | list | length, ds_unavail_msg) -}}
@@ -2004,7 +2005,7 @@
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{%- set right = (ds_last_ts | float(0)) if ds_stale else as_timestamp(now()) -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
 {%- set sev = severe_moisture_low | int(14) -%}
 {%- set warn = warning_moisture_low | int(25) -%}
 {#- the switch (*Thresholds*): off, no plant is flagged -#}
@@ -2049,7 +2050,7 @@
 {#- the rain chart fills its tier's canvas: 384 x 184 (3.5"), or 384 x 168 on the 2.7" (specs/rain_27l.py) -#}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set h12 = time_format != '24h' -%}
-{%- set right = (ds_last_ts | float(0)) if ds_stale else as_timestamp(now()) -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
 {%- set warn = warning_rain_hour | float(2.5) -%}
 {%- set sev = severe_rain_hour | float(10) -%}
 {#- the switch off: no bar is flagged, no threshold is drawn, the footer states the rain without a chip -#}
@@ -2095,7 +2096,7 @@
 {#- the rain chart fills its tier's canvas: 384 x 184 (3.5"), or 384 x 168 on the 2.7" (specs/rain_27l.py) -#}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set h12 = time_format != '24h' -%}
-{%- set right = (ds_last_ts | float(0)) if ds_stale else as_timestamp(now()) -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
 {%- set warn = warning_rain_hour | float(2.5) -%}
 {%- set sev = severe_rain_hour | float(10) -%}
 {#- the switch off: no bar is flagged, no threshold is drawn, the footer states the rain without a chip -#}

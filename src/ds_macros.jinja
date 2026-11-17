@@ -614,6 +614,8 @@
 {{- R(ns, P - sx, y0, W - P - 1 + sx, y1 - 1, color.severe) -}}
 {%- set ns.el = ns.el + [{'type': 'text', 'value': (msg | string | upper), 'x': (W // 2), 'y': ((y0 + y1) // 2), 'font': FONT[tt[0]], 'size': tt[1], 'color': color.onSevere, 'anchor': 'mm', 'align': 'center', 'max_width': (W - 2 * P - 2 * sx), 'spacing': sx}] -%}
 {%- endmacro -%}
+{#- STAMP_AT: the time the update stamp shows: this redraw's, or the newest data's while the data is stale (*Title row*) -#}
+{%- macro STAMP_AT(last, stale) -%}{{ (last | float(0)) if stale else as_timestamp(now()) }}{%- endmacro -%}
 {#- ERRPAGE: a page in its Error state: the title row with the time of this redraw (there is no data whose time to show)
      and the error block under it -#}
 {%- macro ERRPAGE(ns, title, msg) -%}

@@ -4,7 +4,7 @@ PAYLOAD_MAIN = r'''
 {#- the rain chart fills its tier's canvas: 384 x 184 (3.5"), or 384 x 168 on the 2.7" (specs/rain_27l.py) -#}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set h12 = time_format != '24h' -%}
-{%- set right = (ds_last_ts | float(0)) if ds_stale else as_timestamp(now()) -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
 {%- set warn = warning_rain_hour | float(2.5) -%}
 {%- set sev = severe_rain_hour | float(10) -%}
 {#- the switch off: no bar is flagged, no threshold is drawn, the footer states the rain without a chip -#}

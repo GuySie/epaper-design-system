@@ -2,7 +2,7 @@ SCALE_FROM = 400        # ppm: outdoor air, which indoor air rarely goes below (
 PAYLOAD_MAIN = r'''
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set h12 = time_format != '24h' -%}
-{%- set right = (ds_last_ts | float(0)) if ds_stale else as_timestamp(now()) -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
 {%- set warn, sev = warning_co2 | float(1000), severe_co2 | float(1400) -%}
 {#- scale, set by the CO2 page: from outdoor air (SCALE_FROM) up to EP_CHART.top x the severe value -#}
 {%- set lo = ''' + str(SCALE_FROM) + r''' -%}

@@ -1,7 +1,6 @@
 PAYLOAD_MAIN = r'''
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{%- set fmt = '%H:%M' if time_format == '24h' else '%-I:%M' -%}
-{%- set right = (ds_last_ts | float(0)) if ds_stale else as_timestamp(now()) -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
 {%- set n = bars | length -%}
 {#- drop the words every bar label shares, so the part that differs is visible -#}
 {%- set labs = bars | map(attribute='label') | map('string') | list -%}
