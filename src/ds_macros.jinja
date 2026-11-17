@@ -247,24 +247,28 @@
 {%- endmacro -%}
 {#- Chart frame (module 'Chart'), shared by the line and bar charts. The parts are drawn in the
      layout's own order, so a chart decides what lies on top (fills under thresholds, bars over them).
-     CFRAME  sets the plot geometry on a namespace: x0 (left, on the padding), xr (right edge of the label
-             margin, W - P - 1), w (plot width left of a label margin of lw + space.s), top (title row + M
-             + inset), base (the baseline: above the axis labels and the footer), ph. The chart sets cf.xe
-             (its last plot column) once it knows its own grid.
+     CFRAME  sets the plot geometry on a namespace, inside the box the chart is given (x0 to x1, y0 to y1: its
+             first and last column and row): x0, xr (the right edge of the label margin, x1), w (the plot's
+             width left of a label margin of lw + space.s), top (y0, lower by half a label's cap height when a
+             value label sits on the top line), base (the baseline, space.axis above y1: the axis band is
+             under it), ph. The chart sets cf.xe (its last plot column) once it knows its own grid.
      CTHRESH a threshold: 1 px line dashed line.dash across the plot (line=false: label only), the value
              in the margin in type.label, right-aligned to the padding
      CBASE   the baseline, line.base
      CAXIS   axis under a baseline: ticks = [[x, text, anchor], ...]; a line.tick tick under the baseline and
              the text in type.label space.s below it (an empty text draws the tick only) -#}
-{%- macro CFRAME(cf, W, H, P, TH, lw, toplabel=false) -%}
-{%- set cf.x0 = P -%}{%- set cf.xr = W - P - 1 -%}
-{%- set cf.w = W - 2 * P - lw - (SPACE_S(EP_TK.type.label[1]) | int) -%}
+{%- macro CFRAME(cf, x0, x1, y0, y1, lw, toplabel=false) -%}
+{%- set cf.x0 = x0 -%}{%- set cf.xr = x1 -%}
+{%- set cf.w = x1 + 1 - x0 - lw - (SPACE_S(EP_TK.type.label[1]) | int) -%}
 {#- a value label centred on the plot's top line needs its upper half of cap height clear of M -#}
-{%- set cf.top = P + TH + (EP_TK.space.m) + (CAPUP[EP_TK.type.label[1]] if toplabel else 0) -%}
-{#- under the baseline: the axis band, M, the footer -#}
-{%- set cf.base = H - P - EP_TK.space.footer - (EP_TK.space.m) - EP_TK.space.axis - 1 -%}
+{%- set cf.top = y0 + (CAPUP[EP_TK.type.label[1]] if toplabel else 0) -%}
+{#- under the baseline: the axis band, down to the box's last row -#}
+{%- set cf.base = y1 - EP_TK.space.axis -%}
 {%- set cf.ph = cf.base - cf.top -%}
 {%- endmacro -%}
+{#- CHART_Y0, CHART_Y1: the first and last row of a chart that fills a page: M under the title line, down to M above the footer -#}
+{%- macro CHART_Y0() -%}{{ EP_TK.space.pad + EP_TK.space.titleRow + EP_TK.space.m }}{%- endmacro -%}
+{%- macro CHART_Y1() -%}{{ EP_TK.height - EP_TK.space.pad - EP_TK.space.footer - EP_TK.space.m - 1 }}{%- endmacro -%}
 {%- macro CTHRESH(ns, cf, txt, y, line=true) -%}
 {%- if line -%}{{- L(ns, cf.x0, y, cf.xe, y, EP_TK.line.base, color.ink, EP_TK.line.dash[0], EP_TK.line.dash[1]) -}}{%- endif -%}
 {{- T(ns, txt, cf.xr, y, FONT[EP_TK.type.label[0]], EP_TK.type.label[1], color.ink, 'rm') -}}
@@ -905,17 +909,17 @@
 {%- endfor -%}
 {%- if foot and foot_h > 0 -%}{{- FOOT(ns, foot, '', W, H, P, flevel) -}}{%- endif -%}
 {%- endmacro -%}
-{#- BARCHART: pattern 'Bar chart', the version with thresholds. n slots; bars = [{'i': slot, 'v': value, 'f': height as a
+{#- CHART_BARS: module 'Chart' as bars, inside the box x0 to x1, y0 to y1 (its first and last column and row). n slots; bars = [{'i': slot, 'v': value, 'f': height as a
      share of the plot, 'level': 'sev', 'warn' or ''}], only the bars with a value above zero are drawn; lines = [[value,
      label]] (warning, severe); cap: a logarithmic scale from 0 to cap (0: linear from 0 to hi). minbar: the smallest bar,
-     in line.base. ticks = [[slot, text]] and the end's text. foot = [left, right, level], or empty: the statement in the
-     plot when nothing is above zero (the thresholds and footer are left out then). flag=false (the reading's switch is
+     in line.base. ticks = [[slot, text]] and the end's text. empty: the statement in the
+     plot when nothing is above zero (the thresholds are left out then). BARCHART: pattern 'Bar chart', the version
+     with thresholds: the title row, the chart between it and the footer, and the footer (left out when nothing is
+     above zero); foot = [left, right, level]. flag=false (the reading's switch is
      off): no threshold line or value is drawn; the label margin keeps its width, so the plot doesn't move. -#}
-{%- macro BARCHART(ns, title, right, n, bars, lines, ticks, endtxt, foot, empty, stale=false, cap=0, hi=0, minbar=1, flag=true) -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, title, right, W, P, TH, stale) -}}
+{%- macro CHART_BARS(ns, x0, x1, y0, y1, n, bars, lines, ticks, endtxt, empty, cap=0, hi=0, minbar=1, flag=true) -%}
 {%- set lw = namespace(w=0) -%}{%- for v, l in lines -%}{%- set lw.w = [lw.w, VALUE_W(l, EP_TK.type.label[1], FONT[EP_TK.type.label[0]]) | int] | max -%}{%- endfor -%}
-{%- set cf = namespace() -%}{{- CFRAME(cf, W, H, P, TH, lw.w) -}}
+{%- set cf = namespace() -%}{{- CFRAME(cf, x0, x1, y0, y1, lw.w) -}}
 {%- set x0, top, base, ph = cf.x0, cf.top, cf.base, cf.ph -%}
 {%- set slot = cf.w // n -%}
 {%- set bw = slot - EP_TK.line.barGap -%}
@@ -943,21 +947,25 @@
 {%- set tk = namespace(l=[]) -%}
 {%- for i, t in ticks -%}{%- set tk.l = tk.l + [[x0 + i * slot, t, 'lm' if i == 0 else 'mm']] -%}{%- endfor -%}
 {{- CAXIS(ns, cf, tk.l + [[xe, endtxt, 'rm']]) -}}
-{%- if wet -%}{{- FOOT(ns, foot[0], foot[1], W, H, P, foot[2]) -}}
-{%- else -%}{{- EMPTY(ns, empty, x0, xe - 1, top, base) -}}{%- endif -%}
+{%- if not wet -%}{{- EMPTY(ns, empty, x0, xe - 1, top, base) -}}{%- endif -%}
 {%- endmacro -%}
-{#- LINECHART: pattern 'Line chart', the version with thresholds. pts = [{'ts', 'v': value, 'mx': the sample's maximum}],
-     t0 to t1 the time axis (h12: 12-hour labels, CLOCK), lo to hi the fixed y-scale, warn and sev the thresholds, gap: a longer step breaks the line.
-     Severity fills under the line, paper notches, the series, the current value as a square, the clock-time axis;
-     foot = [left, right, level]: the page's conclusion. flag=false (the reading's switch is off): no threshold line or
-     value and no fill; the scale, its top value and the label margin stay. -#}
-{%- macro LINECHART(ns, title, right, pts, t0, t1, lo, hi, warn, sev, gap, foot, h12, stale=false, flag=true) -%}
+{%- macro BARCHART(ns, title, right, n, bars, lines, ticks, endtxt, foot, empty, stale=false, cap=0, hi=0, minbar=1, flag=true) -%}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {{- TITLE(ns, title, right, W, P, TH, stale) -}}
+{{- CHART_BARS(ns, P, W - P - 1, CHART_Y0() | int, CHART_Y1() | int, n, bars, lines, ticks, endtxt, empty, cap, hi, minbar, flag) -}}
+{%- if (bars | selectattr('v', 'gt', 0) | list | length) > 0 -%}{{- FOOT(ns, foot[0], foot[1], W, H, P, foot[2]) -}}{%- endif -%}
+{%- endmacro -%}
+{#- CHART_LINE: module 'Chart' as a line, inside the box x0 to x1, y0 to y1. pts = [{'ts', 'v': value, 'mx': the sample's maximum}],
+     t0 to t1 the time axis (h12: 12-hour labels, CLOCK), lo to hi the fixed y-scale, warn and sev the thresholds, gap: a longer step breaks the line.
+     Severity fills under the line, paper notches, the series, the current value as a square, the clock-time axis;
+     LINECHART: pattern 'Line chart', the version with thresholds: the title row, the chart, the footer; foot = [left,
+     right, level]: the page's conclusion. flag=false (the reading's switch is off): no threshold line or
+     value and no fill; the scale, its top value and the label margin stay. -#}
+{%- macro CHART_LINE(ns, x0, x1, y0, y1, pts, t0, t1, lo, hi, warn, sev, gap, h12, flag=true) -%}
 {#- label margin sized to the widest label + S; labels right-aligned to the padding -#}
 {%- set labs = [hi, sev, warn] | map('round') | map('int') | map('string') | list -%}
 {%- set lw = namespace(w=0) -%}{%- for l in labs -%}{%- set lw.w = [lw.w, TEXT_W(l, EP_TK.type.label[1], FONT[EP_TK.type.label[0]]) | int] | max -%}{%- endfor -%}
-{%- set cf = namespace() -%}{{- CFRAME(cf, W, H, P, TH, lw.w, true) -}}
+{%- set cf = namespace() -%}{{- CFRAME(cf, x0, x1, y0, y1, lw.w, true) -}}
 {%- set x0, pw, top, base, ph = cf.x0, cf.w, cf.top, cf.base, cf.ph -%}
 {%- set xe = x0 + pw - 1 -%}{%- set cf.xe = xe -%}
 {%- macro ys(v) -%}{{ (base - ([[((v | float) - lo) / (hi - lo), 0] | max, 1] | min) * ph) | round | int }}{%- endmacro -%}
@@ -1031,6 +1039,11 @@
 {%- set tk.l = tk.l + [[xs(t) | int, CLOCK(t, h12, true), 'lm' if i == 0 else ('rm' if i == nt else 'mm')]] -%}
 {%- endfor -%}
 {{- CAXIS(ns, cf, tk.l) -}}
+{%- endmacro -%}
+{%- macro LINECHART(ns, title, right, pts, t0, t1, lo, hi, warn, sev, gap, foot, h12, stale=false, flag=true) -%}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{{- TITLE(ns, title, right, W, P, TH, stale) -}}
+{{- CHART_LINE(ns, P, W - P - 1, CHART_Y0() | int, CHART_Y1() | int, pts, t0, t1, lo, hi, warn, sev, gap, h12, flag) -}}
 {{- FOOT(ns, foot[0], foot[1], W, H, P, foot[2]) -}}
 {%- endmacro -%}
 {#- TIMELINE: pattern 'Timeline', the sun and moon on a compass axis. lat: the home's latitude; north: the northern

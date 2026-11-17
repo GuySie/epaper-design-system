@@ -175,7 +175,7 @@ modules:
   Event list:        {macros: [ELIST, EFREE]}
   Event hero:        {macros: [EHERO]}
   Meters:            {macros: []}
-  Chart:             {macros: [CFRAME, CTHRESH, CBASE, CAXIS]}
+  Chart:             {macros: [CHART_BARS, CHART_LINE, CFRAME, CTHRESH, CBASE, CAXIS]}
   Timeline:          {macros: [TMARK]}
   Checkbox rows:     {macros: []}
   Tiles:             {macros: []}

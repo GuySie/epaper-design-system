@@ -438,7 +438,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'efonpx'
+  ds_set: 'axanzh'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'
