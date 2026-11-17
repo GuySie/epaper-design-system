@@ -266,7 +266,8 @@
 {%- set cf.base = y1 - EP_TK.space.axis -%}
 {%- set cf.ph = cf.base - cf.top -%}
 {%- endmacro -%}
-{#- CHART_Y0, CHART_Y1: the first and last row of a chart that fills a page: M under the title line, down to M above the footer -#}
+{#- CHART_Y0, CHART_Y1: the first and last row of a module that fills a page between the title row and the footer (a
+     chart, the timeline): M under the title line, down to M above the footer -#}
 {%- macro CHART_Y0() -%}{{ EP_TK.space.pad + EP_TK.space.titleRow + EP_TK.space.m }}{%- endmacro -%}
 {%- macro CHART_Y1() -%}{{ EP_TK.height - EP_TK.space.pad - EP_TK.space.footer - EP_TK.space.m - 1 }}{%- endmacro -%}
 {%- macro CTHRESH(ns, cf, txt, y, line=true) -%}
@@ -865,16 +866,17 @@
 {%- if y0 + (shown - 1) * pitch + rih + foot_h <= H - P -%}{{- EFREE(ns, events, ft, today, W, H, P) -}}{%- endif -%}
 {%- endif -%}
 {%- endmacro -%}
-{#- METERS: pattern 'Meters'. bars = [{'label', 'percent', 'percent_text', 'marker_pct', 'is_severe', 'is_warning', 'rcap'}],
-     labels already shortened by the page, rcap the reset caption ('' for none). Fill before you float: up to 3 bars in
-     type.primary, more in type.data; order fill → footer → spread (bars L apart when everything still fits, else M).
-     reserve: the page has a footer to show (its room is kept even when foot is empty); foot, flevel: the conclusion. -#}
-{%- macro METERS(ns, title, right, bars, stale=false, reserve=false, foot='', flevel=none) -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, title, right, W, P, TH, stale) -}}
+{#- METER_ROWS: module 'Meters', inside the box x0 to x1, y0 to y1 (its first and last column and row). bars = [{'label',
+     'percent', 'percent_text', 'marker_pct', 'is_severe', 'is_warning', 'rcap'}], labels already shortened by the page, rcap
+     the reset caption ('' for none). Fill before you float: up to 3 bars in type.primary, more in type.data; order fill →
+     the room to keep → spread (bars L apart when everything still fits, else M). keep: rows to leave free under the bars
+     while they still fit (a page's footer); mt.kept says whether they were.
+     METERS: pattern 'Meters': the title row, the bars under it, the footer. reserve: the page has a footer to show (its
+     room is kept even when foot is empty); foot, flevel: the conclusion. -#}
+{%- macro METER_ROWS(ns, mt, x0, x1, y0, y1, bars, keep=0) -%}
 {%- set n = bars | length -%}
-{%- set top = P + TH + (EP_TK.space.m) -%}
-{%- set avail = H - P - top -%}
+{%- set top = y0 -%}
+{%- set avail = y1 + 1 - y0 -%}
 {%- set big = n <= 3 -%}
 {%- set tr, tb = (EP_PRIMARY[0], EP_PRIMARY[1]) if big else (EP_TK.type.data, EP_TK.type.data) -%}
 {%- set ts = tb[1] -%}
@@ -883,31 +885,38 @@
 {%- set th = cap - (SPACE_XS(ts) | int) -%}
 {%- set gap = SPACE_S(ts) | int -%}
 {%- set bh = cap + gap + th + (SPACE_XS(ts) | int) -%}
-{%- set fn = FNEED(P) | int -%}
-{%- set foot_h = fn if (reserve and (n * bh + (n - 1) * (EP_TK.space.m)) + fn <= avail) else 0 -%}
-{%- set g = P if (n * bh + (n - 1) * P + foot_h) <= avail else EP_TK.space.m -%}
+{#- the room kept free under the bars (a page's footer) only while the bars still fit M apart; then the bars spread to L -#}
+{%- set foot_h = keep if (keep and (n * bh + (n - 1) * (EP_TK.space.m)) + keep <= avail) else 0 -%}
+{%- set mt.kept = foot_h > 0 -%}
+{%- set g = EP_TK.space.l if (n * bh + (n - 1) * EP_TK.space.l + foot_h) <= avail else EP_TK.space.m -%}
 {#- the percentage column starts space.l after the widest label, leaving room for the widest percentage and reset caption -#}
 {%- set sl = EP_TK.space.l -%}
 {%- set lw = namespace(l=0, r=0) -%}
 {%- for b in bars -%}{%- set lw.l = [lw.l, VALUE_W(b.label, ts, FONT[tr[0]]) | int] | max -%}{%- endfor -%}
 {%- for b in bars -%}{%- set lw.r = [lw.r, VALUE_W(b.rcap, EP_TK.type.label[1], FONT[EP_TK.type.label[0]]) | int] | max -%}{%- endfor -%}
 {%- set pw = VALUE_W(color.severeMark ~ '100%', ts, FONT[tb[0]]) | int -%}
-{%- set px = P + [lw.l, W - 2 * P - pw - lw.r - 2 * sl] | min + sl -%}
+{%- set px = x0 + [lw.l, x1 + 1 - x0 - pw - lw.r - 2 * sl] | min + sl -%}
 {%- for b in bars -%}
 {%- set y = top + loop.index0 * (bh + g) -%}
 {%- set cy = TOPY(y, ts) | int -%}
-{{- T(ns, b.label, P, cy, FONT[tr[0]], ts, color.ink, 'lm', px - P - sl) -}}
+{{- T(ns, b.label, x0, cy, FONT[tr[0]], ts, color.ink, 'lm', px - x0 - sl) -}}
 {%- set ptxt = b.percent_text | replace('--', '—') -%}
 {%- set kind = 'sev' if b.is_severe else ('warn' if b.is_warning else '') -%}
 {%- set pf = FONT[tb[0]] -%}
 {%- if kind -%}{{- RCHIP(ns, (color.severeMark if kind == 'sev' else '') ~ ptxt, px + (VALUE_W((color.severeMark if kind == 'sev' else '') ~ ptxt, ts, pf) | int) - 2, cy, pf, ts, 0, 0, color.severe if kind == 'sev' else color.warningChip, color.onSevere if kind == 'sev' else color.onWarning) -}}
 {%- else -%}{{- T(ns, ptxt, px, cy, pf, ts, color.ink, 'lm') -}}{%- endif -%}
 {#- the reset caption sits on the bar label's baseline, as the stamp sits on the title's -#}
-{%- if b.rcap -%}{{- T(ns, b.rcap, W - P - 1, cy + CAPDN[ts] - CAPDN[EP_TK.type.label[1]], FONT[EP_TK.type.label[0]], EP_TK.type.label[1], color.ink, 'rm') -}}{%- endif -%}
+{%- if b.rcap -%}{{- T(ns, b.rcap, x1, cy + CAPDN[ts] - CAPDN[EP_TK.type.label[1]], FONT[EP_TK.type.label[0]], EP_TK.type.label[1], color.ink, 'rm') -}}{%- endif -%}
 {%- set fc = color.severe if kind == 'sev' else (color.warning if kind == 'warn' else color.ink) -%}
-{{- PBAR(ns, P, W - P - 1, y + cap + gap, th, b.percent, b.marker_pct, fc) -}}
+{{- PBAR(ns, x0, x1, y + cap + gap, th, b.percent, b.marker_pct, fc) -}}
 {%- endfor -%}
-{%- if foot and foot_h > 0 -%}{{- FOOT(ns, foot, '', W, H, P, flevel) -}}{%- endif -%}
+{%- endmacro -%}
+{%- macro METERS(ns, title, right, bars, stale=false, reserve=false, foot='', flevel=none) -%}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{{- TITLE(ns, title, right, W, P, TH, stale) -}}
+{%- set mt = namespace(kept=false) -%}
+{{- METER_ROWS(ns, mt, P, W - P - 1, P + TH + EP_TK.space.m, H - P - 1, bars, (FNEED(P) | int) if reserve else 0) -}}
+{%- if foot and mt.kept -%}{{- FOOT(ns, foot, '', W, H, P, flevel) -}}{%- endif -%}
 {%- endmacro -%}
 {#- CHART_BARS: module 'Chart' as bars, inside the box x0 to x1, y0 to y1 (its first and last column and row). n slots; bars = [{'i': slot, 'v': value, 'f': height as a
      share of the plot, 'level': 'sev', 'warn' or ''}], only the bars with a value above zero are drawn; lines = [[value,
@@ -1046,30 +1055,29 @@
 {{- CHART_LINE(ns, P, W - P - 1, CHART_Y0() | int, CHART_Y1() | int, pts, t0, t1, lo, hi, warn, sev, gap, h12, flag) -}}
 {{- FOOT(ns, foot[0], foot[1], W, H, P, foot[2]) -}}
 {%- endmacro -%}
-{#- TIMELINE: pattern 'Timeline', the sun and moon on a compass axis. lat: the home's latitude; north: the northern
+{#- TIMELINE_SKY: module 'Timeline', the sun and moon on a compass axis, inside the box xa to xb, ya to yb (its first and
+     last column and row). TIMELINE: pattern 'Timeline': the title row, that module between it and the footer, the footer. lat: the home's latitude; north: the northern
      hemisphere (the track centres south); sun_az, sun_el: the sun's position; moon: {'az', 'alt', 'icon'} or none;
      letters: the three compass letters along the track; times = [[label, clock time]] (five) under it; foot: the
      page's conclusion. The vertical rhythm, from the bottom up: the footer, M, the times, space.s, their labels, M, the
      compass row, the horizon; the sky takes what is left. -#}
-{%- macro TIMELINE(ns, title, right, lat, north, sun_az, sun_el, moon, letters, times, foot) -%}
-{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
-{{- TITLE(ns, title, right, W, P, TH) -}}
+{%- macro TIMELINE_SKY(ns, xa, xb, ya, yb, lat, north, sun_az, sun_el, moon, letters, times) -%}
 {%- set saz, sel = sun_az, sun_el -%}
 {#- the track ends half an inline icon inside the padding, so a marker at either end stays inside it -#}
-{%- set x0, x1 = P + EP_TK.icon.inline // 2, W - P - 1 - EP_TK.icon.inline // 2 -%}
+{%- set x0, x1 = xa + EP_TK.icon.inline // 2, xb - EP_TK.icon.inline // 2 -%}
 {%- set SEG = 64 -%}
-{#- vertical rhythm, from the bottom up (fill before you float: the sky takes what is left): the footer, M, the
+{#- vertical rhythm, from the box's last row up (fill before you float: the sky takes what is left): the
      five times (type.data), space.s, their labels (type.label), M, the compass row (space.axis), the horizon -#}
 {%- set M = EP_TK.space.m -%}
 {%- set lt, dt = EP_TK.type.label, EP_TK.type.data -%}
-{%- set dcy = H - P - EP_TK.space.footer - M - 1 - CAPDN[dt[1]] -%}
+{%- set dcy = yb - CAPDN[dt[1]] -%}
 {%- set lcy = dcy - CAPUP[dt[1]] - (SPACE_S(dt[1]) | int) - 1 - CAPDN[lt[1]] -%}
 {%- set hy = lcy - CAPUP[lt[1]] - M - EP_TK.space.axis - 1 -%}
 {%- set cf = namespace(base=hy) -%}{%- set ay = AXIS_Y(cf) | int -%}
 {#- vertical scale: the sky runs from M below the title line to the horizon; its top is the highest the sun can get at this
      latitude (90 - |lat| + 23.44 deg), so the summer noon sun reaches the top and the winter sun isn't flattened onto the line -#}
 {%- set emax = [90 - (lat | abs) + 23.44, 90] | min -%}
-{%- set sky_top = P + TH + (EP_TK.space.m) -%}
+{%- set sky_top = ya -%}
 {#- the highest marker, its paper disc and the icon's half stay clear of the sky top -#}
 {%- set scale = hy - (sky_top + EP_TK.icon.markerDisc + EP_TK.icon.inline // 2) -%}
 {#- azimuth -> x: a time track that runs left to right; north hemisphere centres south, south hemisphere centres north -#}
@@ -1094,7 +1102,7 @@
 {%- endif -%}
 {%- set below = ([sx] if sel < 0 else []) + ([mpos.x] if (mpos.x > -99 and not mpos.up) else []) -%}
 {#- horizon + compass ticks; a letter steps aside for a marker under the line -#}
-{{- L(ns, P, hy, W - P - 1, hy) -}}
+{{- L(ns, xa, hy, xb, hy) -}}
 {%- set tk = namespace(l=[]) -%}
 {%- for az in [90, 180, 270] -%}
 {%- set tx = (x0 + az / 360 * (x1 - x0)) | round | int -%}
@@ -1140,11 +1148,16 @@
 {{- TMARK(ns, moon.icon, mpos.x, (EY(mal) | int) if mpos.up else ay, mpos.up) -}}
 {%- endif -%}
 {#- the five times of the day under the timeline: label above, clock time below -#}
-{%- set cw = (W - 2 * P) / 5 -%}
+{%- set cw = (xb + 1 - xa) / 5 -%}
 {%- for lab, tv in times -%}
-{%- set cx = (P + cw * loop.index0 + cw / 2) | round | int -%}
+{%- set cx = (xa + cw * loop.index0 + cw / 2) | round | int -%}
 {{- T(ns, lab, cx, lcy, FONT[lt[0]], lt[1], color.ink, 'mm', cw - (SPACE_S(lt[1]) | int)) -}}
 {{- T(ns, tv, cx, dcy, FONT[dt[0]], dt[1], color.ink, 'mm') -}}
 {%- endfor -%}
+{%- endmacro -%}
+{%- macro TIMELINE(ns, title, right, lat, north, sun_az, sun_el, moon, letters, times, foot) -%}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{{- TITLE(ns, title, right, W, P, TH) -}}
+{{- TIMELINE_SKY(ns, P, W - P - 1, CHART_Y0() | int, CHART_Y1() | int, lat, north, sun_az, sun_el, moon, letters, times) -}}
 {{- FOOT(ns, foot, '', W, H, P) -}}
 {%- endmacro -%}
