@@ -1,0 +1,311 @@
+page: claude
+description:
+  shows: Claude usage as up to four progress bars, each with its reset time, and optionally a marker for how far through its
+    period you are.
+  needs:
+  - claude_usage
+  trigger_advice: A state trigger on one of the usage sensors, or a time pattern every 15 minutes.
+redraw: trigger
+stale:
+- bar_1
+- bar_2
+- bar_3
+- bar_4
+inputs:
+- name: bar_1
+  section: content
+  label: Bar 1 - sensor
+  help: Usage percentage sensor for the first bar (e.g. Session Usage)
+  selector:
+    entity:
+      filter:
+        domain: sensor
+        integration: hass_claude_usage
+  required: true
+- name: bar_1_reset
+  section: content
+  label: Bar 1 - reset time sensor
+  help: Optional. Only needed if the usage sensor doesn't carry its own "resets_at" attribute (e.g. Session/Week/Week Sonnet
+    Usage, which have a separate reset time sensor)
+  selector:
+    entity:
+      filter:
+        domain: sensor
+        integration: hass_claude_usage
+  default: ''
+- name: bar_2
+  section: content
+  label: Bar 2 - sensor
+  help: Usage percentage sensor for the second bar. Leave blank to disable this bar
+  selector:
+    entity:
+      filter:
+        domain: sensor
+        integration: hass_claude_usage
+  default: ''
+- name: bar_2_reset
+  section: content
+  label: Bar 2 - reset time sensor
+  help: Optional. Only needed if the usage sensor doesn't carry its own "resets_at" attribute
+  selector:
+    entity:
+      filter:
+        domain: sensor
+        integration: hass_claude_usage
+  default: ''
+- name: bar_3
+  section: content
+  label: Bar 3 - sensor
+  help: Usage percentage sensor for the third bar. Leave blank to disable this bar
+  selector:
+    entity:
+      filter:
+        domain: sensor
+        integration: hass_claude_usage
+  default: ''
+- name: bar_3_reset
+  section: content
+  label: Bar 3 - reset time sensor
+  help: Optional. Only needed if the usage sensor doesn't carry its own "resets_at" attribute
+  selector:
+    entity:
+      filter:
+        domain: sensor
+        integration: hass_claude_usage
+  default: ''
+- name: bar_4
+  section: content
+  label: Bar 4 - sensor
+  help: Usage percentage sensor for the fourth bar. Leave blank to disable this bar
+  selector:
+    entity:
+      filter:
+        domain: sensor
+        integration: hass_claude_usage
+  default: ''
+- name: bar_4_reset
+  section: content
+  label: Bar 4 - reset time sensor
+  help: Optional. Only needed if the usage sensor doesn't carry its own "resets_at" attribute
+  selector:
+    entity:
+      filter:
+        domain: sensor
+        integration: hass_claude_usage
+  default: ''
+- name: bar_1_label
+  section: content
+  label: Bar 1 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name
+  selector:
+    text: {}
+  default: ''
+- name: bar_1_period_hours
+  section: content
+  label: Bar 1 - period length (hours)
+  help: Optional. Set this to draw a marker on the bar showing how far through the period we currently are, to compare against
+    the usage fill (e.g. 5 for a rolling session, 168 for a 7-day week). Leave at 0 to disable
+  selector:
+    number:
+      min: 0
+      max: 999
+      unit_of_measurement: h
+      mode: box
+  default: 0
+- name: bar_2_label
+  section: content
+  label: Bar 2 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name
+  selector:
+    text: {}
+  default: ''
+- name: bar_2_period_hours
+  section: content
+  label: Bar 2 - period length (hours)
+  help: Optional. Set this to draw a marker on the bar showing how far through the period we currently are, to compare against
+    the usage fill (e.g. 5 for a rolling session, 168 for a 7-day week). Leave at 0 to disable
+  selector:
+    number:
+      min: 0
+      max: 999
+      unit_of_measurement: h
+      mode: box
+  default: 0
+- name: bar_3_label
+  section: content
+  label: Bar 3 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name
+  selector:
+    text: {}
+  default: ''
+- name: bar_3_period_hours
+  section: content
+  label: Bar 3 - period length (hours)
+  help: Optional. Set this to draw a marker on the bar showing how far through the period we currently are, to compare against
+    the usage fill (e.g. 5 for a rolling session, 168 for a 7-day week). Leave at 0 to disable
+  selector:
+    number:
+      min: 0
+      max: 999
+      unit_of_measurement: h
+      mode: box
+  default: 0
+- name: bar_4_label
+  section: content
+  label: Bar 4 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name
+  selector:
+    text: {}
+  default: ''
+- name: bar_4_period_hours
+  section: content
+  label: Bar 4 - period length (hours)
+  help: Optional. Set this to draw a marker on the bar showing how far through the period we currently are, to compare against
+    the usage fill (e.g. 5 for a rolling session, 168 for a 7-day week). Leave at 0 to disable
+  selector:
+    number:
+      min: 0
+      max: 999
+      unit_of_measurement: h
+      mode: box
+  default: 0
+- name: flag_usage
+  section: thresholds
+  label: 'Usage: flag it'
+  help: Off, no bar is flagged and the pace in the footer is plain text, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_usage
+  section: thresholds
+  label: Warning threshold
+  help: If a bar's usage is at or above this percentage, its fill and percentage chip switch to the warning colour (yellow
+    on a panel that has it, else black).
+  selector:
+    number:
+      min: 0
+      max: 100
+      unit_of_measurement: '%'
+      mode: box
+  default: 90
+- name: severe_usage
+  section: thresholds
+  label: Severe threshold
+  help: If a bar's usage is at or above this percentage, its fill and percentage chip switch to the severe colour.
+  selector:
+    number:
+      min: 0
+      max: 100
+      unit_of_measurement: '%'
+      mode: box
+  default: 100
+bind:
+- flag_usage
+- warning_usage
+- severe_usage
+- bar_1
+- bar_1_label
+- bar_1_reset
+- bar_1_period_hours
+- bar_2
+- bar_2_label
+- bar_2_reset
+- bar_2_period_hours
+- bar_3
+- bar_3_label
+- bar_3_reset
+- bar_3_period_hours
+- bar_4
+- bar_4_label
+- bar_4_reset
+- bar_4_period_hours
+data:
+  variables:
+  - header_title_display: '{{ header_title if header_title else language_map[weekday_lang][''default_title''] }}'
+  - bars: |
+      {% set ns = namespace(list=[]) %} {% set lang = language_map[weekday_lang] %} {% set slots = [
+        {'entity': bar_1, 'label': bar_1_label, 'reset_entity': bar_1_reset, 'period_hours': bar_1_period_hours},
+        {'entity': bar_2, 'label': bar_2_label, 'reset_entity': bar_2_reset, 'period_hours': bar_2_period_hours},
+        {'entity': bar_3, 'label': bar_3_label, 'reset_entity': bar_3_reset, 'period_hours': bar_3_period_hours},
+        {'entity': bar_4, 'label': bar_4_label, 'reset_entity': bar_4_reset, 'period_hours': bar_4_period_hours}
+      ] %} {% for slot in slots %}
+        {% if slot.entity and slot.entity != '' %}
+          {% set raw_state = states(slot.entity) %}
+          {% set has_value = raw_state not in ['unknown', 'unavailable', 'none', ''] %}
+          {% set pct_raw = (raw_state | float(0)) if has_value else 0 %}
+          {% set pct_raw = ([pct_raw, 0] | max) %}
+          {% set pct_raw = ([pct_raw, 100] | min) %}
+          {% set pct = pct_raw | round | int %}
+          {% set fname = entity_name(slot.entity) or device_name(slot.entity) or slot.entity %}
+          {% set label_text = slot.label if slot.label and slot.label != '' else (fname[:-6] if fname.endswith(' Usage') else fname) %}
+          {% set reset_raw = state_attr(slot.entity, 'resets_at') %}
+          {% if not reset_raw and slot.reset_entity and slot.reset_entity != '' %}
+            {% set reset_raw = states(slot.reset_entity) %}
+          {% endif %}
+          {% set marker_pct = none %}
+          {% if reset_raw and reset_raw not in ['unknown', 'unavailable', ''] %}
+            {% set reset_dt = as_datetime(reset_raw) | as_local %}
+            {% set reset_ts = as_timestamp(reset_dt) %}
+            {% if slot.period_hours and slot.period_hours > 0 %}
+              {% set seconds_remaining = ([(reset_dt - now()).total_seconds(), 0] | max) %}
+              {% set period_seconds = slot.period_hours * 3600 %}
+              {% set remaining_frac = ([seconds_remaining / period_seconds, 1] | min) %}
+              {% set marker_pct = ((1 - remaining_frac) * 100) | round | int %}
+            {% endif %}
+          {% else %}
+            {% set reset_ts = 0 %}
+          {% endif %}
+          {% set ns.list = ns.list + [{
+            'label': label_text,
+            'percent': pct,
+            'percent_text': ((pct | string) + '%') if has_value else '--',
+            'is_warning': (flag_usage | default(true)) and has_value and pct >= warning_usage,
+            'is_severe': (flag_usage | default(true)) and has_value and pct >= severe_usage,
+            'reset_ts': reset_ts,
+            'marker_pct': marker_pct
+          }] %}
+        {% endif %}
+      {% endfor %} {{ ns.list }}
+  draw:
+    kind: choose
+    when:
+    - '{{ bars | length > 0 }}'
+    steps: []
+texts:
+  en:
+    resets_prefix: Resets
+    no_bars: No Claude usage sensors configured.
+    default_title: Claude Usage
+  de:
+    resets_prefix: Reset
+    no_bars: Keine Claude-Nutzungssensoren konfiguriert.
+    default_title: Claude-Nutzung
+  nl:
+    resets_prefix: Reset
+    no_bars: Geen Claude-gebruikssensoren geconfigureerd.
+    default_title: Claude-gebruik
+  fr:
+    resets_prefix: Réinit.
+    no_bars: Aucun capteur d'utilisation Claude configuré.
+    default_title: Utilisation Claude
+  es:
+    resets_prefix: Reinicia
+    no_bars: No hay sensores de uso de Claude configurados.
+    default_title: Uso de Claude
+  pl:
+    resets_prefix: Reset
+    no_bars: Nie skonfigurowano czujników użycia Claude.
+    default_title: Użycie Claude
+  hr:
+    resets_prefix: Reset
+    no_bars: Nije konfiguriran nijedan senzor korištenja Claudea.
+    default_title: Korištenje Claudea
+  sv:
+    resets_prefix: Återställs
+    no_bars: Inga Claude-användningssensorer konfigurerade.
+    default_title: Claude-användning
+layouts:
+  '35':
+    spec: claude_35
+    defaults:
+      time_format: 12h

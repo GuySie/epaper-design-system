@@ -1,0 +1,123 @@
+page: sun-moon
+description:
+  shows: Today's dawn, sunrise, noon, sunset and dusk, with the sun (and optionally the moon) on a horizon track.
+  needs:
+  - sun
+  optional:
+  - moon
+  - lunar_phase
+  trigger_advice: A time pattern every 15 or 30 minutes.
+  based_on:
+  - name: sun-stand automation by sgmobiledev
+    url: https://github.com/sgmobiledev/OpenEpaperLinkHATagSources/blob/main/2.66-SoluM-epaper-devices/2.66-sun-stand.yaml
+redraw: trigger
+inputs:
+- name: moon_azimuth_sensor
+  section: content
+  label: Moon azimuth sensor
+  help: Optional sensor reporting the moon's azimuth in degrees, e.g. the "Moon Azimuth" sensor from the Lunar Phase integration.
+    Home Assistant's core Moon integration doesn't provide this. Leave blank to omit the moon from the horizon strip.
+  selector:
+    entity:
+      domain: sensor
+  default: ''
+- name: moon_altitude_sensor
+  section: content
+  label: Moon altitude sensor
+  help: Optional sensor reporting the moon's altitude (elevation) in degrees, e.g. the "Moon Altitude" sensor from the Lunar
+    Phase integration. Leave blank to omit the moon from the horizon strip.
+  selector:
+    entity:
+      domain: sensor
+  default: ''
+- name: moon_phase_sensor
+  section: content
+  label: Moon phase sensor
+  help: Optional moon phase sensor used to pick the moon icon. Leave blank to detect the Moon integration's sensor automatically
+    (its entity ID is translated, so it isn't always `sensor.moon_phase`). Set this to use a different sensor, such as the
+    Lunar Phase integration's "Moon Phase" sensor (its entity_id differs per configured location).
+  selector:
+    entity:
+      domain: sensor
+  default: ''
+- name: hemisphere
+  section: content
+  label: Hemisphere
+  help: Your hemisphere. At solar noon the sun sits due south (azimuth 180°) in the Northern Hemisphere but due north (azimuth
+    0°/360°) in the Southern Hemisphere. This is used to correctly center the sun/moon position on the horizon strip so it
+    sweeps left-to-right without jumping.
+  selector:
+    select:
+      options:
+      - label: Northern
+        value: northern
+      - label: Southern
+        value: southern
+  default: northern
+bind:
+- hemisphere
+- moon_azimuth_sensor
+- moon_altitude_sensor
+- moon_phase_sensor
+data:
+  variables:
+  - moon_phase_entity: '{{ moon_phase_sensor if (moon_phase_sensor | default('''') | trim != '''') else ((integration_entities(''moon'')
+      | first) | default(''notfound'')) }}'
+  - header_title_display: '{{ header_title if header_title else language_map[weekday_lang][''default_title''] }}'
+  - sun_available: '{{ states(''sun.sun'') not in [''unknown'', ''unavailable''] }}'
+  - moon_position_available: '{{ (moon_azimuth_sensor | default('''') | trim != '''') and (moon_altitude_sensor | default('''')
+      | trim != '''') and states(moon_azimuth_sensor) not in [''unknown'', ''unavailable''] and states(moon_altitude_sensor) not
+      in [''unknown'', ''unavailable''] }}'
+  - moon_phase_available: '{{ states(moon_phase_entity) not in [''unknown'', ''unavailable''] }}'
+  - moon_icon: |-
+      {% set moon_phase = states(moon_phase_entity) %} {% if moon_phase == 'new_moon' %}
+        moon-new
+      {% elif moon_phase == 'full_moon' %}
+        moon-full
+      {% else %}
+        {{ 'moon-' ~ moon_phase | replace('_', '-') }}
+      {% endif %}
+  - ds_txt: |
+      {% set m = {
+        "en": {"t": ["Dawn", "Rise", "Noon", "Set", "Dusk"], "c": ["E", "S", "W", "N"], "dl": "Day length"},
+        "de": {"t": ["Dämm.", "Auf", "Mittag", "Unter", "Dämm."], "c": ["O", "S", "W", "N"], "dl": "Tageslänge"},
+        "nl": {"t": ["Dageraad", "Op", "Middag", "Onder", "Schemer"], "c": ["O", "Z", "W", "N"], "dl": "Daglengte"},
+        "fr": {"t": ["Aube", "Lever", "Midi", "Coucher", "Crép."], "c": ["E", "S", "O", "N"], "dl": "Durée du jour"},
+        "es": {"t": ["Alba", "Salida", "Mediod.", "Puesta", "Ocaso"], "c": ["E", "S", "O", "N"], "dl": "Duración del día"},
+        "pl": {"t": ["Świt", "Wschód", "Połud.", "Zachód", "Zmierzch"], "c": ["W", "P", "Z", "P"], "dl": "Długość dnia"},
+        "hr": {"t": ["Zora", "Izlazak", "Podne", "Zalazak", "Sumrak"], "c": ["I", "J", "Z", "S"], "dl": "Duljina dana"},
+        "sv": {"t": ["Gryning", "Upp", "Middag", "Ned", "Skymning"], "c": ["Ö", "S", "V", "N"], "dl": "Dagslängd"}
+      } %} {{ m[weekday_lang] }}
+  draw:
+    kind: choose
+    when:
+    - '{{ sun_available }}'
+    steps: []
+texts:
+  en:
+    default_title: Sun & Moon
+    no_sun: Sun integration not available.
+  de:
+    default_title: Sonne & Mond
+    no_sun: Sonnen-Integration nicht verfügbar.
+  nl:
+    default_title: Zon & Maan
+    no_sun: Zon-integratie niet beschikbaar.
+  fr:
+    default_title: Soleil & Lune
+    no_sun: Intégration soleil non disponible.
+  es:
+    default_title: Sol y Luna
+    no_sun: Integración de sol no disponible.
+  pl:
+    default_title: Słońce i Księżyc
+    no_sun: Integracja słońca niedostępna.
+  hr:
+    default_title: Sunce i Mjesec
+    no_sun: Integracija sunca nije dostupna.
+  sv:
+    default_title: Sol & Måne
+    no_sun: Sol-integrationen är inte tillgänglig.
+layouts:
+  '35':
+    spec: sun_moon_35

@@ -1,0 +1,602 @@
+# Shared by every page definition: the shared inputs, the button flash, the weather drawing step, links, integrations, the day and month lists, the screens.
+inputs:
+  displays:
+    name: E-paper display(s)
+    description: The devices to draw on
+    selector:
+      device:
+        multiple: true
+        filter:
+          integration: opendisplay
+  automation_trigger:
+    name: Trigger
+    description: When to trigger the automation
+    selector:
+      trigger: null
+  automation_conditions:
+    name: Conditions
+    description: Optional conditions that must be met to run the automation
+    default: []
+    selector:
+      condition: null
+  header_title:
+    name: Header title
+    description: Text shown at the top-left of the display. Leave blank to use a translated default.
+    default: ''
+    selector:
+      text: {}
+  time_format:
+    name: Time format
+    description: Choose between 12-hour (AM/PM) or 24-hour format
+    default: 24h
+    selector:
+      select:
+        options:
+        - label: 12-hour (AM/PM)
+          value: 12h
+        - label: 24-hour
+          value: 24h
+  weekday_format:
+    name: Language
+    description: 'Language of the texts on the display: titles, day and month names, messages.'
+    default: en
+    selector:
+      select:
+        options:
+        - label: English
+          value: en
+        - label: German
+          value: de
+        - label: Dutch
+          value: nl
+        - label: French
+          value: fr
+        - label: Spanish
+          value: es
+        - label: Polish
+          value: pl
+        - label: Croatian
+          value: hr
+        - label: Swedish
+          value: sv
+  rotate:
+    name: Rotation
+    description: Display rotation in degrees. The default draws the layout upright on this screen.
+    default: '270'
+    selector:
+      select:
+        options:
+        - label: '0'
+          value: '0'
+        - label: '90'
+          value: '90'
+        - label: '180'
+          value: '180'
+        - label: '270'
+          value: '270'
+  stale_after:
+    name: Mark data as stale after
+    description: When the source hasn't reported data for this many minutes (even an unchanged value counts as a report),
+      the timestamp in the title row shows the time of the last update in a black chip with "!". 0 turns this off.
+    default: 60
+    selector:
+      number:
+        min: 0
+        max: 1440
+        unit_of_measurement: min
+        mode: box
+  led_color:
+    name: LED flash colour
+    description: Colour of the confirmation flash when the update was triggered by a device button press.
+    default:
+    - 0
+    - 255
+    - 0
+    selector:
+      color_rgb: {}
+  led_flash_delay:
+    name: LED flash interval
+    description: Time between the confirmation flashes.
+    default: 500
+    selector:
+      number:
+        min: 100
+        max: 1500
+        step: 100
+        unit_of_measurement: ms
+        mode: slider
+  font_dir:
+    name: Font folder (optional)
+    description: Leave empty when the design-system fonts (TRMNL12/16/21 Regular + Bold and SpaceGrotesk-Bold.ttf) are in
+      one of drawcustom's font folders (/config/www/fonts, /config/media/fonts or /media/fonts). Otherwise give an absolute
+      folder path ending in a slash, e.g. /config/fonts/
+    default: ''
+    selector:
+      text: {}
+  displays@button:
+    name: E-paper display
+    description: The ESL to update when the button is pressed.
+    selector:
+      device:
+        filter:
+          integration: opendisplay
+  button_entity:
+    name: Button
+    description: The physical button's event entity, e.g. `event.<your_device>_button_1`. Find it under the device in Settings
+      > Devices & services.
+    selector:
+      entity:
+        filter:
+          domain: event
+  led_color@button:
+    name: LED flash colour
+    description: Colour of the confirmation flash shown as soon as a press is registered.
+    default:
+    - 0
+    - 255
+    - 0
+    selector:
+      color_rgb: {}
+button_flash:
+  alias: 'Button feedback: flash the pressed device''s LED'
+  if:
+  - condition: template
+    value_template: |-
+      {{ trigger is defined and trigger.entity_id is defined and trigger.entity_id is string
+         and trigger.entity_id.startswith('event.') and device_id(trigger.entity_id) is not none }}
+  then:
+  - action: opendisplay.activate_led
+    continue_on_error: true
+    data:
+      device_id: '{{ device_id(trigger.entity_id) }}'
+      color1: !input 'led_color'
+      flash_count1: 2
+      loop_delay1: !input 'led_flash_delay'
+      brightness: 16
+      repeats: 1
+weather_payload: |-
+  {%- from 'ep_design.jinja' import ep_draw -%} {{- (ep_draw | as_function)('LAYOUT', 'main' if forecast_entity != 'unavailable' else 'error',
+        dict(ds_in, ds_set=ds_set, forecast_entity=forecast_entity, ds_fd=ds_fd | default({}), ds_fh=ds_fh | default({}))) -}}
+links:
+  repository:
+    name: E-paper design system repository
+    url: https://github.com/GuySie/epaper-design-system
+  design_system:
+    name: E-paper design system
+    url: https://github.com/GuySie/epaper-design-system/blob/main/docs/design-system.md
+  trmnl_fonts:
+    name: TRMNL font bundle
+    url: https://trmnl.com/font-family
+  space_grotesk:
+    name: Space Grotesk (Google Fonts)
+    url: https://fonts.google.com/specimen/Space+Grotesk
+  author:
+    name: Guy Sie
+    url: https://github.com/guysie
+fonts: '`TRMNL12-Regular.ttf`, `TRMNL12-Bold.ttf`, `TRMNL16-Regular.ttf`, `TRMNL16-Bold.ttf`, `TRMNL21-Regular.ttf` and `TRMNL21-Bold.ttf`
+  from the TRMNL font bundle (SIL OFL 1.1), and `SpaceGrotesk-Bold.ttf` (the static Bold file of Space Grotesk, SIL OFL 1.1).'
+button_advice: You can add a device's button to the trigger (an "Entity event received" trigger on its `event.*` entity, e.g.
+  `event.<your_device>_button_1`). A press then flashes that device's LED straight away, so you know it registered before
+  the ~30 second redraw. Time-based and other triggers don't flash. If the flash fails, the display is still updated.
+screens:
+  '14': 1.4" (200 x 200) devices. Black and white, or with red, yellow or both.
+  27l: 2.7" (384 x 168) devices held landscape. Black and white, or with red, yellow or both.
+  27p: 2.7" (168 x 384) devices held portrait. Black and white, or with red, yellow or both.
+  '35': 3.5" (384 x 184) devices. Black and white, or with red, yellow or both.
+  '41': 4.1" (400 x 300) devices. Black and white, or with red, yellow or both.
+  '426': The Seeed OpenDisplay 4.26" kit (800 x 480, 92.8 x 55.68 mm).
+  '75': 7.5" (800 x 480) devices. Black and white, grayscale, or with red, yellow or both.
+  75p: 7.5" (480 x 800) devices held portrait. Black and white, grayscale, or with red, yellow or both.
+integrations:
+  opendisplay:
+    name: OpenDisplay integration
+    url: https://github.com/OpenDisplay/Home_Assistant_Integration
+    min_version: v3.0.0-beta.8
+    what: installed and configured
+  neerslag_app:
+    name: Neerslag App integration
+    url: https://github.com/aex351/home-assistant-neerslag-app
+    what: Buienalarm and/or Buienradar, at least one of the two sources enabled
+  claude_usage:
+    name: Claude Usage integration
+    url: https://github.com/trickv/hass-claude-usage
+    what: from HACS, configured with your Anthropic account
+  weather:
+    name: a weather integration
+    url: https://www.home-assistant.io/integrations/#weather
+    what: any, e.g. Met.no
+  calendar:
+    name: a calendar integration
+    url: https://www.home-assistant.io/integrations/#calendar
+    what: one or more calendars
+  sun:
+    name: Sun integration
+    url: https://www.home-assistant.io/integrations/sun
+    what: for day and night weather icons
+  moon:
+    name: Moon integration
+    url: https://www.home-assistant.io/integrations/moon
+    what: for the moon phase
+  kleenex_pollen:
+    name: Kleenex pollen integration
+    url: https://github.com/MarcoGos/kleenex_pollenradar
+    what: for pollen counts
+  lunar_phase:
+    name: Lunar Phase integration
+    url: https://github.com/ngocjohn/lunar-phase
+    what: from HACS, for the moon's position on the horizon (the core Moon integration only gives the phase)
+texts:
+  set_mismatch:
+    en: Update templates and blueprint
+    de: Vorlagen und Blueprint aktualisieren
+    nl: Werk sjablonen en blueprint bij
+    fr: Mettez à jour modèles et blueprint
+    es: Actualiza plantillas y blueprint
+    pl: Zaktualizuj szablony i blueprint
+    hr: Ažurirajte predloške i blueprint
+    sv: Uppdatera mallar och blueprint
+  weekdays:
+    en:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
+    de:
+    - Montag
+    - Dienstag
+    - Mittwoch
+    - Donnerstag
+    - Freitag
+    - Samstag
+    - Sonntag
+    nl:
+    - Maandag
+    - Dinsdag
+    - Woensdag
+    - Donderdag
+    - Vrijdag
+    - Zaterdag
+    - Zondag
+    fr:
+    - Lundi
+    - Mardi
+    - Mercredi
+    - Jeudi
+    - Vendredi
+    - Samedi
+    - Dimanche
+    es:
+    - Lunes
+    - Martes
+    - Miércoles
+    - Jueves
+    - Viernes
+    - Sábado
+    - Domingo
+    pl:
+    - Poniedziałek
+    - Wtorek
+    - Środa
+    - Czwartek
+    - Piątek
+    - Sobota
+    - Niedziela
+    hr:
+    - Ponedjeljak
+    - Utorak
+    - Srijeda
+    - Četvrtak
+    - Petak
+    - Subota
+    - Nedjelja
+    sv:
+    - Måndag
+    - Tisdag
+    - Onsdag
+    - Torsdag
+    - Fredag
+    - Lördag
+    - Söndag
+  months:
+    en:
+    - January
+    - February
+    - March
+    - April
+    - May
+    - June
+    - July
+    - August
+    - September
+    - October
+    - November
+    - December
+    de:
+    - Januar
+    - Februar
+    - März
+    - April
+    - Mai
+    - Juni
+    - Juli
+    - August
+    - September
+    - Oktober
+    - November
+    - Dezember
+    nl:
+    - Januari
+    - Februari
+    - Maart
+    - April
+    - Mei
+    - Juni
+    - Juli
+    - Augustus
+    - September
+    - Oktober
+    - November
+    - December
+    fr:
+    - Janvier
+    - Février
+    - Mars
+    - Avril
+    - Mai
+    - Juin
+    - Juillet
+    - Août
+    - Septembre
+    - Octobre
+    - Novembre
+    - Décembre
+    es:
+    - Enero
+    - Febrero
+    - Marzo
+    - Abril
+    - Mayo
+    - Junio
+    - Julio
+    - Agosto
+    - Septiembre
+    - Octubre
+    - Noviembre
+    - Diciembre
+    pl:
+    - Styczeń
+    - Luty
+    - Marzec
+    - Kwiecień
+    - Maj
+    - Czerwiec
+    - Lipiec
+    - Sierpień
+    - Wrzesień
+    - Październik
+    - Listopad
+    - Grudzień
+    hr:
+    - Siječanj
+    - Veljača
+    - Ožujak
+    - Travanj
+    - Svibanj
+    - Lipanj
+    - Srpanj
+    - Kolovoz
+    - Rujan
+    - Listopad
+    - Studeni
+    - Prosinac
+    sv:
+    - Januari
+    - Februari
+    - Mars
+    - April
+    - Maj
+    - Juni
+    - Juli
+    - Augusti
+    - September
+    - Oktober
+    - November
+    - December
+  weekdays_short:
+    en:
+    - Mo
+    - Tu
+    - We
+    - Th
+    - Fr
+    - Sa
+    - Su
+    de:
+    - Mo
+    - Di
+    - Mi
+    - Do
+    - Fr
+    - Sa
+    - So
+    nl:
+    - Ma
+    - Di
+    - Wo
+    - Do
+    - Vr
+    - Za
+    - Zo
+    fr:
+    - Lu
+    - Ma
+    - Me
+    - Je
+    - Ve
+    - Sa
+    - Di
+    es:
+    - Lu
+    - Ma
+    - Mi
+    - Ju
+    - Vi
+    - Sá
+    - Do
+    pl:
+    - Pn
+    - Wt
+    - Śr
+    - Cz
+    - Pt
+    - So
+    - Nd
+    hr:
+    - Po
+    - Ut
+    - Sr
+    - Če
+    - Pe
+    - Su
+    - Ne
+    sv:
+    - Må
+    - Ti
+    - 'On'
+    - To
+    - Fr
+    - Lö
+    - Sö
+  months_short:
+    en:
+    - Jan
+    - Feb
+    - Mar
+    - Apr
+    - May
+    - Jun
+    - Jul
+    - Aug
+    - Sep
+    - Oct
+    - Nov
+    - Dec
+    de:
+    - Jan
+    - Feb
+    - Mär
+    - Apr
+    - Mai
+    - Jun
+    - Jul
+    - Aug
+    - Sep
+    - Okt
+    - Nov
+    - Dez
+    nl:
+    - Jan
+    - Feb
+    - Mrt
+    - Apr
+    - Mei
+    - Jun
+    - Jul
+    - Aug
+    - Sep
+    - Okt
+    - Nov
+    - Dec
+    fr:
+    - Jan
+    - Fév
+    - Mar
+    - Avr
+    - Mai
+    - Jun
+    - Jul
+    - Aoû
+    - Sep
+    - Oct
+    - Nov
+    - Déc
+    es:
+    - Ene
+    - Feb
+    - Mar
+    - Abr
+    - May
+    - Jun
+    - Jul
+    - Ago
+    - Sep
+    - Oct
+    - Nov
+    - Dic
+    pl:
+    - Sty
+    - Lut
+    - Mar
+    - Kwi
+    - Maj
+    - Cze
+    - Lip
+    - Sie
+    - Wrz
+    - Paź
+    - Lis
+    - Gru
+    hr:
+    - Sij
+    - Vel
+    - Ožu
+    - Tra
+    - Svi
+    - Lip
+    - Srp
+    - Kol
+    - Ruj
+    - Lis
+    - Stu
+    - Pro
+    sv:
+    - Jan
+    - Feb
+    - Mar
+    - Apr
+    - Maj
+    - Jun
+    - Jul
+    - Aug
+    - Sep
+    - Okt
+    - Nov
+    - Dec
+screen_facts:
+  '14':
+    size: 1.4" (200 x 200)
+    native: This panel is square (200 x 200)
+  27l:
+    size: 2.7" (384 x 168)
+    native: This panel is natively portrait (168 x 384)
+  27p:
+    size: 2.7" (168 x 384)
+    native: This panel is natively portrait (168 x 384)
+  '35':
+    size: 3.5" (384 x 184)
+    native: This panel is natively portrait (184 x 384)
+  '41':
+    size: 4.1" (400 x 300)
+    native: This panel is natively landscape (400 x 300)
+  '426':
+    size: 4.26" (800 x 480)
+    native: This panel is natively landscape (800 x 480)
+  '75':
+    size: 7.5" (800 x 480)
+    native: This panel is natively landscape (800 x 480)
+  75p:
+    size: 7.5" (480 x 800)
+    native: This panel is natively landscape (800 x 480)

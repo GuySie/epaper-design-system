@@ -1,0 +1,240 @@
+# Registry: the patterns (with their versions) and the pages, the one source for the design system's
+# generated tables (lib/registry.py write DOC). Edit here, never in the generated tables.
+#
+# Vocabulary (design system, Vocabulary): a pattern is what a kind of screen looks like (see Vocabulary);
+# a version is the pattern drawn differently; a page is a pattern filled with real content for one use; its layouts say
+# on which screens it is drawn (one page, one pattern: the same content in another pattern is a page of its own).
+# status: live = drawn by a blueprint today · mock = mocked up, rules in the design system · reserved
+# screens: 14 · 27l · 27p · 35 · 41 · 426 · 75 · 75p · 709
+
+screens: ['14', '27l', '27p', '35', '41', '426', '75', '75p', '709']
+screen_names: {'14': '1.4"', '27l': '2.7" L', '27p': '2.7" P', '35': '3.5"', '41': '4.1"', '426': '4.26"', '75': '7.5" L', '75p': '7.5" P', '709': '7.09" (no tier yet)'}
+
+# the shared inputs (Blueprint mechanics): a blueprint has those that apply to it; the page tables list only the others
+common_inputs: [displays, automation_trigger, automation_conditions, time_format, weekday_format, header_title,
+                font_dir, rotate, led_color, led_flash_delay, stale_after]
+
+patterns:
+  glance:
+    name: Glance
+    status: live
+    macro: GLANCE
+    modules: [Title row, Hero block]
+    versions:
+      hero-chip:    {name: with the hero in a chip, status: live}
+      word:         {name: with a word, status: mock}
+      progress:     {name: with a progress bar, status: mock}
+  hero-dashboard:
+    name: Hero dashboard
+    status: live
+    macro: HERODASH, WXDASH, WXPORT
+    modules: [Title row, Hero band, Strip, Footer]
+    versions:
+      strips:       {name: with forecast strips, status: live}
+      module:       {name: with a chart or list, status: live}
+  bar-chart:
+    name: Bar chart
+    status: live
+    macro: BARCHART
+    modules: [Title row, Chart, Footer]
+    versions:
+      thresholds:   {name: with thresholds, status: live}
+      prices:       {name: for prices, status: mock}
+  line-chart:
+    name: Line chart
+    status: live
+    macro: LINECHART
+    modules: [Title row, Chart, Footer]
+    versions:
+      thresholds:   {name: with thresholds, status: live}
+  timeline:
+    name: Timeline
+    status: live
+    macro: TIMELINE
+    modules: [Title row, Timeline, Footer]
+  key-value-list:
+    name: Key-value list
+    status: live
+    macro: KVPAGE
+    modules: [Title row, Key-value list, Footer]
+  grouped-list:
+    name: Grouped list
+    status: live
+    macro: GROUPED
+    modules: [Title row, Date-grouped list]
+  event-list:
+    name: Event list
+    status: live
+    macro: EVENTS
+    modules: [Title row, Event list, Event hero, Footer]
+    versions:
+      event-hero:   {name: with one event as a hero, status: live}
+      line-numbers: {name: with line numbers, status: mock}
+  meters:
+    name: Meters
+    status: live
+    macro: METERS
+    modules: [Title row, Meters, Footer]
+    versions:
+      both-ways:    {name: both ways, status: mock}
+  checklist:
+    name: Checklist
+    status: mock
+    modules: [Title row, Checkbox rows, Footer]
+  code:
+    name: Code
+    status: mock
+    modules: [Title row, Code block]
+  tiles:
+    name: Tiles
+    status: mock
+    modules: [Title row, Tiles]
+  month:
+    name: Month
+    status: mock
+    modules: [Title row, Month grid]
+  note:
+    name: Note
+    status: mock
+    modules: [Title row, Text block]
+    versions:
+      progress:     {name: with a progress bar, status: mock}
+  image:
+    name: Image
+    status: mock
+    modules: [Title row, Picture block]
+
+# pages: what a blueprint offers (its blueprints are its layouts in pages/<page>.yaml, never listed here). uses = pattern[/version]; layouts per screen: the page's own pattern (default for the
+# rest) or '-' = not offered; the lint fails on another pattern's name
+pages:
+  weather-glance: {name: Weather (Glance), uses: glance, status: live, default: [glance], widest: '-12°'}
+  weather:        {name: Weather, uses: hero-dashboard/strips, status: live, default: [hero-dashboard/strips], '14': ['-'], widest: '-12°'}
+  medication:     {name: Medication, uses: glance, status: live, default: [glance], '14': ['-'], '27p': ['-'], widest: '20:00'}
+  doors-windows:  {name: Doors & windows, uses: glance, status: live, default: [glance]}
+  rain:           {name: Rain forecast, uses: bar-chart/thresholds, status: live, default: [bar-chart/thresholds], '14': ['-'], widest: '50 mm/h'}
+  co2:            {name: CO2 graph, uses: line-chart/thresholds, status: live, default: [line-chart/thresholds], '14': ['-'], widest: '4000'}
+  sun-moon:       {name: Sun & moon, uses: timeline, status: live, default: [timeline], '14': ['-'], '27p': ['-'], widest: '10:44am'}
+  claude:         {name: Claude usage, uses: meters, status: live, default: [meters], '14': ['-']}
+  entities:       {name: Entities, uses: key-value-list, status: live, default: [key-value-list], '14': ['-']}
+  plants:         {name: Plant moisture, uses: key-value-list, status: live, default: [key-value-list], '14': ['-']}
+  weather-calendar: {name: Weather and calendar, uses: hero-dashboard/module, status: live, default: ['-'], '75p': [hero-dashboard/module], widest: '-12°'}
+  calendar:       {name: Calendar, uses: grouped-list, status: live, default: [grouped-list], '14': ['-']}
+  appointment:    {name: Next appointment, uses: event-list, status: live, default: [event-list], '14': ['-'], widest: '20:00'}
+  bin-day:        {name: Bin day, uses: glance/word, status: mock, default: [glance/word]}
+  room-sign:      {name: Room sign, uses: glance/word, status: mock, default: [glance/word]}
+  appliance:      {name: Appliance run, uses: glance/progress, status: mock, default: [glance/progress], '14': ['-'], '27p': ['-'], widest: '20:00'}
+  countdown:      {name: Countdown, uses: glance, status: mock, default: [glance]}
+  date:           {name: Today's date, uses: glance, status: mock, default: [glance], widest: '28'}
+  energy-price:   {name: Energy price, uses: bar-chart/prices, status: mock, default: [bar-chart/prices], '14': ['-'], '27p': ['-']}
+  departures:     {name: Departures, uses: event-list/line-numbers, status: mock, default: [event-list/line-numbers], '14': ['-']}
+  energy-flows:   {name: Solar & battery, uses: meters/both-ways, status: mock, default: [meters/both-ways], '14': ['-'], widest: '100%'}
+  packages:       {name: Packages, uses: key-value-list, status: mock, default: [key-value-list], '14': ['-']}
+  shopping:       {name: Shopping list, uses: checklist, status: mock, default: [checklist], '14': ['-']}
+  home-status:    {name: Home status, uses: tiles, status: mock, default: [tiles]}
+  month:          {name: Month overview, uses: month, status: mock, default: [month], '14': ['-'], '27p': ['-']}
+  message:        {name: Message board, uses: note, status: mock, default: [note], '14': ['-']}
+  now-playing:    {name: Now playing, uses: note/progress, status: mock, default: [note/progress], '14': ['-']}
+  picture:        {name: Picture, uses: image, status: mock, default: [image], '14': ['-'], '27l': ['-'], '27p': ['-']}
+  guest-wifi:     {name: Guest Wi-Fi, uses: code, status: mock, default: [code]}
+  energy:         {name: Energy overview, uses: hero-dashboard/module, status: mock, default: [hero-dashboard/module], '14': ['-'], widest: '100%'}
+  air:            {name: Air quality, uses: hero-dashboard/module, status: mock, default: [hero-dashboard/module], '14': ['-'], widest: '4000'}
+  day:            {name: Day overview, uses: hero-dashboard/module, status: mock, default: [hero-dashboard/module], '14': ['-'], widest: '28'}
+
+# words that are not terms of the design system; the lint fails the design system when one is used as a term
+withdrawn: [preset, presets, row kind, row kinds, fallback chain, page frame, Matrix, body module, compact form, short form, family, families]
+
+# components and modules; the design system's Components and Modules tables must list
+# exactly these, at these levels; code comments name them as (component 'X') / (module 'X')
+components:
+  Value:                {macros: [T, VALUE_W, SEGS, UGAP]}
+  Chip:                 {macros: [RCHIP, CCHIP, DCHIP, LEVEL_FILL, LEVEL_TEXT, LEVEL_MARK]}
+  Icon:                 {macros: [I]}
+  Hero chip:            {macros: [HERO_CHIP]}
+  QR code:              {macros: []}
+  Empty statement:      {macros: [EMPTY]}
+  Moon badge:           {macros: [MOON_BADGE]}
+  Hero group:           {macros: [HERO_ALONE, HERO_SHARED, HERO_LEFT, HERO_INK_X, HERO_ADVANCE]}
+  Glance secondary:     {macros: [SECOND, PICK]}
+  Hour cell / Day cell: {macros: [HCELL, DCELL, DATA_REGULAR]}
+  Forecast row:         {macros: [RROW]}
+  Key-value row:        {macros: [KV, ROW]}
+  Event row:            {macros: []}
+  Checkbox row:         {macros: []}
+  Progress bar:         {macros: [PBAR]}
+modules:
+  Title row:         {macros: [TITLE]}
+  Hero block:        {macros: [HBLOCK, HERO_BLOCK_Y]}
+  Hero band:         {macros: [HBAND]}
+  Footer:            {macros: [FOOT]}
+  Error block:       {macros: [ERRBLOCK]}
+  Detail rows:       {macros: [DROWS, DCOLW]}
+  Strip:             {macros: [HSTRIP, DSTRIP, STRIPY, CELLH]}
+  Forecast table:    {macros: [RROW]}
+  Key-value list:    {macros: [KVLIST]}
+  Date-grouped list: {macros: [DLIST]}
+  Event list:        {macros: [ELIST, EFREE]}
+  Event hero:        {macros: [EHERO]}
+  Meters:            {macros: []}
+  Chart:             {macros: [CFRAME, CTHRESH, CBASE, CAXIS]}
+  Timeline:          {macros: [TMARK]}
+  Checkbox rows:     {macros: []}
+  Tiles:             {macros: []}
+  Level meter:       {macros: [METER]}
+  Code block:        {macros: []}
+  Month grid:        {macros: []}
+  Text block:        {macros: []}
+  Picture block:     {macros: []}
+
+# glossary: every other named thing in the design system, at its vocabulary level (token, component, module,
+# pattern, page, layout, blueprint) or '—' when it isn't a design part (a region, a property, a state); 'of' = what it is
+# part of. aliases: other words for the same thing; lib/vocab.py rewrites them to the name in the design system and the
+# code comments, and the lint fails on them. Components, modules, patterns and pages above are in the glossary too.
+terms:
+  update stamp:        {level: component,     of: Title row, what: 'the time of the last update, right in the title row (short: stamp)', aliases: []}
+  stale chip:          {level: component,     of: Title row, what: 'the update stamp in an ink chip with "!" when the data is old (an outline with "!" where warnings are outlines)', aliases: [stale stamp chip, stale stamp]}
+  title line:          {level: component,     of: Title row, what: 'the line under the title row', aliases: [title rule]}
+  hero numeral:        {level: component,     of: Hero group, what: 'the number of a hero group, in Space Grotesk Bold at the hero size', aliases: []}
+  warning chip:        {level: component,     of: Chip, what: 'a chip at the warning level (an outline where the panel has no warning colour)', aliases: [warn chip]}
+  severe chip:         {level: component,     of: Chip, what: 'a chip at the severe level', aliases: []}
+  ink chip:            {level: component,     of: Chip, what: 'a chip filled with ink: the stale chip, an event in progress, and severe on black/white panels', aliases: []}
+  row chip:            {level: component,     of: Chip, what: 'one chip spanning the label and the value of a row', aliases: []}
+  track:               {level: component,     of: Progress bar, what: 'the outlined bar a progress bar fills', aliases: []}
+  now-marker:          {level: component,     of: Progress bar, what: 'the line across a progress bar for "now in the period"', aliases: [now marker]}
+  alert row:           {level: component, of: Detail rows, what: 'the first detail row when a page flags something that has no row of its own (the weather: an official warning or the current condition)', aliases: [alert slot]}
+  pollen row:          {level: component, of: Detail rows, what: 'the weather''s last detail row while pollen is above 0: type and count (a forecast row on the 2.7" portrait)', aliases: [pollen slot]}
+  hour strip:          {level: module,   of: Strip, what: 'the strip of hour cells', aliases: []}
+  day strip:           {level: module,   of: Strip, what: 'the strip of day cells', aliases: []}
+  chart frame:         {level: '—',      of: Chart, what: 'what bar and line charts share: plot, label margin, clock-time axis, thresholds', aliases: []}
+  plot:                {level: '—',      of: Chart, what: 'the area the bars or the series are drawn in', aliases: [plot area]}
+  label margin:        {level: '—',      of: Chart, what: 'the space right of the plot for the scale and threshold values', aliases: []}
+  clock-time axis:     {level: '—',      of: Chart, what: 'the baseline with ticks and clock times under the plot', aliases: []}
+  hero column:         {level: '—',      of: Hero band, what: 'the space the hero group is centred in, left of the detail rows', aliases: []}
+  detail column:       {level: '—',      of: Detail rows, what: 'the width the detail rows take: widest label + space.l + widest value', aliases: [details column]}
+  hero ladder:         {level: token,    of: null, what: 'the hero sizes (*Style choices*, Hero ladder)', aliases: []}
+  icon ladder:         {level: token,    of: null, what: 'the icon sizes (`icon.ladder`; *Style choices*, Icon ladder)', aliases: []}
+  Error:               {level: '—',      of: States, what: 'no data or a misconfiguration: the error block under the title row', aliases: []}
+  Empty:               {level: '—',      of: States, what: 'nothing to show: the empty statement', aliases: []}
+  page definition:     {level: '—',      of: Page, what: 'everything a page''s blueprints are generated from besides its layouts: inputs, data, texts, description (pages/<page>.yaml)', aliases: []}
+  spec:                {level: '—',      of: Layout, what: 'the file that draws a layout in pixels (`src/specs/`); a layout may reuse another layout''s spec with its own tokens', aliases: []}
+  shared part:         {level: '—',      of: Blueprint, what: 'a piece every blueprint has, written once (texts, stale test, drawing step, button flash, template note)', aliases: []}
+  Stale:               {level: '—',      of: States, what: 'the newest data is older than stale_after: the stale chip', aliases: []}
+
+# aliases of registered names (components, modules, patterns, pages) and of hardware words; the key is the name as it
+# is written in running text. An alias with a capital letter matches only with that capital (Track for the Timeline,
+# but not a progress bar's track).
+aliases:
+  Glance secondary: [Glance secondary slot, secondary slot, secondary band, secondary line]
+  detail rows:      [details rows]
+  strip:            [forecast strip]
+  progress bar:     [usage bar]
+  empty statement:  [empty message]
+  error block:      [severe block]
+  moon badge:       [moon-phase badge]
+  footer:           [footer band, summary line]
+  calendar:         [agenda]
+  Timeline:         [Track]
+  timeline:         [sun & moon track]
+  the whole screen: [the whole panel]
+  base line:        [base rule]
+  strip line:       [strip rule]
+  heavy line:       [heavy rule]

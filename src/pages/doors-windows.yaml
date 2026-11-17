@@ -1,0 +1,88 @@
+page: doors-windows
+description:
+  shows: How many of your outside doors and windows are open, and which one, so you can check before you leave.
+  needs_also:
+  - Door and window sensors (binary sensors with the door, window, opening or garage door class).
+  trigger_advice: 'None to set: the page redraws only when the number of open doors and windows changes, when Home Assistant
+    starts, or when you choose Run actions, so it costs almost no battery.'
+  title_default: '"Open"'
+redraw: change
+inputs:
+- name: openings
+  section: content
+  label: Doors and windows
+  help: The door and window sensors to watch. Pick only the ones that lead outside; fridge, mailbox or washing machine sensors
+    don't belong here. The device redraws whenever the number of open ones changes.
+  selector:
+    entity:
+      multiple: true
+      filter:
+      - domain: binary_sensor
+        device_class: door
+      - domain: binary_sensor
+        device_class: window
+      - domain: binary_sensor
+        device_class: opening
+      - domain: binary_sensor
+        device_class: garage_door
+  required: true
+- name: severe_openings
+  section: thresholds
+  label: Doors that are severe when open
+  help: Any open door or window is a warning (yellow chip). These ones are severe (red chip) when open, for example the front
+    door. Leave empty for warnings only.
+  selector:
+    entity:
+      multiple: true
+      filter:
+      - domain: binary_sensor
+  default: []
+bind:
+- displays
+- openings
+- severe_openings
+data:
+  variables:
+  - ds_otxt: |
+      {% set m = {
+        "en": {"title": "Open", "all": "All closed", "door": "door", "window": "window", "none": "No doors or windows selected"},
+        "nl": {"title": "Open", "all": "Alles dicht", "door": "deur", "window": "raam", "none": "Geen deuren of ramen gekozen"},
+        "de": {"title": "Offen", "all": "Alles zu", "door": "Tür", "window": "Fenster", "none": "Keine Türen oder Fenster gewählt"},
+        "fr": {"title": "Ouvert", "all": "Tout fermé", "door": "porte", "window": "fenêtre", "none": "Aucune porte ou fenêtre choisie"},
+        "es": {"title": "Abierto", "all": "Todo cerrado", "door": "puerta", "window": "ventana", "none": "Ninguna puerta o ventana elegida"},
+        "pl": {"title": "Otwarte", "all": "Zamknięte", "door": "drzwi", "window": "okno", "none": "Nie wybrano drzwi ani okien"},
+        "hr": {"title": "Otvoreno", "all": "Sve zatvoreno", "door": "vrata", "window": "prozor", "none": "Nisu odabrana vrata ni prozori"},
+        "sv": {"title": "Öppet", "all": "Allt stängt", "door": "dörr", "window": "fönster", "none": "Inga dörrar eller fönster valda"}
+      } %} {{ m[weekday_lang] if weekday_lang in m else m['en'] }}
+  - ds_open: |
+      {% set ns = namespace(sev=[], warn=[]) %} {% for e in openings %}{% if is_state(e, 'on') %} {% set dc = state_attr(e, 'device_class') | default('', true) %} {% set nm = ((e ~ ' ' ~ (entity_name(e) or '') ~ ' ' ~ (device_name(e) or '')) | lower) %} {% set win = dc == 'window' or (dc != 'door' and ('window' in nm or 'raam' in nm or 'fenster' in nm)) %} {% set area = area_name(e) or e.split('.')[1].split('_')[0] %} {% set item = {'label': (area ~ ' ' ~ (ds_otxt['window'] if win else ds_otxt['door'])), 'area': area, 'win': win} %} {% if e in severe_openings %}{% set ns.sev = ns.sev + [item] %}{% else %}{% set ns.warn = ns.warn + [item] %}{% endif %} {% endif %}{% endfor %} {{ {'items': ns.sev + ns.warn, 'sev': ns.sev | count} }}
+  steps:
+  - condition: template
+    value_template: '{{ trigger.platform != ''state'' or trigger.from_state.state != trigger.to_state.state }}'
+  draw:
+    kind: choose
+    when:
+    - condition: template
+      value_template: '{{ openings | count > 0 }}'
+    steps: []
+  triggers:
+  - trigger: state
+    entity_id: !input 'openings'
+    not_from:
+    - unavailable
+    - unknown
+    not_to:
+    - unavailable
+    - unknown
+  - trigger: homeassistant
+    event: start
+    id: redraw
+  mode:
+    mode: queued
+    max_exceeded: silent
+    max: 3
+layouts:
+  '14':
+    spec: doors_windows_14
+    defaults:
+      rotate: '0'

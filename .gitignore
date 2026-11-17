@@ -1,0 +1,10 @@
+# build output and local test material
+src/build/
+src/baseline/
+src/fonts/
+src/lib/ep_tokens.fit.json
+__pycache__/
+.mypy_cache/
+*.pyc
+.venv/
+work/

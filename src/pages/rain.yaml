@@ -1,0 +1,179 @@
+page: rain
+description:
+  shows: The next two hours of rain in 5-minute bars, from Buienalarm and Buienradar (the higher of the two for each bar),
+    on a log scale so drizzle stays visible next to a downpour.
+  needs:
+  - neerslag_app
+  trigger_advice: A time pattern every 5 or 15 minutes; the sources update about every 3 minutes.
+  notes:
+  - Buienradar only covers the Netherlands and Belgium; Buienalarm covers more countries.
+redraw: trigger
+stale:
+- buienalarm_entity
+- buienradar_entity
+inputs:
+- name: buienalarm_entity
+  section: content
+  label: Buienalarm sensor
+  help: The Neerslag App Buienalarm forecast sensor
+  selector:
+    entity:
+      filter:
+        domain: sensor
+        integration: neerslag
+  default: sensor.neerslag_buienalarm_regen_data
+- name: buienradar_entity
+  section: content
+  label: Buienradar sensor
+  help: The Neerslag App Buienradar forecast sensor
+  selector:
+    entity:
+      filter:
+        domain: sensor
+        integration: neerslag
+  default: sensor.neerslag_buienradar_regen_data
+- name: flag_rain_hour
+  section: thresholds
+  label: 'Rain per hour: flag it'
+  help: Off, no bar is flagged and the chart shows no threshold lines, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_rain_hour
+  section: thresholds
+  label: 'Rain per hour: warning at or above'
+  help: A bar at or above this is a warning. The chart marks the value with the lower dashed line.
+  selector:
+    number:
+      min: 0
+      step: 0.1
+      unit_of_measurement: mm/h
+      mode: box
+  default: 2.5
+- name: severe_rain_hour
+  section: thresholds
+  label: 'Rain per hour: severe at or above'
+  help: If a timeframe's combined rain intensity is at or above this value, its bar switches to the severe colour. The graph
+    uses a log scale up to 50 mm/h (violent rain).
+  selector:
+    number:
+      min: 0
+      step: 0.1
+      unit_of_measurement: mm/h
+      mode: box
+  default: 10
+bind:
+- buienalarm_entity
+- buienradar_entity
+- flag_rain_hour
+- severe_rain_hour
+- warning_rain_hour
+data:
+  variables:
+  - has_any_data: |
+      {% set raw1 = state_attr(buienalarm_entity, 'data') %} {% set raw2 = state_attr(buienradar_entity, 'data') %} {% set d1 = raw1 is mapping and raw1.get('success', False) and (raw1.get('precip', []) | length > 0) %} {% set d2 = raw2 is string and (raw2 | trim | length > 0) %} {{ d1 or d2 }}
+  - buckets: |
+      {% set ns = namespace(list=[]) %} {% set cap = 50 %} {% set threshold = severe_rain_hour | float(10) %} {% set now_ts = now().timestamp() %} {% set now_5_ts = (now_ts // 300) * 300 %}
+      {% set raw1 = state_attr(buienalarm_entity, 'data') %} {% set has_data1 = raw1 is mapping and raw1.get('success', False) and (raw1.get('precip', []) | length > 0) %} {% if has_data1 %}
+        {% set start1 = raw1.start | float %}
+        {% set start1 = (start1 / 1000) if start1 > 10000000000 else start1 %}
+        {% set delta1 = raw1.delta | int(300) %}
+        {% set delta1 = 300 if delta1 <= 0 else delta1 %}
+        {% set precip1 = raw1.precip %}
+      {% endif %}
+      {% set raw2 = state_attr(buienradar_entity, 'data') %} {% set has_data2 = raw2 is string and (raw2 | trim | length > 0) %} {% if has_data2 %}
+        {% set ns2 = namespace(list=[]) %}
+        {% for token in raw2.split(' ') %}
+          {% if '|' in token and ':' in token %}
+            {% set parts = token.split('|') %}
+            {% set code2 = parts[0] | int(0) %}
+            {% set hh = parts[1].split(':')[0] | int(0) %}
+            {% set mm = parts[1].split(':')[1] | int(0) %}
+            {% set cand = now().replace(hour=hh, minute=mm, second=0, microsecond=0) %}
+            {% set cand = (cand + timedelta(days=1)) if cand.timestamp() < (now_ts - 3600) else cand %}
+            {% set ns2.list = ns2.list + [{'ts': cand.timestamp(), 'code': code2}] %}
+          {% endif %}
+        {% endfor %}
+        {% set parsed2 = ns2.list %}
+      {% endif %}
+      {% for i in range(24) %}
+        {% set bucket_ts = now_5_ts + (i * 300) %}
+        {% set mm1 = namespace(v=0) %}
+        {% if has_data1 %}
+          {% set idx = ((bucket_ts - start1) / delta1) | round(0, 'common') | int %}
+          {% if idx >= 0 and idx < (precip1 | length) and (((start1 + idx * delta1) - bucket_ts) | abs) <= (delta1 / 2) %}
+            {% set code1 = precip1[idx] | int(0) %}
+            {% set mm1.v = 0 if code1 <= 0 else 10 ** ((code1 - 109) / 32) %}
+          {% endif %}
+        {% endif %}
+        {% set mm2 = namespace(v=0) %}
+        {% if has_data2 %}
+          {% for entry in parsed2 %}
+            {% if ((entry.ts - bucket_ts) | abs) <= 150 %}
+              {% set candmm = 0 if entry.code <= 0 else 10 ** ((entry.code - 109) / 32) %}
+              {% set mm2.v = candmm if candmm > mm2.v else mm2.v %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        {% set mm_h = [mm1.v, mm2.v] | max %}
+        {% set scaled = 0 if mm_h <= 0 else [[(((mm_h + 1) | log(10)) / ((cap + 1) | log(10))), 0] | max, 1] | min %}
+        {% set bucket_dt = as_datetime(bucket_ts) | as_local %}
+        {% set label = bucket_dt.strftime('%H:%M') if time_format == '24h' else ((bucket_dt.strftime('%I') | int | string) + bucket_dt.strftime(':%M')) %}
+        {% set ns.list = ns.list + [{
+          'index': i,
+          'ts': bucket_ts,
+          'mm_h': mm_h,
+          'scaled': scaled,
+          'is_severe': mm_h >= threshold,
+          'label': label
+        }] %}
+      {% endfor %} {{ ns.list }}
+  - ds_txt: |
+      {% set m = {
+        "en": {"title": "Rain", "dry": "Dry until", "rain": "Rain", "heavy": "Heavy rain", "peak": "peak", "unit": "mm/h"},
+        "de": {"title": "Regen", "dry": "Trocken bis", "rain": "Regen", "heavy": "Starkregen", "peak": "Spitze", "unit": "mm/h"},
+        "nl": {"title": "Regen", "dry": "Droog tot", "rain": "Regen", "heavy": "Zware bui", "peak": "piek", "unit": "mm/h"},
+        "fr": {"title": "Pluie", "dry": "Sec jusqu'à", "rain": "Pluie", "heavy": "Forte pluie", "peak": "pic", "unit": "mm/h"},
+        "es": {"title": "Lluvia", "dry": "Seco hasta", "rain": "Lluvia", "heavy": "Lluvia fuerte", "peak": "pico", "unit": "mm/h"},
+        "pl": {"title": "Deszcz", "dry": "Sucho do", "rain": "Deszcz", "heavy": "Ulewa", "peak": "szczyt", "unit": "mm/h"},
+        "hr": {"title": "Kiša", "dry": "Suho do", "rain": "Kiša", "heavy": "Jaka kiša", "peak": "vrh", "unit": "mm/h"},
+        "sv": {"title": "Regn", "dry": "Torrt till", "rain": "Regn", "heavy": "Skyfall", "peak": "topp", "unit": "mm/h"}
+      } %} {{ m[weekday_lang] }}
+  - ds_title: '{{ header_title if header_title else ds_txt[''title''] }}'
+  draw:
+    kind: choose
+    when:
+    - '{{ has_any_data }}'
+    steps: []
+texts:
+  en:
+    no_data: No rain forecast data available.
+    default_title: Rain (next 2h)
+  de:
+    no_data: Keine Regenvorhersagedaten verfügbar.
+    default_title: Regen (nächste 2 Std.)
+  nl:
+    no_data: Geen regenvoorspellingsgegevens beschikbaar.
+    default_title: Regen (komende 2u)
+  fr:
+    no_data: Aucune donnée de prévision de pluie disponible.
+    default_title: Pluie (2 prochaines h)
+  es:
+    no_data: No hay datos de previsión de lluvia disponibles.
+    default_title: Lluvia (próximas 2h)
+  pl:
+    no_data: Brak dostępnych danych prognozy opadów.
+    default_title: Deszcz (najbliższe 2h)
+  hr:
+    no_data: Nema dostupnih podataka o prognozi kiše.
+    default_title: Kiša (sljedeća 2h)
+  sv:
+    no_data: Ingen nederbördsprognosdata tillgänglig.
+    default_title: Regn (nästa 2h)
+layouts:
+  '35':
+    spec: rain_35
+  27l:
+    spec: rain_27l
+    notes:
+    - 'Button devices sold as 2.9": configure the firmware for 168 x 384, or the top 16 px are cut off.'

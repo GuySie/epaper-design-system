@@ -1,0 +1,350 @@
+page: weather-glance
+description:
+  shows: 'The weather at a glance: the temperature large, with the condition icon, and one more reading under it.'
+  needs:
+  - weather
+  optional:
+  - sun
+  - moon
+  - kleenex_pollen
+  trigger_advice: A time pattern every 15 or 30 minutes.
+  notes:
+  - Leave the weather entity empty to use the first working weather entity.
+  based_on:
+  - name: Weatherman blueprint by Chunkysteveo
+    url: https://github.com/chunkysteveo/OpenEPaperLink-HA-Weatherman/
+  title_default: '"Weather"'
+redraw: trigger
+stale: drawing
+inputs:
+- name: weather_entity
+  section: content
+  label: Weather entity
+  help: The weather entity to show. While it isn't working, another working weather entity is used
+    instead.
+  selector:
+    entity:
+      filter:
+        domain: weather
+  required: true
+- name: current_temp_sensor
+  section: content
+  label: Current temperature sensor
+  help: Optional temperature sensor to use instead of forecast temperature
+  selector:
+    entity:
+      filter:
+        domain: sensor
+        device_class: temperature
+  default: ''
+- name: pollen_sensor
+  section: content
+  label: Pollen forecast sensor
+  help: Optional Kleenex pollen sensor to use - if not specified an additional hour weather forecast will be shown
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: moon_phase_sensor
+  section: content
+  label: Moon phase sensor
+  help: Sensor used for the moon phase icon. Leave blank to detect the Moon integration's sensor automatically (its entity
+    ID is translated, so it isn't always `sensor.moon_phase`). Set this to use a different sensor, such as the Lunar Phase
+    integration's "Moon Phase" sensor.
+  selector:
+    entity:
+      domain: sensor
+  default: ''
+- name: weather_warning_sensor
+  section: content
+  label: Weather warning level sensor (optional)
+  help: A sensor with the official warning level for your area (KNMI's "Warning level", Meteoalarm, ...). Code yellow (or
+    minor/moderate) shows as a warning chip, orange and red (severe/extreme) as a severe chip, ahead of every other alert
+    on the display.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: weather_warning_text_sensor
+  section: content
+  label: Weather warning text sensor (optional)
+  help: A sensor that lists the active warnings (KNMI's "Warnings"), so the chip can name the warning (e.g. thunderstorms).
+    Without it the chip shows the colour code.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: pollen_type
+  section: content
+  label: Pollen type
+  help: Optional type of pollen to track (as listed in the Kleenex data) - if not specified will default to the total pollen
+    count
+  selector:
+    text: null
+  default: ''
+- name: flag_temp_low
+  section: thresholds
+  label: 'Cold: flag it'
+  help: Off, cold is never flagged, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_temp_low
+  section: thresholds
+  label: 'Cold: warning at or below'
+  help: Temperatures at or below this get a warning chip.
+  selector:
+    number:
+      unit_of_measurement: °
+      mode: box
+  default: 3
+- name: severe_temp_low
+  section: thresholds
+  label: 'Cold: severe at or below'
+  help: Temperatures at or below this get a severe chip.
+  selector:
+    number:
+      unit_of_measurement: °
+      mode: box
+  default: 0
+- name: flag_temp_high
+  section: thresholds
+  label: 'Heat: flag it'
+  help: Off, heat is never flagged, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_temp_high
+  section: thresholds
+  label: 'Heat: warning at or above'
+  help: Temperatures at or above this get a warning chip.
+  selector:
+    number:
+      unit_of_measurement: °
+      mode: box
+  default: 27
+- name: severe_temp_high
+  section: thresholds
+  label: 'Heat: severe at or above'
+  help: Temperatures at or above this get a severe chip.
+  selector:
+    number:
+      unit_of_measurement: °
+      mode: box
+  default: 35
+- name: flag_wind_high
+  section: thresholds
+  label: 'Wind: flag it'
+  help: Off, wind is never flagged, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_wind_high
+  section: thresholds
+  label: 'Wind: warning at or above'
+  help: Wind speeds at or above this get a warning chip (in the weather entity's wind unit).
+  selector:
+    number:
+      unit_of_measurement: km/h
+      mode: box
+  default: 50
+- name: severe_wind_high
+  section: thresholds
+  label: 'Wind: severe at or above'
+  help: Wind speeds at or above this get a severe chip (in the weather entity's wind unit).
+  selector:
+    number:
+      unit_of_measurement: km/h
+      mode: box
+  default: 75
+- name: flag_rain_hour
+  section: thresholds
+  label: 'Rain per hour: flag it'
+  help: Off, rain per hour is never flagged, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_rain_hour
+  section: thresholds
+  label: 'Rain per hour: warning at or above'
+  help: Hourly forecast rain at or above this gets a warning chip.
+  selector:
+    number:
+      min: 0
+      step: 0.1
+      unit_of_measurement: mm/h
+      mode: box
+  default: 2.5
+- name: severe_rain_hour
+  section: thresholds
+  label: 'Rain per hour: severe at or above'
+  help: Hourly forecast rain at or above this gets a severe chip.
+  selector:
+    number:
+      min: 0
+      step: 0.1
+      unit_of_measurement: mm/h
+      mode: box
+  default: 10
+- name: flag_rain_day
+  section: thresholds
+  label: 'Rain per day: flag it'
+  help: Off, rain per day is never flagged, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_rain_day
+  section: thresholds
+  label: 'Rain per day: warning at or above'
+  help: A day's forecast rain (today's total included) at or above this gets a warning chip.
+  selector:
+    number:
+      unit_of_measurement: mm
+      mode: box
+      step: 0.1
+  default: 10
+- name: severe_rain_day
+  section: thresholds
+  label: 'Rain per day: severe at or above'
+  help: A day's forecast rain (today's total included) at or above this gets a severe chip.
+  selector:
+    number:
+      unit_of_measurement: mm
+      mode: box
+      step: 0.1
+  default: 25
+- name: flag_pollen_high
+  section: thresholds
+  label: 'Pollen: flag it'
+  help: Off, pollen is never flagged, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_pollen_high
+  section: thresholds
+  label: 'Pollen: warning at or above (optional)'
+  help: 'Leave empty to use the sensor''s own level: "high" is a warning. Set a count to use that instead.'
+  selector:
+    number:
+      unit_of_measurement: ppm
+      mode: box
+  default: ''
+- name: severe_pollen_high
+  section: thresholds
+  label: 'Pollen: severe at or above (optional)'
+  help: 'Leave empty to use the sensor''s own level: "very high" is severe. Set a count to use that instead.'
+  selector:
+    number:
+      unit_of_measurement: ppm
+      mode: box
+  default: ''
+- name: warning_conditions
+  section: thresholds
+  label: 'Conditions: warning'
+  help: 'Weather conditions that count as a warning: the hour or day label becomes a warning chip, and the current condition
+    is named in a chip. Only conditions that are a risk by themselves; fog, snow and wind are flagged by the temperature and
+    wind thresholds and by official warnings instead.'
+  selector:
+    select:
+      multiple: true
+      options:
+      - clear-night
+      - cloudy
+      - exceptional
+      - fog
+      - hail
+      - lightning
+      - lightning-rainy
+      - partlycloudy
+      - pouring
+      - rainy
+      - snowy
+      - snowy-rainy
+      - sunny
+      - windy
+      - windy-variant
+  default:
+  - hail
+  - lightning
+  - lightning-rainy
+  - exceptional
+- name: severe_conditions
+  section: thresholds
+  label: 'Conditions: severe'
+  help: 'Weather conditions that count as severe: the hour or day label becomes a severe chip, and the current condition is
+    named in a chip. Empty by default: severe is kept for measured values past a severe threshold and official orange / red
+    warnings.'
+  selector:
+    select:
+      multiple: true
+      options:
+      - clear-night
+      - cloudy
+      - exceptional
+      - fog
+      - hail
+      - lightning
+      - lightning-rainy
+      - partlycloudy
+      - pouring
+      - rainy
+      - snowy
+      - snowy-rainy
+      - sunny
+      - windy
+      - windy-variant
+  default: []
+bind:
+- weather_entity
+ds_in: true
+data:
+  variables:
+  - forecast_entity: |-
+      {% if weather_entity and states(weather_entity) not in ['unknown', 'unavailable'] %}
+        {{ weather_entity }}
+      {% else %}
+        {{ (states | selectattr('domain','equalto','weather') | rejectattr('state','in',['unknown','unavailable']) | list | first).entity_id if states | selectattr('domain','equalto','weather') | rejectattr('state','in',['unknown','unavailable']) | list else 'unavailable' }}
+      {% endif %}
+  steps:
+  - if:
+    - '{{ forecast_entity != ''unavailable'' }}'
+    then:
+    - action: weather.get_forecasts
+      target:
+        entity_id: '{{ forecast_entity }}'
+      data:
+        type: daily
+      response_variable: ds_fd
+    - if:
+      - '{{ (state_attr(forecast_entity, ''supported_features'') | int(0)) | bitwise_and(2) > 0 }}'
+      then:
+      - action: weather.get_forecasts
+        target:
+          entity_id: '{{ forecast_entity }}'
+        data:
+          type: hourly
+        response_variable: ds_fh
+  draw:
+    kind: weather
+layouts:
+  '14':
+    spec: weather_glance_14
+    defaults:
+      time_format: 12h
+      rotate: '0'
+  '35':
+    spec: weather_glance_35
+    inputs:
+    - name: moon_phase_sensor
+      section: content
+      label: Moon phase sensor
+      help: Sensor used for the moon phase badge on the weather icon. Leave blank to detect the Moon integration's sensor
+        automatically (its entity ID is translated, so it isn't always `sensor.moon_phase`). Set this to use a different sensor,
+        such as the Lunar Phase integration's "Moon Phase" sensor. No Moon sensor means no badge.
+      selector:
+        entity:
+          domain: sensor
+      default: ''

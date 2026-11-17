@@ -1,0 +1,154 @@
+page: calendar
+description:
+  shows: The coming days, each under its day header with its events, today first; later days fold into one line when they
+    don't fit.
+  needs:
+  - calendar
+  trigger_advice: A time pattern every hour.
+  based_on:
+  - name: calendar automation by svenove
+    url: https://github.com/svenove/OpenEPaperLink-HA-Calendar
+  times: the event times and the update time
+redraw: trigger
+inputs:
+- name: calendar_entities
+  section: content
+  label: Calendar(s)
+  help: One or more calendar entities to source events from. Events from multiple calendars are merged into a single agenda.
+  selector:
+    entity:
+      multiple: true
+      filter:
+        domain: calendar
+  required: true
+- name: days_shown
+  section: content
+  label: Days shown
+  help: How many days ahead to display, starting today. With many days and/or busy calendars, content may overflow the display's
+    300px height.
+  selector:
+    number:
+      min: 1
+      max: 7
+      mode: box
+  default: 6
+bind:
+- calendar_entities
+- days_shown
+data:
+  variables:
+  - text_strip_pattern: '[^ -ɏ‐-‧‰-※€™]'
+  - header_title_display: '{{ header_title if header_title else language_map[weekday_lang][''title''] }}'
+  draw:
+    kind: choose
+    when:
+    - '{{ calendar_entities | count > 0 }}'
+    steps:
+    - action: calendar.get_events
+      target:
+        entity_id: '{{ calendar_entities }}'
+      data:
+        start_date_time: '{{ today_at(''00:00'') }}'
+        end_date_time: '{{ today_at(''00:00'') + timedelta(days=days_shown) }}'
+      response_variable: cal_events
+    - variables:
+        all_events: |
+          {{ (cal_events.values() | map(attribute='events') | list | sum(start=[])) | sort(attribute='start') }}
+        days: |
+          {% set ns = namespace(list=[], prior=0) %} {% for i in range(days_shown | int) %}
+            {% set day_date = today_at('00:00') + timedelta(days=i) %}
+            {% set day_key = day_date.strftime('%Y-%m-%d') %}
+            {% set day_ns = namespace(raw=[], matched=0) %}
+            {% for event in all_events %}
+              {% if (as_timestamp(event.start) | timestamp_custom('%Y-%m-%d')) == day_key %}
+                {% set day_ns.matched = day_ns.matched + 1 %}
+                {% if (as_timestamp(event.start) | timestamp_custom('%H:%M')) == '00:00' %}
+                  {% set line = {'time': '', 'text': language_map[weekday_lang]['all_day_prefix'] ~ (event.summary | default('') | regex_replace(text_strip_pattern, '') | regex_replace(' {2,}', ' ') | trim)} %}
+                {% else %}
+                  {% set start_label = (as_timestamp(event.start) | timestamp_custom('%-I:%M %p')) if time_format == '12h' else (as_timestamp(event.start) | timestamp_custom('%H:%M')) %}
+                  {% set end_label = (as_timestamp(event.end) | timestamp_custom('%-I:%M %p')) if time_format == '12h' else (as_timestamp(event.end) | timestamp_custom('%H:%M')) %}
+                  {% set line = {'start_ts': as_timestamp(event.start), 'end_ts': as_timestamp(event.end), 'time': start_label, 'text': (event.summary | default('') | regex_replace(text_strip_pattern, '') | regex_replace(' {2,}', ' ') | trim)} %}
+                {% endif %}
+                {% set day_ns.raw = day_ns.raw + [{'ts': as_timestamp(event.start), 'line': line}] %}
+              {% endif %}
+            {% endfor %}
+            {% set count = day_ns.matched if day_ns.matched > 0 else 1 %}
+            {% set event_lines = (day_ns.raw | sort(attribute='ts') | map(attribute='line') | list) if day_ns.matched > 0 else [{'time': '', 'text': language_map[weekday_lang]['no_events']}] %}
+            {% set ns.list = ns.list + [{
+              'weekday': language_map[weekday_lang]['weekdays'][day_date.weekday()],
+              'day_num': day_date.day,
+              'month': language_map[weekday_lang]['months'][day_date.month - 1],
+              'is_today': i == 0,
+              'event_lines': event_lines
+            }] %}
+            {% set ns.prior = ns.prior + count %}
+          {% endfor %} {{ ns.list }}
+texts:
+  use:
+    weekdays: weekdays
+    months: months
+  en:
+    today: "Today"
+    more: "+{e} more"
+    title: Agenda
+    all_day_prefix: 'All day: '
+    no_events: No appointments
+    no_calendars: No calendar chosen
+  de:
+    today: "Heute"
+    more: "+{e} weitere"
+    title: Kalender
+    all_day_prefix: 'Ganztägig: '
+    no_events: Keine Termine
+    no_calendars: Kein Kalender ausgewählt
+  nl:
+    today: "Vandaag"
+    more: "+{e} meer"
+    title: Agenda
+    all_day_prefix: 'Hele dag: '
+    no_events: Geen afspraken
+    no_calendars: Geen agenda gekozen
+  fr:
+    today: "Aujourd'hui"
+    more: "+{e} autres"
+    title: Agenda
+    all_day_prefix: 'Toute la journée : '
+    no_events: Aucun rendez-vous
+    no_calendars: Aucun calendrier choisi
+  es:
+    today: "Hoy"
+    more: "+{e} más"
+    title: Agenda
+    all_day_prefix: 'Todo el día: '
+    no_events: Sin citas
+    no_calendars: Ningún calendario elegido
+  pl:
+    today: "Dziś"
+    more: "+{e} więcej"
+    title: Kalendarz
+    all_day_prefix: 'Cały dzień: '
+    no_events: Brak wydarzeń
+    no_calendars: Nie wybrano kalendarza
+  hr:
+    today: "Danas"
+    more: "+{e} još"
+    title: Kalendar
+    all_day_prefix: 'Cijeli dan: '
+    no_events: Nema događaja
+    no_calendars: Nije odabran kalendar
+  sv:
+    today: "Idag"
+    more: "+{e} till"
+    title: Kalender
+    all_day_prefix: 'Heldag: '
+    no_events: Inga händelser
+    no_calendars: Ingen kalender vald
+layouts:
+  '41':
+    spec: calendar_41
+    defaults:
+      rotate: '0'
+  '426':
+    spec: calendar_426
+    defaults:
+      rotate: '0'

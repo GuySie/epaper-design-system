@@ -1,0 +1,5 @@
+Jinja2==3.1.6
+PyYAML==6.0.3
+Pillow==12.3.0
+numpy==2.5.3
+odl-renderer==0.5.14

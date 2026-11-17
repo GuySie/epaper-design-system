@@ -1,0 +1,151 @@
+          # ---- design system: one shared weather data model (wx) for every layout ----
+          - action: weather.get_forecasts
+            target:
+              entity_id: "{{ forecast_entity }}"
+            data:
+              type: daily
+            response_variable: ds_fd
+          - variables:
+              ds_hourly_ok: "{{ (state_attr(forecast_entity, 'supported_features') | int(0)) | bitwise_and(2) > 0 }}"
+          - if:
+              - "{{ ds_hourly_ok }}"
+            then:
+              - action: weather.get_forecasts
+                target:
+                  entity_id: "{{ forecast_entity }}"
+                data:
+                  type: hourly
+                response_variable: ds_fh
+          - variables:
+              wx: >
+                {% set dmap = {'clear-night': 'weather-night', 'cloudy': 'weather-cloudy', 'fog': 'weather-fog', 'hail': 'weather-hail',
+                  'lightning': 'weather-lightning', 'lightning-rainy': 'weather-lightning-rainy', 'partlycloudy': 'weather-partly-cloudy',
+                  'pouring': 'weather-pouring', 'rainy': 'weather-rainy', 'snowy': 'weather-snowy', 'snowy-rainy': 'weather-snowy-rainy',
+                  'sunny': 'weather-sunny', 'windy': 'weather-windy', 'windy-variant': 'weather-windy-variant', 'exceptional': 'alert-circle-outline'} %}
+                {% set nmap = dict(dmap, **{'partlycloudy': 'weather-night-partly-cloudy', 'sunny': 'weather-night'}) %}
+                {% set wd = EP_DAYS_SHORT %}
+                {% set sun_ok = states('sun.sun') not in ['unknown', 'unavailable'] %}
+                {% set n_rise = as_timestamp(state_attr('sun.sun', 'next_rising'), 0) if sun_ok else 0 %}
+                {% set n_set = as_timestamp(state_attr('sun.sun', 'next_setting'), 0) if sun_ok else 0 %}
+                {% set up = states('sun.sun') == 'above_horizon' if sun_ok else true %}
+                {% set fmt = '%H:%M' if time_format != '12h' else '%-I:%M %p' %}
+                {% set hfmt = '%H:00' if time_format != '12h' else '%-I %p' %}
+                {# thresholds -> chip kind: '' (none) / 'warn' / 'sev' #}
+                {% set tlw, tls = warning_temp_low | default(-100) | float(-100), severe_temp_low | default(-100) | float(-100) %}
+                {% set thw, ths = warning_temp_high | default(100) | float(100), severe_temp_high | default(100) | float(100) %}
+                {% set ww, ws = warning_wind_high | default(1000) | float(1000), severe_wind_high | default(1000) | float(1000) %}
+                {% set rhw, rhs = warning_rain_hour | default(1000) | float(1000), severe_rain_hour | default(1000) | float(1000) %}
+                {% set rdw, rds = warning_rain_day | default(1000) | float(1000), severe_rain_day | default(1000) | float(1000) %}
+                {# the switches (Thresholds): off, the reading is never flagged #}
+                {% if not (flag_temp_low | default(true)) %}{% set tlw, tls = -1000, -1000 %}{% endif %}
+                {% if not (flag_temp_high | default(true)) %}{% set thw, ths = 1000, 1000 %}{% endif %}
+                {% if not (flag_wind_high | default(true)) %}{% set ww, ws = 100000, 100000 %}{% endif %}
+                {% if not (flag_rain_hour | default(true)) %}{% set rhw, rhs = 100000, 100000 %}{% endif %}
+                {% if not (flag_rain_day | default(true)) %}{% set rdw, rds = 100000, 100000 %}{% endif %}
+                {% set cs = current_temp_sensor | default('') %}
+                {% set temp = (states(cs) | float(none)) if (cs and states(cs) | is_number) else (state_attr(forecast_entity, 'temperature') | float(none)) %}
+                {% set cond = states(forecast_entity) %}
+                {% set cw_, cs_ = warning_conditions | default([]), severe_conditions | default([]) %}
+                {% set temp_k = '' if temp is none else ('sev' if (temp <= tls or temp >= ths) else ('warn' if (temp <= tlw or temp >= thw) else '')) %}
+                {% set daily = ds_fd[forecast_entity]['forecast'] if (ds_fd is defined and forecast_entity in ds_fd) else [] %}
+                {% set off = 0 if (start_with_today | default(true)) else 1 %}
+                {% set today = daily[0] if daily | length > 0 else {} %}
+                {% set wind = state_attr(forecast_entity, 'wind_speed') %}
+                {% set ns = namespace(hours=[], days=[]) %}
+                {% if ds_fh is defined and forecast_entity in ds_fh %}
+                  {% for f in ds_fh[forecast_entity]['forecast'][:8] %}
+                    {% set ft = as_timestamp(f.datetime) %}
+                    {% if ft > as_timestamp(now()) - 1800 %}
+                      {% set night = sun_ok and ((up and ft > n_set) or ((not up) and ft < n_rise)) %}
+                      {% set mm = (f.precipitation | default(0) | float(0)) %}
+                      {% set ns.hours = ns.hours + [{'t': ft | timestamp_custom(hfmt), 'ts': ((ft | timestamp_custom('%-H')) ~ '¦h') if time_format != '12h' else ((ft | timestamp_custom('%-I')) ~ '¦' ~ (ft | timestamp_custom('%p') | lower)), 'icon': 'mdi:' ~ ((nmap if night else dmap)[f.condition] | default('weather-cloudy')),
+                        'temp': f.temperature | round(0) | int, 'mm': mm | round(1),
+                        'temp_k': 'sev' if ((f.temperature | float(0)) <= tls or (f.temperature | float(0)) >= ths) else ('warn' if ((f.temperature | float(0)) <= tlw or (f.temperature | float(0)) >= thw) else ''),
+                        'mm_k': 'sev' if mm >= rhs else ('warn' if mm >= rhw else ''),
+                        'icon_k': 'sev' if f.condition in cs_ else ('warn' if f.condition in cw_ else '')}] %}
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+                {% for f in daily[off:off + 5] %}
+                  {% set mm = (f.precipitation | default(0) | float(0)) %}
+                  {% set ns.days = ns.days + [{'d': wd[weekday_lang][as_datetime(f.datetime).astimezone(now().tzinfo).weekday()], 'icon': 'mdi:' ~ (dmap[f.condition] | default('weather-cloudy')),
+                    'hi': f.temperature | round(0) | int, 'lo': (f.templow | default(f.temperature)) | round(0) | int, 'mm': mm | round(1),
+                    'mm_k': 'sev' if mm >= rds else ('warn' if mm >= rdw else ''),
+                    'icon_k': 'sev' if f.condition in cs_ else ('warn' if f.condition in cw_ else ''),
+                    't_k': 'sev' if ((f.temperature | float(0)) >= ths or (f.templow | default(f.temperature) | float(0)) <= tls) else ('warn' if ((f.temperature | float(0)) >= thw or (f.templow | default(f.temperature) | float(0)) <= tlw) else '')}] %}
+                {% endfor %}
+                {% set ps = pollen_sensor | default('') %}
+                {% set pt = pollen_type | default('') %}
+                {% set pv = none %}
+                {% set plev = '' %}
+                {% if ps and states(ps) not in ['unknown', 'unavailable'] %}
+                  {% if pt %}
+                    {% set pd = (state_attr(ps, 'details') or []) | selectattr('name', 'match', pt) | list %}
+                    {% set pv = (pd | map(attribute='value') | first | default(none)) if pd else none %}
+                    {% set plev = (pd[0].level | default('')) if pd else '' %}
+                  {% else %}
+                    {% set pv = states(ps) | float(none) %}
+                    {% set plev = state_attr(ps, 'level') or '' %}
+                  {% endif %}
+                {% endif %}
+                {% set plev = (plev | string | lower | replace('-', '_') | replace(' ', '_')) %}
+                {# pollen: a count threshold when one is set (any number, 0 included), otherwise the sensor's own level (high = warning, very high = severe); never with its switch off #}
+                {% set pw, pss = warning_pollen_high | default('') | float(none), severe_pollen_high | default('') | float(none) %}
+                {% set pon = flag_pollen_high | default(true) %}
+                {% set p_sev = pon and pv is not none and ((pv >= pss) if pss is not none else plev in ['very_high', 'veryhigh', 'extreme']) %}
+                {% set p_warn = pon and pv is not none and ((pv >= pw) if pw is not none else plev in ['high']) %}
+                {% set pk = 'sev' if p_sev else ('warn' if p_warn else '') %}
+                {# official weather warning (KNMI, Meteoalarm, ...): a level sensor, optionally a sensor with the warning's subject #}
+                {% set wls = weather_warning_sensor | default('') %}
+                {% set wlv = (states(wls) | lower) if wls else 'none' %}
+                {% set wkey = 'wy' if wlv in ['yellow', 'geel', 'minor', 'moderate'] else ('wo' if wlv in ['orange', 'oranje', 'severe'] else ('wr' if wlv in ['red', 'rood', 'extreme'] else '')) %}
+                {% set wts = weather_warning_text_sensor | default('') %}
+                {% set wsubj = namespace(t='') %}
+                {% if wkey and wts %}
+                  {% set al = state_attr(wts, 'alerts') %}
+                  {% set a0 = al[0] if (al is iterable and al is not string and al | count > 0) else none %}
+                  {% if a0 is mapping %}
+                    {% if a0['condition'] is defined and (a0['condition'] | string) in ds_wtxt['cond'] %}{% set wsubj.t = ds_wtxt['cond'][a0['condition'] | string] %}{% endif %}
+                    {% for k in ['title', 'event', 'headline', 'phenomenon', 'type', 'name'] %}{% if not wsubj.t and a0[k] is defined and a0[k] %}{% set wsubj.t = a0[k] | string %}{% endif %}{% endfor %}
+                  {% elif a0 is string %}{% set wsubj.t = a0 %}{% endif %}
+                  {% if not wsubj.t and states(wts) not in ['none', 'unknown', 'unavailable', ''] and states(wts) | length <= 30 %}{% set wsubj.t = states(wts) %}{% endif %}
+                {% endif %}
+                {% set me = moon_phase_sensor | default('') %}
+                {% set me = me if me else ((integration_entities('moon') | first) | default('')) %}
+                {% set mp = states(me) if me else 'unknown' %}
+                {% set micon = none if mp in ['unknown', 'unavailable'] else ('mdi:moon-new' if mp == 'new_moon' else ('mdi:moon-full' if mp == 'full_moon' else 'mdi:moon-' ~ (mp | replace('_', '-')))) %}
+                {{ {
+                  'ok': temp is not none,
+                  'temp': (temp | round(0) | int) if temp is not none else '—',
+                  'temp_k': temp_k,
+                  'icon_k': 'sev' if cond in cs_ else ('warn' if cond in cw_ else ''),
+                  'icon': 'mdi:' ~ ((dmap if up else nmap)[cond] | default('weather-cloudy')),
+                  'hi': today.temperature | default('—') | round(0) | int if today.temperature is defined else '—',
+                  'lo': today.templow | default('—') | round(0) | int if today.templow is defined else '—',
+                  'hilo_k': ('sev' if ((today.temperature | default(none)) is not none and ((today.temperature | float(0)) >= ths or (today.templow | default(today.temperature) | float(0)) <= tls)) else ('warn' if ((today.temperature | default(none)) is not none and ((today.temperature | float(0)) >= thw or (today.templow | default(today.temperature) | float(0)) <= tlw)) else '')),
+                  'mm_today': (today.precipitation | default(0) | float(0)) | round(1),
+                  'mm_today_k': 'sev' if (today.precipitation | default(0) | float(0)) >= rds else ('warn' if (today.precipitation | default(0) | float(0)) >= rdw else ''),
+                  'wind': (wind | float(0)) | round(0) | int if wind is not none else '—',
+                  'wind_unit': state_attr(forecast_entity, 'wind_speed_unit') or 'km/h',
+                  'pres_unit': state_attr(forecast_entity, 'pressure_unit') or 'hPa',
+                  'wind_k': '' if wind is none else ('sev' if (wind | float(0)) >= ws else ('warn' if (wind | float(0)) >= ww else '')),
+                  'hum': state_attr(forecast_entity, 'humidity'),
+                  'pres': (state_attr(forecast_entity, 'pressure') | float(0)) | round(0) | int if state_attr(forecast_entity, 'pressure') is not none else none,
+                  'dew': (state_attr(forecast_entity, 'dew_point') | float(0)) | round(0) | int if state_attr(forecast_entity, 'dew_point') is not none else none,
+                  'rise': n_rise | timestamp_custom(fmt) if n_rise else '—',
+                  'set': n_set | timestamp_custom(fmt) if n_set else '—',
+                  'hours': ns.hours,
+                  'days': ns.days,
+                  'pollen': none if pv is none else {'name': (pt if pt else 'Pollen'), 'v': ((pv | round(0) | int | string) ~ (('¦' ~ (state_attr(ps, 'unit_of_measurement') or '')) if state_attr(ps, 'unit_of_measurement') else '')), 'k': pk, 'show': pv > 0 or pk != ''},
+                  'moon': micon,
+                  'alert': {'k': 'warn' if wkey == 'wy' else 'sev', 'code': wkey, 'subj': wsubj.t} if wkey else none,
+                  'cond': cond,
+                  'flag': ({'k': 'warn' if wkey == 'wy' else 'sev', 'lab': ds_wtxt[wkey], 'val': ((wsubj.t if wsubj.t else ds_wtxt['alert']) | upper),
+                            'glance': ((ds_wtxt[wkey] | upper) ~ ' ' ~ (wsubj.t | upper)) if wsubj.t else (ds_wtxt[wkey] | upper),
+                            'short': (wsubj.t | upper) if wsubj.t else (ds_wtxt[wkey] | upper), 'code': ds_wtxt[wkey] | upper}) if wkey
+                          else (({'k': 'sev' if cond in cs_ else ('warn' if cond in cw_ else ''), 'lab': ds_wtxt['now'], 'val': (ds_wtxt['cond'][cond] | default(cond)) | upper,
+                            'glance': (ds_wtxt['cond'][cond] | default(cond)) | upper, 'short': (ds_wtxt['cond'][cond] | default(cond)) | upper})
+                            if ('sev' if cond in cs_ else ('warn' if cond in cw_ else '')) else none),
+                  'time': as_timestamp(now()) | timestamp_custom(fmt),
+                  'last': as_timestamp((expand(forecast_entity) | first).last_reported | default((expand(forecast_entity) | first).last_updated), 0) if expand(forecast_entity) | count > 0 else 0
+                } }}

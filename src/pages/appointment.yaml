@@ -1,0 +1,185 @@
+page: appointment
+description:
+  shows: 'Your next appointments: start time, title and a label line, a meeting in progress marked "now", and the next free
+    moment in the footer. A single event gets its start time large.'
+  needs:
+  - calendar
+  trigger_advice: A time pattern every 15 minutes.
+  notes:
+  - All-day events are left out.
+  times: the event times and the update time
+redraw: trigger
+inputs:
+- name: calendar_entities
+  section: content
+  label: Calendar(s)
+  help: One or more calendar entities to source events from. Events from multiple calendars are merged.
+  selector:
+    entity:
+      multiple: true
+      filter:
+        domain: calendar
+  required: true
+- name: days_ahead
+  section: content
+  label: Search window
+  help: How many days ahead to search for upcoming appointments. Increase this if your calendar is sparse and the display
+    isn't finding a second event.
+  selector:
+    number:
+      min: 1
+      max: 14
+      mode: box
+  default: 7
+bind:
+- calendar_entities
+- days_ahead
+data:
+  variables:
+  - text_strip_pattern: '[^ -ɏ‐-‧‰-※€™]'
+  - header_title_display: '{{ header_title if header_title else language_map[weekday_lang][''default_title''] }}'
+  draw:
+    kind: choose
+    when:
+    - '{{ calendar_entities | count > 0 }}'
+    steps:
+    - action: calendar.get_events
+      target:
+        entity_id: '{{ calendar_entities }}'
+      data:
+        start_date_time: '{{ today_at(''00:00'') }}'
+        end_date_time: '{{ today_at(''00:00'') + timedelta(days=days_ahead) }}'
+      response_variable: cal_events
+    - variables:
+        events_data: |
+          {% set now_ts = now().timestamp() %} {% set today_date = now().date() %} {% set unsorted_events = (cal_events.values() | map(attribute='events') | list | sum(start=[])) | selectattr('start', 'search', ':') | list %} {% set tagged = namespace(list=[]) %} {% for e in unsorted_events %}
+            {% set tagged.list = tagged.list + [{'ts': as_timestamp(e.start), 'event': e}] %}
+          {% endfor %} {% set all_events = tagged.list | sort(attribute='ts') | map(attribute='event') | list %} {% set ns = namespace(list=[]) %} {% for e in all_events %}
+            {% if (ns.list | count) < (max_events | int) and as_timestamp(e.end) > now_ts %}
+              {% set start_local = as_local(as_datetime(e.start)) %}
+              {% set is_current = as_timestamp(e.start) <= now_ts %}
+              {% set day_diff = (start_local.date() - today_date).days %}
+              {% if is_current %}
+                {% set label = language_map[weekday_lang]['now_label'] %}
+              {% elif day_diff == 0 %}
+                {% set label = language_map[weekday_lang]['today'] %}
+              {% elif day_diff == 1 %}
+                {% set label = language_map[weekday_lang]['tomorrow'] %}
+              {% else %}
+                {% set label = weekday_short_map[weekday_lang][start_local.weekday()] ~ ' ' ~ start_local.day ~ ' ' ~ months_short_map[weekday_lang][start_local.month - 1] %}
+              {% endif %}
+              {% set start_label = (as_timestamp(e.start) | timestamp_custom('%-I:%M %p')) if time_format == '12h' else (as_timestamp(e.start) | timestamp_custom('%H:%M')) %}
+              {% set end_label = (as_timestamp(e.end) | timestamp_custom('%-I:%M %p')) if time_format == '12h' else (as_timestamp(e.end) | timestamp_custom('%H:%M')) %}
+              {% set ns.list = ns.list + [{
+                'label': label,
+                'is_current': is_current,
+                'time_range': start_label ~ '–' ~ end_label,
+                'start': start_label,
+                'start_ts': as_timestamp(e.start),
+                'end_ts': as_timestamp(e.end),
+                'end': end_label,
+                'summary': (e.summary | default('') | regex_replace(text_strip_pattern, '') | regex_replace(' {2,}', ' ') | trim)
+              }] %}
+            {% endif %}
+          {% endfor %} {{ ns.list }}
+texts:
+  use:
+    weekdays: weekdays
+    months: months
+  en:
+    until: "until"
+    free_until: "free until"
+    free_from: "free from"
+    today: Today
+    tomorrow: Tomorrow
+    now_label: Now
+    no_events: No upcoming appointments
+    no_calendars: No calendar chosen
+    default_title: Next Appointment
+  de:
+    until: "bis"
+    free_until: "frei bis"
+    free_from: "frei ab"
+    today: Heute
+    tomorrow: Morgen
+    now_label: Jetzt
+    no_events: Keine anstehenden Termine
+    no_calendars: Kein Kalender ausgewählt
+    default_title: Nächster Termin
+  nl:
+    until: "tot"
+    free_until: "vrij tot"
+    free_from: "vrij vanaf"
+    today: Vandaag
+    tomorrow: Morgen
+    now_label: Nu
+    no_events: Geen aankomende afspraken
+    no_calendars: Geen agenda gekozen
+    default_title: Volgende Afspraak
+  fr:
+    until: "jusqu'à"
+    free_until: "libre jusqu'à"
+    free_from: "libre dès"
+    today: Aujourd'hui
+    tomorrow: Demain
+    now_label: En cours
+    no_events: Aucun rendez-vous à venir
+    no_calendars: Aucun calendrier choisi
+    default_title: Prochain Rendez-vous
+  es:
+    until: "hasta"
+    free_until: "libre hasta"
+    free_from: "libre desde"
+    today: Hoy
+    tomorrow: Mañana
+    now_label: Ahora
+    no_events: No hay citas próximas
+    no_calendars: Ningún calendario elegido
+    default_title: Próxima Cita
+  pl:
+    until: "do"
+    free_until: "wolne do"
+    free_from: "wolne od"
+    today: Dziś
+    tomorrow: Jutro
+    now_label: Teraz
+    no_events: Brak nadchodzących wydarzeń
+    no_calendars: Nie wybrano kalendarza
+    default_title: Następne Spotkanie
+  hr:
+    until: "do"
+    free_until: "slobodno do"
+    free_from: "slobodno od"
+    today: Danas
+    tomorrow: Sutra
+    now_label: Sada
+    no_events: Nema nadolazećih događaja
+    no_calendars: Nije odabran kalendar
+    default_title: Sljedeći Sastanak
+  sv:
+    until: "till"
+    free_until: "ledig till"
+    free_from: "ledig från"
+    today: Idag
+    tomorrow: Imorgon
+    now_label: Nu
+    no_events: Inga kommande händelser
+    no_calendars: Ingen kalender vald
+    default_title: Nästa Möte
+layouts:
+  '35':
+    spec: appointment_35
+    constants:
+      max_events: 4
+  '41':
+    spec: appointment_41
+    defaults:
+      rotate: '0'
+    constants:
+      max_events: 6
+  '426':
+    spec: appointment_426
+    defaults:
+      rotate: '0'
+    constants:
+      max_events: 10

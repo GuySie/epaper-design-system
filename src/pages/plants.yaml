@@ -1,0 +1,559 @@
+page: plants
+description:
+  shows: Soil moisture for up to 22 plants in two columns, the driest first if you like, with dry plants as warning or severe
+    chips.
+  needs_also:
+  - Soil moisture sensors (e.g. from a plant monitor integration).
+  trigger_advice: A time pattern every 15 minutes.
+redraw: trigger
+stale:
+- plant_1
+- plant_2
+- plant_3
+- plant_4
+- plant_5
+- plant_6
+- plant_7
+- plant_8
+- plant_9
+- plant_10
+- plant_11
+- plant_12
+- plant_13
+- plant_14
+- plant_15
+- plant_16
+- plant_17
+- plant_18
+- plant_19
+- plant_20
+- plant_21
+- plant_22
+inputs:
+- name: plant_1
+  section: content
+  label: Plant 1 - sensor
+  help: Soil moisture sensor for plant 1. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  required: true
+- name: plant_2
+  section: content
+  label: Plant 2 - sensor
+  help: Soil moisture sensor for plant 2. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_3
+  section: content
+  label: Plant 3 - sensor
+  help: Soil moisture sensor for plant 3. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_4
+  section: content
+  label: Plant 4 - sensor
+  help: Soil moisture sensor for plant 4. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_5
+  section: content
+  label: Plant 5 - sensor
+  help: Soil moisture sensor for plant 5. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_6
+  section: content
+  label: Plant 6 - sensor
+  help: Soil moisture sensor for plant 6. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_7
+  section: content
+  label: Plant 7 - sensor
+  help: Soil moisture sensor for plant 7. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_8
+  section: content
+  label: Plant 8 - sensor
+  help: Soil moisture sensor for plant 8. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_9
+  section: content
+  label: Plant 9 - sensor
+  help: Soil moisture sensor for plant 9. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_10
+  section: content
+  label: Plant 10 - sensor
+  help: Soil moisture sensor for plant 10. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_11
+  section: content
+  label: Plant 11 - sensor
+  help: Soil moisture sensor for plant 11. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_12
+  section: content
+  label: Plant 12 - sensor
+  help: Soil moisture sensor for plant 12. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_13
+  section: content
+  label: Plant 13 - sensor
+  help: Soil moisture sensor for plant 13. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_14
+  section: content
+  label: Plant 14 - sensor
+  help: Soil moisture sensor for plant 14. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_15
+  section: content
+  label: Plant 15 - sensor
+  help: Soil moisture sensor for plant 15. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_16
+  section: content
+  label: Plant 16 - sensor
+  help: Soil moisture sensor for plant 16. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_17
+  section: content
+  label: Plant 17 - sensor
+  help: Soil moisture sensor for plant 17. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_18
+  section: content
+  label: Plant 18 - sensor
+  help: Soil moisture sensor for plant 18. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_19
+  section: content
+  label: Plant 19 - sensor
+  help: Soil moisture sensor for plant 19. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_20
+  section: content
+  label: Plant 20 - sensor
+  help: Soil moisture sensor for plant 20. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_21
+  section: content
+  label: Plant 21 - sensor
+  help: Soil moisture sensor for plant 21. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_22
+  section: content
+  label: Plant 22 - sensor
+  help: Soil moisture sensor for plant 22. Leave blank to disable this row.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: plant_1_label
+  section: content
+  label: Plant 1 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_2_label
+  section: content
+  label: Plant 2 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_3_label
+  section: content
+  label: Plant 3 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_4_label
+  section: content
+  label: Plant 4 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_5_label
+  section: content
+  label: Plant 5 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_6_label
+  section: content
+  label: Plant 6 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_7_label
+  section: content
+  label: Plant 7 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_8_label
+  section: content
+  label: Plant 8 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_9_label
+  section: content
+  label: Plant 9 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_10_label
+  section: content
+  label: Plant 10 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_11_label
+  section: content
+  label: Plant 11 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_12_label
+  section: content
+  label: Plant 12 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_13_label
+  section: content
+  label: Plant 13 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_14_label
+  section: content
+  label: Plant 14 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_15_label
+  section: content
+  label: Plant 15 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_16_label
+  section: content
+  label: Plant 16 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_17_label
+  section: content
+  label: Plant 17 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_18_label
+  section: content
+  label: Plant 18 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_19_label
+  section: content
+  label: Plant 19 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_20_label
+  section: content
+  label: Plant 20 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_21_label
+  section: content
+  label: Plant 21 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: plant_22_label
+  section: content
+  label: Plant 22 - label
+  help: Optional label override. Leave blank to derive it from the sensor's name.
+  selector:
+    text: {}
+  default: ''
+- name: sort_driest_first
+  section: content
+  label: Sort driest first
+  help: Order plants by moisture (driest at the top) instead of the configured order
+  selector:
+    boolean: {}
+  default: false
+- name: flag_moisture_low
+  section: thresholds
+  label: 'Dry soil: flag it'
+  help: Off, a plant is never flagged, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_moisture_low
+  section: thresholds
+  label: Warning moisture threshold
+  help: If a plant's moisture is at or below this percentage, its value is shown as a warning chip
+  selector:
+    number:
+      min: 0
+      max: 100
+      unit_of_measurement: '%'
+      mode: box
+  default: 25
+- name: severe_moisture_low
+  section: thresholds
+  label: Severe moisture threshold
+  help: If a plant's moisture is at or below this percentage, its value is shown as severe
+  selector:
+    number:
+      min: 0
+      max: 100
+      unit_of_measurement: '%'
+      mode: box
+  default: 14
+bind:
+- flag_moisture_low
+- severe_moisture_low
+- plant_1
+- plant_1_label
+- plant_2
+- plant_2_label
+- plant_3
+- plant_3_label
+- plant_4
+- plant_4_label
+- plant_5
+- plant_5_label
+- plant_6
+- plant_6_label
+- plant_7
+- plant_7_label
+- plant_8
+- plant_8_label
+- plant_9
+- plant_9_label
+- plant_10
+- plant_10_label
+- plant_11
+- plant_11_label
+- plant_12
+- plant_12_label
+- plant_13
+- plant_13_label
+- plant_14
+- plant_14_label
+- plant_15
+- plant_15_label
+- plant_16
+- plant_16_label
+- plant_17
+- plant_17_label
+- plant_18
+- plant_18_label
+- plant_19
+- plant_19_label
+- plant_20
+- plant_20_label
+- plant_21
+- plant_21_label
+- plant_22
+- plant_22_label
+- warning_moisture_low
+- sort_driest_first
+data:
+  variables:
+  - plants: |
+      {% set ns = namespace(list=[]) %} {% set slots = [
+        {'entity': plant_1, 'label': plant_1_label},
+        {'entity': plant_2, 'label': plant_2_label},
+        {'entity': plant_3, 'label': plant_3_label},
+        {'entity': plant_4, 'label': plant_4_label},
+        {'entity': plant_5, 'label': plant_5_label},
+        {'entity': plant_6, 'label': plant_6_label},
+        {'entity': plant_7, 'label': plant_7_label},
+        {'entity': plant_8, 'label': plant_8_label},
+        {'entity': plant_9, 'label': plant_9_label},
+        {'entity': plant_10, 'label': plant_10_label},
+        {'entity': plant_11, 'label': plant_11_label},
+        {'entity': plant_12, 'label': plant_12_label},
+        {'entity': plant_13, 'label': plant_13_label},
+        {'entity': plant_14, 'label': plant_14_label},
+        {'entity': plant_15, 'label': plant_15_label},
+        {'entity': plant_16, 'label': plant_16_label},
+        {'entity': plant_17, 'label': plant_17_label},
+        {'entity': plant_18, 'label': plant_18_label},
+        {'entity': plant_19, 'label': plant_19_label},
+        {'entity': plant_20, 'label': plant_20_label},
+        {'entity': plant_21, 'label': plant_21_label},
+        {'entity': plant_22, 'label': plant_22_label}
+      ] %} {% for slot in slots %}
+        {% if slot.entity and slot.entity != '' %}
+          {% set raw_state = states(slot.entity) %}
+          {% set has_value = raw_state not in ['unknown', 'unavailable', 'none', ''] %}
+          {% set pct_raw = (raw_state | float(0)) if has_value else 0 %}
+          {% set pct_raw = ([pct_raw, 0] | max) %}
+          {% set pct_raw = ([pct_raw, 100] | min) %}
+          {% set pct = pct_raw | round | int %}
+          {% set fname = device_name(slot.entity) or entity_name(slot.entity) or slot.entity %}
+          {% set fname_lower = fname | lower %}
+          {% if slot.label and slot.label != '' %}
+            {% set label_text = slot.label %}
+          {% elif fname_lower.endswith(' soil moisture') %}
+            {% set label_text = fname[:-14] %}
+          {% elif fname_lower.endswith(' moisture') %}
+            {% set label_text = fname[:-9] %}
+          {% else %}
+            {% set label_text = fname %}
+          {% endif %}
+          {% set ns.list = ns.list + [{
+            'label': label_text,
+            'pct': pct,
+            'ok': has_value
+          }] %}
+        {% endif %}
+      {% endfor %} {{ ns.list }}
+  - header_title_display: '{{ header_title if header_title else language_map[weekday_lang][''default_title''] }}'
+  - ds_plants: |
+      {% set ok = plants | selectattr('ok') | list %} {% set bad = plants | rejectattr('ok') | list %} {{ ((ok | sort(attribute='pct')) + bad) if sort_driest_first else plants }}
+  draw:
+    kind: choose
+    when:
+    - '{{ plants | length > 0 }}'
+    steps: []
+texts:
+  en:
+    no_plants: No plants configured.
+    default_title: Plants
+  de:
+    no_plants: Keine Pflanzen konfiguriert.
+    default_title: Pflanzen
+  nl:
+    no_plants: Geen planten geconfigureerd.
+    default_title: Planten
+  fr:
+    no_plants: Aucune plante configurée.
+    default_title: Plantes
+  es:
+    no_plants: No hay plantas configuradas.
+    default_title: Plantas
+  pl:
+    no_plants: Nie skonfigurowano żadnych roślin.
+    default_title: Rośliny
+  hr:
+    no_plants: Nije konfigurirana nijedna biljka.
+    default_title: Biljke
+  sv:
+    no_plants: Inga växter konfigurerade.
+    default_title: Växter
+layouts:
+  '41':
+    spec: plants_41
+    defaults:
+      rotate: '0'

@@ -1,0 +1,300 @@
+page: entities
+description:
+  shows: Up to 12 entities in two columns, each with its label, state and unit; empty slots are skipped.
+  needs_also:
+  - The entities to show (any domain).
+  trigger_advice: A time pattern every 15 minutes, or a state trigger on the entities that matter most.
+redraw: trigger
+stale:
+- entity_1
+- entity_2
+- entity_3
+- entity_4
+- entity_5
+- entity_6
+- entity_7
+- entity_8
+- entity_9
+- entity_10
+- entity_11
+- entity_12
+inputs:
+- name: entity_1
+  section: content
+  label: Entity 1
+  help: Entity for row 1. Leave blank to disable this row.
+  selector:
+    entity: {}
+  required: true
+- name: entity_2
+  section: content
+  label: Entity 2
+  help: Entity for row 2. Leave blank to disable this row.
+  selector:
+    entity: {}
+  default: ''
+- name: entity_3
+  section: content
+  label: Entity 3
+  help: Entity for row 3. Leave blank to disable this row.
+  selector:
+    entity: {}
+  default: ''
+- name: entity_4
+  section: content
+  label: Entity 4
+  help: Entity for row 4. Leave blank to disable this row.
+  selector:
+    entity: {}
+  default: ''
+- name: entity_5
+  section: content
+  label: Entity 5
+  help: Entity for row 5. Leave blank to disable this row.
+  selector:
+    entity: {}
+  default: ''
+- name: entity_6
+  section: content
+  label: Entity 6
+  help: Entity for row 6. Leave blank to disable this row.
+  selector:
+    entity: {}
+  default: ''
+- name: entity_7
+  section: content
+  label: Entity 7
+  help: Entity for row 7. Leave blank to disable this row.
+  selector:
+    entity: {}
+  default: ''
+- name: entity_8
+  section: content
+  label: Entity 8
+  help: Entity for row 8. Leave blank to disable this row.
+  selector:
+    entity: {}
+  default: ''
+- name: entity_9
+  section: content
+  label: Entity 9
+  help: Entity for row 9. Leave blank to disable this row.
+  selector:
+    entity: {}
+  default: ''
+- name: entity_10
+  section: content
+  label: Entity 10
+  help: Entity for row 10. Leave blank to disable this row.
+  selector:
+    entity: {}
+  default: ''
+- name: entity_11
+  section: content
+  label: Entity 11
+  help: Entity for row 11. Leave blank to disable this row.
+  selector:
+    entity: {}
+  default: ''
+- name: entity_12
+  section: content
+  label: Entity 12
+  help: Entity for row 12. Leave blank to disable this row.
+  selector:
+    entity: {}
+  default: ''
+- name: entity_1_label
+  section: content
+  label: Entity 1 - label
+  help: Optional label override. Leave blank to derive it from the entity's name.
+  selector:
+    text: {}
+  default: ''
+- name: entity_2_label
+  section: content
+  label: Entity 2 - label
+  help: Optional label override. Leave blank to derive it from the entity's name.
+  selector:
+    text: {}
+  default: ''
+- name: entity_3_label
+  section: content
+  label: Entity 3 - label
+  help: Optional label override. Leave blank to derive it from the entity's name.
+  selector:
+    text: {}
+  default: ''
+- name: entity_4_label
+  section: content
+  label: Entity 4 - label
+  help: Optional label override. Leave blank to derive it from the entity's name.
+  selector:
+    text: {}
+  default: ''
+- name: entity_5_label
+  section: content
+  label: Entity 5 - label
+  help: Optional label override. Leave blank to derive it from the entity's name.
+  selector:
+    text: {}
+  default: ''
+- name: entity_6_label
+  section: content
+  label: Entity 6 - label
+  help: Optional label override. Leave blank to derive it from the entity's name.
+  selector:
+    text: {}
+  default: ''
+- name: entity_7_label
+  section: content
+  label: Entity 7 - label
+  help: Optional label override. Leave blank to derive it from the entity's name.
+  selector:
+    text: {}
+  default: ''
+- name: entity_8_label
+  section: content
+  label: Entity 8 - label
+  help: Optional label override. Leave blank to derive it from the entity's name.
+  selector:
+    text: {}
+  default: ''
+- name: entity_9_label
+  section: content
+  label: Entity 9 - label
+  help: Optional label override. Leave blank to derive it from the entity's name.
+  selector:
+    text: {}
+  default: ''
+- name: entity_10_label
+  section: content
+  label: Entity 10 - label
+  help: Optional label override. Leave blank to derive it from the entity's name.
+  selector:
+    text: {}
+  default: ''
+- name: entity_11_label
+  section: content
+  label: Entity 11 - label
+  help: Optional label override. Leave blank to derive it from the entity's name.
+  selector:
+    text: {}
+  default: ''
+- name: entity_12_label
+  section: content
+  label: Entity 12 - label
+  help: Optional label override. Leave blank to derive it from the entity's name.
+  selector:
+    text: {}
+  default: ''
+bind:
+- entity_1
+- entity_1_label
+- entity_2
+- entity_2_label
+- entity_3
+- entity_3_label
+- entity_4
+- entity_4_label
+- entity_5
+- entity_5_label
+- entity_6
+- entity_6_label
+- entity_7
+- entity_7_label
+- entity_8
+- entity_8_label
+- entity_9
+- entity_9_label
+- entity_10
+- entity_10_label
+- entity_11
+- entity_11_label
+- entity_12
+- entity_12_label
+data:
+  variables:
+  - entities: |
+      {% set ns = namespace(list=[]) %} {% set slots = [
+        {'entity': entity_1, 'label': entity_1_label},
+        {'entity': entity_2, 'label': entity_2_label},
+        {'entity': entity_3, 'label': entity_3_label},
+        {'entity': entity_4, 'label': entity_4_label},
+        {'entity': entity_5, 'label': entity_5_label},
+        {'entity': entity_6, 'label': entity_6_label},
+        {'entity': entity_7, 'label': entity_7_label},
+        {'entity': entity_8, 'label': entity_8_label},
+        {'entity': entity_9, 'label': entity_9_label},
+        {'entity': entity_10, 'label': entity_10_label},
+        {'entity': entity_11, 'label': entity_11_label},
+        {'entity': entity_12, 'label': entity_12_label}
+      ] %} {% for slot in slots %}
+        {% if slot.entity and slot.entity != '' %}
+          {% set label_text = slot.label if slot.label and slot.label != '' else (entity_name(slot.entity) or device_name(slot.entity) or slot.entity) %}
+          {% set ns.list = ns.list + [{
+            'label': label_text
+          }] %}
+        {% endif %}
+      {% endfor %} {{ ns.list }}
+  - header_title_display: '{{ header_title if header_title else language_map[weekday_lang][''default_title''] }}'
+  - ds_unavail_msg: |-
+      {{ {'en': 'Most values unavailable.', 'de': 'Die meisten Werte nicht verfügbar.', 'nl': 'Meeste waarden niet beschikbaar.',
+          'fr': 'La plupart des valeurs indisponibles.', 'es': 'La mayoría de los valores no disponibles.',
+          'pl': 'Większość wartości niedostępna.', 'hr': 'Većina vrijednosti nedostupna.', 'sv': 'De flesta värden otillgängliga.'}.get(weekday_lang, 'Most values unavailable.') }}
+  - ds_rows: |
+      {% set ns = namespace(list=[]) %} {% set slots = [
+        [entity_1, entity_1_label], [entity_2, entity_2_label], [entity_3, entity_3_label],
+        [entity_4, entity_4_label], [entity_5, entity_5_label], [entity_6, entity_6_label],
+        [entity_7, entity_7_label], [entity_8, entity_8_label], [entity_9, entity_9_label],
+        [entity_10, entity_10_label], [entity_11, entity_11_label], [entity_12, entity_12_label]
+      ] %} {% for e, lab in slots %}
+        {% if e and e != '' %}
+          {% set raw = states(e) %}
+          {% set ok = raw not in ['unknown', 'unavailable', 'none', ''] %}
+          {% set unit = state_attr(e, 'unit_of_measurement') or '' %}
+          {% set label = lab if lab else (entity_name(e) or device_name(e) or e) %}
+          {% set n = raw | float(none) %}
+          {% if not ok %}{% set val = '—' %}
+          {% elif n is none %}{% set val = raw %}
+          {% else %}
+            {% set dec = 0 if unit in ['%', 'ppm', 'ppb', 'lx', 'W', 'hPa', 'dB', 'μg/m³', 'µg/m³', 'mg/m³', 'Wh', 'rpm'] else 1 %}
+            {% set num = (n | round(dec) | string) %}{% set num = num[:-2] if num.endswith('.0') else num %}
+            {% set num = num if weekday_lang == 'en' else num.replace('.', ',') %}
+            {% set val = (num ~ unit) if unit in ['%', '°', '°C', '°F', '℃', '℉'] else ((num ~ '¦' ~ unit) if unit else num) %}
+          {% endif %}
+          {% set ns.list = ns.list + [{'label': label, 'value': val, 'ok': ok}] %}
+        {% endif %}
+      {% endfor %} {{ ns.list }}
+  draw:
+    kind: choose
+    when:
+    - '{{ entities | length > 0 }}'
+    steps: []
+texts:
+  en:
+    no_entities: No entities configured.
+    default_title: Entities
+  de:
+    no_entities: Keine Entitäten konfiguriert.
+    default_title: Entitäten
+  nl:
+    no_entities: Geen entiteiten geconfigureerd.
+    default_title: Entiteiten
+  fr:
+    no_entities: Aucune entité configurée.
+    default_title: Entités
+  es:
+    no_entities: No hay entidades configuradas.
+    default_title: Entidades
+  pl:
+    no_entities: Nie skonfigurowano żadnych encji.
+    default_title: Encje
+  hr:
+    no_entities: Nije konfiguriran nijedan entitet.
+    default_title: Entiteti
+  sv:
+    no_entities: Inga entiteter konfigurerade.
+    default_title: Entiteter
+layouts:
+  '35':
+    spec: entities_35

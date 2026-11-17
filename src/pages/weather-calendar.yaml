@@ -1,0 +1,493 @@
+page: weather-calendar
+description:
+  shows: The weather's temperature as the hero with its details in the top half, the coming days with their events in the
+    bottom half, with warnings and pollen as chips.
+  needs:
+  - calendar
+  - weather
+  optional:
+  - sun
+  - moon
+  - kleenex_pollen
+  trigger_advice: A time pattern every 15 or 30 minutes.
+  notes:
+  - Leave the weather entity empty to use the first working weather entity.
+  - A weather warning sensor (e.g. KNMI or Meteoalarm) turns the official warning level into a chip.
+  title_default: '"Weather"'
+redraw: trigger
+stale: drawing
+inputs:
+- name: weather_entity
+  section: content
+  label: Weather entity
+  help: The weather entity to show. While it isn't working, another working weather entity is used
+    instead.
+  selector:
+    entity:
+      filter:
+        domain: weather
+  required: true
+- name: current_temp_sensor
+  section: content
+  label: Current temperature sensor
+  help: Optional temperature sensor to use instead of forecast temperature
+  selector:
+    entity:
+      filter:
+        domain: sensor
+        device_class: temperature
+  default: ''
+- name: pollen_sensor
+  section: content
+  label: Pollen forecast sensor
+  help: Optional Kleenex pollen sensor to use - if not specified an additional hour weather forecast will be shown
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: moon_phase_sensor
+  section: content
+  label: Moon phase sensor
+  help: Sensor used for the moon phase icon. Leave blank to detect the Moon integration's sensor automatically (its entity
+    ID is translated, so it isn't always `sensor.moon_phase`). Set this to use a different sensor, such as the Lunar Phase
+    integration's "Moon Phase" sensor.
+  selector:
+    entity:
+      domain: sensor
+  default: ''
+- name: weather_warning_sensor
+  section: content
+  label: Weather warning level sensor (optional)
+  help: A sensor with the official warning level for your area (KNMI's "Warning level", Meteoalarm, ...). Code yellow (or
+    minor/moderate) shows as a warning chip, orange and red (severe/extreme) as a severe chip, ahead of every other alert
+    on the display.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: weather_warning_text_sensor
+  section: content
+  label: Weather warning text sensor (optional)
+  help: A sensor that lists the active warnings (KNMI's "Warnings"), so the chip can name the warning (e.g. thunderstorms).
+    Without it the chip shows the colour code.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: pollen_type
+  section: content
+  label: Pollen type
+  help: Optional type of pollen to track (as listed in the Kleenex data) - if not specified will default to the total pollen
+    count
+  selector:
+    text: null
+  default: ''
+- name: flag_temp_low
+  section: thresholds
+  label: 'Cold: flag it'
+  help: Off, cold is never flagged, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_temp_low
+  section: thresholds
+  label: 'Cold: warning at or below'
+  help: Temperatures at or below this get a warning chip.
+  selector:
+    number:
+      unit_of_measurement: °
+      mode: box
+  default: 3
+- name: severe_temp_low
+  section: thresholds
+  label: 'Cold: severe at or below'
+  help: Temperatures at or below this get a severe chip.
+  selector:
+    number:
+      unit_of_measurement: °
+      mode: box
+  default: 0
+- name: flag_temp_high
+  section: thresholds
+  label: 'Heat: flag it'
+  help: Off, heat is never flagged, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_temp_high
+  section: thresholds
+  label: 'Heat: warning at or above'
+  help: Temperatures at or above this get a warning chip.
+  selector:
+    number:
+      unit_of_measurement: °
+      mode: box
+  default: 27
+- name: severe_temp_high
+  section: thresholds
+  label: 'Heat: severe at or above'
+  help: Temperatures at or above this get a severe chip.
+  selector:
+    number:
+      unit_of_measurement: °
+      mode: box
+  default: 35
+- name: flag_wind_high
+  section: thresholds
+  label: 'Wind: flag it'
+  help: Off, wind is never flagged, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_wind_high
+  section: thresholds
+  label: 'Wind: warning at or above'
+  help: Wind speeds at or above this get a warning chip (in the weather entity's wind unit).
+  selector:
+    number:
+      unit_of_measurement: km/h
+      mode: box
+  default: 50
+- name: severe_wind_high
+  section: thresholds
+  label: 'Wind: severe at or above'
+  help: Wind speeds at or above this get a severe chip (in the weather entity's wind unit).
+  selector:
+    number:
+      unit_of_measurement: km/h
+      mode: box
+  default: 75
+- name: flag_rain_hour
+  section: thresholds
+  label: 'Rain per hour: flag it'
+  help: Off, rain per hour is never flagged, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_rain_hour
+  section: thresholds
+  label: 'Rain per hour: warning at or above'
+  help: Hourly forecast rain at or above this gets a warning chip.
+  selector:
+    number:
+      min: 0
+      step: 0.1
+      unit_of_measurement: mm/h
+      mode: box
+  default: 2.5
+- name: severe_rain_hour
+  section: thresholds
+  label: 'Rain per hour: severe at or above'
+  help: Hourly forecast rain at or above this gets a severe chip.
+  selector:
+    number:
+      min: 0
+      step: 0.1
+      unit_of_measurement: mm/h
+      mode: box
+  default: 10
+- name: flag_rain_day
+  section: thresholds
+  label: 'Rain per day: flag it'
+  help: Off, rain per day is never flagged, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_rain_day
+  section: thresholds
+  label: 'Rain per day: warning at or above'
+  help: A day's forecast rain (today's total included) at or above this gets a warning chip.
+  selector:
+    number:
+      unit_of_measurement: mm
+      mode: box
+      step: 0.1
+  default: 10
+- name: severe_rain_day
+  section: thresholds
+  label: 'Rain per day: severe at or above'
+  help: A day's forecast rain (today's total included) at or above this gets a severe chip.
+  selector:
+    number:
+      unit_of_measurement: mm
+      mode: box
+      step: 0.1
+  default: 25
+- name: flag_pollen_high
+  section: thresholds
+  label: 'Pollen: flag it'
+  help: Off, pollen is never flagged, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_pollen_high
+  section: thresholds
+  label: 'Pollen: warning at or above (optional)'
+  help: 'Leave empty to use the sensor''s own level: "high" is a warning. Set a count to use that instead.'
+  selector:
+    number:
+      unit_of_measurement: ppm
+      mode: box
+  default: ''
+- name: severe_pollen_high
+  section: thresholds
+  label: 'Pollen: severe at or above (optional)'
+  help: 'Leave empty to use the sensor''s own level: "very high" is severe. Set a count to use that instead.'
+  selector:
+    number:
+      unit_of_measurement: ppm
+      mode: box
+  default: ''
+- name: warning_conditions
+  section: thresholds
+  label: 'Conditions: warning'
+  help: 'Weather conditions that count as a warning: the hour or day label becomes a warning chip, and the current condition
+    is named in a chip. Only conditions that are a risk by themselves; fog, snow and wind are flagged by the temperature and
+    wind thresholds and by official warnings instead.'
+  selector:
+    select:
+      multiple: true
+      options:
+      - clear-night
+      - cloudy
+      - exceptional
+      - fog
+      - hail
+      - lightning
+      - lightning-rainy
+      - partlycloudy
+      - pouring
+      - rainy
+      - snowy
+      - snowy-rainy
+      - sunny
+      - windy
+      - windy-variant
+  default:
+  - hail
+  - lightning
+  - lightning-rainy
+  - exceptional
+- name: severe_conditions
+  section: thresholds
+  label: 'Conditions: severe'
+  help: 'Weather conditions that count as severe: the hour or day label becomes a severe chip, and the current condition is
+    named in a chip. Empty by default: severe is kept for measured values past a severe threshold and official orange / red
+    warnings.'
+  selector:
+    select:
+      multiple: true
+      options:
+      - clear-night
+      - cloudy
+      - exceptional
+      - fog
+      - hail
+      - lightning
+      - lightning-rainy
+      - partlycloudy
+      - pouring
+      - rainy
+      - snowy
+      - snowy-rainy
+      - sunny
+      - windy
+      - windy-variant
+  default: []
+- name: calendar_entities
+  section: content
+  label: Calendar(s)
+  help: One or more calendar entities to source events from. Events from multiple calendars are merged into a single agenda.
+    Leave empty and the calendar half says no calendar is chosen.
+  selector:
+    entity:
+      multiple: true
+      filter:
+        domain: calendar
+  default: []
+- name: days_shown
+  section: content
+  label: Days shown
+  help: How many days ahead to display, starting today. With many days and/or busy calendars, content may overflow the display's
+    300px height.
+  selector:
+    number:
+      min: 1
+      max: 7
+      mode: box
+  default: 6
+bind:
+- weather_entity
+- calendar_entities
+- days_shown
+ds_in: true
+data:
+  variables:
+  - weekday_lang: '{{ ds_in.weekday_lang }}'
+  - time_format: '{{ ds_in.time_format }}'
+  - forecast_entity: |-
+      {% if weather_entity and states(weather_entity) not in ['unknown', 'unavailable'] %}
+        {{ weather_entity }}
+      {% else %}
+        {{ (states | selectattr('domain','equalto','weather') | rejectattr('state','in',['unknown','unavailable']) | list | first).entity_id if states | selectattr('domain','equalto','weather') | rejectattr('state','in',['unknown','unavailable']) | list else 'unavailable' }}
+      {% endif %}
+  - text_strip_pattern: '[^ -ɏ‐-‧‰-※€™]'
+  steps:
+  - if:
+    - '{{ forecast_entity != ''unavailable'' }}'
+    then:
+    - action: weather.get_forecasts
+      target:
+        entity_id: '{{ forecast_entity }}'
+      data:
+        type: daily
+      response_variable: ds_fd
+    - if:
+      - '{{ (state_attr(forecast_entity, ''supported_features'') | int(0)) | bitwise_and(2) > 0 }}'
+      then:
+      - action: weather.get_forecasts
+        target:
+          entity_id: '{{ forecast_entity }}'
+        data:
+          type: hourly
+        response_variable: ds_fh
+  - if:
+    - '{{ calendar_entities | count > 0 }}'
+    then:
+    - action: calendar.get_events
+      target:
+        entity_id: '{{ calendar_entities }}'
+      data:
+        start_date_time: '{{ today_at(''00:00'') }}'
+        end_date_time: '{{ today_at(''00:00'') + timedelta(days=days_shown) }}'
+      response_variable: cal_events
+  - variables:
+      all_events: |
+        {{ ((cal_events.values() | map(attribute='events') | list | sum(start=[])) | sort(attribute='start')) if cal_events is defined else [] }}
+      days: |
+        {% set ns = namespace(list=[], prior=0) %} {% for i in range(days_shown | int) %}
+          {% set day_date = today_at('00:00') + timedelta(days=i) %}
+          {% set day_key = day_date.strftime('%Y-%m-%d') %}
+          {% set day_ns = namespace(raw=[], matched=0) %}
+          {% for event in all_events %}
+            {% if (as_timestamp(event.start) | timestamp_custom('%Y-%m-%d')) == day_key %}
+              {% set day_ns.matched = day_ns.matched + 1 %}
+              {% if (as_timestamp(event.start) | timestamp_custom('%H:%M')) == '00:00' %}
+                {% set line = {'time': '', 'text': language_map[weekday_lang]['all_day_prefix'] ~ (event.summary | default('') | regex_replace(text_strip_pattern, '') | regex_replace(' {2,}', ' ') | trim)} %}
+              {% else %}
+                {% set start_label = (as_timestamp(event.start) | timestamp_custom('%-I:%M %p')) if time_format == '12h' else (as_timestamp(event.start) | timestamp_custom('%H:%M')) %}
+                {% set end_label = (as_timestamp(event.end) | timestamp_custom('%-I:%M %p')) if time_format == '12h' else (as_timestamp(event.end) | timestamp_custom('%H:%M')) %}
+                {% set line = {'start_ts': as_timestamp(event.start), 'end_ts': as_timestamp(event.end), 'time': start_label, 'text': (event.summary | default('') | regex_replace(text_strip_pattern, '') | regex_replace(' {2,}', ' ') | trim)} %}
+              {% endif %}
+              {% set day_ns.raw = day_ns.raw + [{'ts': as_timestamp(event.start), 'line': line}] %}
+            {% endif %}
+          {% endfor %}
+          {% set count = day_ns.matched if day_ns.matched > 0 else 1 %}
+          {% set event_lines = (day_ns.raw | sort(attribute='ts') | map(attribute='line') | list) if day_ns.matched > 0 else [{'time': '', 'text': language_map[weekday_lang]['no_events']}] %}
+          {% set ns.list = ns.list + [{
+            'weekday': language_map[weekday_lang]['weekdays'][day_date.weekday()],
+            'day_num': day_date.day,
+            'month': language_map[weekday_lang]['months'][day_date.month - 1],
+            'is_today': i == 0,
+            'event_lines': event_lines
+          }] %}
+          {% set ns.prior = ns.prior + count %}
+        {% endfor %} {{ ns.list }}
+  draw:
+    kind: weather
+layouts:
+  75p:
+    spec: weather_calendar_75p
+    inputs:
+    - name: weather_entity
+      section: content
+      label: Weather entity
+      help: The weather entity to show. While it isn't working, another working weather entity is used
+        instead. Must support the daily forecast type.
+      selector:
+        entity:
+          filter:
+            domain: weather
+      required: true
+    - name: moon_phase_sensor
+      section: content
+      label: Moon phase sensor
+      help: Sensor used for the moon phase badge on the weather icon. Leave blank to detect the Moon integration's sensor
+        automatically (its entity ID is translated, so it isn't always `sensor.moon_phase`). Set this to use a different sensor,
+        such as the Lunar Phase integration's "Moon Phase" sensor. No Moon sensor means no badge.
+      selector:
+        entity:
+          domain: sensor
+      default: ''
+    - name: location_string
+      section: appearance
+      label: Location name
+      help: Label displayed at the top of the screen (e.g. 'Chicago, Illinois')
+      selector:
+        text: null
+      default: ''
+      after: severe_conditions
+    title_default: '"Weather" plus the location'
+texts:
+  use:
+    weekdays: weekdays
+    months: months
+  en:
+    today: "Today"
+    more: "+{e} more"
+    title: Agenda
+    all_day_prefix: 'All day: '
+    no_events: No appointments
+    no_calendars: No calendar chosen
+  de:
+    today: "Heute"
+    more: "+{e} weitere"
+    title: Kalender
+    all_day_prefix: 'Ganztägig: '
+    no_events: Keine Termine
+    no_calendars: Kein Kalender ausgewählt
+  nl:
+    today: "Vandaag"
+    more: "+{e} meer"
+    title: Agenda
+    all_day_prefix: 'Hele dag: '
+    no_events: Geen afspraken
+    no_calendars: Geen agenda gekozen
+  fr:
+    today: "Aujourd'hui"
+    more: "+{e} autres"
+    title: Agenda
+    all_day_prefix: 'Toute la journée : '
+    no_events: Aucun rendez-vous
+    no_calendars: Aucun calendrier choisi
+  es:
+    today: "Hoy"
+    more: "+{e} más"
+    title: Agenda
+    all_day_prefix: 'Todo el día: '
+    no_events: Sin citas
+    no_calendars: Ningún calendario elegido
+  pl:
+    today: "Dziś"
+    more: "+{e} więcej"
+    title: Kalendarz
+    all_day_prefix: 'Cały dzień: '
+    no_events: Brak wydarzeń
+    no_calendars: Nie wybrano kalendarza
+  hr:
+    today: "Danas"
+    more: "+{e} još"
+    title: Kalendar
+    all_day_prefix: 'Cijeli dan: '
+    no_events: Nema događaja
+    no_calendars: Nije odabran kalendar
+  sv:
+    today: "Idag"
+    more: "+{e} till"
+    title: Kalender
+    all_day_prefix: 'Heldag: '
+    no_events: Inga händelser
+    no_calendars: Ingen kalender vald

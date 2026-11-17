@@ -1,0 +1,159 @@
+page: co2
+description:
+  shows: A CO2 sensor's recent history as a line graph, with the warning and severe levels, the spans above them filled, and
+    the current value and the peak in the footer.
+  needs_also:
+  - A CO2 sensor with long-term statistics (a `measurement` state class, which CO2 sensors from integrations normally have).
+  trigger_advice: 'A time pattern every 15 minutes: the graph changes slowly, and every redraw costs battery.'
+  notes:
+  - The history comes from Home Assistant's 5-minute statistics, kept for 10 days by default.
+  title_default: '"CO2" plus the sensor''s area'
+redraw: trigger
+stale:
+- co2_entity
+inputs:
+- name: co2_entity
+  section: content
+  label: CO2 sensor
+  help: The CO2 sensor to graph (ppm, with long-term statistics)
+  selector:
+    entity:
+      filter:
+        domain: sensor
+        device_class: carbon_dioxide
+  required: true
+- name: hours
+  section: content
+  label: Time span
+  help: How much history the graph shows
+  selector:
+    select:
+      options:
+      - label: 3 hours
+        value: '3'
+      - label: 6 hours
+        value: '6'
+      - label: 12 hours
+        value: '12'
+      - label: 24 hours
+        value: '24'
+  default: '12'
+- name: flag_co2
+  section: thresholds
+  label: 'CO2: flag it'
+  help: Off, nothing is flagged and the graph shows no threshold lines. The severe value below still sets the height of the graph.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_co2
+  section: thresholds
+  label: 'CO2: warning at or above'
+  help: CO2 level drawn as the lower dashed line. Spans above it are filled yellow on BWRY panels, and the summary line turns
+    into a warning chip.
+  selector:
+    number:
+      min: 400
+      max: 5000
+      step: 50
+      unit_of_measurement: ppm
+      mode: box
+  default: 1000
+- name: severe_co2
+  section: thresholds
+  label: 'CO2: severe at or above'
+  help: CO2 level drawn as the upper dashed line. Spans above it are filled in the severe colour, and the summary line turns
+    into a severe chip. The graph runs from 400 ppm (outdoor air) up to 1.5 x this value.
+  selector:
+    number:
+      min: 400
+      max: 5000
+      step: 50
+      unit_of_measurement: ppm
+      mode: box
+  default: 1400
+bind:
+- co2_entity
+- hours
+- flag_co2
+- warning_co2
+- severe_co2
+data:
+  variables:
+  - ds_title: '{% set a = area_name(co2_entity) if co2_entity else none %} {{ header_title if header_title else (language_map[weekday_lang][''default_title'']
+      ~ (('' · '' ~ a) if a else '''')) }}'
+  steps:
+  - action: recorder.get_statistics
+    continue_on_error: true
+    data:
+      statistic_ids:
+      - '{{ co2_entity }}'
+      start_time: '{{ (now() - timedelta(hours=hours | int(12))).strftime(''%Y-%m-%d %H:%M:%S'') }}'
+      period: 5minute
+      types:
+      - mean
+      - max
+    response_variable: co2_stats
+  - variables:
+      ds_t1: '{{ as_timestamp(now()) }}'
+      ds_t0: '{{ as_timestamp(now()) - (hours | int(12)) * 3600 }}'
+      ds_bucket: '{{ [((hours | int(12)) * 12 / 160) | round(0, ''ceil'') | int, 1] | max }}'
+      ds_pts: |
+        {% set st = co2_stats.statistics if (co2_stats is defined and co2_stats is mapping and co2_stats.statistics is defined) else {} %} {% set raw = (st[co2_entity] if co2_entity in st else []) | selectattr('mean', 'defined') | list %} {% set ns = namespace(list=[]) %} {% for g in raw | batch(ds_bucket | int(1)) %}
+          {% set vals = g | map(attribute='mean') | reject('none') | list %}
+          {% set mxs = g | map(attribute='max') | reject('none') | list %}
+          {% if vals | length > 0 %}
+            {% set ts = ((as_timestamp(g[0].start) + as_timestamp(g[-1].end)) / 2) %}
+            {% set ns.list = ns.list + [{'ts': ts, 'v': (vals | sum) / (vals | length), 'mx': (mxs | max) if mxs else (vals | max)}] %}
+          {% endif %}
+        {% endfor %} {% set cur = states(co2_entity) | float(none) %} {% if cur is not none and (ns.list | length) > 0 %}
+          {% set ns.list = ns.list + [{'ts': as_timestamp(now()), 'v': cur, 'mx': cur}] %}
+        {% endif %} {{ ns.list }}
+  draw:
+    kind: choose
+    when:
+    - '{{ ds_pts | length >= 2 }}'
+    steps: []
+texts:
+  en:
+    default_title: CO2
+    now: NOW
+    peak: PEAK
+    no_data: No history for this sensor.
+  de:
+    default_title: CO2
+    now: JETZT
+    peak: SPITZE
+    no_data: Kein Verlauf für diesen Sensor.
+  nl:
+    default_title: CO2
+    now: NU
+    peak: PIEK
+    no_data: Geen geschiedenis voor deze sensor.
+  fr:
+    default_title: CO2
+    now: ACTUEL
+    peak: PIC
+    no_data: Aucun historique pour ce capteur.
+  es:
+    default_title: CO2
+    now: AHORA
+    peak: PICO
+    no_data: Sin historial para este sensor.
+  pl:
+    default_title: CO2
+    now: TERAZ
+    peak: SZCZYT
+    no_data: Brak historii dla tego czujnika.
+  hr:
+    default_title: CO2
+    now: SADA
+    peak: VRH
+    no_data: Nema povijesti za ovaj senzor.
+  sv:
+    default_title: CO2
+    now: NU
+    peak: TOPP
+    no_data: Ingen historik för denna sensor.
+layouts:
+  '35':
+    spec: co2_35

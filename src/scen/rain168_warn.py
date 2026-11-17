@@ -1,0 +1,2 @@
+exec(open(__import__('os').environ['EP_ROOT'] + '/scen/rain168.py').read())
+exec(open(__import__('os').environ['EP_ROOT'] + '/scen/_rain_warn.py').read())
