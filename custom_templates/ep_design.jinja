@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'ganwuu' -%}
+{%- set EP_SET = 'ixzsyf' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -1188,6 +1188,9 @@
 {%- endif -%}
 {%- endif -%}
 {%- endmacro -%}
+{#- NUMBER: a sensor's number as it is read large or beside a bar (*Single value*): no decimals from 100 up or when it
+     has none, else one; any other state as it is -#}
+{%- macro NUMBER(raw) -%}{%- set n = raw | float(none) -%}{{ raw if n is none else DECIMAL(((n | round(0) | int) if (n | abs >= 100 or n == (n | round(0))) else (n | round(1))) | string) }}{%- endmacro -%}
 {#- READING: an entity's state as it is read: a number rounded as its unit asks (none for the units counted in whole
      numbers, else one, and none when it ends in .0) with its unit, any other state as it is -#}
 {%- macro READING(raw, unit) -%}
@@ -2121,7 +2124,7 @@
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
 {#- pattern 'Key-value list': one column with lines while every row fits, else two columns of equal length; the error state when most values are unavailable -#}
-{%- set it = namespace(l=[]) -%}{%- for r in ds_rows -%}{%- set it.l = it.l + [[r.label, r.value, none]] -%}{%- endfor -%}
+{%- set it = namespace(l=[]) -%}{%- for r in ds_rows -%}{%- set it.l = it.l + [[r.label, READING(r.raw, r.unit) if r.ok else '—', none]] -%}{%- endfor -%}
 {{- KVPAGE(ns, header_title_display, right, it.l, ds_stale, ds_rows | rejectattr('ok') | list | length, ds_unavail_msg) -}}
 {%- elif layout == 'entities_35' and view == 'error' -%}
 {%- set ds_last_ts = c.ds_last_ts -%}
@@ -2267,8 +2270,6 @@
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
-{#- the number as it is read: no decimals from 100 up or when it has none, else one -#}
-{%- macro NUM(raw) -%}{%- set n = raw | float(none) -%}{{ raw if n is none else DECIMAL(((n | round(0) | int) if (n | abs >= 100 or n == (n | round(0))) else (n | round(1))) | string) }}{%- endmacro -%}
 {%- set rows = ds_levels -%}
 {%- set n = rows | length -%}
 {%- set bad = rows | rejectattr('ok') | list | length -%}
@@ -2278,7 +2279,7 @@
 {%- else -%}
 {%- set bl = namespace(l=[]) -%}
 {%- for r in rows -%}
-{%- set txt = (NUM(r.raw) ~ (('¦' ~ r.unit) if r.unit else '')) if r.ok else '--' -%}
+{%- set txt = (NUMBER(r.raw) ~ (('¦' ~ r.unit) if r.unit else '')) if r.ok else '--' -%}
 {%- set bl.l = bl.l + [{'label': r.label, 'percent': r.pct, 'percent_text': txt, 'marker_pct': none, 'is_severe': r.level == 'sev', 'is_warning': r.level == 'warn', 'rcap': ''}] -%}
 {%- endfor -%}
 {#- pattern 'Meters', without a footer -#}
@@ -2291,8 +2292,6 @@
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
-{#- the number as it is read: no decimals from 100 up or when it has none, else one -#}
-{%- macro NUM(raw) -%}{%- set n = raw | float(none) -%}{{ raw if n is none else DECIMAL(((n | round(0) | int) if (n | abs >= 100 or n == (n | round(0))) else (n | round(1))) | string) }}{%- endmacro -%}
 {%- set rows = ds_levels -%}
 {%- set n = rows | length -%}
 {%- set bad = rows | rejectattr('ok') | list | length -%}
@@ -2302,7 +2301,7 @@
 {%- else -%}
 {%- set bl = namespace(l=[]) -%}
 {%- for r in rows -%}
-{%- set txt = (NUM(r.raw) ~ (('¦' ~ r.unit) if r.unit else '')) if r.ok else '--' -%}
+{%- set txt = (NUMBER(r.raw) ~ (('¦' ~ r.unit) if r.unit else '')) if r.ok else '--' -%}
 {%- set bl.l = bl.l + [{'label': r.label, 'percent': r.pct, 'percent_text': txt, 'marker_pct': none, 'is_severe': r.level == 'sev', 'is_warning': r.level == 'warn', 'rcap': ''}] -%}
 {%- endfor -%}
 {#- pattern 'Meters', without a footer -#}
@@ -2315,8 +2314,6 @@
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
-{#- the number as it is read: no decimals from 100 up or when it has none, else one -#}
-{%- macro NUM(raw) -%}{%- set n = raw | float(none) -%}{{ raw if n is none else DECIMAL(((n | round(0) | int) if (n | abs >= 100 or n == (n | round(0))) else (n | round(1))) | string) }}{%- endmacro -%}
 {%- set rows = ds_levels -%}
 {%- set n = rows | length -%}
 {%- set bad = rows | rejectattr('ok') | list | length -%}
@@ -2326,7 +2323,7 @@
 {%- else -%}
 {%- set bl = namespace(l=[]) -%}
 {%- for r in rows -%}
-{%- set txt = (NUM(r.raw) ~ (('¦' ~ r.unit) if r.unit else '')) if r.ok else '--' -%}
+{%- set txt = (NUMBER(r.raw) ~ (('¦' ~ r.unit) if r.unit else '')) if r.ok else '--' -%}
 {%- set bl.l = bl.l + [{'label': r.label, 'percent': r.pct, 'percent_text': txt, 'marker_pct': none, 'is_severe': r.level == 'sev', 'is_warning': r.level == 'warn', 'rcap': ''}] -%}
 {%- endfor -%}
 {#- pattern 'Meters', without a footer -#}
@@ -2489,10 +2486,8 @@
 {%- set language_map = c.language_map -%}
 {%- set W, P = EP_TK.width, EP_TK.space.pad -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
-{#- the number as it is read: no decimals from 100 up or when it has none, else one -#}
-{%- macro NUM(raw) -%}{%- set n = raw | float(none) -%}{{ raw if n is none else DECIMAL(((n | round(0) | int) if (n | abs >= 100 or n == (n | round(0))) else (n | round(1))) | string) }}{%- endmacro -%}
 {%- set v = ds_value -%}
-{%- set txt = NUM(v.raw) if v.raw else '—' -%}
+{%- set txt = NUMBER(v.raw) if v.raw else '—' -%}
 {%- if v.raw and (HERO_INK_W(txt, EP_TK.type.heroAlone) | int) > W - 2 * P -%}
 {#- the hero has one size here, fitted on four digits: a longer reading doesn't step down, it says so -#}
 {{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['too_long']) -}}
@@ -2506,11 +2501,9 @@
 {%- set ds_title = c.ds_title -%}
 {%- set ds_value = c.ds_value -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
-{#- the number as it is read: no decimals from 100 up or when it has none, else one -#}
-{%- macro NUM(raw) -%}{%- set n = raw | float(none) -%}{{ raw if n is none else DECIMAL(((n | round(0) | int) if (n | abs >= 100 or n == (n | round(0))) else (n | round(1))) | string) }}{%- endmacro -%}
 {%- set v = ds_value -%}
-{%- set txt = NUM(v.raw) if v.raw else '—' -%}
-{%- set second = (NUM(v.second) ~ (('¦' ~ v.second_unit) if v.second_unit else '')) if v.second else '' -%}
+{%- set txt = NUMBER(v.raw) if v.raw else '—' -%}
+{%- set second = (NUMBER(v.second) ~ (('¦' ~ v.second_unit) if v.second_unit else '')) if v.second else '' -%}
 {#- pattern 'Glance': the hero with its unit; a longer reading than the layout was fitted on steps down the hero ladder -#}
 {{- GLANCE(ns, ds_title, right, txt, ds_icon, ds_stale, hlevel=v.level, txt=second, unit=v.unit, step=true) -}}
 {%- elif layout == 'single_value_35' and view == 'main' -%}
@@ -2519,11 +2512,9 @@
 {%- set ds_title = c.ds_title -%}
 {%- set ds_value = c.ds_value -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
-{#- the number as it is read: no decimals from 100 up or when it has none, else one -#}
-{%- macro NUM(raw) -%}{%- set n = raw | float(none) -%}{{ raw if n is none else DECIMAL(((n | round(0) | int) if (n | abs >= 100 or n == (n | round(0))) else (n | round(1))) | string) }}{%- endmacro -%}
 {%- set v = ds_value -%}
-{%- set txt = NUM(v.raw) if v.raw else '—' -%}
-{%- set second = (NUM(v.second) ~ (('¦' ~ v.second_unit) if v.second_unit else '')) if v.second else '' -%}
+{%- set txt = NUMBER(v.raw) if v.raw else '—' -%}
+{%- set second = (NUMBER(v.second) ~ (('¦' ~ v.second_unit) if v.second_unit else '')) if v.second else '' -%}
 {#- pattern 'Glance': the hero with its unit; a longer reading than the layout was fitted on steps down the hero ladder -#}
 {{- GLANCE(ns, ds_title, right, txt, ds_icon, ds_stale, hlevel=v.level, txt=second, unit=v.unit, step=true) -}}
 {%- elif layout == 'sun_moon_35' and view == 'main' -%}

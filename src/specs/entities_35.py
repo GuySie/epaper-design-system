@@ -2,7 +2,7 @@ PAYLOAD_MAIN = r'''
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
 {#- pattern 'Key-value list': one column with lines while every row fits, else two columns of equal length; the error state when most values are unavailable -#}
-{%- set it = namespace(l=[]) -%}{%- for r in ds_rows -%}{%- set it.l = it.l + [[r.label, r.value, none]] -%}{%- endfor -%}
+{%- set it = namespace(l=[]) -%}{%- for r in ds_rows -%}{%- set it.l = it.l + [[r.label, READING(r.raw, r.unit) if r.ok else '—', none]] -%}{%- endfor -%}
 {{- KVPAGE(ns, header_title_display, right, it.l, ds_stale, ds_rows | rejectattr('ok') | list | length, ds_unavail_msg) -}}
 '''
 
