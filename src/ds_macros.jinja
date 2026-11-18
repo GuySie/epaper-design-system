@@ -900,6 +900,69 @@
 {{- TILEGRID(ns, shown, P, W - P - 1, P + TH + EP_TK.space.m, H - P, mc, mr) -}}
 {%- endif -%}
 {%- endmacro -%}
+{#- CHECKROWS: module 'Checkbox rows' between x0..x1, from top down to yb. open and done = [{'text', 'due', 'level'}]:
+     the open items first, then the done ones in the rows left over. One column while the open items fit, with a line
+     between open and done; when they don't, two columns of equal length on a landscape screen (no lines, a divider), one on
+     a portrait screen. When the open items still don't fit, the done ones are left out and the last row reads more ({e} =
+     how many are left out). A row (component 'Checkbox row'): a box as high as type.data's caps, outlined at line.base,
+     ink-filled when done; the item in type.data, cut before its due day; the due day right in type.label. A level
+     ('sev' / 'warn') turns the row into a chip, which stays clear of the column divider -#}
+{%- macro CHECKROWS(ns, open, done, x0, x1, top, yb, landscape, more) -%}
+{%- set df, ds = FONT[EP_TK.type.data[0]], EP_TK.type.data[1] -%}
+{%- set lf, ls = FONT[EP_TK.type.label[0]], EP_TK.type.label[1] -%}
+{%- set S = SPACE_S(ds) | int -%}
+{%- set rh, g = EP_TK.space.row, EP_TK.space.l -%}
+{%- set cap = CAPH(ds) | int -%}
+{%- set per = [KVFIT(top, yb) | int, 1] | max -%}
+{%- set no = open | length -%}
+{%- set two = landscape and no > per -%}
+{%- set room = per * (2 if two else 1) -%}
+{%- set rows = namespace(l=[]) -%}
+{%- if no > room -%}
+{%- for it in open[:room - 1] -%}{%- set rows.l = rows.l + [[it, 0]] -%}{%- endfor -%}
+{%- set rows.l = rows.l + [[{'text': more | replace('{e}', no - room + 1), 'due': '', 'level': ''}, 2]] -%}
+{%- else -%}
+{%- for it in open -%}{%- set rows.l = rows.l + [[it, 0]] -%}{%- endfor -%}
+{%- for it in done[:room - no] -%}{%- set rows.l = rows.l + [[it, 1]] -%}{%- endfor -%}
+{%- endif -%}
+{%- set cw = ((x1 + 1 - x0 - g) // 2) if two else (x1 + 1 - x0) -%}
+{#- the divider ends with the last row's box or at the content's bottom, whichever comes first -#}
+{%- if two -%}{{- L(ns, x0 + cw + g // 2, top, x0 + cw + g // 2, [top + per * rh - 2, yb - 1] | min) -}}{%- endif -%}
+{%- for it, kind in rows.l -%}
+{%- set col = loop.index0 // per -%}
+{%- set c0 = x0 + col * (cw + g) -%}{%- set c1 = c0 + cw - 1 -%}
+{%- set y = top + (loop.index0 % per) * rh -%}{%- set cy = y + rh // 2 -%}
+{%- set lv = it.level if kind == 0 else '' -%}
+{%- set fg = LEVEL_TEXT(lv) if lv else color.ink -%}
+{%- set inner = two and col == 0 -%}
+{%- if lv -%}{{- R(ns, c0 - (S if col == 0 else 0), y, c1 + (0 if inner else S), y + rh - 2, LEVEL_FILL(lv)) -}}{%- endif -%}
+{%- if kind == 2 -%}
+{{- T(ns, it.text | upper, c0 + cap + S, cy - 1, lf, ls, color.ink, 'lm', cw - cap - S) -}}
+{%- else -%}
+{%- if kind == 1 -%}{{- R(ns, c0, cy - 1 - cap // 2, c0 + cap - 1, cy - 1 - cap // 2 + cap - 1, color.ink) -}}
+{%- else -%}{{- BOX(ns, c0, cy - 1 - cap // 2, c0 + cap - 1, cy - 1 - cap // 2 + cap - 1, fg, EP_TK.line.base) -}}{%- endif -%}
+{%- set dx = c1 - (S if (inner and lv) else 0) -%}
+{%- set dw = ((VALUE_W(it.due, ls, lf) | int) + g) if it.due else 0 -%}
+{{- T(ns, (LEVEL_MARK(lv) if lv else '') ~ it.text, c0 + cap + S, cy - 1, df, ds, fg, 'lm', dx + 1 - c0 - cap - S - dw) -}}
+{%- if it.due -%}{{- T(ns, it.due, dx, cy - 1, lf, ls, fg, 'rm') -}}{%- endif -%}
+{%- endif -%}
+{%- if not two and loop.index == no and not loop.last -%}{{- L(ns, c0, y + rh - 1, c1, y + rh - 1) -}}{%- endif -%}
+{%- endfor -%}
+{%- endmacro -%}
+{#- CHECKLIST: pattern 'Checklist'. open and done as CHECKROWS takes them; foot = the count, short = its narrow form (used
+     when foot doesn't fit); more = the text of the '+N more' row; nothing = the empty statement when there is no row -#}
+{%- macro CHECKLIST(ns, title, right, open, done, foot, short, more, nothing) -%}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{{- TITLE(ns, title, right, W, P, TH) -}}
+{%- set top = P + TH + EP_TK.space.m -%}
+{%- if not open and not done -%}
+{{- EMPTY(ns, nothing, P, W - P - 1, top, H - P) -}}
+{%- else -%}
+{{- CHECKROWS(ns, open, done, P, W - P - 1, top, H - P - (FNEED(P) | int), W > H, more) -}}
+{%- set dt = EP_TK.type.data -%}
+{{- FOOT(ns, foot if (VALUE_W(foot, dt[1], FONT[dt[0]]) | int) <= W - 2 * P else short, '', W, H, P) -}}
+{%- endif -%}
+{%- endmacro -%}
 {#- GROUPED: pattern 'Grouped list'. days = [{'head': day header text, 'lines': event lines, 'real': events among them}].
      Fill before you float: whole days while they fit; a day that doesn't fit whole shows the events that do and a "+N"
      text line (more = its text with {e}); later days are left out. -#}

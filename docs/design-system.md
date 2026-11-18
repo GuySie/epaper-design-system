@@ -692,10 +692,10 @@ A component is one drawn building block with a fixed job; it can contain other c
 | **Forecast row** | One row of the 2.7" portrait's forecast table: label, mm, temperature. Rules: *Forecast row*, below the table | hour or day | `type.data`, `space.row`, `space.l`, `chip.*` | `RROW`, `RCHIP` |
 | **Key-value row** | Name and value in a list, one or two columns, row lines | name, value, level | `type.label`, `type.data`, `space.row` (`space.rowDense` on the 4.1" plant list), `space.l`, `line.base`, `chip.*` | `KVLIST` / `KV` (read their tokens; `ROW` draws) |
 | **Event row** | One event: the start time in a column, the title, and the label text line under it (`TOMORROW · UNTIL 10:30`); see *Event list* | event | `type.primary`, `type.label`, `space.s`, `line.base` | drawn in `ELIST` |
-| **Checkbox row** | One to-do item: checkbox, item, due day | item, done, due, level | `type.data`, `type.label`, `space.row`, `space.s`, `line.base`, `chip.*` | — (mockup) |
+| **Checkbox row** | One to-do item: checkbox, item, due day | item, done, due, level | `type.data`, `type.label`, `space.row`, `space.s`, `line.base`, `chip.*` | `CHECKROWS` |
 | **Progress bar** | Progress bar with track, fill, now-marker and reset caption (one bar; the *Meters* module stacks them; drawn as in *Meters*) | value, period | `type.primary`, `type.label`, `line.series`, `chip.*` | `PBAR` for the track, fill and now-marker; the label row stays in the layout |
 
-Mocked up, no blueprint yet: the **checkbox row** (*Checklist*), the **QR code** (*Code*), and the hero group's version *with a word* (*Glance with a word*). Reserved (documented, no blueprint uses it yet): the **level meter** (`METER`).
+Mocked up, no blueprint yet: the **QR code** (*Code*), and the hero group's version *with a word* (*Glance with a word*). Reserved (documented, no blueprint uses it yet): the **level meter** (`METER`).
 
 ### Hero group
 
@@ -753,7 +753,7 @@ A module is one block of content on a screen, built from components (and other m
 | **Meters** | Progress bars stacked. Rules: *Meters* under *Patterns*. | — | — | — |
 | **Chart** | Plot, label margin, clock-time axis, thresholds, severe fills. | series, thresholds | `type.label`, `line.*`, `space.s` | `CFRAME`, `CTHRESH`, `CBASE`, `CAXIS` (read their tokens); bars, series and notches stay in each chart |
 | **Timeline** | Sun and moon track with markers and the sun path. Rules: *Timeline* under *Patterns*. | sun, moon | `icon.inline`, `icon.markerDisc`, `line.tick`, `type.label` | `TMARK` for markers, `SERIES` for the path, `CAXIS` for the compass row; the heights follow the vertical rhythm in *Sun & moon* |
-| **Checkbox rows** | *Mockup (Checklist), no blueprint yet.* Checkbox (`line.base` outline / ink fill, cap height of `type.data`) + an item on one text line + due day; see *Checklist*. | — | — | — |
+| **Checkbox rows** | Checkbox rows in one or two columns, open items first. Rules: *Checklist* under *Patterns*. | items, done, due, level | `type.data`, `type.label`, `space.row`, `space.s`, `space.l`, `line.base` | `CHECKROWS` |
 | **Tiles** | Repeated icon–state–label unit in a grid. Rules: *Tiles* under *Patterns*. | icon, state, label | `type.data`, `type.label`, `space.m`, `line.base` | `TILEGRID` |
 | **Level meter** | *Reserved: no blueprint uses it.* A level in four segments. Rules: *Level meter*, below the table. | — | — | — |
 | **Hero block** | The hero group *on its own* and the Glance secondary under it, centred as one block (*Hero group*, hero centring; the secondary's chip box is reserved, so nothing moves when a chip appears). The Glance's one module under the title row; see *Glance*. | hero, icon, levels, Glance secondary | `type.heroAlone`, `icon.heroAloneSteps`, `type.secondary`, `space.heroGap` | `HBLOCK`, `HERO_BLOCK_Y` |
@@ -871,7 +871,7 @@ A pattern is what a kind of screen looks like: which modules, in which order, an
 | **Grouped list** | Title row, Date-grouped list | — | live | `GROUPED` |
 | **Event list** | Title row, Event list, Event hero, Footer | *with one event as a hero*<br>*with line numbers* (mock) | live | `EVENTS` |
 | **Meters** | Title row, Meters, Footer | *both ways* (mock) | live | `METERS` |
-| **Checklist** | Title row, Checkbox rows, Footer | — | mock | — |
+| **Checklist** | Title row, Checkbox rows, Footer | — | live | `CHECKLIST` |
 | **Code** | Title row, Code block | — | mock | — |
 | **Tiles** | Title row, Tiles | — | live | `TILES` |
 | **Month** | Title row, Month grid | — | mock | — |
@@ -1024,6 +1024,18 @@ Equal tiles, each a centred stack: the icon, the state in `type.data`, the label
 - *Mockup, no blueprint flags a tile yet:* a flagged tile chips its state; the icon and the label never change, and nothing moves.
 - Widest state: 9 characters (`Triggered`): the room a tile has less `space.s` on both sides, where the chip goes. A longer state, and a label wider than its tile, is cut with an ellipsis.
 
+### Checklist
+
+A list of to-do items: checkbox rows, filled first, and the footer.
+
+- **Checkbox row:** a square as high as the caps of `type.data`, outlined at `line.base`, ink-filled when done; `space.s` after it, the item in `type.data` as written, its due day right in `type.label`, in fixed rows of `space.row`. The due day is today's word (`TODAY`), the weekday as the update stamp writes it within six days either way (`SA`), else the day and the month (`13 AUG`).
+- **Order:** open items first, done items after them. The open items keep the order the list has in Home Assistant; a switch puts the ones with a due day first, earliest first. Done is the filled box only: weight and colour never mark it. A switch leaves the done items out.
+- **Fill first:** one column while the open items fit, with the done ones in the rows left over and one line between open and done. When they don't fit, a landscape screen takes two columns of equal length (no lines; the column divider and the row rhythm carry it) and a portrait screen stays at one. When the open items still don't fit, the done ones are left out and the last row reads `+N more`.
+- **Footer:** the count (`14 OPEN · 4 DONE`, `14 OPEN` where narrow or where the done items are left out by the switch).
+- **Flagged:** an overdue item is a severe row chip, one due today a warning chip; the chip spans box, item and due day like a key-value row chip, and a row keeps its place when it is flagged. A switch turns the flagging off.
+- **Nothing to show:** no open items and no done ones to show is one empty statement.
+- Widest readings: an item of 40 characters (cut with an ellipsis before its due day), the due day `VANDAAG`, the footer `99 OPEN · 99 DONE`.
+
 ### Mocked-up patterns
 
 Patterns and versions that exist as mock-ups only: no blueprint is built from them yet, so their rules are proposals. Each moves to its place above when its first page is built (a version to its pattern, a pattern to its own section).
@@ -1057,16 +1069,6 @@ Patterns and versions that exist as mock-ups only: no blueprint is built from th
 
 *Mockup (Solar & battery).* A bar whose track runs both ways from a centre tick (taking power left, sending it back right); a battery's bar is its charge, the direction in the caption at the right.
 
-#### Checklist
-
-*Mockup (To-do list).* A list of to-do items (Home Assistant `todo` entities): shopping, chores, packing.
-
-- **Checkbox row:** a square as high as the caps of `type.data`, outlined at `line.base`, ink-filled when done; `space.s` after it, the item in `type.data` as written, its due day right in `type.label` (`SAT`, `TODAY`), in fixed rows of `space.row`.
-- **Order:** open items first, done items after them. Done is the filled box only: weight and colour never mark it.
-- **Fill first:** as many rows as fit, two columns on wide screens (one line between open and done in one column, none in two). When the open items don't fit, the done ones are left out and the last row reads `+N more`.
-- **Footer:** the count (`14 OPEN · 4 DONE`, `14 OPEN` where narrow).
-- **Severity:** an overdue item is a severe row chip, one due today a warning chip; the chip spans box, item and due day like a key-value row chip.
-
 #### Code
 
 *Mockup (Guest Wi-Fi).* A QR code people scan with a phone: guest Wi-Fi, a link to a manual, an inventory label. Drawn with drawcustom's `qrcode` element (error correction H).
@@ -1096,7 +1098,7 @@ Patterns and versions that exist as mock-ups only: no blueprint is built from th
 
 ## Pages
 
-A page is a pattern filled with real content for one use. Each page names the pattern it uses, its layouts (● drawn by a blueprint today; ○ no blueprint yet; — not offered; the 7.09" has no tier yet), the widest reading its entity can show, and the inputs its blueprints add to the ones every blueprint has (*Blueprint mechanics*). Every live page has the same parts, in this order: the pattern it uses, **Shows**, **Tested with**, its own rules, and its inputs. A page for any entities (Single value, Levels, Entities, History graph, Tiles) also has **Examples** after **Tested with**: uses people have e-paper screens for, each a scenario drawn by the page's own blueprint and shown in the README. Thresholds for every page are in *Thresholds*.
+A page is a pattern filled with real content for one use. Each page names the pattern it uses, its layouts (● drawn by a blueprint today; ○ no blueprint yet; — not offered; the 7.09" has no tier yet), the widest reading its entity can show, and the inputs its blueprints add to the ones every blueprint has (*Blueprint mechanics*). Every live page has the same parts, in this order: the pattern it uses, **Shows**, **Tested with**, its own rules, and its inputs. A page for any entities (Single value, Levels, Entities, History graph, Tiles, To-do list) also has **Examples** after **Tested with**: uses people have e-paper screens for, each a scenario drawn by the page's own blueprint and shown in the README. Thresholds for every page are in *Thresholds*.
 
 <!-- registry:pages -->
 | Page | Uses | Status | Widest reading | 1.4" | 2.7" L | 2.7" P | 3.5" | 4.1" | 4.26" | 7.5" L | 7.5" P | 7.09" (no tier yet) |
@@ -1123,7 +1125,7 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | **Energy price** | Bar chart for prices | mock | — | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Departures** | Event list with line numbers | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Solar & battery** | Meters both ways | mock | 100% | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **To-do list** | Checklist | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **To-do list** | Checklist | live | — | — | ● | ● | ● | ● | ○ | ● | ● | ○ |
 | **Tiles** | Tiles | live | Triggered | ● | ● | ● | ● | ● | ○ | ● | ● | ○ |
 | **Month overview** | Month | mock | — | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Message board** | Note | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
@@ -1497,6 +1499,36 @@ The Tiles pattern for any entities: up to 12, one tile each.
 | 7.5" P | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
 <!-- /registry:layouts-tiles -->
 
+### To-do list
+
+A Checklist of the items of one `todo` entity in Home Assistant.
+
+- **Shows:** the list's open items, each with its box and its due day, then the done ones while there is room; the count in the footer. The title is the list's name unless a header title is given.
+- **Tested with:** a shopping list with an overdue item, one due today, one due on Monday and three done, on a colour, a yellow and a grey panel; 14 open items (one of 40 characters, a due day twelve days off) and 4 done; a long title; an unavailable list (the error state); a list without items; every item done; flagging off; the done items left out; due days first.
+<!-- registry:examples-todo -->
+- **Examples:** the week's chores; a packing list. Each is drawn in the README.
+<!-- /registry:examples-todo -->
+- **Items:** as Home Assistant's `todo.get_items` gives them, open and done; an item's text as written.
+- **Order, done items, flagging:** as *Checklist* says, by the switches `due_first` (off), `show_done` (on) and `flag_due` (on).
+- **Unavailable:** an unavailable list is the error state (*States*); the page has no stale state.
+
+<!-- registry:inputs-todo -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `todo_entity`, `show_done`, `due_first`, `flag_due` |
+<!-- /registry:inputs-todo -->
+
+<!-- registry:layouts-todo -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 2.7" L | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |
+| 2.7" P | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |
+| 3.5" | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 13 |
+| 4.1" | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 13 |
+| 7.5" L | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |
+| 7.5" P | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |
+<!-- /registry:layouts-todo -->
+
 ### Plant moisture
 
 A Key-value list of up to 22 plants, driest first if chosen.
@@ -1582,7 +1614,7 @@ A *Hero dashboard with a chart or list*: the weather's hero band over the calend
 
 ### Mocked-up pages
 
-Bin day, Room sign, Appliance run, Energy price, Departures, Solar & battery, To-do list, Month overview, Message board, Now playing, Guest Wi-Fi, and the Hero dashboard Value with details: their patterns and layouts are in the table above, their rules with the pattern versions they use.
+Bin day, Room sign, Appliance run, Energy price, Departures, Solar & battery, Month overview, Message board, Now playing, Guest Wi-Fi, and the Hero dashboard Value with details: their patterns and layouts are in the table above, their rules with the pattern versions they use.
 
 ## Blueprint mechanics
 

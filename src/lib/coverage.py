@@ -35,6 +35,7 @@ NOEMPTY = 'n/a: the page has no list or chart that can be empty'
 REQ = 'n/a: the first entry is required, so the list is never empty'
 NOHIST = 'n/a: a chart without history is the error view'
 EVENTS = 'n/a: an event has no value that can be unavailable; an unavailable calendar is the error view'
+NOITEM = 'n/a: an item has no value that can be unavailable; an unavailable list is the error view'
 COVERAGE = {
     # weather (an official orange alert is the severe case: it draws the severe chip)
     'weather_glance_14':     wx('wxp16', 'wxp16_negmoon', 'wxp16_warn', 'wxp16_alert', 'wxp16_warn_g', 'wxp16_y', 'wxp16_title', 'wx_stale', 'wx_err', 'wxp16_alert', 'wx_p0', 'wxp16_plong'),
@@ -76,6 +77,13 @@ COVERAGE = {
     'tiles_41': pg('tl', 'tl_widest', NOTHR, NOTHR, 'tl_g', 'tl_y', 'tl_title', 'tl_stale', 'tl_err', 'tl_unav', REQ),
     'tiles_75': pg('tl', 'tl_widest', NOTHR, NOTHR, 'tl_g', 'tl_y', 'tl_title', 'tl_stale', 'tl_err', 'tl_unav', REQ),
     'tiles_75p': pg('tl', 'tl_widest', NOTHR, NOTHR, 'tl_g', 'tl_y', 'tl_title', 'tl_stale', 'tl_err', 'tl_unav', REQ),
+    # To-do list: the ordinary case has an overdue item (severe) and one due today (warning)
+    'todo_27l': pg('td', 'td_many', 'td', 'td', 'td_g', 'td_y', 'td_title', NOSTALE, 'td_err', NOITEM, 'td_empty'),
+    'todo_27p': pg('td', 'td_many', 'td', 'td', 'td_g', 'td_y', 'td_title', NOSTALE, 'td_err', NOITEM, 'td_empty'),
+    'todo_35': pg('td', 'td_many', 'td', 'td', 'td_g', 'td_y', 'td_title', NOSTALE, 'td_err', NOITEM, 'td_empty'),
+    'todo_41': pg('td', 'td_many', 'td', 'td', 'td_g', 'td_y', 'td_title', NOSTALE, 'td_err', NOITEM, 'td_empty'),
+    'todo_75': pg('td', 'td_many', 'td', 'td', 'td_g', 'td_y', 'td_title', NOSTALE, 'td_err', NOITEM, 'td_empty'),
+    'todo_75p': pg('td', 'td_many', 'td', 'td', 'td_g', 'td_y', 'td_title', NOSTALE, 'td_err', NOITEM, 'td_empty'),
     # History graph
     'history_27l': pg('hg', 'hg_widest', 'hg_warn', 'hg_sev', 'hg_g', 'hg_y', 'hg_title', 'hg_stale', 'hg_err', 'hg_unav', NOHIST),
     'history_35': pg('hg', 'hg_widest', 'hg_warn', 'hg_sev', 'hg_g', 'hg_y', 'hg_title', 'hg_stale', 'hg_err', 'hg_unav', NOHIST),

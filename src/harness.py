@@ -248,7 +248,7 @@ def make_env(sc):
                        as_timestamp=as_timestamp, as_datetime=as_datetime, as_local=as_local,
                        today_at=today_at, timedelta=dt.timedelta, float=to_float, int=to_int,
                        integration_entities=integration_entities, device_id=device_id, iif=iif, device_attr=device_attr,
-                       state_translated=lambda e: getattr(sc, 'TRANSLATED', {}).get(e, g_states(e)), namespace=jinja2.utils.Namespace, area_name=lambda e: getattr(sc, 'AREAS', {}).get(e), device_name=device_name, entity_name=entity_name, min=min, max=max, range=range)
+                       strptime=lambda v, f, *d: dt.datetime.strptime(v, f), state_translated=lambda e: getattr(sc, 'TRANSLATED', {}).get(e, g_states(e)), namespace=jinja2.utils.Namespace, area_name=lambda e: getattr(sc, 'AREAS', {}).get(e), device_name=device_name, entity_name=entity_name, min=min, max=max, range=range)
     env.filters.update(float=to_float, int=to_int, as_timestamp=as_timestamp,
                        timestamp_custom=timestamp_custom, expand=lambda e: g_expand(e), as_datetime=as_datetime, as_local=as_local,
                        round=ha_round, log=ha_log, regex_replace=regex_replace, regex_match=regex_match,
@@ -349,6 +349,8 @@ def run(bp_path, sc_path, out_png, choose_index=None):
                 calls.append(render_value(env, st['data'], ctx))
             elif 'action' in st and st['action'].startswith('calendar.get_events'):
                 ctx[st['response_variable']] = sc.CALENDAR_RESPONSE
+            elif st.get('action') == 'todo.get_items':
+                ctx[st['response_variable']] = getattr(sc, 'TODO_RESPONSE', {})
             elif 'action' in st and st['action'] == 'recorder.get_statistics':
                 ctx[st['response_variable']] = getattr(sc, 'STATS_RESPONSE', {'statistics': {}})
             elif 'action' in st and st['action'].startswith('weather.get_forecasts'):

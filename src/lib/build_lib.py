@@ -193,7 +193,7 @@ def build_design(keys):
     =========================================================================== -#}
 {%- from 'ep_tokens.jinja' import EP_TIER, EP_LAYOUT, EP_FONT, EP_COLOR, EP_SPACE, EP_STROKE, EP_ICON, EP_CHART -%}
 {%- from 'ep_metrics.jinja' import ''' + ', '.join(HOIST) + ''' -%}
-{%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_TXT, EP_SETTXT -%}
+{%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_MONTHS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
 {%- set EP_SET = '@@EPSET@@' -%}
 ''')

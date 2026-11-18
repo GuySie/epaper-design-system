@@ -65,6 +65,7 @@ def main():
     lay.update(spec=name, key='mock', layout=layout, blueprint=bp, name=f'Mock-up {stem}')      # lib/layouts.py lists it
     lay.pop('source_url', None)
     page['layouts'] = {a.screen: lay}
+    page.pop('examples', None)                 # the page's examples are drawn on its own layouts, which the draft replaces
     pf.write_text(pageyaml.dump(page))
     for f in (T / 'pages').glob('[!_]*.yaml'):
         if f != pf:

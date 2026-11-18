@@ -79,7 +79,8 @@ patterns:
       both-ways:    {name: both ways, status: mock}
   checklist:
     name: Checklist
-    status: mock
+    status: live
+    macro: CHECKLIST
     modules: [Title row, Checkbox rows, Footer]
   code:
     name: Code
@@ -126,7 +127,7 @@ pages:
   energy-price:   {name: Energy price, uses: bar-chart/prices, status: mock, default: [bar-chart/prices], '14': ['-'], '27p': ['-']}
   departures:     {name: Departures, uses: event-list/line-numbers, status: mock, default: [event-list/line-numbers], '14': ['-']}
   energy-flows:   {name: Solar & battery, uses: meters/both-ways, status: mock, default: [meters/both-ways], '14': ['-'], widest: '100%'}
-  todo:           {name: To-do list, uses: checklist, status: mock, default: [checklist], '14': ['-']}
+  todo:           {name: To-do list, uses: checklist, status: live, default: [checklist], '14': ['-']}
   tiles:          {name: Tiles, uses: tiles, status: live, default: [tiles], widest: 'Triggered'}
   month:          {name: Month overview, uses: month, status: mock, default: [month], '14': ['-'], '27p': ['-']}
   message:        {name: Message board, uses: note, status: mock, default: [note], '14': ['-']}
@@ -153,7 +154,7 @@ components:
   Forecast row:         {macros: [RROW]}
   Key-value row:        {macros: [KV, ROW]}
   Event row:            {macros: []}
-  Checkbox row:         {macros: []}
+  Checkbox row:         {macros: [CHECKROWS]}
   Progress bar:         {macros: [PBAR]}
 modules:
   Title row:         {macros: [TITLE]}
@@ -171,7 +172,7 @@ modules:
   Meters:            {macros: [METER_ROWS]}
   Chart:             {macros: [CHART_BARS, CHART_LINE, CFRAME, CTHRESH, CBASE, CAXIS]}
   Timeline:          {macros: [TIMELINE_SKY, TMARK]}
-  Checkbox rows:     {macros: []}
+  Checkbox rows:     {macros: [CHECKROWS]}
   Tiles:             {macros: [TILEGRID]}
   Level meter:       {macros: [METER]}
   Code block:        {macros: []}

@@ -26,9 +26,9 @@
     =========================================================================== -#}
 {%- from 'ep_tokens.jinja' import EP_TIER, EP_LAYOUT, EP_FONT, EP_COLOR, EP_SPACE, EP_STROKE, EP_ICON, EP_CHART -%}
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
-{%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_TXT, EP_SETTXT -%}
+{%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_MONTHS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'ixzsyf' -%}
+{%- set EP_SET = 'mtlukq' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -60,6 +60,12 @@
   'tiles_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'tiles'},
   'tiles_75': {'kit': 'other', 'tier': '800x480-0.20', 'page': 'tiles'},
   'tiles_75p': {'kit': 'other', 'tier': '480x800-0.20', 'page': 'tiles'},
+  'todo_27l': {'kit': 'other', 'tier': '384x168-0.17', 'page': 'todo'},
+  'todo_27p': {'kit': 'other', 'tier': '168x384-0.17', 'page': 'todo'},
+  'todo_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'todo'},
+  'todo_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'todo'},
+  'todo_75': {'kit': 'other', 'tier': '800x480-0.20', 'page': 'todo'},
+  'todo_75p': {'kit': 'other', 'tier': '480x800-0.20', 'page': 'todo'},
   'weather_27l': {'kit': 'weather', 'tier': '384x168-0.17', 'page': 'weather'},
   'weather_27p': {'kit': 'weather', 'tier': '168x384-0.17', 'page': 'weather'},
   'weather_35': {'kit': 'weather', 'tier': '384x184-0.21', 'page': 'weather'},
@@ -111,6 +117,7 @@
 {%- set displays = c.displays -%}
 {%- set ds_btn = c.ds_btn -%}
 {%- set ds_icon = c.ds_icon -%}
+{%- set due_first = c.due_first -%}
 {%- set entity = c.entity -%}
 {%- set entity_1 = c.entity_1 -%}
 {%- set entity_10 = c.entity_10 -%}
@@ -149,6 +156,7 @@
 {%- set entity_9_icon = c.entity_9_icon -%}
 {%- set entity_9_label = c.entity_9_label -%}
 {%- set flag_co2 = c.flag_co2 -%}
+{%- set flag_due = c.flag_due -%}
 {%- set flag_high = c.flag_high -%}
 {%- set flag_late = c.flag_late -%}
 {%- set flag_low = c.flag_low -%}
@@ -230,10 +238,12 @@
 {%- set severe_temp_low = c.severe_temp_low -%}
 {%- set severe_usage = c.severe_usage -%}
 {%- set severe_wind_high = c.severe_wind_high -%}
+{%- set show_done = c.show_done -%}
 {%- set sort_driest_first = c.sort_driest_first -%}
 {%- set stale_after = c.stale_after -%}
 {%- set start_with_today = c.start_with_today -%}
 {%- set time_format = c.time_format -%}
+{%- set todo_entity = c.todo_entity -%}
 {%- set warning_co2 = c.warning_co2 -%}
 {%- set warning_conditions = c.warning_conditions -%}
 {%- set warning_high = c.warning_high -%}
@@ -1252,6 +1262,69 @@
 {{- ERRBLOCK(ns, err, W, H, P, TH) -}}
 {%- else -%}
 {{- TILEGRID(ns, shown, P, W - P - 1, P + TH + EP_TK.space.m, H - P, mc, mr) -}}
+{%- endif -%}
+{%- endmacro -%}
+{#- CHECKROWS: module 'Checkbox rows' between x0..x1, from top down to yb. open and done = [{'text', 'due', 'level'}]:
+     the open items first, then the done ones in the rows left over. One column while the open items fit, with a line
+     between open and done; when they don't, two columns of equal length on a landscape screen (no lines, a divider), one on
+     a portrait screen. When the open items still don't fit, the done ones are left out and the last row reads more ({e} =
+     how many are left out). A row (component 'Checkbox row'): a box as high as type.data's caps, outlined at line.base,
+     ink-filled when done; the item in type.data, cut before its due day; the due day right in type.label. A level
+     ('sev' / 'warn') turns the row into a chip, which stays clear of the column divider -#}
+{%- macro CHECKROWS(ns, open, done, x0, x1, top, yb, landscape, more) -%}
+{%- set df, ds = FONT[EP_TK.type.data[0]], EP_TK.type.data[1] -%}
+{%- set lf, ls = FONT[EP_TK.type.label[0]], EP_TK.type.label[1] -%}
+{%- set S = SPACE_S(ds) | int -%}
+{%- set rh, g = EP_TK.space.row, EP_TK.space.l -%}
+{%- set cap = CAPH(ds) | int -%}
+{%- set per = [KVFIT(top, yb) | int, 1] | max -%}
+{%- set no = open | length -%}
+{%- set two = landscape and no > per -%}
+{%- set room = per * (2 if two else 1) -%}
+{%- set rows = namespace(l=[]) -%}
+{%- if no > room -%}
+{%- for it in open[:room - 1] -%}{%- set rows.l = rows.l + [[it, 0]] -%}{%- endfor -%}
+{%- set rows.l = rows.l + [[{'text': more | replace('{e}', no - room + 1), 'due': '', 'level': ''}, 2]] -%}
+{%- else -%}
+{%- for it in open -%}{%- set rows.l = rows.l + [[it, 0]] -%}{%- endfor -%}
+{%- for it in done[:room - no] -%}{%- set rows.l = rows.l + [[it, 1]] -%}{%- endfor -%}
+{%- endif -%}
+{%- set cw = ((x1 + 1 - x0 - g) // 2) if two else (x1 + 1 - x0) -%}
+{#- the divider ends with the last row's box or at the content's bottom, whichever comes first -#}
+{%- if two -%}{{- L(ns, x0 + cw + g // 2, top, x0 + cw + g // 2, [top + per * rh - 2, yb - 1] | min) -}}{%- endif -%}
+{%- for it, kind in rows.l -%}
+{%- set col = loop.index0 // per -%}
+{%- set c0 = x0 + col * (cw + g) -%}{%- set c1 = c0 + cw - 1 -%}
+{%- set y = top + (loop.index0 % per) * rh -%}{%- set cy = y + rh // 2 -%}
+{%- set lv = it.level if kind == 0 else '' -%}
+{%- set fg = LEVEL_TEXT(lv) if lv else color.ink -%}
+{%- set inner = two and col == 0 -%}
+{%- if lv -%}{{- R(ns, c0 - (S if col == 0 else 0), y, c1 + (0 if inner else S), y + rh - 2, LEVEL_FILL(lv)) -}}{%- endif -%}
+{%- if kind == 2 -%}
+{{- T(ns, it.text | upper, c0 + cap + S, cy - 1, lf, ls, color.ink, 'lm', cw - cap - S) -}}
+{%- else -%}
+{%- if kind == 1 -%}{{- R(ns, c0, cy - 1 - cap // 2, c0 + cap - 1, cy - 1 - cap // 2 + cap - 1, color.ink) -}}
+{%- else -%}{{- BOX(ns, c0, cy - 1 - cap // 2, c0 + cap - 1, cy - 1 - cap // 2 + cap - 1, fg, EP_TK.line.base) -}}{%- endif -%}
+{%- set dx = c1 - (S if (inner and lv) else 0) -%}
+{%- set dw = ((VALUE_W(it.due, ls, lf) | int) + g) if it.due else 0 -%}
+{{- T(ns, (LEVEL_MARK(lv) if lv else '') ~ it.text, c0 + cap + S, cy - 1, df, ds, fg, 'lm', dx + 1 - c0 - cap - S - dw) -}}
+{%- if it.due -%}{{- T(ns, it.due, dx, cy - 1, lf, ls, fg, 'rm') -}}{%- endif -%}
+{%- endif -%}
+{%- if not two and loop.index == no and not loop.last -%}{{- L(ns, c0, y + rh - 1, c1, y + rh - 1) -}}{%- endif -%}
+{%- endfor -%}
+{%- endmacro -%}
+{#- CHECKLIST: pattern 'Checklist'. open and done as CHECKROWS takes them; foot = the count, short = its narrow form (used
+     when foot doesn't fit); more = the text of the '+N more' row; nothing = the empty statement when there is no row -#}
+{%- macro CHECKLIST(ns, title, right, open, done, foot, short, more, nothing) -%}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{{- TITLE(ns, title, right, W, P, TH) -}}
+{%- set top = P + TH + EP_TK.space.m -%}
+{%- if not open and not done -%}
+{{- EMPTY(ns, nothing, P, W - P - 1, top, H - P) -}}
+{%- else -%}
+{{- CHECKROWS(ns, open, done, P, W - P - 1, top, H - P - (FNEED(P) | int), W > H, more) -}}
+{%- set dt = EP_TK.type.data -%}
+{{- FOOT(ns, foot if (VALUE_W(foot, dt[1], FONT[dt[0]]) | int) <= W - 2 * P else short, '', W, H, P) -}}
 {%- endif -%}
 {%- endmacro -%}
 {#- GROUPED: pattern 'Grouped list'. days = [{'head': day header text, 'lines': event lines, 'real': events among them}].
@@ -2626,6 +2699,150 @@
 {%- for t in ds_tiles -%}{%- set tl.l = tl.l + [{'icon': t.icon, 'value': READING(t.raw, t.unit) if t.ok else '—', 'label': t.label, 'ok': t.ok}] -%}{%- endfor -%}
 {#- pattern 'Tiles': 3 x 4 -#}
 {{- TILES(ns, header_title_display, right, tl.l, 3, 4, ds_stale, ds_unavail_msg) -}}
+{%- elif layout == 'todo_27l' and view == 'main' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_todo = c.ds_todo -%}
+{%- set language_map = c.language_map -%}
+{%- set tx = language_map[weekday_lang] -%}
+{%- set wd = EP_DAYS_SHORT[weekday_lang] if weekday_lang in EP_DAYS_SHORT else EP_DAYS_SHORT['en'] -%}
+{%- set mo = EP_MONTHS_SHORT[weekday_lang] if weekday_lang in EP_MONTHS_SHORT else EP_MONTHS_SHORT['en'] -%}
+{%- set o = namespace(l=[]) -%}{%- set d = namespace(l=[]) -%}
+{#- the due day: today's word, the weekday within six days either way, else the day and the month -#}
+{%- for it in ds_todo.open -%}
+{%- set n = it.n -%}
+{%- set due = '' if n == '' else ((tx['today'] | upper) if n == 0 else ((wd[it.wd] | upper) if (n | abs) <= 6 else (it.day ~ ' ' ~ (mo[it.mon - 1] | upper)))) -%}
+{%- set o.l = o.l + [{'text': it.s | string, 'due': due, 'level': it.lv}] -%}
+{%- endfor -%}
+{%- for it in ds_todo.done -%}{%- set d.l = d.l + [{'text': it.s | string, 'due': '', 'level': ''}] -%}{%- endfor -%}
+{%- set short = ds_todo.n_open ~ ' ' ~ (tx['open'] | upper) -%}
+{%- set foot = (short ~ ' · ' ~ ds_todo.n_done ~ ' ' ~ (tx['done'] | upper)) if ds_todo.counted else short -%}
+{#- pattern 'Checklist' -#}
+{{- CHECKLIST(ns, ds_title, as_timestamp(now()), o.l, d.l, foot, short, tx['more'], tx['nothing']) -}}
+{%- elif layout == 'todo_27l' and view == 'error' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_todo = c.ds_todo -%}
+{%- set language_map = c.language_map -%}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['list_unavailable']) -}}
+{%- elif layout == 'todo_27p' and view == 'main' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_todo = c.ds_todo -%}
+{%- set language_map = c.language_map -%}
+{%- set tx = language_map[weekday_lang] -%}
+{%- set wd = EP_DAYS_SHORT[weekday_lang] if weekday_lang in EP_DAYS_SHORT else EP_DAYS_SHORT['en'] -%}
+{%- set mo = EP_MONTHS_SHORT[weekday_lang] if weekday_lang in EP_MONTHS_SHORT else EP_MONTHS_SHORT['en'] -%}
+{%- set o = namespace(l=[]) -%}{%- set d = namespace(l=[]) -%}
+{#- the due day: today's word, the weekday within six days either way, else the day and the month -#}
+{%- for it in ds_todo.open -%}
+{%- set n = it.n -%}
+{%- set due = '' if n == '' else ((tx['today'] | upper) if n == 0 else ((wd[it.wd] | upper) if (n | abs) <= 6 else (it.day ~ ' ' ~ (mo[it.mon - 1] | upper)))) -%}
+{%- set o.l = o.l + [{'text': it.s | string, 'due': due, 'level': it.lv}] -%}
+{%- endfor -%}
+{%- for it in ds_todo.done -%}{%- set d.l = d.l + [{'text': it.s | string, 'due': '', 'level': ''}] -%}{%- endfor -%}
+{%- set short = ds_todo.n_open ~ ' ' ~ (tx['open'] | upper) -%}
+{%- set foot = (short ~ ' · ' ~ ds_todo.n_done ~ ' ' ~ (tx['done'] | upper)) if ds_todo.counted else short -%}
+{#- pattern 'Checklist' -#}
+{{- CHECKLIST(ns, ds_title, as_timestamp(now()), o.l, d.l, foot, short, tx['more'], tx['nothing']) -}}
+{%- elif layout == 'todo_27p' and view == 'error' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_todo = c.ds_todo -%}
+{%- set language_map = c.language_map -%}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['list_unavailable']) -}}
+{%- elif layout == 'todo_35' and view == 'main' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_todo = c.ds_todo -%}
+{%- set language_map = c.language_map -%}
+{%- set tx = language_map[weekday_lang] -%}
+{%- set wd = EP_DAYS_SHORT[weekday_lang] if weekday_lang in EP_DAYS_SHORT else EP_DAYS_SHORT['en'] -%}
+{%- set mo = EP_MONTHS_SHORT[weekday_lang] if weekday_lang in EP_MONTHS_SHORT else EP_MONTHS_SHORT['en'] -%}
+{%- set o = namespace(l=[]) -%}{%- set d = namespace(l=[]) -%}
+{#- the due day: today's word, the weekday within six days either way, else the day and the month -#}
+{%- for it in ds_todo.open -%}
+{%- set n = it.n -%}
+{%- set due = '' if n == '' else ((tx['today'] | upper) if n == 0 else ((wd[it.wd] | upper) if (n | abs) <= 6 else (it.day ~ ' ' ~ (mo[it.mon - 1] | upper)))) -%}
+{%- set o.l = o.l + [{'text': it.s | string, 'due': due, 'level': it.lv}] -%}
+{%- endfor -%}
+{%- for it in ds_todo.done -%}{%- set d.l = d.l + [{'text': it.s | string, 'due': '', 'level': ''}] -%}{%- endfor -%}
+{%- set short = ds_todo.n_open ~ ' ' ~ (tx['open'] | upper) -%}
+{%- set foot = (short ~ ' · ' ~ ds_todo.n_done ~ ' ' ~ (tx['done'] | upper)) if ds_todo.counted else short -%}
+{#- pattern 'Checklist' -#}
+{{- CHECKLIST(ns, ds_title, as_timestamp(now()), o.l, d.l, foot, short, tx['more'], tx['nothing']) -}}
+{%- elif layout == 'todo_35' and view == 'error' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_todo = c.ds_todo -%}
+{%- set language_map = c.language_map -%}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['list_unavailable']) -}}
+{%- elif layout == 'todo_41' and view == 'main' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_todo = c.ds_todo -%}
+{%- set language_map = c.language_map -%}
+{%- set tx = language_map[weekday_lang] -%}
+{%- set wd = EP_DAYS_SHORT[weekday_lang] if weekday_lang in EP_DAYS_SHORT else EP_DAYS_SHORT['en'] -%}
+{%- set mo = EP_MONTHS_SHORT[weekday_lang] if weekday_lang in EP_MONTHS_SHORT else EP_MONTHS_SHORT['en'] -%}
+{%- set o = namespace(l=[]) -%}{%- set d = namespace(l=[]) -%}
+{#- the due day: today's word, the weekday within six days either way, else the day and the month -#}
+{%- for it in ds_todo.open -%}
+{%- set n = it.n -%}
+{%- set due = '' if n == '' else ((tx['today'] | upper) if n == 0 else ((wd[it.wd] | upper) if (n | abs) <= 6 else (it.day ~ ' ' ~ (mo[it.mon - 1] | upper)))) -%}
+{%- set o.l = o.l + [{'text': it.s | string, 'due': due, 'level': it.lv}] -%}
+{%- endfor -%}
+{%- for it in ds_todo.done -%}{%- set d.l = d.l + [{'text': it.s | string, 'due': '', 'level': ''}] -%}{%- endfor -%}
+{%- set short = ds_todo.n_open ~ ' ' ~ (tx['open'] | upper) -%}
+{%- set foot = (short ~ ' · ' ~ ds_todo.n_done ~ ' ' ~ (tx['done'] | upper)) if ds_todo.counted else short -%}
+{#- pattern 'Checklist' -#}
+{{- CHECKLIST(ns, ds_title, as_timestamp(now()), o.l, d.l, foot, short, tx['more'], tx['nothing']) -}}
+{%- elif layout == 'todo_41' and view == 'error' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_todo = c.ds_todo -%}
+{%- set language_map = c.language_map -%}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['list_unavailable']) -}}
+{%- elif layout == 'todo_75' and view == 'main' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_todo = c.ds_todo -%}
+{%- set language_map = c.language_map -%}
+{%- set tx = language_map[weekday_lang] -%}
+{%- set wd = EP_DAYS_SHORT[weekday_lang] if weekday_lang in EP_DAYS_SHORT else EP_DAYS_SHORT['en'] -%}
+{%- set mo = EP_MONTHS_SHORT[weekday_lang] if weekday_lang in EP_MONTHS_SHORT else EP_MONTHS_SHORT['en'] -%}
+{%- set o = namespace(l=[]) -%}{%- set d = namespace(l=[]) -%}
+{#- the due day: today's word, the weekday within six days either way, else the day and the month -#}
+{%- for it in ds_todo.open -%}
+{%- set n = it.n -%}
+{%- set due = '' if n == '' else ((tx['today'] | upper) if n == 0 else ((wd[it.wd] | upper) if (n | abs) <= 6 else (it.day ~ ' ' ~ (mo[it.mon - 1] | upper)))) -%}
+{%- set o.l = o.l + [{'text': it.s | string, 'due': due, 'level': it.lv}] -%}
+{%- endfor -%}
+{%- for it in ds_todo.done -%}{%- set d.l = d.l + [{'text': it.s | string, 'due': '', 'level': ''}] -%}{%- endfor -%}
+{%- set short = ds_todo.n_open ~ ' ' ~ (tx['open'] | upper) -%}
+{%- set foot = (short ~ ' · ' ~ ds_todo.n_done ~ ' ' ~ (tx['done'] | upper)) if ds_todo.counted else short -%}
+{#- pattern 'Checklist' -#}
+{{- CHECKLIST(ns, ds_title, as_timestamp(now()), o.l, d.l, foot, short, tx['more'], tx['nothing']) -}}
+{%- elif layout == 'todo_75' and view == 'error' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_todo = c.ds_todo -%}
+{%- set language_map = c.language_map -%}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['list_unavailable']) -}}
+{%- elif layout == 'todo_75p' and view == 'main' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_todo = c.ds_todo -%}
+{%- set language_map = c.language_map -%}
+{%- set tx = language_map[weekday_lang] -%}
+{%- set wd = EP_DAYS_SHORT[weekday_lang] if weekday_lang in EP_DAYS_SHORT else EP_DAYS_SHORT['en'] -%}
+{%- set mo = EP_MONTHS_SHORT[weekday_lang] if weekday_lang in EP_MONTHS_SHORT else EP_MONTHS_SHORT['en'] -%}
+{%- set o = namespace(l=[]) -%}{%- set d = namespace(l=[]) -%}
+{#- the due day: today's word, the weekday within six days either way, else the day and the month -#}
+{%- for it in ds_todo.open -%}
+{%- set n = it.n -%}
+{%- set due = '' if n == '' else ((tx['today'] | upper) if n == 0 else ((wd[it.wd] | upper) if (n | abs) <= 6 else (it.day ~ ' ' ~ (mo[it.mon - 1] | upper)))) -%}
+{%- set o.l = o.l + [{'text': it.s | string, 'due': due, 'level': it.lv}] -%}
+{%- endfor -%}
+{%- for it in ds_todo.done -%}{%- set d.l = d.l + [{'text': it.s | string, 'due': '', 'level': ''}] -%}{%- endfor -%}
+{%- set short = ds_todo.n_open ~ ' ' ~ (tx['open'] | upper) -%}
+{%- set foot = (short ~ ' · ' ~ ds_todo.n_done ~ ' ' ~ (tx['done'] | upper)) if ds_todo.counted else short -%}
+{#- pattern 'Checklist' -#}
+{{- CHECKLIST(ns, ds_title, as_timestamp(now()), o.l, d.l, foot, short, tx['more'], tx['nothing']) -}}
+{%- elif layout == 'todo_75p' and view == 'error' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_todo = c.ds_todo -%}
+{%- set language_map = c.language_map -%}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['list_unavailable']) -}}
 {%- elif layout == 'weather_27l' and view == 'main' -%}
 {%- set stale = (stale_after | int(0)) > 0 and wx.last > 0 and (as_timestamp(now()) - wx.last) > (stale_after | int(0)) * 60 -%}
 {%- set right = wx.last if stale else as_timestamp(now()) -%}

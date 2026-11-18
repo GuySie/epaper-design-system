@@ -139,17 +139,37 @@ CASES = [
     ('tl', 'tiles_75p', 'skip', 'free'), ('tl_widest', 'tiles_75p', 'skip', 'free'), ('tl_title', 'tiles_75p', 'skip', 'free'), ('tl_stale', 'tiles_75p', 'skip', 'free'),
     ('tl_unav', 'tiles_75p', 'skip', 'free'), ('tl_g', 'tiles_75p', 'skip', 'free'), ('tl_y', 'tiles_75p', 'skip', 'free'), ('tl_err', 'tiles_75p', 'skip', 'free'),
     ('tl_few', 'tiles_75p', 'skip', 'free'), ('tl_two', 'tiles_75p', 'skip', 'free'), ('pic_tiles_75p', 'tiles_75p', 'skip', 'free'),
+    # To-do list (a to-do entity as a Checklist): its states, then other configurations (CONFIG_CASES)
+    ('td', 'todo_27l', 'M+', 'free'), ('td_many', 'todo_27l', 'M+', 'free'), ('td_title', 'todo_27l', 'M+', 'free'), ('td_g', 'todo_27l', 'M+', 'free'),
+    ('td_y', 'todo_27l', 'M+', 'free'), ('td_err', 'todo_27l', 'skip', 'free'), ('td_empty', 'todo_27l', 'skip', 'free'), ('td_flagoff', 'todo_27l', 'M+', 'free'),
+    ('td_nodone', 'todo_27l', 'M+', 'free'), ('td_duefirst', 'todo_27l', 'M+', 'free'), ('td_alldone', 'todo_27l', 'M+', 'free'), ('pic_todo_27l', 'todo_27l', 'M+', 'free'),
+    ('td', 'todo_27p', 'M+', 'free'), ('td_many', 'todo_27p', 'M+', 'free'), ('td_title', 'todo_27p', 'M+', 'free'), ('td_g', 'todo_27p', 'M+', 'free'),
+    ('td_y', 'todo_27p', 'M+', 'free'), ('td_err', 'todo_27p', 'skip', 'free'), ('td_empty', 'todo_27p', 'skip', 'free'), ('td_flagoff', 'todo_27p', 'M+', 'free'),
+    ('td_nodone', 'todo_27p', 'M+', 'free'), ('td_duefirst', 'todo_27p', 'M+', 'free'), ('td_alldone', 'todo_27p', 'M+', 'free'), ('pic_todo_27p', 'todo_27p', 'M+', 'free'),
+    ('td', 'todo_35', 'M+', 'free'), ('td_many', 'todo_35', 'M+', 'free'), ('td_title', 'todo_35', 'M+', 'free'), ('td_g', 'todo_35', 'M+', 'free'),
+    ('td_y', 'todo_35', 'M+', 'free'), ('td_err', 'todo_35', 'skip', 'free'), ('td_empty', 'todo_35', 'skip', 'free'), ('td_flagoff', 'todo_35', 'M+', 'free'),
+    ('td_nodone', 'todo_35', 'M+', 'free'), ('td_duefirst', 'todo_35', 'M+', 'free'), ('td_alldone', 'todo_35', 'M+', 'free'), ('pic_todo_35', 'todo_35', 'M+', 'free'),
+    ('td', 'todo_41', 'M+', 'free'), ('td_many', 'todo_41', 'M+', 'free'), ('td_title', 'todo_41', 'M+', 'free'), ('td_g', 'todo_41', 'M+', 'free'),
+    ('td_y', 'todo_41', 'M+', 'free'), ('td_err', 'todo_41', 'skip', 'free'), ('td_empty', 'todo_41', 'skip', 'free'), ('td_flagoff', 'todo_41', 'M+', 'free'),
+    ('td_nodone', 'todo_41', 'M+', 'free'), ('td_duefirst', 'todo_41', 'M+', 'free'), ('td_alldone', 'todo_41', 'M+', 'free'), ('pic_todo_41', 'todo_41', 'M+', 'free'),
+    ('td', 'todo_75', 'M+', 'free'), ('td_many', 'todo_75', 'M+', 'free'), ('td_title', 'todo_75', 'M+', 'free'), ('td_g', 'todo_75', 'M+', 'free'),
+    ('td_y', 'todo_75', 'M+', 'free'), ('td_err', 'todo_75', 'skip', 'free'), ('td_empty', 'todo_75', 'skip', 'free'), ('td_flagoff', 'todo_75', 'M+', 'free'),
+    ('td_nodone', 'todo_75', 'M+', 'free'), ('td_duefirst', 'todo_75', 'M+', 'free'), ('td_alldone', 'todo_75', 'M+', 'free'), ('pic_todo_75', 'todo_75', 'M+', 'free'),
+    ('td', 'todo_75p', 'M+', 'free'), ('td_many', 'todo_75p', 'M+', 'free'), ('td_title', 'todo_75p', 'M+', 'free'), ('td_g', 'todo_75p', 'M+', 'free'),
+    ('td_y', 'todo_75p', 'M+', 'free'), ('td_err', 'todo_75p', 'skip', 'free'), ('td_empty', 'todo_75p', 'skip', 'free'), ('td_flagoff', 'todo_75p', 'M+', 'free'),
+    ('td_nodone', 'todo_75p', 'M+', 'free'), ('td_duefirst', 'todo_75p', 'M+', 'free'), ('td_alldone', 'todo_75p', 'M+', 'free'), ('pic_todo_75p', 'todo_75p', 'M+', 'free'),
 ]
 
 # cases that show another configuration of their page (an icon, a second value, a longer reading), not another state of
 # one device: the hero may be another size or sit elsewhere there (check.py same_layout leaves them out)
-CONFIG_CASES = {'sv_icon', 'sv_hum', 'sv_long', 'pic_single_value_14', 'pic_single_value_27l', 'pic_single_value_35'} | {'tl_few', 'tl_two'} | {f'pic_tiles_{k}' for k in ('14', '27l', '27p', '35', '41', '75', '75p')}
+CONFIG_CASES = {'sv_icon', 'sv_hum', 'sv_long', 'pic_single_value_14', 'pic_single_value_27l', 'pic_single_value_35'} | {'tl_few', 'tl_two'} | {'td_flagoff', 'td_nodone', 'td_duefirst', 'td_alldone'} | {f'pic_todo_{k}' for k in ('27l', '27p', '35', '41', '75', '75p')} | {f'pic_tiles_{k}' for k in ('14', '27l', '27p', '35', '41', '75', '75p')}
 
 # a page's examples (pages/<page>.yaml `examples`) are check cases of their layout, checked as its first case is unless the example names its own gap rule
 from layouts import examples as _examples       # noqa: E402
 for _p, _k, _c, _t, _gap in _examples():
-    _g, _f = next((g, f) for c, k, g, f in CASES if k == _k)
-    CASES.append((_c, _k, _gap or _g, _f)); CONFIG_CASES.add(_c)
+    _first = next(((g, f) for c, k, g, f in CASES if k == _k), None)
+    if _first:                                   # a mock-up's draft layout (lib/preview.py) has no cases, so no examples
+        CASES.append((_c, _k, _gap or _first[0], _first[1])); CONFIG_CASES.add(_c)
 
 SIZES = {l['key']: l['canvas'] for l in layouts()}      # layout key -> canvas (its screen's tier)
 WEATHER_EXTRA = ['wx', 'wx_cond', 'wx_alert', 'wx_warn', 'wx_y', 'wxneg', 'wx_p0', 'wx_warn_g', 'wx_moon', 'tonight', 'tonight_knmi', 'tonight_knmi2',

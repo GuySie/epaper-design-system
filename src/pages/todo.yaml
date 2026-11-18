@@ -1,0 +1,154 @@
+page: todo
+description:
+  shows: 'A to-do list: the open items first, each with its box and its due day, then the done ones while there is room. An
+    overdue item and one due today are flagged.'
+  needs_also:
+  - A to-do list (any to-do entity).
+  trigger_advice: 'A state trigger on the list (its state is the number of open items), and a time pattern once a day so the
+    due days stay right.'
+  title_default: the list's name
+redraw: trigger
+inputs:
+- name: todo_entity
+  section: content
+  label: To-do list
+  help: The list whose items are shown.
+  selector:
+    entity:
+      filter:
+        domain: todo
+  required: true
+- name: show_done
+  section: content
+  label: Show done items
+  help: On, the done items follow the open ones while there is room. Off, only the open items are shown.
+  selector:
+    boolean: {}
+  default: true
+- name: due_first
+  section: content
+  label: Due days first
+  help: On, the items with a due day come first, the earliest first. Off, the items keep the order the list has.
+  selector:
+    boolean: {}
+  default: false
+- name: flag_due
+  section: thresholds
+  label: 'Due day: flag it'
+  help: On, an overdue item is severe and an item due today is a warning.
+  selector:
+    boolean: {}
+  default: true
+bind:
+- todo_entity
+- show_done
+- due_first
+- flag_due
+data:
+  variables:
+  - ds_title: '{{ header_title if header_title else (entity_name(todo_entity) or device_name(todo_entity) or todo_entity) }}'
+  steps:
+  - action: todo.get_items
+    continue_on_error: true
+    target:
+      entity_id: '{{ todo_entity }}'
+    data:
+      status:
+      - needs_action
+      - completed
+    response_variable: todo_items
+  - variables:
+      ds_todo: |
+        {% set r = todo_items[todo_entity]['items'] if (todo_items is defined and todo_items is mapping and todo_entity in todo_items) else [] %} {% set today = strptime(now().strftime('%Y-%m-%d'), '%Y-%m-%d') %} {% set ns = namespace(o=[], d=[]) %} {% for it in r %}
+          {% set due = ((it.due | string)[:10]) if (it.due is defined and it.due) else '' %}
+          {% if it.status == 'completed' %}
+            {% set ns.d = ns.d + [{'s': it.summary | string, 'n': '', 'k': 99999, 'lv': ''}] %}
+          {% elif due %}
+            {% set dd = strptime(due, '%Y-%m-%d') %} {% set n = (dd - today).days %}
+            {% set ns.o = ns.o + [{'s': it.summary | string, 'n': n, 'k': n, 'wd': dd.weekday(), 'day': dd.day, 'mon': dd.month, 'lv': (('sev' if n < 0 else ('warn' if n == 0 else '')) if flag_due else '')}] %}
+          {% else %}
+            {% set ns.o = ns.o + [{'s': it.summary | string, 'n': '', 'k': 99999, 'lv': ''}] %}
+          {% endif %}
+        {% endfor %} {{ {'open': (ns.o | sort(attribute='k')) if due_first else ns.o, 'done': ns.d if show_done else [], 'n_open': ns.o | length, 'n_done': ns.d | length, 'counted': show_done} }}
+  draw:
+    kind: choose
+    when:
+    - "{{ states(todo_entity) not in ['unknown', 'unavailable'] }}"
+    steps: []
+texts:
+  en:
+    today: Today
+    more: '+{e} more'
+    open: open
+    done: done
+    nothing: Nothing to do
+    list_unavailable: List unavailable
+  de:
+    today: Heute
+    more: '+{e} weitere'
+    open: offen
+    done: erledigt
+    nothing: Nichts zu tun
+    list_unavailable: Liste nicht verfügbar
+  nl:
+    today: Vandaag
+    more: '+{e} meer'
+    open: open
+    done: klaar
+    nothing: Niets te doen
+    list_unavailable: Lijst niet beschikbaar
+  fr:
+    today: "Aujourd'hui"
+    more: '+{e} autres'
+    open: à faire
+    done: faits
+    nothing: Rien à faire
+    list_unavailable: Liste indisponible
+  es:
+    today: Hoy
+    more: '+{e} más'
+    open: pendientes
+    done: hechas
+    nothing: Nada que hacer
+    list_unavailable: Lista no disponible
+  pl:
+    today: Dziś
+    more: '+{e} więcej'
+    open: otwarte
+    done: gotowe
+    nothing: Nic do zrobienia
+    list_unavailable: Lista niedostępna
+  hr:
+    today: Danas
+    more: '+{e} još'
+    open: otvoreno
+    done: gotovo
+    nothing: Nema zadataka
+    list_unavailable: Popis nije dostupan
+  sv:
+    today: Idag
+    more: '+{e} till'
+    open: öppna
+    done: klara
+    nothing: Inget att göra
+    list_unavailable: Listan är inte tillgänglig
+examples:
+- case: ex_todo_chores
+  screen: '41'
+  shows: "the week's chores"
+- case: ex_todo_packing
+  screen: '35'
+  shows: "a packing list"
+layouts:
+  27l:
+    spec: todo_27l
+  27p:
+    spec: todo_27p
+  '35':
+    spec: todo_35
+  '41':
+    spec: todo_41
+  '75':
+    spec: todo_75
+  75p:
+    spec: todo_75p
