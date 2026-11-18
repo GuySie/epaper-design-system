@@ -56,6 +56,20 @@ def layouts():
     return tuple(out)
 
 
+def examples():
+    """[(page, layout key, case, shows, gap rule or None)]: a page definition's `examples`, each a scenario (scen/<case>.py) drawn on one
+    of the page's screens to show a use the page has (the README's pictures, the design system's Examples lines)"""
+    import pages
+    keys = {(l['page'], l['screen']): l['key'] for l in layouts()}
+    out = []
+    for page in pages.names():
+        for e in pages.load(page).get('examples') or []:
+            if (page, str(e['screen'])) not in keys:
+                sys.exit(f"pages/{page}.yaml: example {e['case']} names screen {e['screen']}, which the page has no layout for")
+            out.append((page, keys[(page, str(e['screen']))], e['case'], e['shows'], e.get('gap')))
+    return out
+
+
 def registry():
     """registry.yaml with each page's blueprints (layout keys) filled in from the page definitions"""
     import yaml

@@ -172,6 +172,9 @@ def tables(r, pkg=PKG):
                     x for x in (('also ' + code(more)) if more else '', ('without ' + code(less)) if less else '') if x) + ' |')
         T[f'inputs-{k}'] = rows
         T[f'layouts-{k}'] = layout_rows(r, pg)
+        exs = [t for p_, _, _, t, _ in _layout_examples() if p_ == k]
+        if exs:
+            T[f'examples-{k}'] = ['- **Examples:** ' + '; '.join(exs) + '. Each is drawn in the README.']
     rows = ['| Term | Kind | Part of | What it is |', '|---|---|---|---|']
     G = []
     for n, c in r['components'].items():
@@ -252,6 +255,11 @@ def blueprint_rows(pkg=PKG):
     return rows
 
 
+def _layout_examples():
+    from layouts import examples
+    return examples()
+
+
 def picture_rows(pkg=PKG):
     """the README's pictures: per page its blueprints, each with its name and its reference picture (lib/pictures.py)"""
     import pictures
@@ -263,7 +271,25 @@ def picture_rows(pkg=PKG):
         bp = yaml.load((pathlib.Path(pkg) / f).read_text(encoding='utf-8'), Loader=_Tagless)['blueprint']
         name = re.sub(r'^E-paper ', '', bp['name'])
         out += [f'{name}', '', f'![{name}](docs/images/{pathlib.Path(f).stem}.png)', '']
-    return out[1:-1]
+    # a page's examples follow its blueprints
+    res, cur = [], None
+    ex = {}
+    for pname, _, _, shows, f in pictures.example_picks():
+        ex.setdefault(pname, []).append((shows, f))
+    def flush(pn):
+        for shows, f in ex.get(pn, []):
+            cap = 'Example: ' + shows
+            res.extend([cap, '', f'![{cap}](docs/images/{f})', ''])
+    for line in out[1:]:
+        m = re.match(r'^\*\*(.+)\*\*$', line)
+        if m:
+            if cur: flush(cur)
+            cur = m.group(1)
+        res.append(line)
+    if cur:
+        if res and res[-1] != '': res.append('')
+        flush(cur)
+    return res[:-1] if res and res[-1] == '' else res
 
 
 class _Tagless(yaml.SafeLoader):

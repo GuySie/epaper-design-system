@@ -82,6 +82,14 @@ Single value 3.5"
 ![Single value 3.5"](docs/images/epaper-blueprint-3.5-single-value.png)
 
 
+Example: a countdown: the days until a date
+
+![Example: a countdown: the days until a date](docs/images/example-single-value-countdown.png)
+
+Example: today's date
+
+![Example: today's date](docs/images/example-single-value-date.png)
+
 **Weather**
 
 Weather 2.7" landscape
@@ -160,6 +168,14 @@ History graph 4.1"
 ![History graph 4.1"](docs/images/epaper-blueprint-4.1-history-graph.png)
 
 
+Example: the house's power use over a day
+
+![Example: the house's power use over a day](docs/images/example-history-power.png)
+
+Example: a freezer's temperature, flagged when it warms up
+
+![Example: a freezer's temperature, flagged when it warms up](docs/images/example-history-freezer.png)
+
 **Sun & moon**
 
 Sun & moon 3.5"
@@ -189,12 +205,28 @@ Levels 4.1"
 ![Levels 4.1"](docs/images/epaper-blueprint-4.1-levels.png)
 
 
+Example: the batteries of the devices in the house
+
+![Example: the batteries of the devices in the house](docs/images/example-levels-batteries.png)
+
+Example: a printer's ink
+
+![Example: a printer's ink](docs/images/example-levels-ink.png)
+
 **Entities**
 
 Entities 3.5"
 
 ![Entities 3.5"](docs/images/epaper-blueprint-3.5-entities.png)
 
+
+Example: packages on their way
+
+![Example: packages on their way](docs/images/example-entities-packages.png)
+
+Example: a home server
+
+![Example: a home server](docs/images/example-entities-server.png)
 
 **Plant moisture**
 
@@ -265,6 +297,14 @@ Tiles 7.5" landscape
 Tiles 7.5" portrait
 
 ![Tiles 7.5" portrait](docs/images/epaper-blueprint-7.5-tiles-portrait.png)
+
+Example: what is still open or on before you leave
+
+![Example: what is still open or on before you leave](docs/images/example-tiles-leaving.png)
+
+Example: the appliances and what they are doing
+
+![Example: the appliances and what they are doing](docs/images/example-tiles-appliances.png)
 <!-- /registry:pictures -->
 
 The design itself is written down in [docs/design-system.md](docs/design-system.md): screens and their tokens, colour, type, icons, states, components, modules, patterns and pages.

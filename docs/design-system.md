@@ -1096,7 +1096,7 @@ Patterns and versions that exist as mock-ups only: no blueprint is built from th
 
 ## Pages
 
-A page is a pattern filled with real content for one use. Each page names the pattern it uses, its layouts (● drawn by a blueprint today; ○ no blueprint yet; — not offered; the 7.09" has no tier yet), the widest reading its entity can show, and the inputs its blueprints add to the ones every blueprint has (*Blueprint mechanics*). Every live page has the same parts, in this order: the pattern it uses, **Shows**, **Tested with**, its own rules, and its inputs. Thresholds for every page are in *Thresholds*.
+A page is a pattern filled with real content for one use. Each page names the pattern it uses, its layouts (● drawn by a blueprint today; ○ no blueprint yet; — not offered; the 7.09" has no tier yet), the widest reading its entity can show, and the inputs its blueprints add to the ones every blueprint has (*Blueprint mechanics*). Every live page has the same parts, in this order: the pattern it uses, **Shows**, **Tested with**, its own rules, and its inputs. A page for any entities (Single value, Levels, Entities, History graph, Tiles) also has **Examples** after **Tested with**: uses people have e-paper screens for, each a scenario drawn by the page's own blueprint and shown in the README. Thresholds for every page are in *Thresholds*.
 
 <!-- registry:pages -->
 | Page | Uses | Status | Widest reading | 1.4" | 2.7" L | 2.7" P | 3.5" | 4.1" | 4.26" | 7.5" L | 7.5" P | 7.09" (no tier yet) |
@@ -1267,7 +1267,9 @@ A Glance for any sensor: its number, large, with its unit.
 
 - **Shows:** one entity's number as the hero, with its unit. The title is the entity's name unless a header title is given.
 - **Tested with:** `1240 ppm`; the widest reading (`-12.5 °C`); a high reading at warning and at severe, a low one at severe; a yellow and a grey panel; a long title; stale data; an unavailable sensor (`—`); both switches off. As other configurations: an icon with a second value (`21.4 °C`, `48 %`), a short reading with an icon (`48 %`), and a reading longer than the widest (`123456 kWh`: a smaller number on the 2.7" and 3.5", the error state on the 1.4").
-- **Examples:** a room's CO2 or temperature; a countdown (whole days as the number, the date as the second value); today's date (the day of the month as the number, never the clock time).
+<!-- registry:examples-single-value -->
+- **Examples:** a countdown: the days until a date; today's date. Each is drawn in the README.
+<!-- /registry:examples-single-value -->
 - **Unit:** after the number, on its baseline, as *Hero group*, *A unit beside the number* says. On the 1.4" the unit is the Glance secondary instead: a four-digit number needs the screen's width.
 - **Widest reading:** four characters and a three-letter unit (`1240 ppm`, `-12.5 °C`). A longer reading steps down the hero ladder one rung at a time until it fits, as a word-hero does (*Glance with a word*); it is never cut.
 - **The 1.4" has one size.** Its hero is fitted on the widest four digits (`4000`) and never steps, so the number keeps its size whatever the value; that size is under the Glance floor, the one exception to it (*Physical size minimums*). A reading too wide for it is the error state: "Value too long for this screen."
@@ -1287,7 +1289,7 @@ A Glance for any sensor: its number, large, with its unit.
 |---|---|---|---|---|---|
 | 1.4" | 72 px | 72 → 48 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 16 |
 | 2.7" L | 88 px | 88 → 56 px | normal, widest, warning, severe, gray, colour, title, stale, unavailable | error, empty | 15 |
-| 3.5" | 104 px | 104 → 64 px | normal, widest, warning, severe, gray, colour, title, stale, unavailable | error, empty | 15 |
+| 3.5" | 104 px | 104 → 64 px | normal, widest, warning, severe, gray, colour, title, stale, unavailable | error, empty | 17 |
 <!-- /registry:layouts-single-value -->
 
 ### Rain forecast
@@ -1338,6 +1340,9 @@ A Line chart for any sensor: its last hours on the automatic scale.
 
 - **Shows:** one sensor's last 3, 6, 12 or 24 hours as a line, the current value as the square at its end, the scale's two ends beside the plot, and the footer's conclusion. The title is the sensor's name unless a header title is given.
 - **Tested with:** a room's temperature over 12 hours; the widest labels (`-12.5`); a nearly flat line; a CO2 sensor over 24 hours (whole numbers); the period at warning and at severe (the severe line close to the scale's top, whose label gives way); a low dip; high and low together, on a colour, a yellow and a grey panel; a long title; stale data; the sensor unavailable now; no history (the error view); both switches off; 12-hour time.
+<!-- registry:examples-history -->
+- **Examples:** the house's power use over a day; a freezer's temperature, flagged when it warms up. Each is drawn in the README.
+<!-- /registry:examples-history -->
 - **Scale:** the automatic scale (*Chart frame (all charts)*, *Fixed y-scale*). With a threshold on, its lines are inside the scale; this page doesn't use the scale built from the severe value.
 - **Footer:** left the current value (`NOW 20.6 °C`), right the period's lowest and highest (`LOW 18.3 · HIGH 22.8 °C`); a chip at the highest level the period reached.
 - **Widest reading:** four characters and a three-letter unit (`1240 ppm`, `-12.5 °C`): the label margin is as wide as `-12.5`, whatever the scale shows.
@@ -1354,7 +1359,7 @@ A Line chart for any sensor: its last hours on the automatic scale.
 | Screen | Checked in | Not applicable | Cases |
 |---|---|---|---|
 | 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 17 |
-| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 17 |
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 19 |
 | 4.1" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 17 |
 <!-- /registry:layouts-history -->
 
@@ -1406,6 +1411,9 @@ Meters for any sensors: each a row with its value and a bar that shows how full 
 
 - **Shows:** up to six sensors, one row each: its label, its value with its unit, and a bar filled to the value's share of that row's maximum. No footer, no reset time and no now-marker: those are Claude usage's.
 - **Tested with:** a battery, solar power of 4 kW, a tank of 1000 L and humidity; the widest reading (`1240 ppm`) beside a long label; a high row at warning; low rows at severe and at warning, on a colour, a yellow and a grey panel; a long title; stale data; one row unavailable; most rows unavailable (the error state); both switches off; three rows (the larger type); six rows (the 4.1").
+<!-- registry:examples-levels -->
+- **Examples:** the batteries of the devices in the house; a printer's ink. Each is drawn in the README.
+<!-- /registry:examples-levels -->
 - **Label:** the sensor's name, or the row's label input.
 - **Value and bar:** the number as *Single value* writes it, with its unit. The bar is the value divided by the row's maximum (`bar_<n>_max`, 100 by default), kept between empty and full.
 - **Rows:** four on the 3.5" and the 2.7" landscape, six on the 4.1"; each blueprint offers only the rows its screen has. Type and spacing as *Meters* says.
@@ -1424,7 +1432,7 @@ Meters for any sensors: each a row with its value and a bar that shows how full 
 | Screen | Checked in | Not applicable | Cases |
 |---|---|---|---|
 | 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 13 |
-| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 13 |
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 15 |
 | 4.1" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 14 |
 <!-- /registry:layouts-levels -->
 
@@ -1434,7 +1442,9 @@ A Key-value list of up to 12 entities.
 
 - **Shows:** name and state with its unit, one or two columns.
 - **Tested with:** 12 entities (two columns), unavailable values, more than half unavailable (the error state), stale data, Home Assistant's own unit glyphs (µg/m³, ℃).
-- **Examples:** a room's sensors; packages on their way, one row per parcel with where it is.
+<!-- registry:examples-entities -->
+- **Examples:** packages on their way; a home server. Each is drawn in the README.
+<!-- /registry:examples-entities -->
 
 <!-- registry:inputs-entities -->
 | Screen | Inputs of this page |
@@ -1445,7 +1455,7 @@ A Key-value list of up to 12 entities.
 <!-- registry:layouts-entities -->
 | Screen | Checked in | Not applicable | Cases |
 |---|---|---|---|
-| 3.5" | normal, widest, title, stale, error, unavailable | warning, severe, gray, colour, empty | 8 |
+| 3.5" | normal, widest, title, stale, error, unavailable | warning, severe, gray, colour, empty | 10 |
 <!-- /registry:layouts-entities -->
 
 ### Tiles (the page)
@@ -1454,6 +1464,9 @@ The Tiles pattern for any entities: up to 12, one tile each.
 
 - **Shows:** per entity its icon, its state and its label. As many tiles as the screen holds (*Tiles*); each blueprint offers only the entities its screen has.
 - **Tested with:** every tile filled, with icons from the input, from the entity and one tile without; a state and labels too long for a tile, and `-12,5°C`; five entities and two entities (the grid shrinks); a long title; stale data; one entity unavailable; every entity unavailable (the error state; on the 1.4" a dash); a grey and a yellow panel.
+<!-- registry:examples-tiles -->
+- **Examples:** what is still open or on before you leave; the appliances and what they are doing. Each is drawn in the README.
+<!-- /registry:examples-tiles -->
 - **State:** a number as *Entities* writes it, with its unit; any other state in Home Assistant's own wording for it (`Closed` for a door that is `off`), which follows the language Home Assistant is set to, not the blueprint's.
 - **Label:** the entity's name, or the tile's label input.
 - **Icon:** the tile's icon input, else the entity's own icon; an entity with neither gets no icon. An icon the kit has no glyph for is drawn by the renderer's own icon element (*Blueprint mechanics*).
@@ -1478,7 +1491,7 @@ The Tiles pattern for any entities: up to 12, one tile each.
 | 1.4" | normal, widest, gray, colour, title, stale, unavailable | warning, severe, error, empty | 8 |
 | 2.7" P | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 10 |
 | 2.7" L | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
-| 3.5" | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
+| 3.5" | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 13 |
 | 4.1" | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
 | 7.5" L | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
 | 7.5" P | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |

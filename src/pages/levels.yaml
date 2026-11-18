@@ -174,6 +174,13 @@ texts:
     default_title: Razine
   sv:
     default_title: Nivåer
+examples:
+- case: ex_levels_batteries
+  screen: '35'
+  shows: "the batteries of the devices in the house"
+- case: ex_levels_ink
+  screen: '35'
+  shows: "a printer's ink"
 layouts:
   27l:
     spec: levels_27l

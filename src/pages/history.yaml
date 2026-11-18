@@ -174,6 +174,13 @@ texts:
     low: LÄGST
     high: HÖGST
     no_data: Ingen historik för den här sensorn.
+examples:
+- case: ex_history_power
+  screen: '35'
+  shows: "the house's power use over a day"
+- case: ex_history_freezer
+  screen: '35'
+  shows: "a freezer's temperature, flagged when it warms up"
 layouts:
   27l:
     spec: history_27l

@@ -128,6 +128,15 @@ texts:
   sv:
     no_entities: Inga entiteter konfigurerade.
     default_title: Entiteter
+examples:
+- case: ex_entities_packages
+  screen: '35'
+  shows: "packages on their way"
+  gap: M+
+- case: ex_entities_server
+  screen: '35'
+  shows: "a home server"
+  gap: M+
 layouts:
   '35':
     spec: entities_35

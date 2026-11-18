@@ -109,6 +109,13 @@ texts:
     default_title: Status
   sv:
     default_title: Status
+examples:
+- case: ex_tiles_leaving
+  screen: '35'
+  shows: "what is still open or on before you leave"
+- case: ex_tiles_appliances
+  screen: '35'
+  shows: "the appliances and what they are doing"
 layouts:
   '14':
     spec: tiles_14

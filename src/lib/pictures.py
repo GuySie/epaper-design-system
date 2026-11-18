@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The reference pictures: one per blueprint at the panel's own pixels, in English, with a warning and a severe state
+"""The reference pictures: one per blueprint, and one per example of a page (pages/<page>.yaml `examples`), at the panel's own pixels, in English, with a warning and a severe state
 visible where the page has thresholds (each picture case, scen/pic_<layout>.py, says what it adds to the ordinary case).
 
   pictures.py RENDERS    copy each layout's picture case (`pic_<layout>`: its `normal` case in English, on a BWRY panel where the screen has one) from the renders a release kept
@@ -25,6 +25,13 @@ def picks():
     return out
 
 
+def example_picks():
+    """[(page name, layout key, case, shows, picture file)]: every page's examples (lib/layouts.py `examples`)"""
+    from layouts import registry, examples
+    name = {k: p['name'] for k, p in registry()['pages'].items()}
+    return [(name[pg], key, case, shows, 'example-' + case[3:].replace('_', '-') + '.png') for pg, key, case, shows, _ in examples()]
+
+
 def main(renders):
     IMAGES.mkdir(parents=True, exist_ok=True)
     want = set()
@@ -35,6 +42,12 @@ def main(renders):
         dst = IMAGES / (pathlib.Path(f).stem + '.png')
         shutil.copyfile(src, dst)
         want.add(dst.name)
+    for _, key, case, _, f in example_picks():
+        src = pathlib.Path(renders) / f'{key}__{case}.png'
+        if not src.exists():
+            sys.exit(f'pictures: no render {src.name} (the release keeps them in EP_RENDERS)')
+        shutil.copyfile(src, IMAGES / f)
+        want.add(f)
     for old in IMAGES.glob('*.png'):
         if old.name not in want:
             old.unlink()

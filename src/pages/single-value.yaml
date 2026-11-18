@@ -126,6 +126,13 @@ texts:
     too_long: Vrijednost je preduga za ovaj zaslon.
   sv:
     too_long: Värdet är för långt för den här skärmen.
+examples:
+- case: ex_single_value_countdown
+  screen: '35'
+  shows: "a countdown: the days until a date"
+- case: ex_single_value_date
+  screen: '35'
+  shows: "today's date"
 layouts:
   '14':
     spec: single_value_14

@@ -145,6 +145,12 @@ CASES = [
 # one device: the hero may be another size or sit elsewhere there (check.py same_layout leaves them out)
 CONFIG_CASES = {'sv_icon', 'sv_hum', 'sv_long', 'pic_single_value_14', 'pic_single_value_27l', 'pic_single_value_35'} | {'tl_few', 'tl_two'} | {f'pic_tiles_{k}' for k in ('14', '27l', '27p', '35', '41', '75', '75p')}
 
+# a page's examples (pages/<page>.yaml `examples`) are check cases of their layout, checked as its first case is unless the example names its own gap rule
+from layouts import examples as _examples       # noqa: E402
+for _p, _k, _c, _t, _gap in _examples():
+    _g, _f = next((g, f) for c, k, g, f in CASES if k == _k)
+    CASES.append((_c, _k, _gap or _g, _f)); CONFIG_CASES.add(_c)
+
 SIZES = {l['key']: l['canvas'] for l in layouts()}      # layout key -> canvas (its screen's tier)
 WEATHER_EXTRA = ['wx', 'wx_cond', 'wx_alert', 'wx_warn', 'wx_y', 'wxneg', 'wx_p0', 'wx_warn_g', 'wx_moon', 'tonight', 'tonight_knmi', 'tonight_knmi2',
                  'tonight_knmi3', 'tonight_storm', 'wx_bw', 'wx_12h_en', 'wx_stale', 'wx_err', 'wx_unav', 'wx_flagoff']
