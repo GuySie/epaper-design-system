@@ -10,12 +10,15 @@ Names:
   heroLadder, iconLadder, strokes.KEY, xs.SIZE, s.SIZE, unitGap.SIZE, unitGapNone, grays, tightScreens, tightRange,
   classScreens.CLASS, mediumMm, largeMm   computed from those constants and the panel facts
   input:PAGE:INPUT    an input's default in pages/PAGE.yaml, with its unit
+  shared:INPUT        the default of an input every blueprint has (pages/_shared.yaml), with its unit
+  layout:KEY:PATH     a measured token of one layout (ep_tokens.jinja EP_LAYOUT), e.g. layout:weather_41:icon.stripDay
   const:PAGE:SCREEN:NAME   a constant a page definition gives one of its layouts
   spec:LAYOUT:NAME    a constant of specs/LAYOUT.py (or specs/_wx.py as spec:_wx:NAME)
   color:PATH          a colour role value (lib/derive_tokens.py COLOR, a dotted path), in backticks
   heroMinUsed, heroStepPct   the smallest hero any tier uses (the tokens), the ladder's step below 160
   markerDisc          icon.markerDisc for the inline icon sizes in use
   inputPages:INPUT    the live pages whose definition has that input
+  stalePages          the live pages that have a stale state
   dv:WxHxWMMxHMM:PATH a token the generator derives for a screen that has no tier yet (space.pad, type.data, icon.min,
                       line.base, pitch, sizeClass); a type token reads as TRMNL<size>
   heroIconMin         the smallest icon on its own, as a fraction of the digit height
@@ -102,6 +105,13 @@ def input_pages(name):
     return ', '.join(out)
 
 
+def stale_pages():
+    """the live pages that have a stale state (their definition names what counts as their newest report)"""
+    from layouts import registry
+    return ', '.join(v['name'] for page, v in registry()['pages'].items()
+                     if v.get('blueprints') and (SRC / 'pages' / f'{page}.yaml').exists() and page_def(page).get('stale'))
+
+
 def class_screens(cls):
     keys = [k for k in dt.KNOWN if dt.derive(*dt.KNOWN[k])[0]['sizeClass'] == cls]
     seen = []
@@ -121,6 +131,20 @@ def value(name):
     if kind == 'input':
         page, inp = arg.split(':')
         return input_default(page, inp)
+    if kind == 'stalePages':
+        return stale_pages()
+    if kind == 'shared':
+        import pages
+        i = pages.shared()['inputs'][arg]
+        unit = ((i.get('selector') or {}).get('number') or {}).get('unit_of_measurement', '')
+        return num(i['default']) + ((' ' + unit) if unit else '')
+    if kind == 'layout':
+        from tier_tables import load_layouts
+        key, path = arg.split(':')
+        v = load_layouts()[key]
+        for k in path.split('.'):
+            v = v[k]
+        return num(v)
     if kind == 'const':
         page, screen, n = arg.split(':')
         return num(page_def(page)['layouts'][screen]['constants'][n])
