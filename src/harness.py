@@ -40,14 +40,9 @@ def collect_defaults(inputs, out):
         elif isinstance(v, dict):
             if 'default' in v:
                 out[k] = v.get('default')
-            else:  # a required input: the scenario gives it
-                out[k] = REQUIRED_EMPTY.get(k)
+            else:  # a required input: the scenario gives it; one it leaves out is empty (a list where several are picked)
+                out[k] = [] if ((v.get('selector') or {}).get('entity') or {}).get('multiple') else ''
     return out
-
-
-# required inputs: a scenario that leaves one out gets it empty
-REQUIRED_EMPTY = {'weather_entity': '', 'calendar_entities': [], 'entity_1': '', 'plant_1': '', 'bar_1': '',
-                  'openings': []}
 
 
 def subst(obj, vals):

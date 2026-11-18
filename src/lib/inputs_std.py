@@ -10,7 +10,7 @@ The scheme: five sections, always in this order, each only when it has inputs.
   thresholds  Thresholds (collapsed):       flag_<what>, warning_<what>, severe_<what> for each reading
   appearance  Appearance (collapsed):       header_title, location_string, time_format, weekday_format, rotate
   advanced    Advanced (collapsed):         stale_after, led_color, led_flash_delay, font_dir
-Required: displays, the main entity (MAIN), and the trigger. Everything else has a default.
+Required: displays, the main entity (main_of), and the trigger. Everything else has a default.
 Only the input names change; the blueprint's variables keep the names the drawing reads.
 """
 import glob, os, re, sys
@@ -26,18 +26,20 @@ SECTIONS = [
 ]
 SCALE = []   # the page sets its chart scale; never an input (design system: Chart frame, item 2)
 
-# the page's main entity: required, first in Content
-MAIN = {'weather': 'weather_entity', 'appointment': 'calendar_entities', 'calendar': 'calendar_entities',
-        'entities': 'entity_1', 'plant-moisture': 'plant_1', 'claude-usage': 'bar_1', 'doors-windows': 'openings',
-        'co2-graph': 'co2_entity', 'medication': 'button_entity', 'rain-forecast': None, 'sun-moon': None}
+def main_of(fname):
+    """the main entity of the blueprint's page: required, first in Content. It is the page definition's `required: true`
+    input, or the button for a page a button redraws (a shared input without a default); a page can have none"""
+    import pages
+    from layouts import layouts
+    page = next((l['page'] for l in layouts() if l['blueprint'] == fname), None)
+    if page is None:
+        return None
+    p = pages.load(page)
+    req = [i['name'] for i in p['inputs'] if i.get('required')]
+    return req[0] if req else ('button_entity' if p.get('redraw') == 'button' else None)
+
+
 OPTIONAL_DEFAULT = {'location_string': '""'}
-
-
-def part(fname, table):
-    for k, v in table.items():
-        if k in fname:
-            return v
-    return None
 
 
 def block_end(lines, i, indent):
@@ -128,7 +130,7 @@ def standardise(path):
     text = open(path, encoding='utf-8').read()
     lines = text.split('\n')
     s, e, items = parse(lines)
-    main = part(fname, MAIN)
+    main = main_of(fname)
     blocks = {}
     for nn, blk in items:
         if nn == main or nn == 'displays':
@@ -184,7 +186,7 @@ def lint(path):
     th = [n for n in names if section_of(n) == 'thresholds']
     if th != threshold_order(th):
         errs.append(f'thresholds out of order: {th}')
-    main = part(fname, MAIN)
+    main = main_of(fname)
     for n, blk in items:
         has_def = any(re.match(r'^  default:', l) for l in blk)
         if n in ('displays', 'automation_trigger', main):
