@@ -116,6 +116,7 @@ pages:
   co2:            {name: CO2 graph, uses: line-chart/thresholds, status: live, default: [line-chart/thresholds], '14': ['-'], widest: '4000'}
   sun-moon:       {name: Sun & moon, uses: timeline, status: live, default: [timeline], '14': ['-'], '27p': ['-'], widest: '10:44am'}
   claude:         {name: Claude usage, uses: meters, status: live, default: [meters], '14': ['-']}
+  levels:         {name: Levels, uses: meters, status: live, default: [meters], '14': ['-'], widest: '1240 ppm'}
   entities:       {name: Entities, uses: key-value-list, status: live, default: [key-value-list], '14': ['-']}
   plants:         {name: Plant moisture, uses: key-value-list, status: live, default: [key-value-list], '14': ['-']}
   weather-calendar: {name: Weather and calendar, uses: hero-dashboard/module, status: live, default: ['-'], '75p': [hero-dashboard/module], widest: '-12°'}

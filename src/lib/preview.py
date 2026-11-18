@@ -112,7 +112,10 @@ def main():
     # tokens: kept on an existing screen; derived and quickly fitted on a new one (or when a fit is asked for)
     env = dict(os.environ, EP_ROOT=str(T), EP_REFIT='1', PYTHONPATH='')
     provisional = []
-    if a.panel or a.fit_hero or a.fit_glance or a.fit_strips:
+    # a layout that doesn't exist yet has no measured tokens to take over: the fit runs for it too, and measures nothing
+    # when no fit is asked for (a layout without a hero or strips has no measured tokens)
+    is_new = f"\n  '{a.page.replace('-', '_')}_{a.screen}': {{\n" not in (T / 'lib' / 'ep_tokens.jinja').read_text()
+    if a.panel or a.fit_hero or a.fit_glance or a.fit_strips or is_new:
         fit = [(s, 'C') for s in a.fit_hero.split(',') if s]
         glance = [s for s in a.fit_glance.split(',') if s]
         patch(T / 'lib' / 'layout_fit.py', f"FIT = {{'mock': {fit!r}}} if {bool(fit)} else {{}}\n"

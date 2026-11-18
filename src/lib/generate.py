@@ -43,6 +43,11 @@ def merged(page, scr):
             pos = [n for n, x in enumerate(inputs) if x['name'] == after]
             inputs.insert(pos[0] + 1 if pos else len(inputs), i)
     p['inputs'] = inputs
+    drop = set(lay.get('drop_inputs') or [])
+    if drop:                              # an input a layout doesn't have is not bound, and isn't a source that can go stale
+        p['bind'] = [x for x in page.get('bind') or [] if not (x in drop if isinstance(x, str) else set(x) <= drop)]
+        if isinstance(page.get('stale'), list):
+            p['stale'] = [e for e in page['stale'] if e not in drop]
     vs = list(p['data'].get('variables') or [])
     for v in lay.get('variables') or []:
         n = list(v)[0]

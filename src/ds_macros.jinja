@@ -892,7 +892,8 @@
 {%- endif -%}
 {%- endmacro -%}
 {#- METER_ROWS: module 'Meters', inside the box x0 to x1, y0 to y1 (its first and last column and row). bars = [{'label',
-     'percent', 'percent_text', 'marker_pct', 'is_severe', 'is_warning', 'rcap'}], labels already shortened by the page, rcap
+     'percent', 'percent_text' (the value as written, a percentage or a number with its unit), 'marker_pct', 'is_severe',
+     'is_warning', 'rcap'}], labels already shortened by the page, rcap
      the reset caption ('' for none). Fill before you float: up to 3 bars in type.primary, more in type.data; order fill →
      the room to keep → spread (bars L apart when everything still fits, else M). keep: rows to leave free under the bars
      while they still fit (a page's footer); mt.kept says whether they were.
@@ -919,7 +920,9 @@
 {%- set lw = namespace(l=0, r=0) -%}
 {%- for b in bars -%}{%- set lw.l = [lw.l, VALUE_W(b.label, ts, FONT[tr[0]]) | int] | max -%}{%- endfor -%}
 {%- for b in bars -%}{%- set lw.r = [lw.r, VALUE_W(b.rcap, EP_TK.type.label[1], FONT[EP_TK.type.label[0]]) | int] | max -%}{%- endfor -%}
-{%- set pw = VALUE_W(color.severeMark ~ '100%', ts, FONT[tb[0]]) | int -%}
+{%- set vw = namespace(w=VALUE_W(color.severeMark ~ '100%', ts, FONT[tb[0]]) | int) -%}
+{%- for b in bars -%}{%- set vw.w = [vw.w, VALUE_W(color.severeMark ~ (b.percent_text | replace('--', '—')), ts, FONT[tb[0]]) | int] | max -%}{%- endfor -%}
+{%- set pw = vw.w -%}
 {%- set px = x0 + [lw.l, x1 + 1 - x0 - pw - lw.r - 2 * sl] | min + sl -%}
 {%- for b in bars -%}
 {%- set y = top + loop.index0 * (bh + g) -%}

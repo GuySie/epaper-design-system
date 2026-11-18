@@ -1,0 +1,197 @@
+page: levels
+description:
+  shows: 'Up to six sensors as rows, each with its value and a bar that shows how full it is: batteries, tanks, power, humidity.'
+  trigger_advice: 'A time pattern every 15 minutes: every redraw costs battery.'
+  title_default: '"Levels"'
+redraw: trigger
+stale:
+- repeat:
+    from: 1
+    to: 6
+    items:
+    - bar_{n}
+inputs:
+- name: bar_1
+  section: content
+  label: Row 1 - sensor
+  help: The sensor for row 1.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  required: true
+- repeat:
+    from: 2
+    to: 6
+    items:
+    - name: bar_{n}
+      section: content
+      label: Row {n} - sensor
+      help: The sensor for row {n}. Leave blank to leave the row out.
+      selector:
+        entity:
+          filter:
+            domain: sensor
+      default: ''
+- repeat:
+    from: 1
+    to: 6
+    items:
+    - name: bar_{n}_label
+      section: content
+      label: Row {n} - label
+      help: Optional label. Leave blank to use the sensor's name.
+      selector:
+        text: {}
+      default: ''
+- repeat:
+    from: 1
+    to: 6
+    items:
+    - name: bar_{n}_max
+      section: content
+      label: Row {n} - full at
+      help: The value at which the bar is full. 100 fits a percentage.
+      selector:
+        number:
+          mode: box
+          step: any
+      default: 100
+- name: flag_high
+  section: thresholds
+  label: 'High: flag it'
+  help: On, a row is flagged when it is at or above the two values below.
+  selector:
+    boolean: {}
+  default: false
+- name: warning_high
+  section: thresholds
+  label: 'High: warning at or above'
+  help: A row at or above this share of its maximum is a warning.
+  selector:
+    number:
+      min: 0
+      max: 100
+      unit_of_measurement: '%'
+      mode: box
+  default: 0
+- name: severe_high
+  section: thresholds
+  label: 'High: severe at or above'
+  help: A row at or above this share of its maximum is severe.
+  selector:
+    number:
+      min: 0
+      max: 100
+      unit_of_measurement: '%'
+      mode: box
+  default: 0
+- name: flag_low
+  section: thresholds
+  label: 'Low: flag it'
+  help: On, a row is flagged when it is at or below the two values below.
+  selector:
+    boolean: {}
+  default: false
+- name: warning_low
+  section: thresholds
+  label: 'Low: warning at or below'
+  help: A row at or below this share of its maximum is a warning.
+  selector:
+    number:
+      min: 0
+      max: 100
+      unit_of_measurement: '%'
+      mode: box
+  default: 0
+- name: severe_low
+  section: thresholds
+  label: 'Low: severe at or below'
+  help: A row at or below this share of its maximum is severe.
+  selector:
+    number:
+      min: 0
+      max: 100
+      unit_of_measurement: '%'
+      mode: box
+  default: 0
+bind:
+- repeat:
+    from: 1
+    to: 6
+    items:
+    - bar_{n}
+    - bar_{n}_label
+    - bar_{n}_max
+- flag_high
+- warning_high
+- severe_high
+- flag_low
+- warning_low
+- severe_low
+data:
+  variables:
+  - include: default_title
+  - ds_levels: |
+      {% set ns = namespace(list=[]) %} {% set slots = [
+              {'entity': bar_1 | default(''), 'label': bar_1_label | default(''), 'max': bar_1_max | default(100)},
+              {'entity': bar_2 | default(''), 'label': bar_2_label | default(''), 'max': bar_2_max | default(100)},
+              {'entity': bar_3 | default(''), 'label': bar_3_label | default(''), 'max': bar_3_max | default(100)},
+              {'entity': bar_4 | default(''), 'label': bar_4_label | default(''), 'max': bar_4_max | default(100)},
+              {'entity': bar_5 | default(''), 'label': bar_5_label | default(''), 'max': bar_5_max | default(100)},
+              {'entity': bar_6 | default(''), 'label': bar_6_label | default(''), 'max': bar_6_max | default(100)}
+            ] %} {% for slot in slots %}
+              {% if slot.entity is defined and slot.entity and slot.entity != '' %}
+                {% set raw = states(slot.entity) %} {% set n = raw | float(none) %} {% set ok = raw not in ['unknown', 'unavailable', 'none', ''] and n is not none %}
+                {% set mx = slot.max | float(100) %} {% set pct = (([[n / (mx if mx > 0 else 100) * 100, 0] | max, 100] | min) if ok else 0) %}
+                {% set lvl = '' %}
+                {% if ok %}
+                  {% if (flag_high and pct >= (severe_high | float(0))) or (flag_low and pct <= (severe_low | float(0))) %}{% set lvl = 'sev' %}
+                  {% elif (flag_high and pct >= (warning_high | float(0))) or (flag_low and pct <= (warning_low | float(0))) %}{% set lvl = 'warn' %}{% endif %}
+                {% endif %}
+                {% set fname = entity_name(slot.entity) or device_name(slot.entity) or slot.entity %}
+                {% set ns.list = ns.list + [{'label': slot.label if slot.label else fname, 'raw': raw if ok else '', 'unit': (state_attr(slot.entity, 'unit_of_measurement') or '') if ok else '', 'pct': pct | round | int, 'level': lvl, 'ok': ok}] %}
+              {% endif %}
+            {% endfor %} {{ ns.list }}
+  draw:
+    kind: single
+texts:
+  use:
+    most_unavailable: most_unavailable
+  en:
+    default_title: Levels
+  de:
+    default_title: Füllstände
+  nl:
+    default_title: Niveaus
+  fr:
+    default_title: Niveaux
+  es:
+    default_title: Niveles
+  pl:
+    default_title: Poziomy
+  hr:
+    default_title: Razine
+  sv:
+    default_title: Nivåer
+layouts:
+  27l:
+    spec: levels_27l
+    drop_inputs:
+    - bar_5
+    - bar_6
+    - bar_5_label
+    - bar_6_label
+    - bar_5_max
+    - bar_6_max
+  '35':
+    spec: levels_35
+    drop_inputs:
+    - bar_5
+    - bar_6
+    - bar_5_label
+    - bar_6_label
+    - bar_5_max
+    - bar_6_max
+  '41':
+    spec: levels_41

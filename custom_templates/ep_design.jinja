@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'pzntog' -%}
+{%- set EP_SET = 'hzjgsm' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -39,6 +39,9 @@
   'co2_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'co2'},
   'doors_windows_14': {'kit': 'other', 'tier': '200x200-0.13', 'page': 'doors-windows'},
   'entities_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'entities'},
+  'levels_27l': {'kit': 'other', 'tier': '384x168-0.17', 'page': 'levels'},
+  'levels_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'levels'},
+  'levels_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'levels'},
   'medication_27l': {'kit': 'other', 'tier': '384x168-0.17', 'page': 'medication'},
   'plants_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'plants'},
   'rain_27l': {'kit': 'other', 'tier': '384x168-0.17', 'page': 'rain'},
@@ -64,20 +67,30 @@
      A missing input is undefined ---- -#}
 {%- set bar_1 = c.bar_1 -%}
 {%- set bar_1_label = c.bar_1_label -%}
+{%- set bar_1_max = c.bar_1_max -%}
 {%- set bar_1_period_hours = c.bar_1_period_hours -%}
 {%- set bar_1_reset = c.bar_1_reset -%}
 {%- set bar_2 = c.bar_2 -%}
 {%- set bar_2_label = c.bar_2_label -%}
+{%- set bar_2_max = c.bar_2_max -%}
 {%- set bar_2_period_hours = c.bar_2_period_hours -%}
 {%- set bar_2_reset = c.bar_2_reset -%}
 {%- set bar_3 = c.bar_3 -%}
 {%- set bar_3_label = c.bar_3_label -%}
+{%- set bar_3_max = c.bar_3_max -%}
 {%- set bar_3_period_hours = c.bar_3_period_hours -%}
 {%- set bar_3_reset = c.bar_3_reset -%}
 {%- set bar_4 = c.bar_4 -%}
 {%- set bar_4_label = c.bar_4_label -%}
+{%- set bar_4_max = c.bar_4_max -%}
 {%- set bar_4_period_hours = c.bar_4_period_hours -%}
 {%- set bar_4_reset = c.bar_4_reset -%}
+{%- set bar_5 = c.bar_5 -%}
+{%- set bar_5_label = c.bar_5_label -%}
+{%- set bar_5_max = c.bar_5_max -%}
+{%- set bar_6 = c.bar_6 -%}
+{%- set bar_6_label = c.bar_6_label -%}
+{%- set bar_6_max = c.bar_6_max -%}
 {%- set buienalarm_entity = c.buienalarm_entity -%}
 {%- set buienradar_entity = c.buienradar_entity -%}
 {%- set calendar_entities = c.calendar_entities -%}
@@ -1211,7 +1224,8 @@
 {%- endif -%}
 {%- endmacro -%}
 {#- METER_ROWS: module 'Meters', inside the box x0 to x1, y0 to y1 (its first and last column and row). bars = [{'label',
-     'percent', 'percent_text', 'marker_pct', 'is_severe', 'is_warning', 'rcap'}], labels already shortened by the page, rcap
+     'percent', 'percent_text' (the value as written, a percentage or a number with its unit), 'marker_pct', 'is_severe',
+     'is_warning', 'rcap'}], labels already shortened by the page, rcap
      the reset caption ('' for none). Fill before you float: up to 3 bars in type.primary, more in type.data; order fill →
      the room to keep → spread (bars L apart when everything still fits, else M). keep: rows to leave free under the bars
      while they still fit (a page's footer); mt.kept says whether they were.
@@ -1238,7 +1252,9 @@
 {%- set lw = namespace(l=0, r=0) -%}
 {%- for b in bars -%}{%- set lw.l = [lw.l, VALUE_W(b.label, ts, FONT[tr[0]]) | int] | max -%}{%- endfor -%}
 {%- for b in bars -%}{%- set lw.r = [lw.r, VALUE_W(b.rcap, EP_TK.type.label[1], FONT[EP_TK.type.label[0]]) | int] | max -%}{%- endfor -%}
-{%- set pw = VALUE_W(color.severeMark ~ '100%', ts, FONT[tb[0]]) | int -%}
+{%- set vw = namespace(w=VALUE_W(color.severeMark ~ '100%', ts, FONT[tb[0]]) | int) -%}
+{%- for b in bars -%}{%- set vw.w = [vw.w, VALUE_W(color.severeMark ~ (b.percent_text | replace('--', '—')), ts, FONT[tb[0]]) | int] | max -%}{%- endfor -%}
+{%- set pw = vw.w -%}
 {%- set px = x0 + [lw.l, x1 + 1 - x0 - pw - lw.r - 2 * sl] | min + sl -%}
 {%- for b in bars -%}
 {%- set y = top + loop.index0 * (bh + g) -%}
@@ -2002,6 +2018,78 @@
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
 {{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_entities']) -}}
+{%- elif layout == 'levels_27l' and view == 'main' -%}
+{%- set ds_last_ts = c.ds_last_ts -%}
+{%- set ds_levels = c.ds_levels -%}
+{%- set ds_stale = c.ds_stale -%}
+{%- set header_title_display = c.header_title_display -%}
+{%- set language_map = c.language_map -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
+{#- the number as it is read: no decimals from 100 up or when it has none, else one -#}
+{%- macro NUM(raw) -%}{%- set n = raw | float(none) -%}{{ raw if n is none else DECIMAL(((n | round(0) | int) if (n | abs >= 100 or n == (n | round(0))) else (n | round(1))) | string) }}{%- endmacro -%}
+{%- set rows = ds_levels -%}
+{%- set n = rows | length -%}
+{%- set bad = rows | rejectattr('ok') | list | length -%}
+{%- if n >= 2 and bad * 2 > n -%}
+{#- mostly unavailable (*States*): the error state -#}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['most_unavailable']) -}}
+{%- else -%}
+{%- set bl = namespace(l=[]) -%}
+{%- for r in rows -%}
+{%- set txt = (NUM(r.raw) ~ (('¦' ~ r.unit) if r.unit else '')) if r.ok else '--' -%}
+{%- set bl.l = bl.l + [{'label': r.label, 'percent': r.pct, 'percent_text': txt, 'marker_pct': none, 'is_severe': r.level == 'sev', 'is_warning': r.level == 'warn', 'rcap': ''}] -%}
+{%- endfor -%}
+{#- pattern 'Meters', without a footer -#}
+{{- METERS(ns, header_title_display, right, bl.l, ds_stale) -}}
+{%- endif -%}
+{%- elif layout == 'levels_35' and view == 'main' -%}
+{%- set ds_last_ts = c.ds_last_ts -%}
+{%- set ds_levels = c.ds_levels -%}
+{%- set ds_stale = c.ds_stale -%}
+{%- set header_title_display = c.header_title_display -%}
+{%- set language_map = c.language_map -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
+{#- the number as it is read: no decimals from 100 up or when it has none, else one -#}
+{%- macro NUM(raw) -%}{%- set n = raw | float(none) -%}{{ raw if n is none else DECIMAL(((n | round(0) | int) if (n | abs >= 100 or n == (n | round(0))) else (n | round(1))) | string) }}{%- endmacro -%}
+{%- set rows = ds_levels -%}
+{%- set n = rows | length -%}
+{%- set bad = rows | rejectattr('ok') | list | length -%}
+{%- if n >= 2 and bad * 2 > n -%}
+{#- mostly unavailable (*States*): the error state -#}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['most_unavailable']) -}}
+{%- else -%}
+{%- set bl = namespace(l=[]) -%}
+{%- for r in rows -%}
+{%- set txt = (NUM(r.raw) ~ (('¦' ~ r.unit) if r.unit else '')) if r.ok else '--' -%}
+{%- set bl.l = bl.l + [{'label': r.label, 'percent': r.pct, 'percent_text': txt, 'marker_pct': none, 'is_severe': r.level == 'sev', 'is_warning': r.level == 'warn', 'rcap': ''}] -%}
+{%- endfor -%}
+{#- pattern 'Meters', without a footer -#}
+{{- METERS(ns, header_title_display, right, bl.l, ds_stale) -}}
+{%- endif -%}
+{%- elif layout == 'levels_41' and view == 'main' -%}
+{%- set ds_last_ts = c.ds_last_ts -%}
+{%- set ds_levels = c.ds_levels -%}
+{%- set ds_stale = c.ds_stale -%}
+{%- set header_title_display = c.header_title_display -%}
+{%- set language_map = c.language_map -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
+{#- the number as it is read: no decimals from 100 up or when it has none, else one -#}
+{%- macro NUM(raw) -%}{%- set n = raw | float(none) -%}{{ raw if n is none else DECIMAL(((n | round(0) | int) if (n | abs >= 100 or n == (n | round(0))) else (n | round(1))) | string) }}{%- endmacro -%}
+{%- set rows = ds_levels -%}
+{%- set n = rows | length -%}
+{%- set bad = rows | rejectattr('ok') | list | length -%}
+{%- if n >= 2 and bad * 2 > n -%}
+{#- mostly unavailable (*States*): the error state -#}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['most_unavailable']) -}}
+{%- else -%}
+{%- set bl = namespace(l=[]) -%}
+{%- for r in rows -%}
+{%- set txt = (NUM(r.raw) ~ (('¦' ~ r.unit) if r.unit else '')) if r.ok else '--' -%}
+{%- set bl.l = bl.l + [{'label': r.label, 'percent': r.pct, 'percent_text': txt, 'marker_pct': none, 'is_severe': r.level == 'sev', 'is_warning': r.level == 'warn', 'rcap': ''}] -%}
+{%- endfor -%}
+{#- pattern 'Meters', without a footer -#}
+{{- METERS(ns, header_title_display, right, bl.l, ds_stale) -}}
+{%- endif -%}
 {%- elif layout == 'medication_27l' and view == 'main' -%}
 {%- set ds_date = c.ds_date -%}
 {%- set ds_overdue_k = c.ds_overdue_k -%}

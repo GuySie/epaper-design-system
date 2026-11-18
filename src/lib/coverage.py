@@ -64,6 +64,10 @@ COVERAGE = {
     'single_value_14': pg('sv', 'sv_wide4', 'sv_warn', 'sv_sev', 'sv_g', 'sv_y', 'sv_title', 'sv_stale', 'sv_err_long', 'sv_unav', NOEMPTY),
     'single_value_27l': pg('sv', 'sv_widest', 'sv_warn', 'sv_sev', 'sv_g', 'sv_y', 'sv_title', 'sv_stale', NOERRV, 'sv_unav', NOEMPTY),
     'single_value_35': pg('sv', 'sv_widest', 'sv_warn', 'sv_sev', 'sv_g', 'sv_y', 'sv_title', 'sv_stale', NOERRV, 'sv_unav', NOEMPTY),
+    # Levels: the first row is required, so the page is never empty
+    'levels_27l': pg('lv', 'lv_widest', 'lv_warn', 'lv_sev', 'lv_g', 'lv_y', 'lv_title', 'lv_stale', 'lv_err', 'lv_unav', REQ),
+    'levels_35': pg('lv', 'lv_widest', 'lv_warn', 'lv_sev', 'lv_g', 'lv_y', 'lv_title', 'lv_stale', 'lv_err', 'lv_unav', REQ),
+    'levels_41': pg('lv', 'lv_widest', 'lv_warn', 'lv_sev', 'lv_g', 'lv_y', 'lv_title', 'lv_stale', 'lv_err', 'lv_unav', REQ),
     'appointment_35':   pg('appt35', 'a35_1w', NOTHR, NOTHR, NOCHIP, NOCHIP, 'appt35_title', NOSTALE, 'appt35_err', EVENTS, 'appt_none'),
     'appointment_41': pg('a41_6', 'a41_1w', NOTHR, NOTHR, 'a41_6_g', NOCHIP, 'a41_6_title', NOSTALE, 'a41_err', EVENTS, 'a41_0'),
     'appointment_426': pg('a426_9', 'a426_1w', NOTHR, NOTHR, 'a426_9_g', MONO, 'a426_9_title', NOSTALE, 'a426_err', EVENTS, 'a426_0'),

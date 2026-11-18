@@ -633,7 +633,7 @@ Three levels, the same on every module:
 
 **Every value that has a bad direction gets a warning and a severe input**, with a default, on every blueprint that shows it. The same data has the same inputs, names and defaults everywhere.
 
-**Every reading that can be flagged has a switch**, `flag_<what>`, on by default, in front of its `warning_<what>` and `severe_<what>`. Single value's two switches are off by default: no value fits every sensor. Off, the reading is never flagged, on any part of the page. Every number is a real threshold, 0 included: no number means "off". Without a switch: the lists (conditions, the doors and windows that count as severe), where an empty list flags nothing. A chart with its switch off: *Bar chart with thresholds, Line chart with thresholds*, Switched off. Pollen's two count inputs are empty by default: empty, the sensor's own level decides (*Weather thresholds*); a count overrides it.
+**Every reading that can be flagged has a switch**, `flag_<what>`, on by default, in front of its `warning_<what>` and `severe_<what>`. The switches of Single value and Levels are off by default: no value fits every sensor. Off, the reading is never flagged, on any part of the page. Every number is a real threshold, 0 included: no number means "off". Without a switch: the lists (conditions, the doors and windows that count as severe), where an empty list flags nothing. A chart with its switch off: *Bar chart with thresholds, Line chart with thresholds*, Switched off. Pollen's two count inputs are empty by default: empty, the sensor's own level decides (*Weather thresholds*); a count overrides it.
 
 | Page | Data | Warning | Severe |
 |---|---|---|---|
@@ -649,6 +649,7 @@ Three levels, the same on every module:
 | Claude usage | Usage | ≥ <!-- v:input:claude:warning_usage -->90 %<!-- /v --> | ≥ <!-- v:input:claude:severe_usage -->100 %<!-- /v --> |
 | Plant moisture | Soil moisture | ≤ <!-- v:input:plants:warning_moisture_low -->25 %<!-- /v --> | ≤ <!-- v:input:plants:severe_moisture_low -->14 %<!-- /v --> |
 | Single value | The value, high (`*_high`, at or above) and low (`*_low`, at or below) | the user's value | the user's value |
+| Levels | Each row's share of its maximum, high and low | the user's value | the user's value |
 | Medication | Hours since the last press | ≥ <!-- v:input:medication:warning_late -->24 h<!-- /v --> | ≥ <!-- v:input:medication:severe_late -->36 h<!-- /v --> |
 | Doors & windows | An opening is open | — | the openings in `severe_openings` |
 
@@ -1010,7 +1011,7 @@ With one event, the event hero (*Event hero* under *Modules*) takes the list's p
 
 Progress bars and the footer.
 
-- Label in `type.primary` Regular and percentage Bold while they fit, else `type.data` (how many fit on each screen: *Claude usage*). The track is as high as the label's caps less `space.xs`, `space.s` under the label text line, with `space.xs` below it, so a chip on the next label text line keeps a paper gap. Bars L apart when they fit, else M. The track is a `line.base` ink outline. Fill: ink; the warning colour at the warning threshold, the severe colour at the severe threshold, with the matching chip behind the percentage. "Now in period" marker: a line as wide as `line.series` across the track only, with paper edges where it crosses the fill, so it stays visible past the fill. Reset caption: `type.label`, right-aligned, on the bar label's baseline, as the stamp sits on the title's. Percentage column measured: `space.l` after the widest label (the label is cut short only when the widest percentage and reset caption wouldn't fit, `space.l` apart).
+- Label in `type.primary` Regular and percentage Bold while they fit, else `type.data` (how many fit on each screen: *Claude usage*). The track is as high as the label's caps less `space.xs`, `space.s` under the label text line, with `space.xs` below it, so a chip on the next label text line keeps a paper gap. Bars L apart when they fit, else M. The track is a `line.base` ink outline. Fill: ink; the warning colour at the warning threshold, the severe colour at the severe threshold, with the matching chip behind the percentage. "Now in period" marker: a line as wide as `line.series` across the track only, with paper edges where it crosses the fill, so it stays visible past the fill. Reset caption: `type.label`, right-aligned, on the bar label's baseline, as the stamp sits on the title's. The value column is as wide as the widest value shown, never narrower than `100%` (Levels shows values with their units). Percentage column measured: `space.l` after the widest label (the label is cut short only when the widest percentage and reset caption wouldn't fit, `space.l` apart).
 
 ### Mocked-up patterns
 
@@ -1110,6 +1111,7 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | **CO2 graph** | Line chart with thresholds | live | 4000 | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Sun & moon** | Timeline | live | 10:44am | — | ○ | — | ● | ○ | ○ | ○ | ○ | ○ |
 | **Claude usage** | Meters | live | — | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
+| **Levels** | Meters | live | 1240 ppm | — | ● | ○ | ● | ● | ○ | ○ | ○ | ○ |
 | **Entities** | Key-value list | live | — | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Plant moisture** | Key-value list | live | — | — | ○ | ○ | ○ | ● | ○ | ○ | ○ | ○ |
 | **Weather and calendar** | Hero dashboard with a chart or list | live | -12° | — | — | — | — | — | — | — | ● | — |
@@ -1377,6 +1379,34 @@ Meters: up to four usage bars with their reset times.
 | 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 11 |
 <!-- /registry:layouts-claude -->
 
+### Levels
+
+Meters for any sensors: each a row with its value and a bar that shows how full it is.
+
+- **Shows:** up to six sensors, one row each: its label, its value with its unit, and a bar filled to the value's share of that row's maximum. No footer, no reset time and no now-marker: those are Claude usage's.
+- **Tested with:** a battery, solar power of 4 kW, a tank of 1000 L and humidity; the widest reading (`1240 ppm`) beside a long label; a high row at warning; low rows at severe and at warning, on a colour, a yellow and a grey panel; a long title; stale data; one row unavailable; most rows unavailable (the error state); both switches off; three rows (the larger type); six rows (the 4.1").
+- **Label:** the sensor's name, or the row's label input.
+- **Value and bar:** the number as *Single value* writes it, with its unit. The bar is the value divided by the row's maximum (`bar_<n>_max`, 100 by default), kept between empty and full.
+- **Rows:** four on the 3.5" and the 2.7" landscape, six on the 4.1"; each blueprint offers only the rows its screen has. Type and spacing as *Meters* says.
+- **Widest reading:** a value of four characters with a three-letter unit (`1240 ppm`).
+- **Flagged:** as *Meters* says, by two readings for all rows, each a share of the row's maximum: high (`*_high`, at or above) and low (`*_low`, at or below). Both switches are off by default (*Thresholds*).
+- **Unavailable:** the value is `—` and the track is empty; most rows unavailable is the error state (*States*).
+
+<!-- registry:inputs-levels -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `bar_1`, `bar_2`, `bar_3`, `bar_4`, `bar_1_label`, `bar_2_label`, `bar_3_label`, `bar_4_label`, `bar_1_max`, `bar_2_max`, `bar_3_max`, `bar_4_max`, `flag_high`, `warning_high`, `severe_high`, `flag_low`, `warning_low`, `severe_low` |
+| 4.1" | also `bar_5`, `bar_6`, `bar_5_label`, `bar_6_label`, `bar_5_max`, `bar_6_max` |
+<!-- /registry:inputs-levels -->
+
+<!-- registry:layouts-levels -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 13 |
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 13 |
+| 4.1" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 14 |
+<!-- /registry:layouts-levels -->
+
 ### Entities
 
 A Key-value list of up to 12 entities.
@@ -1495,7 +1525,7 @@ What every blueprint does the same way; where it can, through a shared part that
   5. **Advanced** (collapsed): `stale_after`, `led_color`, `led_flash_delay` and `font_dir`. The LED inputs are there wherever a button can start the redraw: the LED confirms the press. A blueprint that redraws on a change (Doors & windows) has none.
 - **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button). Every other input has a default, and an optional entity left empty removes its part of the page. The Rain forecast has no main entity: it needs one of its two sources.
 - **Input names:** the device input is always `displays`, also where it takes one device (Medication). Numbered entries are `<name>_<n>` with `<name>_<n>_label` (`entity_1`, `plant_1`, `bar_1`). Thresholds are `warning_<what>` and `severe_<what>`, their switch `flag_<what>`. A blueprint's variables keep the names its drawing reads, so renaming an input never changes the drawing.
-  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather (Glance), Single value, Weather, Rain forecast, CO2 graph, Claude usage, Entities, Plant moisture, Weather and calendar<!-- /v -->); see *Title row* for the exempt blueprints.
+  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather (Glance), Single value, Weather, Rain forecast, CO2 graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar<!-- /v -->); see *Title row* for the exempt blueprints.
   - The panel is never an input: a page drawn on two screens is two blueprints (the Rain forecast on the 3.5" and on the 2.7" landscape).
 - **Texts:** every blueprint's strings live in `ep_i18n.jinja`, written from the page definitions (per page, `EP_TXT['<page>']`, which the blueprint's `language_map` reads; the weekday and month lists once, in `pages/_shared.yaml`) and `wx_txt.yaml` (the weather words, `ds_wtxt`), keyed by the 8 language codes, holding weekday/month names and every user-facing string (including the empty, error and stale strings). Paired with separate `weekday_short_map` / `months_short_map` dicts, which read `EP_DAYS_SHORT` / `EP_MONTHS_SHORT`. The update stamp uses weekday + time (`SU 17:58`); dates in content use `SU 8 NOV`. Don't fold them into `language_map`.
 - **One set.** A release gives its templates and its blueprints the same set id: a short hash of the four templates as built, so it changes when the templates change and only then (`lib/set_id.py`). Every blueprint hands its id to the drawing, and the templates compare it with theirs. When they differ, or the blueprint has none, the templates draw the title row and the error block and nothing else: the message (`UPDATE TEMPLATES AND BLUEPRINT`, translated) and, on new lines under it, the two ids (`BLUEPRINT hjnenx · TEMPLATES udrrap` on one line where that fits, else one each; a blueprint without an id shows `—`), the lines centred as one block in the title's type. Templates from before this rule can't tell a newer blueprint apart, and missing templates still fail with `TemplateNotFound`: nothing can draw then.
