@@ -178,8 +178,11 @@ def tables(r, pkg=PKG):
         G.append((n, 'component', '—', 'see *Components*'))
     # the glossary holds the words: components, modules, the registry's terms and the Vocabulary's own words. Pattern,
     # version and page names are not in it: the Patterns and Pages tables are their index
+    # a name a module shares with its pattern, and with that pattern's page, has one row that names every kind
+    pat = {p['name'] for p in r['patterns'].values()}; pgs = {p['name'] for p in r['pages'].values()}
     for n in r['modules']:
-        G.append((n, 'module', '—', 'see *Modules*'))
+        ks = ['module'] + (['pattern'] if n in pat else []) + (['page'] if n in pgs else [])
+        G.append((n, ', '.join(ks), '—', 'see ' + ', '.join(f'*{k.capitalize()}s*' for k in ks)))
     for n in VOCABULARY:
         G.append((n, 'vocabulary', '—', 'see *Vocabulary*'))
     for n, t in (r.get('terms') or {}).items():

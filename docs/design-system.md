@@ -932,7 +932,7 @@ Any module that can be drawn at the size the hero band leaves: a bar or line cha
   - **Bottom half:** the module, its first text S below the divider (*Spacing (internal)*, *Dividers are symmetric*), top-aligned.
   - **Errors per half:** when one module's data is missing, its half shows the error block, in that half, and the other half keeps drawing.
 - One module (*Open items*: two side by side).
-- Mockups: Energy overview (battery, flows, price bars), Air quality (CO₂, climate, the 24 h line chart), Day overview (date, counts, events).
+- Mockup (Value with details): one large value with a chart or a list beside it for any sensors, such as energy (battery, flows, price bars), air quality (CO₂, climate, the 24 h line chart) or the day (date, counts, events).
 
 ### Bar chart and Line chart
 
@@ -1059,7 +1059,7 @@ Patterns and versions that exist as mock-ups only: no blueprint is built from th
 
 #### Checklist
 
-*Mockup (Shopping list).* A list of to-do items (Home Assistant `todo` entities): shopping, chores, packing.
+*Mockup (To-do list).* A list of to-do items (Home Assistant `todo` entities): shopping, chores, packing.
 
 - **Checkbox row:** a square as high as the caps of `type.data`, outlined at `line.base`, ink-filled when done; `space.s` after it, the item in `type.data` as written, its due day right in `type.label` (`SAT`, `TODAY`), in fixed rows of `space.row`.
 - **Order:** open items first, done items after them. Done is the filled box only: weight and colour never mark it.
@@ -1126,20 +1126,18 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | **Departures** | Event list with line numbers | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Solar & battery** | Meters both ways | mock | 100% | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Packages** | Key-value list | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Shopping list** | Checklist | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **To-do list** | Checklist | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Tiles** | Tiles | live | Triggered | ● | ● | ● | ● | ● | ○ | ● | ● | ○ |
 | **Month overview** | Month | mock | — | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Message board** | Note | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Now playing** | Note with a progress bar | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Guest Wi-Fi** | Code | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Energy overview** | Hero dashboard with a chart or list | mock | 100% | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Air quality** | Hero dashboard with a chart or list | mock | 4000 | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Day overview** | Hero dashboard with a chart or list | mock | 28 | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Value with details** | Hero dashboard with a chart or list | mock | 4000 | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 <!-- /registry:pages -->
 
 **Rules for every page:**
 
-- **One page, one pattern.** A page fills the same pattern on every screen it is offered on. The same content in another pattern is a page of its own, named after it: Weather (Glance) beside Weather. Where a page's pattern doesn't fit a screen, it isn't offered there; Rain forecast, Energy price, Solar & battery, Energy overview, Air quality and Day overview get a Glance page for the 1.4" when one is built.
+- **One page, one pattern.** A page fills the same pattern on every screen it is offered on. The same content in another pattern is a page of its own, named after it: Weather (Glance) beside Weather. Where a page's pattern doesn't fit a screen, it isn't offered there; Rain forecast, Energy price, Solar & battery and Value with details get a Glance page for the 1.4" when one is built.
 - **Clock times, never countdowns of minutes** (*Text rules*, *Clock times, never relative times*).
 - **The widest reading decides the layout.** Every size and every layout is chosen for the widest reading the page's entity can show (`100%`, `4000`, `-12°`, day `28`), so a screen keeps its layout from one reading, and one state, to the next. The one exception is the hero on its own, fitted on its ordinary reading: at a wider one its icon gives way (*Hero group*, *Wide readings*).
 - **Labels don't change with the state** (`NET`, not `NET IMPORT` / `NET EXPORT`): a direction goes in the value (`-0.4 kW`).
@@ -1572,7 +1570,7 @@ A *Hero dashboard with a chart or list*: the weather's hero band over the calend
 
 ### Mocked-up pages
 
-Bin day, Room sign, Appliance run, Countdown, Today's date, Energy price, Departures, Solar & battery, Packages, Shopping list, Month overview, Message board, Now playing, Guest Wi-Fi, and the Hero dashboards Energy overview, Air quality and Day overview: their patterns and layouts are in the table above, their rules with the pattern versions they use. Countdown is a Glance with whole days as the hero and the date in the Glance secondary; Today's date has the day of the month as its hero, never the clock time.
+Bin day, Room sign, Appliance run, Countdown, Today's date, Energy price, Departures, Solar & battery, Packages, To-do list, Month overview, Message board, Now playing, Guest Wi-Fi, and the Hero dashboard Value with details: their patterns and layouts are in the table above, their rules with the pattern versions they use. Countdown is a Glance with whole days as the hero and the date in the Glance secondary; Today's date has the day of the month as its hero, never the clock time.
 
 ## Blueprint mechanics
 
@@ -1673,7 +1671,7 @@ Every named part of the design system, with its kind (`—` when it is a region,
 | **Error block** | module | — | see *Modules* (not: severe block) |
 | **ESL** | vocabulary | — | see *Vocabulary* |
 | **Event hero** | module | — | see *Modules* |
-| **Event list** | module | — | see *Modules* |
+| **Event list** | module, pattern | — | see *Modules*, *Patterns* |
 | **Event row** | component | — | see *Components* |
 | **Footer** | module | — | see *Modules* (not: footer band, summary line) |
 | **Forecast row** | component | — | see *Components* |
@@ -1692,12 +1690,12 @@ Every named part of the design system, with its kind (`—` when it is a region,
 | **icon ladder** | token | — | the icon sizes (`icon.ladder`; *Style choices*, Icon ladder) |
 | **ink chip** | component | Chip | a chip filled with ink: the stale chip, an event in progress, and severe on black/white panels |
 | **Input** | vocabulary | — | see *Vocabulary* |
-| **Key-value list** | module | — | see *Modules* |
+| **Key-value list** | module, pattern | — | see *Modules*, *Patterns* |
 | **Key-value row** | component | — | see *Components* |
 | **label margin** | — | Chart | the space right of the plot for the scale and threshold values |
 | **Layout** | vocabulary | — | see *Vocabulary* |
 | **Level meter** | module | — | see *Modules* |
-| **Meters** | module | — | see *Modules* |
+| **Meters** | module, pattern | — | see *Modules*, *Patterns* |
 | **Module** | vocabulary | — | see *Vocabulary* |
 | **Month grid** | module | — | see *Modules* |
 | **Moon badge** | component | — | see *Components* (not: moon-phase badge) |
@@ -1720,8 +1718,8 @@ Every named part of the design system, with its kind (`—` when it is a region,
 | **Strip** | module | — | see *Modules* (not: forecast strip) |
 | **Text block** | module | — | see *Modules* |
 | **Tier** | vocabulary | — | see *Vocabulary* |
-| **Tiles** | module | — | see *Modules* |
-| **Timeline** | module | — | see *Modules* (not: Track, sun & moon track) |
+| **Tiles** | module, pattern, page | — | see *Modules*, *Patterns*, *Pages* |
+| **Timeline** | module, pattern | — | see *Modules*, *Patterns* (not: Track, sun & moon track) |
 | **title line** | component | Title row | the line under the title row (not: title rule) |
 | **Title row** | module | — | see *Modules* |
 | **Token** | vocabulary | — | see *Vocabulary* |
