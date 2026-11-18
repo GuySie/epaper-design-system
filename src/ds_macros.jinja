@@ -834,6 +834,69 @@
 {%- endif -%}
 {%- endif -%}
 {%- endmacro -%}
+{#- READING: an entity's state as it is read: a number rounded as its unit asks (none for the units counted in whole
+     numbers, else one, and none when it ends in .0) with its unit, any other state as it is -#}
+{%- macro READING(raw, unit) -%}
+{%- set n = raw | float(none) -%}
+{%- if n is none -%}{{ raw }}
+{%- else -%}
+{%- set num = (n | round(0 if unit in ['%', 'ppm', 'ppb', 'lx', 'W', 'hPa', 'dB', 'μg/m³', 'µg/m³', 'mg/m³', 'Wh', 'rpm'] else 1) | string) -%}
+{%- set num = num[:-2] if num.endswith('.0') else num -%}
+{{ DECIMAL(num) ~ (unit if unit in ['%', '°', '°C', '°F', '℃', '℉'] else (('¦' ~ unit) if unit else '')) }}
+{%- endif -%}
+{%- endmacro -%}
+{#- TILEGRID: module 'Tiles' between x0..x1 and y0..y1. tiles = [{'icon', 'value', 'label'}]; mc x mr is the screen's grid.
+     With fewer tiles the grid is the smallest one that holds them (of two equally small, the one whose tiles are closest
+     to square), filled row by row. Each tile is a centred stack: the icon, the state in type.data, the label in
+     type.label; a tile without an icon centres its state and label alone. One icon size for all tiles: the largest
+     ladder size that leaves room for the text, at most four times type.data's size unless the screen holds one tile.
+     Lines between two tiles that both hold an entity, each space.m short of where it would cross another -#}
+{%- macro TILEGRID(ns, tiles, x0, x1, y0, y1, mc, mr) -%}
+{%- set M = EP_TK.space.m -%}
+{%- set df, ds = FONT[EP_TK.type.data[0]], EP_TK.type.data[1] -%}
+{%- set lf, ls = FONT[EP_TK.type.label[0]], EP_TK.type.label[1] -%}
+{%- set S, XS = SPACE_S(ds) | int, SPACE_XS(ds) | int -%}
+{%- set shown = tiles[:mc * mr] -%}
+{%- set n = shown | length -%}
+{%- set g = namespace(c=mc, r=mr, k=mc * mr + 1, q=0) -%}
+{%- for c in range(1, mc + 1) -%}{%- for r in range(1, mr + 1) -%}{%- if c * r >= n -%}
+{%- set tw, th = (x1 + 1 - x0) / c, (y1 - y0) / r -%}{%- set q = [tw / th, th / tw] | max -%}
+{%- if c * r < g.k or (c * r == g.k and q < g.q) -%}{%- set g.c, g.r, g.k, g.q = c, r, c * r, q -%}{%- endif -%}
+{%- endif -%}{%- endfor -%}{%- endfor -%}
+{%- set cols, rows = g.c, g.r -%}
+{%- set cw, chh = (x1 + 1 - x0) // cols, (y1 - y0) // rows -%}
+{%- set text = ds + XS + ls -%}
+{%- set fit = EP_ICON.ladder | select('le', [chh - text - 2 * XS - M, cw - 2 * M] | min) | list -%}
+{%- set cap = EP_ICON.ladder | select('le', 4 * ds) | list | last -%}
+{%- set s = (fit | last) if fit else EP_TK.icon.min -%}
+{%- set s = s if mc * mr == 1 else ([s, cap] | min) -%}
+{%- set stack = s + XS + text -%}
+{%- set mw = cw - 2 * M -%}
+{%- for t in shown -%}
+{%- set col, row = loop.index0 % cols, loop.index0 // cols -%}
+{%- set tx, ty = x0 + col * cw, y0 + row * chh -%}{%- set cx = tx + cw // 2 -%}
+{%- if col -%}{{- L(ns, tx, ty + M, tx, ty + chh - M) -}}{%- endif -%}
+{%- if row -%}{{- L(ns, tx + M, ty, tx + cw - M, ty) -}}{%- endif -%}
+{%- set yt = (ty + (chh - stack) // 2) if t.icon else (ty + (chh - text) // 2 - s - XS) -%}
+{%- if t.icon -%}{{- I(ns, t.icon, cx, yt + s // 2, s) -}}{%- endif -%}
+{%- set ys = yt + s + XS + ds // 2 -%}
+{{- T(ns, t.value, cx, ys, df, ds, color.ink, 'mm', mw - 2 * S) -}}
+{{- T(ns, t.label | upper, cx, ys + ds // 2 + XS + ls // 2, lf, ls, color.ink, 'mm', mw) -}}
+{%- endfor -%}
+{%- endmacro -%}
+{#- TILES: pattern 'Tiles'. tiles = [{'icon', 'value', 'label', 'ok'}]; mc x mr is the screen's grid; the error state
+     (err) when most entities are unavailable -#}
+{%- macro TILES(ns, title, right, tiles, mc, mr, stale=false, err='') -%}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{{- TITLE(ns, title, right, W, P, TH, stale) -}}
+{%- set shown = tiles[:mc * mr] -%}
+{%- set n, bad = shown | length, shown | rejectattr('ok') | list | length -%}
+{%- if err and n >= 2 and bad * 2 > n -%}
+{{- ERRBLOCK(ns, err, W, H, P, TH) -}}
+{%- else -%}
+{{- TILEGRID(ns, shown, P, W - P - 1, P + TH + EP_TK.space.m, H - P, mc, mr) -}}
+{%- endif -%}
+{%- endmacro -%}
 {#- GROUPED: pattern 'Grouped list'. days = [{'head': day header text, 'lines': event lines, 'real': events among them}].
      Fill before you float: whole days while they fit; a day that doesn't fit whole shows the events that do and a "+N"
      text line (more = its text with {e}); later days are left out. -#}

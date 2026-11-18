@@ -68,6 +68,14 @@ COVERAGE = {
     'levels_27l': pg('lv', 'lv_widest', 'lv_warn', 'lv_sev', 'lv_g', 'lv_y', 'lv_title', 'lv_stale', 'lv_err', 'lv_unav', REQ),
     'levels_35': pg('lv', 'lv_widest', 'lv_warn', 'lv_sev', 'lv_g', 'lv_y', 'lv_title', 'lv_stale', 'lv_err', 'lv_unav', REQ),
     'levels_41': pg('lv', 'lv_widest', 'lv_warn', 'lv_sev', 'lv_g', 'lv_y', 'lv_title', 'lv_stale', 'lv_err', 'lv_unav', REQ),
+    # Tiles: no thresholds; the first entity is required, so the page is never empty. One tile (1.4"): no error view
+    'tiles_14': pg('tl', 'tl_widest', NOTHR, NOTHR, 'tl_g', 'tl_y', 'tl_title', 'tl_stale', NOERRV, 'tl_unav', REQ),
+    'tiles_27l': pg('tl', 'tl_widest', NOTHR, NOTHR, 'tl_g', 'tl_y', 'tl_title', 'tl_stale', 'tl_err', 'tl_unav', REQ),
+    'tiles_27p': pg('tl', 'tl_widest', NOTHR, NOTHR, 'tl_g', 'tl_y', 'tl_title', 'tl_stale', 'tl_err', 'tl_unav', REQ),
+    'tiles_35': pg('tl', 'tl_widest', NOTHR, NOTHR, 'tl_g', 'tl_y', 'tl_title', 'tl_stale', 'tl_err', 'tl_unav', REQ),
+    'tiles_41': pg('tl', 'tl_widest', NOTHR, NOTHR, 'tl_g', 'tl_y', 'tl_title', 'tl_stale', 'tl_err', 'tl_unav', REQ),
+    'tiles_75': pg('tl', 'tl_widest', NOTHR, NOTHR, 'tl_g', 'tl_y', 'tl_title', 'tl_stale', 'tl_err', 'tl_unav', REQ),
+    'tiles_75p': pg('tl', 'tl_widest', NOTHR, NOTHR, 'tl_g', 'tl_y', 'tl_title', 'tl_stale', 'tl_err', 'tl_unav', REQ),
     # History graph
     'history_27l': pg('hg', 'hg_widest', 'hg_warn', 'hg_sev', 'hg_g', 'hg_y', 'hg_title', 'hg_stale', 'hg_err', 'hg_unav', NOHIST),
     'history_35': pg('hg', 'hg_widest', 'hg_warn', 'hg_sev', 'hg_g', 'hg_y', 'hg_title', 'hg_stale', 'hg_err', 'hg_unav', NOHIST),

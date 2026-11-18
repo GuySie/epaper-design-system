@@ -1,0 +1,245 @@
+page: tiles
+description:
+  shows: Up to 12 entities as tiles, each with an icon, its state and its label. How many fit depends on the screen; with fewer
+    entities the tiles grow.
+  needs_also:
+  - The entities to show (any domain).
+  trigger_advice: 'A state trigger on the entities that matter most, or a time pattern every 15 minutes: every redraw costs battery.'
+  title_default: '"Status"'
+redraw: trigger
+stale:
+- repeat:
+    from: 1
+    to: 12
+    items:
+    - entity_{n}
+inputs:
+- name: entity_1
+  section: content
+  label: Entity 1
+  help: Entity for tile 1.
+  selector:
+    entity: {}
+  required: true
+- repeat:
+    from: 2
+    to: 12
+    items:
+    - name: entity_{n}
+      section: content
+      label: Entity {n}
+      help: Entity for tile {n}. Leave blank for no tile.
+      selector:
+        entity: {}
+      default: ''
+- repeat:
+    from: 1
+    to: 12
+    items:
+    - name: entity_{n}_label
+      section: content
+      label: Entity {n} - label
+      help: Optional label. Leave blank to use the entity's name.
+      selector:
+        text: {}
+      default: ''
+- repeat:
+    from: 1
+    to: 12
+    items:
+    - name: entity_{n}_icon
+      section: content
+      label: Entity {n} - icon
+      help: Optional icon. Leave blank to use the entity's own icon; an entity without one gets no icon.
+      selector:
+        icon: {}
+      default: ''
+bind:
+- repeat:
+    from: 1
+    to: 12
+    items:
+    - entity_{n}
+    - entity_{n}_label
+    - entity_{n}_icon
+data:
+  variables:
+  - include: default_title
+  - ds_unavail_msg: '{{ language_map[weekday_lang][''most_unavailable''] }}'
+  - ds_tiles: |
+      {% set ns = namespace(list=[]) %} {% set slots = [
+        [entity_1 | default(''), entity_1_label | default(''), entity_1_icon | default('')],
+        [entity_2 | default(''), entity_2_label | default(''), entity_2_icon | default('')],
+        [entity_3 | default(''), entity_3_label | default(''), entity_3_icon | default('')],
+        [entity_4 | default(''), entity_4_label | default(''), entity_4_icon | default('')],
+        [entity_5 | default(''), entity_5_label | default(''), entity_5_icon | default('')],
+        [entity_6 | default(''), entity_6_label | default(''), entity_6_icon | default('')],
+        [entity_7 | default(''), entity_7_label | default(''), entity_7_icon | default('')],
+        [entity_8 | default(''), entity_8_label | default(''), entity_8_icon | default('')],
+        [entity_9 | default(''), entity_9_label | default(''), entity_9_icon | default('')],
+        [entity_10 | default(''), entity_10_label | default(''), entity_10_icon | default('')],
+        [entity_11 | default(''), entity_11_label | default(''), entity_11_icon | default('')],
+        [entity_12 | default(''), entity_12_label | default(''), entity_12_icon | default('')]
+      ] %} {% for e, lab, ic in slots %}
+        {% if e and e != '' %}
+          {% set raw = states(e) %}
+          {% set ok = raw not in ['unknown', 'unavailable', 'none', ''] %}
+          {% set word = state_translated(e) if (ok and raw | float(none) is none) else raw %}
+          {% set ns.list = ns.list + [{'label': lab if lab else (entity_name(e) or device_name(e) or e), 'raw': word, 'unit': (state_attr(e, 'unit_of_measurement') or '') if ok else '', 'icon': ic if ic else (state_attr(e, 'icon') or ''), 'ok': ok}] %}
+        {% endif %}
+      {% endfor %} {{ ns.list }}
+  draw:
+    kind: single
+texts:
+  use:
+    most_unavailable: most_unavailable
+  en:
+    default_title: Status
+  de:
+    default_title: Status
+  nl:
+    default_title: Status
+  fr:
+    default_title: État
+  es:
+    default_title: Estado
+  pl:
+    default_title: Status
+  hr:
+    default_title: Status
+  sv:
+    default_title: Status
+layouts:
+  '14':
+    spec: tiles_14
+    drop_inputs:
+    - entity_2
+    - entity_2_label
+    - entity_2_icon
+    - entity_3
+    - entity_3_label
+    - entity_3_icon
+    - entity_4
+    - entity_4_label
+    - entity_4_icon
+    - entity_5
+    - entity_5_label
+    - entity_5_icon
+    - entity_6
+    - entity_6_label
+    - entity_6_icon
+    - entity_7
+    - entity_7_label
+    - entity_7_icon
+    - entity_8
+    - entity_8_label
+    - entity_8_icon
+    - entity_9
+    - entity_9_label
+    - entity_9_icon
+    - entity_10
+    - entity_10_label
+    - entity_10_icon
+    - entity_11
+    - entity_11_label
+    - entity_11_icon
+    - entity_12
+    - entity_12_label
+    - entity_12_icon
+  27p:
+    spec: tiles_27p
+    drop_inputs:
+    - entity_4
+    - entity_4_label
+    - entity_4_icon
+    - entity_5
+    - entity_5_label
+    - entity_5_icon
+    - entity_6
+    - entity_6_label
+    - entity_6_icon
+    - entity_7
+    - entity_7_label
+    - entity_7_icon
+    - entity_8
+    - entity_8_label
+    - entity_8_icon
+    - entity_9
+    - entity_9_label
+    - entity_9_icon
+    - entity_10
+    - entity_10_label
+    - entity_10_icon
+    - entity_11
+    - entity_11_label
+    - entity_11_icon
+    - entity_12
+    - entity_12_label
+    - entity_12_icon
+  27l:
+    spec: tiles_27l
+    drop_inputs:
+    - entity_7
+    - entity_7_label
+    - entity_7_icon
+    - entity_8
+    - entity_8_label
+    - entity_8_icon
+    - entity_9
+    - entity_9_label
+    - entity_9_icon
+    - entity_10
+    - entity_10_label
+    - entity_10_icon
+    - entity_11
+    - entity_11_label
+    - entity_11_icon
+    - entity_12
+    - entity_12_label
+    - entity_12_icon
+  '35':
+    spec: tiles_35
+    drop_inputs:
+    - entity_7
+    - entity_7_label
+    - entity_7_icon
+    - entity_8
+    - entity_8_label
+    - entity_8_icon
+    - entity_9
+    - entity_9_label
+    - entity_9_icon
+    - entity_10
+    - entity_10_label
+    - entity_10_icon
+    - entity_11
+    - entity_11_label
+    - entity_11_icon
+    - entity_12
+    - entity_12_label
+    - entity_12_icon
+  '41':
+    spec: tiles_41
+    drop_inputs:
+    - entity_7
+    - entity_7_label
+    - entity_7_icon
+    - entity_8
+    - entity_8_label
+    - entity_8_icon
+    - entity_9
+    - entity_9_label
+    - entity_9_icon
+    - entity_10
+    - entity_10_label
+    - entity_10_icon
+    - entity_11
+    - entity_11_label
+    - entity_11_icon
+    - entity_12
+    - entity_12_label
+    - entity_12_icon
+  '75':
+    spec: tiles_75
+  75p:
+    spec: tiles_75p

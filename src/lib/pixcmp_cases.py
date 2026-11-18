@@ -118,11 +118,32 @@ CASES = [
     ('pic_weather_glance_14', 'weather_glance_14', 'skip', 'free'), ('pic_weather_glance_35', 'weather_glance_35', 'skip', 'free'), ('pic_weather_27l', 'weather_27l', 'C', 'fill'),
     ('pic_weather_27p', 'weather_27p', 'C', 'fill'), ('pic_weather_35', 'weather_35', 'C', 'fill'), ('pic_weather_41', 'weather_41', 'C', 'fill'),
     ('pic_weather_426', 'weather_426', 'C', 'free'), ('pic_weather_75', 'weather_75', 'C', 'free'), ('pic_weather_75p', 'weather_75p', 'C', 'fill'),
+    # Tiles (any entities as tiles): its states, then other configurations (fewer entities than tiles: CONFIG_CASES)
+    ('tl', 'tiles_14', 'skip', 'free'), ('tl_widest', 'tiles_14', 'skip', 'free'), ('tl_title', 'tiles_14', 'skip', 'free'), ('tl_stale', 'tiles_14', 'skip', 'free'),
+    ('tl_unav', 'tiles_14', 'skip', 'free'), ('tl_g', 'tiles_14', 'skip', 'free'), ('tl_y', 'tiles_14', 'skip', 'free'), ('pic_tiles_14', 'tiles_14', 'skip', 'free'),
+    ('tl', 'tiles_27l', 'skip', 'free'), ('tl_widest', 'tiles_27l', 'skip', 'free'), ('tl_title', 'tiles_27l', 'skip', 'free'), ('tl_stale', 'tiles_27l', 'skip', 'free'),
+    ('tl_unav', 'tiles_27l', 'skip', 'free'), ('tl_g', 'tiles_27l', 'skip', 'free'), ('tl_y', 'tiles_27l', 'skip', 'free'), ('tl_err', 'tiles_27l', 'skip', 'free'),
+    ('tl_few', 'tiles_27l', 'skip', 'free'), ('tl_two', 'tiles_27l', 'skip', 'free'), ('pic_tiles_27l', 'tiles_27l', 'skip', 'free'),
+    ('tl', 'tiles_27p', 'skip', 'free'), ('tl_widest', 'tiles_27p', 'skip', 'free'), ('tl_title', 'tiles_27p', 'skip', 'free'), ('tl_stale', 'tiles_27p', 'skip', 'free'),
+    ('tl_unav', 'tiles_27p', 'skip', 'free'), ('tl_g', 'tiles_27p', 'skip', 'free'), ('tl_y', 'tiles_27p', 'skip', 'free'), ('tl_err', 'tiles_27p', 'skip', 'free'),
+    ('tl_two', 'tiles_27p', 'skip', 'free'), ('pic_tiles_27p', 'tiles_27p', 'skip', 'free'),
+    ('tl', 'tiles_35', 'skip', 'free'), ('tl_widest', 'tiles_35', 'skip', 'free'), ('tl_title', 'tiles_35', 'skip', 'free'), ('tl_stale', 'tiles_35', 'skip', 'free'),
+    ('tl_unav', 'tiles_35', 'skip', 'free'), ('tl_g', 'tiles_35', 'skip', 'free'), ('tl_y', 'tiles_35', 'skip', 'free'), ('tl_err', 'tiles_35', 'skip', 'free'),
+    ('tl_few', 'tiles_35', 'skip', 'free'), ('tl_two', 'tiles_35', 'skip', 'free'), ('pic_tiles_35', 'tiles_35', 'skip', 'free'),
+    ('tl', 'tiles_41', 'skip', 'free'), ('tl_widest', 'tiles_41', 'skip', 'free'), ('tl_title', 'tiles_41', 'skip', 'free'), ('tl_stale', 'tiles_41', 'skip', 'free'),
+    ('tl_unav', 'tiles_41', 'skip', 'free'), ('tl_g', 'tiles_41', 'skip', 'free'), ('tl_y', 'tiles_41', 'skip', 'free'), ('tl_err', 'tiles_41', 'skip', 'free'),
+    ('tl_few', 'tiles_41', 'skip', 'free'), ('tl_two', 'tiles_41', 'skip', 'free'), ('pic_tiles_41', 'tiles_41', 'skip', 'free'),
+    ('tl', 'tiles_75', 'skip', 'free'), ('tl_widest', 'tiles_75', 'skip', 'free'), ('tl_title', 'tiles_75', 'skip', 'free'), ('tl_stale', 'tiles_75', 'skip', 'free'),
+    ('tl_unav', 'tiles_75', 'skip', 'free'), ('tl_g', 'tiles_75', 'skip', 'free'), ('tl_y', 'tiles_75', 'skip', 'free'), ('tl_err', 'tiles_75', 'skip', 'free'),
+    ('tl_few', 'tiles_75', 'skip', 'free'), ('tl_two', 'tiles_75', 'skip', 'free'), ('pic_tiles_75', 'tiles_75', 'skip', 'free'),
+    ('tl', 'tiles_75p', 'skip', 'free'), ('tl_widest', 'tiles_75p', 'skip', 'free'), ('tl_title', 'tiles_75p', 'skip', 'free'), ('tl_stale', 'tiles_75p', 'skip', 'free'),
+    ('tl_unav', 'tiles_75p', 'skip', 'free'), ('tl_g', 'tiles_75p', 'skip', 'free'), ('tl_y', 'tiles_75p', 'skip', 'free'), ('tl_err', 'tiles_75p', 'skip', 'free'),
+    ('tl_few', 'tiles_75p', 'skip', 'free'), ('tl_two', 'tiles_75p', 'skip', 'free'), ('pic_tiles_75p', 'tiles_75p', 'skip', 'free'),
 ]
 
 # cases that show another configuration of their page (an icon, a second value, a longer reading), not another state of
 # one device: the hero may be another size or sit elsewhere there (check.py same_layout leaves them out)
-CONFIG_CASES = {'sv_icon', 'sv_hum', 'sv_long', 'pic_single_value_14', 'pic_single_value_27l', 'pic_single_value_35'}
+CONFIG_CASES = {'sv_icon', 'sv_hum', 'sv_long', 'pic_single_value_14', 'pic_single_value_27l', 'pic_single_value_35'} | {'tl_few', 'tl_two'} | {f'pic_tiles_{k}' for k in ('14', '27l', '27p', '35', '41', '75', '75p')}
 
 SIZES = {l['key']: l['canvas'] for l in layouts()}      # layout key -> canvas (its screen's tier)
 WEATHER_EXTRA = ['wx', 'wx_cond', 'wx_alert', 'wx_warn', 'wx_y', 'wxneg', 'wx_p0', 'wx_warn_g', 'wx_moon', 'tonight', 'tonight_knmi', 'tonight_knmi2',

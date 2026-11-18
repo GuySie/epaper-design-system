@@ -754,7 +754,7 @@ A module is one block of content on a screen, built from components (and other m
 | **Chart** | Plot, label margin, clock-time axis, thresholds, severe fills. | series, thresholds | `type.label`, `line.*`, `space.s` | `CFRAME`, `CTHRESH`, `CBASE`, `CAXIS` (read their tokens); bars, series and notches stay in each chart |
 | **Timeline** | Sun and moon track with markers and the sun path. Rules: *Timeline* under *Patterns*. | sun, moon | `icon.inline`, `icon.markerDisc`, `line.tick`, `type.label` | `TMARK` for markers, `SERIES` for the path, `CAXIS` for the compass row; the heights follow the vertical rhythm in *Sun & moon* |
 | **Checkbox rows** | *Mockup (Checklist), no blueprint yet.* Checkbox (`line.base` outline / ink fill, cap height of `type.data`) + an item on one text line + due day; see *Checklist*. | — | — | — |
-| **Tiles** | *Mockup (Tiles), no blueprint yet.* Repeated icon–state–label unit in a grid (*Tiles*). | — | — | — |
+| **Tiles** | Repeated icon–state–label unit in a grid. Rules: *Tiles* under *Patterns*. | icon, state, label | `type.data`, `type.label`, `space.m`, `line.base` | `TILEGRID` |
 | **Level meter** | *Reserved: no blueprint uses it.* A level in four segments. Rules: *Level meter*, below the table. | — | — | — |
 | **Hero block** | The hero group *on its own* and the Glance secondary under it, centred as one block (*Hero group*, hero centring; the secondary's chip box is reserved, so nothing moves when a chip appears). The Glance's one module under the title row; see *Glance*. | hero, icon, levels, Glance secondary | `type.heroAlone`, `icon.heroAloneSteps`, `type.secondary`, `space.heroGap` | `HBLOCK`, `HERO_BLOCK_Y` |
 | **Hero band** | The hero group *beside other content* and the detail rows, **centred by ink between the title line and the next line** (the strip's, or the module's). Rules: *Hero dashboard* under *Patterns*. | hero, icon, rows | `type.heroShared`, `icon.heroShared`, `space.l` | `HBAND` |
@@ -873,7 +873,7 @@ A pattern is what a kind of screen looks like: which modules, in which order, an
 | **Meters** | Title row, Meters, Footer | *both ways* (mock) | live | `METERS` |
 | **Checklist** | Title row, Checkbox rows, Footer | — | mock | — |
 | **Code** | Title row, Code block | — | mock | — |
-| **Tiles** | Title row, Tiles | — | mock | — |
+| **Tiles** | Title row, Tiles | — | live | `TILES` |
 | **Month** | Title row, Month grid | — | mock | — |
 | **Note** | Title row, Text block | *with a progress bar* (mock) | mock | — |
 <!-- /registry:patterns -->
@@ -1013,6 +1013,17 @@ Progress bars and the footer.
 
 - Label in `type.primary` Regular and percentage Bold while they fit, else `type.data` (how many fit on each screen: *Claude usage*). The track is as high as the label's caps less `space.xs`, `space.s` under the label text line, with `space.xs` below it, so a chip on the next label text line keeps a paper gap. Bars L apart when they fit, else M. The track is a `line.base` ink outline. Fill: ink; the warning colour at the warning threshold, the severe colour at the severe threshold, with the matching chip behind the percentage. "Now in period" marker: a line as wide as `line.series` across the track only, with paper edges where it crosses the fill, so it stays visible past the fill. Reset caption: `type.label`, right-aligned, on the bar label's baseline, as the stamp sits on the title's. The value column is as wide as the widest value shown, never narrower than `100%` (Levels shows values with their units). Percentage column measured: `space.l` after the widest label (the label is cut short only when the widest percentage and reset caption wouldn't fit, `space.l` apart).
 
+### Tiles
+
+Equal tiles, each a centred stack: the icon, the state in `type.data`, the label in `type.label`. The stack is centred in its tile.
+
+- Tiles per screen: one on the 1.4", 1 × 3 on the 2.7" portrait, 3 × 2 on the 2.7" landscape, the 3.5" and the 4.1", 4 × 3 on the 7.5", 3 × 4 on the 7.5" portrait. With fewer entities the grid is the smallest one that holds them (of two equally small, the one whose tiles are closest to square), filled row by row; a tile left over stays empty.
+- Lines between two tiles that both hold an entity, centred in the gutter, each stopping `space.m` short of where it would cross another; none around the outside.
+- The icon is the largest ladder size that leaves room for the state and label under it, and at most four times the size of `type.data`; a single tile's icon has no such limit. All tiles on a screen share one icon size.
+- A tile without an icon centres its state and label alone (where the icon comes from: *the Tiles page*).
+- *Mockup, no blueprint flags a tile yet:* a flagged tile chips its state; the icon and the label never change, and nothing moves.
+- Widest state: 9 characters (`Triggered`): the room a tile has less `space.s` on both sides, where the chip goes. A longer state, and a label wider than its tile, is cut with an ellipsis.
+
 ### Mocked-up patterns
 
 Patterns and versions that exist as mock-ups only: no blueprint is built from them yet, so their rules are proposals. Each moves to its place above when its first page is built (a version to its pattern, a pattern to its own section).
@@ -1066,17 +1077,6 @@ Patterns and versions that exist as mock-ups only: no blueprint is built from th
 - **Off:** no code, one empty statement (`GASTENNETWERK UIT`): the network being off is a fact, not a problem.
 - **Checked:** every mockup decodes with a standard QR reader.
 
-#### Tiles
-
-*Mockup (Tiles).* Equal tiles, each a centred stack: the icon, the state in `type.data`, the label in `type.label`. The stack is centred in its tile.
-
-- Tiles per screen: one on the 1.4", 1 × 3 on the 2.7" portrait, 3 × 2 on the 2.7" landscape, the 3.5" and the 4.1", 4 × 3 on the 7.5", 3 × 4 on the 7.5" portrait. With fewer entities the grid is the smallest one that holds them (of two equally small, the one whose tiles are closest to square), filled row by row; a tile left over stays empty.
-- Lines between two tiles that both hold an entity, centred in the gutter, each stopping `space.m` short of where it would cross another; none around the outside.
-- The icon is the largest ladder size that leaves room for the state and label under it, and at most four times the size of `type.data`; a single tile's icon has no such limit. All tiles on a screen share one icon size.
-- The icon comes from the tile's icon input, else from the entity's own icon; a tile with neither has none, and its state and label are centred alone.
-- A flagged tile chips its state; the icon and the label never change, and nothing moves.
-- Widest state: 9 characters (`Triggered`). A longer state, and a label wider than its tile, is cut with an ellipsis.
-
 #### Month
 
 *Mockup (Month overview).* A calendar month.
@@ -1127,7 +1127,7 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | **Solar & battery** | Meters both ways | mock | 100% | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Packages** | Key-value list | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Shopping list** | Checklist | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Tiles** | Tiles | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Tiles** | Tiles | live | Triggered | ● | ● | ● | ● | ● | ○ | ● | ● | ○ |
 | **Month overview** | Month | mock | — | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Message board** | Note | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Now playing** | Note with a progress bar | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
@@ -1451,6 +1451,42 @@ A Key-value list of up to 12 entities.
 | 3.5" | normal, widest, title, stale, error, unavailable | warning, severe, gray, colour, empty | 8 |
 <!-- /registry:layouts-entities -->
 
+### Tiles (the page)
+
+The Tiles pattern for any entities: up to 12, one tile each.
+
+- **Shows:** per entity its icon, its state and its label. As many tiles as the screen holds (*Tiles*); each blueprint offers only the entities its screen has.
+- **Tested with:** every tile filled, with icons from the input, from the entity and one tile without; a state and labels too long for a tile, and `-12,5°C`; five entities and two entities (the grid shrinks); a long title; stale data; one entity unavailable; every entity unavailable (the error state; on the 1.4" a dash); a grey and a yellow panel.
+- **State:** a number as *Entities* writes it, with its unit; any other state in Home Assistant's own wording for it (`Closed` for a door that is `off`), which follows the language Home Assistant is set to, not the blueprint's.
+- **Label:** the entity's name, or the tile's label input.
+- **Icon:** the tile's icon input, else the entity's own icon; an entity with neither gets no icon. An icon the kit has no glyph for is drawn by the renderer's own icon element (*Blueprint mechanics*).
+- **Flagged:** never: the page has no thresholds, as *Entities* has none.
+- **Unavailable:** the state is `—`; most entities unavailable is the error state (*States*).
+
+<!-- registry:inputs-tiles -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `entity_1`, `entity_1_label`, `entity_1_icon` |
+| 2.7" P | also `entity_2`, `entity_3`, `entity_2_label`, `entity_3_label`, `entity_2_icon`, `entity_3_icon` |
+| 2.7" L | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon` |
+| 3.5" | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon` |
+| 4.1" | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon` |
+| 7.5" L | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_7`, `entity_8`, `entity_9`, `entity_10`, `entity_11`, `entity_12`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_7_label`, `entity_8_label`, `entity_9_label`, `entity_10_label`, `entity_11_label`, `entity_12_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon`, `entity_7_icon`, `entity_8_icon`, `entity_9_icon`, `entity_10_icon`, `entity_11_icon`, `entity_12_icon` |
+| 7.5" P | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_7`, `entity_8`, `entity_9`, `entity_10`, `entity_11`, `entity_12`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_7_label`, `entity_8_label`, `entity_9_label`, `entity_10_label`, `entity_11_label`, `entity_12_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon`, `entity_7_icon`, `entity_8_icon`, `entity_9_icon`, `entity_10_icon`, `entity_11_icon`, `entity_12_icon` |
+<!-- /registry:inputs-tiles -->
+
+<!-- registry:layouts-tiles -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 1.4" | normal, widest, gray, colour, title, stale, unavailable | warning, severe, error, empty | 8 |
+| 2.7" P | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 10 |
+| 2.7" L | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
+| 3.5" | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
+| 4.1" | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
+| 7.5" L | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
+| 7.5" P | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
+<!-- /registry:layouts-tiles -->
+
 ### Plant moisture
 
 A Key-value list of up to 22 plants, driest first if chosen.
@@ -1536,7 +1572,7 @@ A *Hero dashboard with a chart or list*: the weather's hero band over the calend
 
 ### Mocked-up pages
 
-Bin day, Room sign, Appliance run, Countdown, Today's date, Energy price, Departures, Solar & battery, Packages, Shopping list, Tiles, Month overview, Message board, Now playing, Guest Wi-Fi, and the Hero dashboards Energy overview, Air quality and Day overview: their patterns and layouts are in the table above, their rules with the pattern versions they use. Countdown is a Glance with whole days as the hero and the date in the Glance secondary; Today's date has the day of the month as its hero, never the clock time.
+Bin day, Room sign, Appliance run, Countdown, Today's date, Energy price, Departures, Solar & battery, Packages, Shopping list, Month overview, Message board, Now playing, Guest Wi-Fi, and the Hero dashboards Energy overview, Air quality and Day overview: their patterns and layouts are in the table above, their rules with the pattern versions they use. Countdown is a Glance with whole days as the hero and the date in the Glance secondary; Today's date has the day of the month as its hero, never the clock time.
 
 ## Blueprint mechanics
 
@@ -1550,7 +1586,7 @@ What every blueprint does the same way; where it can, through a shared part that
   5. **Advanced** (collapsed): `stale_after`, `led_color`, `led_flash_delay` and `font_dir`. The LED inputs are there wherever a button can start the redraw: the LED confirms the press. A blueprint that redraws on a change (Doors & windows) has none.
 - **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button). Every other input has a default, and an optional entity left empty removes its part of the page. The Rain forecast has no main entity: it needs one of its two sources.
 - **Input names:** the device input is always `displays`, also where it takes one device (Medication). Numbered entries are `<name>_<n>` with `<name>_<n>_label` (`entity_1`, `plant_1`, `bar_1`). Thresholds are `warning_<what>` and `severe_<what>`, their switch `flag_<what>`. A blueprint's variables keep the names its drawing reads, so renaming an input never changes the drawing.
-  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather (Glance), Single value, Weather, Rain forecast, CO2 graph, History graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar<!-- /v -->); see *Title row* for the exempt blueprints.
+  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather (Glance), Single value, Weather, Rain forecast, CO2 graph, History graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar, Tiles<!-- /v -->); see *Title row* for the exempt blueprints.
   - The panel is never an input: a page drawn on two screens is two blueprints (the Rain forecast on the 3.5" and on the 2.7" landscape).
 - **Texts:** every blueprint's strings live in `ep_i18n.jinja`, written from the page definitions (per page, `EP_TXT['<page>']`, which the blueprint's `language_map` reads; the weekday and month lists once, in `pages/_shared.yaml`) and `wx_txt.yaml` (the weather words, `ds_wtxt`), keyed by the 8 language codes, holding weekday/month names and every user-facing string (including the empty, error and stale strings). Paired with separate `weekday_short_map` / `months_short_map` dicts, which read `EP_DAYS_SHORT` / `EP_MONTHS_SHORT`. The update stamp uses weekday + time (`SU 17:58`); dates in content use `SU 8 NOV`. Don't fold them into `language_map`.
 - **One set.** A release gives its templates and its blueprints the same set id: a short hash of the four templates as built, so it changes when the templates change and only then (`lib/set_id.py`). Every blueprint hands its id to the drawing, and the templates compare it with theirs. When they differ, or the blueprint has none, the templates draw the title row and the error block and nothing else: the message (`UPDATE TEMPLATES AND BLUEPRINT`, translated) and, on new lines under it, the two ids (`BLUEPRINT hjnenx · TEMPLATES udrrap` on one line where that fits, else one each; a blueprint without an id shows `—`), the lines centred as one block in the title's type. Templates from before this rule can't tell a newer blueprint apart, and missing templates still fail with `TemplateNotFound`: nothing can draw then.
@@ -1595,6 +1631,7 @@ Proven: TRMNL text and Space Grotesk heroes on BWRY ESLs (1.4", 2.7", 3.5", 4.1"
 11. The history `plot` element: whether OpenDisplay draws a series with it (*Blueprint mechanics*); until then a series is runs of `line` segments.
 12. Single value: the unit beside a large number (`type.secondary`'s size next to an 88 or 104 px numeral) reads as part of the reading; an icon the kit has no glyph for (drawn by the renderer's icon element) sits acceptably beside the number.
 13. Single value on the 1.4": the number at its one size (under the Glance floor) still reads from where the label is used.
+14. Tiles: icons the kit has no glyph for, drawn by the renderer's icon element at tile size (their soft edges on a panel with colour); Home Assistant's wording of a state in a language other than English at the tile's width.
 
 ## Open items
 

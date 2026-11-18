@@ -437,7 +437,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'uwruww'
+  ds_set: 'ganwuu'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'
