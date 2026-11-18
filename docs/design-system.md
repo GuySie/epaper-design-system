@@ -633,7 +633,7 @@ Three levels, the same on every module:
 
 **Every value that has a bad direction gets a warning and a severe input**, with a default, on every blueprint that shows it. The same data has the same inputs, names and defaults everywhere.
 
-**Every reading that can be flagged has a switch**, `flag_<what>`, on by default, in front of its `warning_<what>` and `severe_<what>`. The switches of Single value and Levels are off by default: no value fits every sensor. Off, the reading is never flagged, on any part of the page. Every number is a real threshold, 0 included: no number means "off". Without a switch: the lists (conditions, the doors and windows that count as severe), where an empty list flags nothing. A chart with its switch off: *Bar chart with thresholds, Line chart with thresholds*, Switched off. Pollen's two count inputs are empty by default: empty, the sensor's own level decides (*Weather thresholds*); a count overrides it.
+**Every reading that can be flagged has a switch**, `flag_<what>`, on by default, in front of its `warning_<what>` and `severe_<what>`. The switches of Single value, Levels and History graph are off by default: no value fits every sensor. Off, the reading is never flagged, on any part of the page. Every number is a real threshold, 0 included: no number means "off". Without a switch: the lists (conditions, the doors and windows that count as severe), where an empty list flags nothing. A chart with its switch off: *Bar chart with thresholds, Line chart with thresholds*, Switched off. Pollen's two count inputs are empty by default: empty, the sensor's own level decides (*Weather thresholds*); a count overrides it.
 
 | Page | Data | Warning | Severe |
 |---|---|---|---|
@@ -650,6 +650,7 @@ Three levels, the same on every module:
 | Plant moisture | Soil moisture | ≤ <!-- v:input:plants:warning_moisture_low -->25 %<!-- /v --> | ≤ <!-- v:input:plants:severe_moisture_low -->14 %<!-- /v --> |
 | Single value | The value, high (`*_high`, at or above) and low (`*_low`, at or below) | the user's value | the user's value |
 | Levels | Each row's share of its maximum, high and low | the user's value | the user's value |
+| History graph | The value, high (`*_high`, at or above) and low (`*_low`, at or below) | the user's value | the user's value |
 | Medication | Hours since the last press | ≥ <!-- v:input:medication:warning_late -->24 h<!-- /v --> | ≥ <!-- v:input:medication:severe_late -->36 h<!-- /v --> |
 | Doors & windows | An opening is open | — | the openings in `severe_openings` |
 
@@ -947,8 +948,9 @@ Bar and line charts share one frame. The Rain forecast is the reference Bar char
 2. **Fixed y-scale.**
    - With thresholds: 0 (or the page's own bottom) up to <!-- v:dt:CHART_TOP -->1.5<!-- /v --> × the severe value. A different top comes from a different severe value; the scale is never an input.
    - **CO2 graph:** from <!-- v:spec:co2_35:SCALE_FROM -->400<!-- /v --> ppm, the level of outdoor air, which indoor air rarely goes below.
-   - Without thresholds: snap min and max outward to round steps (2°, 100 ppm, 1 kW) with a smallest span (*Open items*).
-   - Never re-stretch to the data on each refresh. Clip values beyond the scale at the edge.
+   - **The automatic scale**, for a reading whose range the page can't know (History graph): the scale takes in every value of the period and every threshold line that is shown, then snaps outward to a round step: 1, 2 or 5 times a power of ten, the largest that still gives at least four steps. It is never narrower than a smallest span, so a flat line isn't stretched into noise: a tenth of the largest value shown, and at least ten times the reading's last digit (10 for whole numbers, 1 for one decimal). Both ends are labelled.
+   - Never re-stretch to the data on each refresh: a scale built from thresholds or set by the page stays put, and the automatic scale only changes when a value crosses a round step. Clip values beyond the scale at the edge.
+   - **An end label gives way to a threshold label** that would come closer to it than a label's height: the threshold's value then stands for that end.
    - **The logarithmic scale** is the other scale a page can name, for a reading that spans orders of magnitude: from 0 to a fixed top, each value placed at log(value + 1), so a small reading stays visible next to a large one. Thresholds sit at their log position. Rain intensity uses it, up to <!-- v:spec:rain_35:SCALE_TOP -->50<!-- /v --> mm/h (violent rain): drizzle (0.1–1 mm/h) stays visible next to a downpour.
 3. **Clock-time axis.** Evenly spaced labels from start to end (*Style choices*, Axis ticks). The rain chart marks a fixed number of bars and the end instead. Clock times, never relative ones (*Text rules*, *Clock times, never relative times*). **12-hour form:** every axis label carries its half of the day as a unit attached to the time (*Text rules*, *Short hour labels*): `8:47am · 2:47pm`. The widest is `12:47pm`; five still fit on the 3.5". Where the label's cut is allowed in capitals only (the 2.7", *TRMNL12 on 1.4" and 2.7"*), it is written in capitals at the label's size: `2:05PM`. The footer's times and the empty statement's carry it the same way; a span within one half of the day carries it once, at the end (`2:50–3:00pm`), and a span across noon or midnight at both ends (`11:15am–1:00pm`). Ticks are `line.tick` long, starting on the row under the baseline; the labels' caps start `space.s` below the ticks. The Sun & moon compass row is the same axis under the horizon: same ticks, same label text line, and a marker below the horizon sits on that label text line. Ticks that point up from a line (sunrise and sunset) are `line.tick` long too.
    - **Vertical frame:** the plot's top is M under the title line (moved down by half a label's cap height when a value label sits on the top line). The baseline sits `space.axis` + M + `space.footer` above the bottom padding, so the axis labels keep M from the footer line.
@@ -972,7 +974,7 @@ The chart frame with a warning and a severe input (*Thresholds*); its scale is t
 #### Line charts
 
 1. **Stroke.** `line.series` ink, drawn as 1 px lines (*Lines and strokes*), straight segments, square joins, snapped to whole pixels. Dashes on a curve are measured along its length, never per segment. Use a step line for states and setpoints.
-2. **No area fill**, except severe spans (severe colour from baseline to line).
+2. **No area fill**, except flagged spans (from baseline to line, in the level's colour): above a high threshold, and under a low one where the page has low thresholds (History graph).
 3. **Current value.** A filled square (3 × `line.series` wide) on the latest point, or on the render-time point of a forecast chart. Its value and time go in the title row or footer.
 4. **Measured vs forecast.** Measured is solid and forecast is dashed (`line.forecastDash`). A dotted vertical line (`line.dot`) at the render time splits them, labelled with that clock time above the plot.
 5. **Two series at most.** The primary is the thick solid line; the secondary is thinner and dashed. Name them in a legend of line samples above the plot, never by colour. No page draws a second series yet: the second series and the legend are a proposal until one does.
@@ -1109,6 +1111,7 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | **Doors & windows** | Glance | live | — | ● | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Rain forecast** | Bar chart with thresholds | live | 50 mm/h | — | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **CO2 graph** | Line chart with thresholds | live | 4000 | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
+| **History graph** | Line chart with thresholds | live | -12.5 | — | ● | ○ | ● | ● | ○ | ○ | ○ | ○ |
 | **Sun & moon** | Timeline | live | 10:44am | — | ○ | — | ● | ○ | ○ | ○ | ○ | ○ |
 | **Claude usage** | Meters | live | — | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Levels** | Meters | live | 1240 ppm | — | ● | ○ | ● | ● | ○ | ○ | ○ | ○ |
@@ -1337,6 +1340,32 @@ A Line chart *with thresholds*: the last hours of CO2 with the current value at 
 | 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 12 |
 <!-- /registry:layouts-co2 -->
 
+### History graph
+
+A Line chart for any sensor: its last hours on the automatic scale.
+
+- **Shows:** one sensor's last 3, 6, 12 or 24 hours as a line, the current value as the square at its end, the scale's two ends beside the plot, and the footer's conclusion. The title is the sensor's name unless a header title is given.
+- **Tested with:** a room's temperature over 12 hours; the widest labels (`-12.5`); a nearly flat line; a CO2 sensor over 24 hours (whole numbers); the period at warning and at severe (the severe line close to the scale's top, whose label gives way); a low dip; high and low together, on a colour, a yellow and a grey panel; a long title; stale data; the sensor unavailable now; no history (the error view); both switches off; 12-hour time.
+- **Scale:** the automatic scale (*Chart frame (all charts)*, *Fixed y-scale*). With a threshold on, its lines are inside the scale; this page doesn't use the scale built from the severe value.
+- **Footer:** left the current value (`NOW 20.6 °C`), right the period's lowest and highest (`LOW 18.3 · HIGH 22.8 °C`); a chip at the highest level the period reached.
+- **Widest reading:** four characters and a three-letter unit (`1240 ppm`, `-12.5 °C`): the label margin is as wide as `-12.5`, whatever the scale shows.
+- **Thresholds:** high (`*_high`, at or above) and low (`*_low`, at or below), each with its two dashed lines and the spans past them filled (*Line charts*). Both switches are off by default (*Thresholds*).
+- **Points:** at most <!-- v:spec:history_35:POINTS -->166<!-- /v --> on the 3.5" (*Chart frame (all charts)*, *Density*), as on the CO2 graph.
+
+<!-- registry:inputs-history -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `entity`, `hours`, `flag_high`, `warning_high`, `severe_high`, `flag_low`, `warning_low`, `severe_low` |
+<!-- /registry:inputs-history -->
+
+<!-- registry:layouts-history -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 17 |
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 17 |
+| 4.1" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 17 |
+<!-- /registry:layouts-history -->
+
 ### Sun & moon
 
 A Timeline: sun and moon on the compass axis (*Timeline*), the five times of the day under it.
@@ -1525,7 +1554,7 @@ What every blueprint does the same way; where it can, through a shared part that
   5. **Advanced** (collapsed): `stale_after`, `led_color`, `led_flash_delay` and `font_dir`. The LED inputs are there wherever a button can start the redraw: the LED confirms the press. A blueprint that redraws on a change (Doors & windows) has none.
 - **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button). Every other input has a default, and an optional entity left empty removes its part of the page. The Rain forecast has no main entity: it needs one of its two sources.
 - **Input names:** the device input is always `displays`, also where it takes one device (Medication). Numbered entries are `<name>_<n>` with `<name>_<n>_label` (`entity_1`, `plant_1`, `bar_1`). Thresholds are `warning_<what>` and `severe_<what>`, their switch `flag_<what>`. A blueprint's variables keep the names its drawing reads, so renaming an input never changes the drawing.
-  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather (Glance), Single value, Weather, Rain forecast, CO2 graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar<!-- /v -->); see *Title row* for the exempt blueprints.
+  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather (Glance), Single value, Weather, Rain forecast, CO2 graph, History graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar<!-- /v -->); see *Title row* for the exempt blueprints.
   - The panel is never an input: a page drawn on two screens is two blueprints (the Rain forecast on the 3.5" and on the 2.7" landscape).
 - **Texts:** every blueprint's strings live in `ep_i18n.jinja`, written from the page definitions (per page, `EP_TXT['<page>']`, which the blueprint's `language_map` reads; the weekday and month lists once, in `pages/_shared.yaml`) and `wx_txt.yaml` (the weather words, `ds_wtxt`), keyed by the 8 language codes, holding weekday/month names and every user-facing string (including the empty, error and stale strings). Paired with separate `weekday_short_map` / `months_short_map` dicts, which read `EP_DAYS_SHORT` / `EP_MONTHS_SHORT`. The update stamp uses weekday + time (`SU 17:58`); dates in content use `SU 8 NOV`. Don't fold them into `language_map`.
 - **One set.** A release gives its templates and its blueprints the same set id: a short hash of the four templates as built, so it changes when the templates change and only then (`lib/set_id.py`). Every blueprint hands its id to the drawing, and the templates compare it with theirs. When they differ, or the blueprint has none, the templates draw the title row and the error block and nothing else: the message (`UPDATE TEMPLATES AND BLUEPRINT`, translated) and, on new lines under it, the two ids (`BLUEPRINT hjnenx · TEMPLATES udrrap` on one line where that fits, else one each; a blueprint without an id shows `—`), the lines centred as one block in the title's type. Templates from before this rule can't tell a newer blueprint apart, and missing templates still fail with `TemplateNotFound`: nothing can draw then.
@@ -1579,7 +1608,6 @@ Proven: TRMNL text and Space Grotesk heroes on BWRY ESLs (1.4", 2.7", 3.5", 4.1"
 - **Energy price on the 2.7" portrait:** offer it (24 narrow bars) or leave it out. To decide.
 - **LED on a severe state:** flash the device's LED when a page turns severe (a door left open, a missed medication): which pages, which colour, and whether it repeats until the state clears. To decide.
 - **Two modules side by side** on a Hero dashboard with a chart or list (7.5" and 7.09"): one module is the rule today. To decide when a page needs two.
-- **A chart without thresholds:** its scale snaps to round steps and needs a smallest span per reading so a flat line isn't stretched; no value is set. To decide with the first such chart.
 - **Type on large and dense screens:** the step up is one TRMNL step for every large screen, whatever its size, so a 13.3" derives the 7.5"'s type sizes; and where the data is already TRMNL21 (*Type tokens*) `type.primary` is no larger than `type.data`, so a list loses its size hierarchy. Proposed: set the type roles by physical size and reading distance, using the 2× cuts. To decide when the first screen above the 7.5" gets a layout, and for the 4.26".
 - **Outline text font on dense large screens** (from 0.09 mm per pixel): Space Grotesk with letter-spaced capital labels is the candidate (type test card v1); TRMNL stays the system font until it is tested on the 7.09". To decide after that test.
 

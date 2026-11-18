@@ -68,6 +68,10 @@ COVERAGE = {
     'levels_27l': pg('lv', 'lv_widest', 'lv_warn', 'lv_sev', 'lv_g', 'lv_y', 'lv_title', 'lv_stale', 'lv_err', 'lv_unav', REQ),
     'levels_35': pg('lv', 'lv_widest', 'lv_warn', 'lv_sev', 'lv_g', 'lv_y', 'lv_title', 'lv_stale', 'lv_err', 'lv_unav', REQ),
     'levels_41': pg('lv', 'lv_widest', 'lv_warn', 'lv_sev', 'lv_g', 'lv_y', 'lv_title', 'lv_stale', 'lv_err', 'lv_unav', REQ),
+    # History graph
+    'history_27l': pg('hg', 'hg_widest', 'hg_warn', 'hg_sev', 'hg_g', 'hg_y', 'hg_title', 'hg_stale', 'hg_err', 'hg_unav', NOHIST),
+    'history_35': pg('hg', 'hg_widest', 'hg_warn', 'hg_sev', 'hg_g', 'hg_y', 'hg_title', 'hg_stale', 'hg_err', 'hg_unav', NOHIST),
+    'history_41': pg('hg', 'hg_widest', 'hg_warn', 'hg_sev', 'hg_g', 'hg_y', 'hg_title', 'hg_stale', 'hg_err', 'hg_unav', NOHIST),
     'appointment_35':   pg('appt35', 'a35_1w', NOTHR, NOTHR, NOCHIP, NOCHIP, 'appt35_title', NOSTALE, 'appt35_err', EVENTS, 'appt_none'),
     'appointment_41': pg('a41_6', 'a41_1w', NOTHR, NOTHR, 'a41_6_g', NOCHIP, 'a41_6_title', NOSTALE, 'a41_err', EVENTS, 'a41_0'),
     'appointment_426': pg('a426_9', 'a426_1w', NOTHR, NOTHR, 'a426_9_g', MONO, 'a426_9_title', NOSTALE, 'a426_err', EVENTS, 'a426_0'),

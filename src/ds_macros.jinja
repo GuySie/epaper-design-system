@@ -995,12 +995,27 @@
 {#- CHART_LINE: module 'Chart' as a line, inside the box x0 to x1, y0 to y1. pts = [{'ts', 'v': value, 'mx': the sample's maximum}],
      t0 to t1 the time axis (h12: 12-hour labels, CLOCK), lo to hi the fixed y-scale, warn and sev the thresholds, gap: a longer step breaks the line.
      Severity fills under the line, paper notches, the series, the current value as a square, the clock-time axis;
+     opt: {'ends': label the scale's bottom too, 'dec': decimals in the labels, 'low': [warning, severe] at or below
+     (their lines, and the spans under them filled), 'widest': the widest label, which sizes the label margin}.
      LINECHART: pattern 'Line chart', the version with thresholds: the title row, the chart, the footer; foot = [left,
      right, level]: the page's conclusion. flag=false (the reading's switch is off): no threshold line or
      value and no fill; the scale, its top value and the label margin stay. -#}
-{%- macro CHART_LINE(ns, x0, x1, y0, y1, pts, t0, t1, lo, hi, warn, sev, gap, h12, flag=true) -%}
+{#- CHART_SCALE: the automatic scale (Chart frame, Fixed y-scale): 'lo,hi' around vmin..vmax, never narrower than the
+     smallest span (a tenth of the largest value, at least ten times the last digit shown), snapped outward to a round
+     step (1, 2 or 5 times a power of ten, the largest that still gives four steps) -#}
+{%- macro CHART_SCALE(vmin, vmax, dec) -%}
+{%- set ms = [0.1 * ([vmin | abs, vmax | abs] | max), 10 * (10 ** (0 - dec))] | max -%}
+{%- set a, b = vmin, vmax -%}
+{%- if b - a < ms -%}{%- set mid = (a + b) / 2 -%}{%- set a, b = mid - ms / 2, mid + ms / 2 -%}{%- endif -%}
+{%- set raw = (b - a) / 4 -%}
+{%- set n = (raw | log(10)) | round(0, 'floor') -%}{%- set base = 10 ** n -%}{%- set m = raw / base -%}
+{%- set step = (5 if m >= 5 else (2 if m >= 2 else 1)) * base -%}
+{{ ((a / step) | round(0, 'floor') * step) | round(6) }},{{ ((b / step) | round(0, 'ceil') * step) | round(6) }}
+{%- endmacro -%}
+{%- macro CHART_LINE(ns, x0, x1, y0, y1, pts, t0, t1, lo, hi, warn, sev, gap, h12, flag=true, opt={}) -%}
+{%- macro LAB(v) -%}{{ (v | round | int | string) if not opt.dec else DECIMAL((v | round(opt.dec) | string).replace('.0', '')) }}{%- endmacro -%}
 {#- label margin sized to the widest label + S; labels right-aligned to the padding -#}
-{%- set labs = [hi, sev, warn] | map('round') | map('int') | map('string') | list -%}
+{%- set labs = ([hi, sev, warn] | map('round') | map('int') | map('string') | list) if not opt.widest else [opt.widest] -%}
 {%- set lw = namespace(w=0) -%}{%- for l in labs -%}{%- set lw.w = [lw.w, TEXT_W(l, EP_TK.type.label[1], FONT[EP_TK.type.label[0]]) | int] | max -%}{%- endfor -%}
 {%- set cf = namespace() -%}{{- CFRAME(cf, x0, x1, y0, y1, lw.w, true) -}}
 {%- set x0, pw, top, base, ph = cf.x0, cf.w, cf.top, cf.base, cf.ph -%}
@@ -1015,7 +1030,9 @@
 {%- if (p.ts - q.ts) <= gap -%}
 {%- set m = [p.mx, q.mx] | max -%}
 {%- set c = (color.severe if m >= sev else (color.warning if (m >= warn and color.warning != color.ink) else '')) if flag else '' -%}
-{%- set segs.list = segs.list + [{'xa': xs(q.ts) | int, 'ya': ys(q.v) | int, 'xb': xs(p.ts) | int, 'yb': ys(p.v) | int, 'c': c}] -%}
+{%- set ml = [p.mn | default(p.v), q.mn | default(q.v)] | min -%}
+{%- set lc = (color.severe if ml <= opt.low[1] else (color.warning if (ml <= opt.low[0] and color.warning != color.ink) else '')) if opt.low else '' -%}
+{%- set segs.list = segs.list + [{'xa': xs(q.ts) | int, 'ya': ys(q.v) | int, 'xb': xs(p.ts) | int, 'yb': ys(p.v) | int, 'c': c, 'lc': lc}] -%}
 {%- endif -%}
 {%- endfor -%}
 {#- neighbouring flat-topped fills of one colour are drawn as one block (identical pixels, fewer elements) -#}
@@ -1030,7 +1047,18 @@
 {{- POLY(ns, [[s.xa, base], [s.xa, s.ya], [s.xb, s.yb], [s.xb, base]], s.c) -}}
 {%- endfor -%}
 {#- thresholds: 1 px dashed (4 on / 4 off) across the plot, value labels in the margin -#}
-{%- for v, y in lines -%}{%- if flag or loop.index0 == 2 -%}{{- CTHRESH(ns, cf, v | round | int | string, y, loop.index0 < 2) -}}{%- endif -%}{%- endfor -%}
+{#- a low reading's spans are filled under the line too -#}
+{%- if opt.low -%}
+{%- for s in segs.list -%}{%- if s.lc -%}{{- POLY(ns, [[s.xa, base], [s.xa, s.ya], [s.xb, s.yb], [s.xb, base]], s.lc) -}}{%- endif -%}{%- endfor -%}
+{%- endif -%}
+{#- an end label gives way to a threshold label that would come closer to it than a label's height -#}
+{%- set ty = ([lines[0][1], lines[1][1]] if flag else []) + ([ys(opt.low[0]) | int, ys(opt.low[1]) | int] if opt.low else []) -%}
+{%- set lh = EP_TK.type.label[1] -%}
+{%- set near = namespace(top=false, base=false) -%}
+{%- for y in ty -%}{%- if (y - top) | abs < lh -%}{%- set near.top = true -%}{%- endif -%}{%- if (y - base) | abs < lh -%}{%- set near.base = true -%}{%- endif -%}{%- endfor -%}
+{%- for v, y in lines -%}{%- if (flag and loop.index0 < 2) or (loop.index0 == 2 and not near.top) -%}{{- CTHRESH(ns, cf, LAB(v), y, loop.index0 < 2) -}}{%- endif -%}{%- endfor -%}
+{%- if opt.low -%}{{- CTHRESH(ns, cf, LAB(opt.low[0]), ys(opt.low[0]) | int) -}}{{- CTHRESH(ns, cf, LAB(opt.low[1]), ys(opt.low[1]) | int) -}}{%- endif -%}
+{%- if opt.ends and not near.base -%}{{- CTHRESH(ns, cf, LAB(lo), base, false) -}}{%- endif -%}
 {#- paper notches where a threshold crosses a severe fill (on a yellow fill the dashes stay black) -#}
 {#- touching pieces on one threshold line are drawn as one (identical pixels, fewer elements) -#}
 {%- set nt = namespace(l0=[], l1=[]) -%}
@@ -1077,10 +1105,10 @@
 {%- endfor -%}
 {{- CAXIS(ns, cf, tk.l) -}}
 {%- endmacro -%}
-{%- macro LINECHART(ns, title, right, pts, t0, t1, lo, hi, warn, sev, gap, foot, h12, stale=false, flag=true) -%}
+{%- macro LINECHART(ns, title, right, pts, t0, t1, lo, hi, warn, sev, gap, foot, h12, stale=false, flag=true, opt={}) -%}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {{- TITLE(ns, title, right, W, P, TH, stale) -}}
-{{- CHART_LINE(ns, P, W - P - 1, CHART_Y0() | int, CHART_Y1() | int, pts, t0, t1, lo, hi, warn, sev, gap, h12, flag) -}}
+{{- CHART_LINE(ns, P, W - P - 1, CHART_Y0() | int, CHART_Y1() | int, pts, t0, t1, lo, hi, warn, sev, gap, h12, flag, opt) -}}
 {{- FOOT(ns, foot[0], foot[1], W, H, P, foot[2]) -}}
 {%- endmacro -%}
 {#- TIMELINE_SKY: module 'Timeline', the sun and moon on a compass axis, inside the box xa to xb, ya to yb (its first and

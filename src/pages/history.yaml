@@ -1,0 +1,183 @@
+page: history
+description:
+  shows: 'One sensor''s recent history as a line graph: the last hours, the current value, and the period''s lowest and highest.'
+  needs_also:
+  - A sensor with long-term statistics (a `measurement` state class, which sensors from integrations normally have).
+  trigger_advice: 'A time pattern every 15 minutes: the graph changes slowly, and every redraw costs battery.'
+  notes:
+  - The history comes from Home Assistant's 5-minute statistics, kept for 10 days by default.
+  title_default: the sensor's name
+redraw: trigger
+stale:
+- entity
+inputs:
+- name: entity
+  section: content
+  label: Sensor
+  help: The sensor to graph (with long-term statistics).
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  required: true
+- name: hours
+  section: content
+  label: Time span
+  help: How much history the graph shows
+  selector:
+    select:
+      options:
+      - label: 3 hours
+        value: '3'
+      - label: 6 hours
+        value: '6'
+      - label: 12 hours
+        value: '12'
+      - label: 24 hours
+        value: '24'
+  default: '12'
+- name: flag_high
+  section: thresholds
+  label: 'High: flag it'
+  help: On, the graph draws the two values below as lines and fills the spans at or above them.
+  selector:
+    boolean: {}
+  default: false
+- name: warning_high
+  section: thresholds
+  label: 'High: warning at or above'
+  help: A span at or above this is a warning.
+  selector:
+    number:
+      mode: box
+      step: any
+  default: 0
+- name: severe_high
+  section: thresholds
+  label: 'High: severe at or above'
+  help: A span at or above this is severe.
+  selector:
+    number:
+      mode: box
+      step: any
+  default: 0
+- name: flag_low
+  section: thresholds
+  label: 'Low: flag it'
+  help: On, the graph draws the two values below as lines and fills the spans at or below them.
+  selector:
+    boolean: {}
+  default: false
+- name: warning_low
+  section: thresholds
+  label: 'Low: warning at or below'
+  help: A span at or below this is a warning.
+  selector:
+    number:
+      mode: box
+      step: any
+  default: 0
+- name: severe_low
+  section: thresholds
+  label: 'Low: severe at or below'
+  help: A span at or below this is severe.
+  selector:
+    number:
+      mode: box
+      step: any
+  default: 0
+bind:
+- entity
+- hours
+- flag_high
+- warning_high
+- severe_high
+- flag_low
+- warning_low
+- severe_low
+data:
+  variables:
+  - ds_title: '{{ header_title if header_title else (entity_name(entity) or device_name(entity) or entity) }}'
+  - ds_unit: '{{ state_attr(entity, ''unit_of_measurement'') or '''' }}'
+  steps:
+  - action: recorder.get_statistics
+    continue_on_error: true
+    data:
+      statistic_ids:
+      - '{{ entity }}'
+      start_time: '{{ (now() - timedelta(hours=hours | int(12))).strftime(''%Y-%m-%d %H:%M:%S'') }}'
+      period: 5minute
+      types:
+      - mean
+      - max
+      - min
+    response_variable: hist_stats
+  - variables:
+      ds_t1: '{{ as_timestamp(now()) }}'
+      ds_t0: '{{ as_timestamp(now()) - (hours | int(12)) * 3600 }}'
+      ds_bucket: '{{ [((hours | int(12)) * 12 / hist_points) | round(0, ''ceil'') | int, 1] | max }}'
+      ds_pts: |
+        {% set st = hist_stats.statistics if (hist_stats is defined and hist_stats is mapping and hist_stats.statistics is defined) else {} %} {% set raw = (st[entity] if entity in st else []) | selectattr('mean', 'defined') | list %} {% set ns = namespace(list=[]) %} {% for g in raw | batch(ds_bucket | int(1)) %}
+          {% set vals = g | map(attribute='mean') | reject('none') | list %}
+          {% set mxs = g | map(attribute='max') | reject('none') | list %}
+          {% set mns = g | map(attribute='min') | reject('none') | list %}
+          {% if vals | length > 0 %}
+            {% set ts = ((as_timestamp(g[0].start) + as_timestamp(g[-1].end)) / 2) %}
+            {% set ns.list = ns.list + [{'ts': ts, 'v': (vals | sum) / (vals | length), 'mx': (mxs | max) if mxs else (vals | max), 'mn': (mns | min) if mns else (vals | min)}] %}
+          {% endif %}
+        {% endfor %} {% set cur = states(entity) | float(none) %} {% if cur is not none and (ns.list | length) > 0 %}
+          {% set ns.list = ns.list + [{'ts': as_timestamp(now()), 'v': cur, 'mx': cur, 'mn': cur}] %}
+        {% endif %} {{ ns.list }}
+  draw:
+    kind: choose
+    when:
+    - '{{ ds_pts | length >= 2 }}'
+    steps: []
+texts:
+  en:
+    now: NOW
+    low: LOW
+    high: HIGH
+    no_data: No history for this sensor.
+  de:
+    now: JETZT
+    low: TIEF
+    high: HOCH
+    no_data: Kein Verlauf für diesen Sensor.
+  nl:
+    now: NU
+    low: LAAG
+    high: HOOG
+    no_data: Geen geschiedenis voor deze sensor.
+  fr:
+    now: ACTUEL
+    low: BAS
+    high: HAUT
+    no_data: Pas d'historique pour ce capteur.
+  es:
+    now: AHORA
+    low: BAJO
+    high: ALTO
+    no_data: Sin historial para este sensor.
+  pl:
+    now: TERAZ
+    low: MIN
+    high: MAKS
+    no_data: Brak historii tego czujnika.
+  hr:
+    now: SADA
+    low: MIN
+    high: MAKS
+    no_data: Nema povijesti za ovaj senzor.
+  sv:
+    now: NU
+    low: LÄGST
+    high: HÖGST
+    no_data: Ingen historik för den här sensorn.
+layouts:
+  27l:
+    spec: history_27l
+  '35':
+    spec: history_35
+  '41':
+    spec: history_41

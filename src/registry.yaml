@@ -114,6 +114,7 @@ pages:
   doors-windows:  {name: Doors & windows, uses: glance, status: live, default: [glance]}
   rain:           {name: Rain forecast, uses: bar-chart/thresholds, status: live, default: [bar-chart/thresholds], '14': ['-'], widest: '50 mm/h'}
   co2:            {name: CO2 graph, uses: line-chart/thresholds, status: live, default: [line-chart/thresholds], '14': ['-'], widest: '4000'}
+  history:        {name: History graph, uses: line-chart/thresholds, status: live, default: [line-chart/thresholds], '14': ['-'], widest: '-12.5'}
   sun-moon:       {name: Sun & moon, uses: timeline, status: live, default: [timeline], '14': ['-'], '27p': ['-'], widest: '10:44am'}
   claude:         {name: Claude usage, uses: meters, status: live, default: [meters], '14': ['-']}
   levels:         {name: Levels, uses: meters, status: live, default: [meters], '14': ['-'], widest: '1240 ppm'}

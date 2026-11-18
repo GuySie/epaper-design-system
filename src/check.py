@@ -7,7 +7,8 @@ descenders ignored for the bottom edge) and checks the layout against the tier v
 
   title   title caps start at P (top and left); the title rule sits at P + TH - rule width
   edges   all ink stays inside the padding; fills may enter it as far as a chip hangs (S, and an outline one line.base more)
-  gap     (gap='M') the first ink below the title rule starts exactly M below it
+  gap     (gap='M') the first ink below the title rule starts exactly M below it; (gap='M+') at M or lower: a chart on the
+          automatic scale, whose top label gives way to a threshold label close to it (the plot still starts at M)
   bottom  (bottom='fill') the lowest ink ends exactly on row H - P - 1
   group   a hero group (number, its icon, the moon badge) keeps space.l (= P) from any text it shares rows with
   badge   the moon badge's paper ring never cuts a rule
@@ -189,14 +190,14 @@ def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
     # gap below the title rule
     below = [(el, b) for el, k, b in items if k == 'ink' and b[1] > rule_y + rw - 1]
     heroes = [(el, b) for el, k, b in items if el.get('type') == 'text' and 'SpaceGrotesk' in str(el.get('font'))]
-    if gap_rule == 'M' and below:
+    if gap_rule in ('M', 'M+') and below:
         el0, b0 = min(below, key=lambda eb: eb[1][1])
         g = b0[1] - (rule_y + rw)
         if 'SpaceGrotesk' in str(el0.get('font')):
             want = int(el0['size']) // HERO_GAP_DIV          # hero clearance: a hero numeral at the top sits size / 7 below the rule
             if g != want:
                 errs.append(f'hero starts {g} px below the rule, not size/7={want}')
-        elif g != M:
+        elif g != M and not (gap_rule == 'M+' and g > M):
             errs.append(f'content starts {g} px below the rule, not M={M}')
     # 'C': the hero band is centred between the title rule and the next full-width rule (equal gaps, 2 px tolerance, both >= M)
     if gap_rule == 'C':

@@ -12,6 +12,7 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 | [`epaper-blueprint-1.4-doors-windows.yaml`](blueprints/epaper-blueprint-1.4-doors-windows.yaml) | Doors & windows 1.4" | How many of your outside doors and windows are open, and which one, so you can check before you leave. |
 | [`epaper-blueprint-1.4-single-value.yaml`](blueprints/epaper-blueprint-1.4-single-value.yaml) | Single value 1.4" | One sensor's value, large enough to read across the room, with its unit beside it. An icon and a second value under it are optional. |
 | [`epaper-blueprint-1.4-weather-glance.yaml`](blueprints/epaper-blueprint-1.4-weather-glance.yaml) | Weather (Glance) 1.4" | The weather at a glance: the temperature large, with the condition icon, and one more reading under it. |
+| [`epaper-blueprint-2.7-history-graph-landscape.yaml`](blueprints/epaper-blueprint-2.7-history-graph-landscape.yaml) | History graph 2.7" landscape | One sensor's recent history as a line graph: the last hours, the current value, and the period's lowest and highest. |
 | [`epaper-blueprint-2.7-levels-landscape.yaml`](blueprints/epaper-blueprint-2.7-levels-landscape.yaml) | Levels 2.7" landscape | Up to six sensors as rows, each with its value and a bar that shows how full it is: batteries, tanks, power, humidity. |
 | [`epaper-blueprint-2.7-medication-landscape.yaml`](blueprints/epaper-blueprint-2.7-medication-landscape.yaml) | Medication 2.7" landscape | A medication log on one button: press it after taking your medication, and the device shows the time and date of that press, so a glance answers "did I already take this?" |
 | [`epaper-blueprint-2.7-rain-forecast-landscape.yaml`](blueprints/epaper-blueprint-2.7-rain-forecast-landscape.yaml) | Rain forecast 2.7" landscape | The next two hours of rain in 5-minute bars, from Buienalarm and Buienradar (the higher of the two for each bar), on a log scale so drizzle stays visible next to a downpour. |
@@ -21,6 +22,7 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 | [`epaper-blueprint-3.5-claude-usage.yaml`](blueprints/epaper-blueprint-3.5-claude-usage.yaml) | Claude usage 3.5" | Claude usage as up to four progress bars, each with its reset time, and optionally a marker for how far through its period you are. |
 | [`epaper-blueprint-3.5-co2-graph.yaml`](blueprints/epaper-blueprint-3.5-co2-graph.yaml) | CO2 graph 3.5" | A CO2 sensor's recent history as a line graph, with the warning and severe levels, the spans above them filled, and the current value and the peak in the footer. |
 | [`epaper-blueprint-3.5-entities.yaml`](blueprints/epaper-blueprint-3.5-entities.yaml) | Entities 3.5" | Up to 12 entities in two columns, each with its label, state and unit; empty slots are skipped. |
+| [`epaper-blueprint-3.5-history-graph.yaml`](blueprints/epaper-blueprint-3.5-history-graph.yaml) | History graph 3.5" | One sensor's recent history as a line graph: the last hours, the current value, and the period's lowest and highest. |
 | [`epaper-blueprint-3.5-levels.yaml`](blueprints/epaper-blueprint-3.5-levels.yaml) | Levels 3.5" | Up to six sensors as rows, each with its value and a bar that shows how full it is: batteries, tanks, power, humidity. |
 | [`epaper-blueprint-3.5-next-appointment.yaml`](blueprints/epaper-blueprint-3.5-next-appointment.yaml) | Next appointment 3.5" | Your next appointments: start time, title and a label line, a meeting in progress marked "now", and the next free moment in the footer. A single event gets its start time large. |
 | [`epaper-blueprint-3.5-rain-forecast.yaml`](blueprints/epaper-blueprint-3.5-rain-forecast.yaml) | Rain forecast 3.5" | The next two hours of rain in 5-minute bars, from Buienalarm and Buienradar (the higher of the two for each bar), on a log scale so drizzle stays visible next to a downpour. |
@@ -29,6 +31,7 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 | [`epaper-blueprint-3.5-weather-glance.yaml`](blueprints/epaper-blueprint-3.5-weather-glance.yaml) | Weather (Glance) 3.5" | The weather at a glance: the temperature large, with the condition icon, and one more reading under it. |
 | [`epaper-blueprint-3.5-weather.yaml`](blueprints/epaper-blueprint-3.5-weather.yaml) | Weather 3.5" | Current weather with the temperature as the hero, its details, the coming hours and the coming days, with warnings and pollen as chips. |
 | [`epaper-blueprint-4.1-calendar.yaml`](blueprints/epaper-blueprint-4.1-calendar.yaml) | Calendar 4.1" | The coming days, each under its day header with its events, today first; later days fold into one line when they don't fit. |
+| [`epaper-blueprint-4.1-history-graph.yaml`](blueprints/epaper-blueprint-4.1-history-graph.yaml) | History graph 4.1" | One sensor's recent history as a line graph: the last hours, the current value, and the period's lowest and highest. |
 | [`epaper-blueprint-4.1-levels.yaml`](blueprints/epaper-blueprint-4.1-levels.yaml) | Levels 4.1" | Up to six sensors as rows, each with its value and a bar that shows how full it is: batteries, tanks, power, humidity. |
 | [`epaper-blueprint-4.1-next-appointment.yaml`](blueprints/epaper-blueprint-4.1-next-appointment.yaml) | Next appointment 4.1" | Your next appointments: start time, title and a label line, a meeting in progress marked "now", and the next free moment in the footer. A single event gets its start time large. |
 | [`epaper-blueprint-4.1-plant-moisture.yaml`](blueprints/epaper-blueprint-4.1-plant-moisture.yaml) | Plant moisture 4.1" | Soil moisture for up to 22 plants in two columns, the driest first if you like, with dry plants as warning or severe chips. |
@@ -133,6 +136,21 @@ Rain forecast 3.5"
 CO2 graph 3.5"
 
 ![CO2 graph 3.5"](docs/images/epaper-blueprint-3.5-co2-graph.png)
+
+
+**History graph**
+
+History graph 2.7" landscape
+
+![History graph 2.7" landscape](docs/images/epaper-blueprint-2.7-history-graph-landscape.png)
+
+History graph 3.5"
+
+![History graph 3.5"](docs/images/epaper-blueprint-3.5-history-graph.png)
+
+History graph 4.1"
+
+![History graph 4.1"](docs/images/epaper-blueprint-4.1-history-graph.png)
 
 
 **Sun & moon**
