@@ -1188,6 +1188,13 @@ Where it applies:
 | every screen | `weather_entity`, `current_temp_sensor`, `pollen_sensor`, `moon_phase_sensor`, `weather_warning_sensor`, `weather_warning_text_sensor`, `pollen_type`, `flag_temp_low`, `warning_temp_low`, `severe_temp_low`, `flag_temp_high`, `warning_temp_high`, `severe_temp_high`, `flag_wind_high`, `warning_wind_high`, `severe_wind_high`, `flag_rain_hour`, `warning_rain_hour`, `severe_rain_hour`, `flag_rain_day`, `warning_rain_day`, `severe_rain_day`, `flag_pollen_high`, `warning_pollen_high`, `severe_pollen_high`, `warning_conditions`, `severe_conditions` |
 <!-- /registry:inputs-weather-glance -->
 
+<!-- registry:layouts-weather-glance -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 1.4" | 80 px | 80 → 48 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, alert, pollen 0, pollen widest | empty | 37 |
+| 3.5" | 104 px | 104 → 64 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, alert, pollen 0, pollen widest | empty | 28 |
+<!-- /registry:layouts-weather-glance -->
+
 <!-- registry:inputs-weather -->
 | Screen | Inputs of this page |
 |---|---|
@@ -1198,6 +1205,18 @@ Where it applies:
 | 7.5" L | also `location_string` |
 | 7.5" P | also `location_string` |
 <!-- /registry:inputs-weather -->
+
+<!-- registry:layouts-weather -->
+| Screen | Hero | Hero icon | Hour / day cells | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|---|
+| 2.7" L | 72 px | 64 px | 4 / — | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, alert, pollen 0, pollen widest | empty | 28 |
+| 2.7" P | 72 px | 64 px | — | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, alert, pollen 0, pollen widest | empty | 33 |
+| 3.5" | 64 px | 56 px | 4 / — | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, alert, pollen 0, pollen widest | empty | 23 |
+| 4.1" | 80 px | 64 px | 4 / 5 | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, alert, pollen 0, pollen widest | empty | 30 |
+| 4.26" | 160 px | 136 px | 6 / 5 | normal, widest, warning, severe, gray, title, stale, error, unavailable, alert, pollen 0, pollen widest | colour, empty | 35 |
+| 7.5" L | 160 px | 136 px | 6 / 5 | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, alert, pollen 0, pollen widest | empty | 33 |
+| 7.5" P | 160 px | 136 px | 5 / 5 | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, alert, pollen 0, pollen widest | empty | 32 |
+<!-- /registry:layouts-weather -->
 
 ### Medication
 
@@ -1215,6 +1234,12 @@ A Glance: the time of the last press of the device's button is the hero.
 | every screen | `button_entity`, `flag_late`, `warning_late`, `severe_late` |
 <!-- /registry:inputs-medication -->
 
+<!-- registry:layouts-medication -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 2.7" L | 88 px | 88 → 56 px | normal, widest, warning, severe, gray, colour, title, unavailable | stale, error, empty | 10 |
+<!-- /registry:layouts-medication -->
+
 ### Doors & windows
 
 A Glance, redrawn only when the count changes.
@@ -1227,6 +1252,12 @@ A Glance, redrawn only when the count changes.
 |---|---|
 | every screen | `openings`, `severe_openings` |
 <!-- /registry:inputs-doors-windows -->
+
+<!-- registry:layouts-doors-windows -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 1.4" | 112 px | 112 → 72 px | normal, widest, severe, gray, colour, title, error, unavailable, empty | warning, stale | 9 |
+<!-- /registry:layouts-doors-windows -->
 
 ### Rain forecast
 
@@ -1241,6 +1272,13 @@ A Bar chart *with thresholds*: the next two hours in 5-minute bars on a log scal
 |---|---|
 | every screen | `buienalarm_entity`, `buienradar_entity`, `flag_rain_hour`, `warning_rain_hour`, `severe_rain_hour` |
 <!-- /registry:inputs-rain -->
+
+<!-- registry:layouts-rain -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 15 |
+| 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 14 |
+<!-- /registry:layouts-rain -->
 
 ### CO2 graph
 
@@ -1257,6 +1295,12 @@ A Line chart *with thresholds*: the last hours of CO2 with the current value at 
 | every screen | `co2_entity`, `hours`, `flag_co2`, `warning_co2`, `severe_co2` |
 <!-- /registry:inputs-co2 -->
 
+<!-- registry:layouts-co2 -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 12 |
+<!-- /registry:layouts-co2 -->
+
 ### Sun & moon
 
 A Timeline: sun and moon on the compass axis (*Timeline*), the five times of the day under it.
@@ -1271,6 +1315,12 @@ A Timeline: sun and moon on the compass axis (*Timeline*), the five times of the
 |---|---|
 | every screen | `moon_azimuth_sensor`, `moon_altitude_sensor`, `moon_phase_sensor`, `hemisphere` |
 <!-- /registry:inputs-sun-moon -->
+
+<!-- registry:layouts-sun-moon -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, title, error, unavailable | warning, severe, gray, colour, stale, empty | 12 |
+<!-- /registry:layouts-sun-moon -->
 
 ### Claude usage
 
@@ -1287,6 +1337,12 @@ Meters: up to four usage bars with their reset times.
 | every screen | `bar_1`, `bar_1_reset`, `bar_2`, `bar_2_reset`, `bar_3`, `bar_3_reset`, `bar_4`, `bar_4_reset`, `bar_1_label`, `bar_1_period_hours`, `bar_2_label`, `bar_2_period_hours`, `bar_3_label`, `bar_3_period_hours`, `bar_4_label`, `bar_4_period_hours`, `flag_usage`, `warning_usage`, `severe_usage` |
 <!-- /registry:inputs-claude -->
 
+<!-- registry:layouts-claude -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 11 |
+<!-- /registry:layouts-claude -->
+
 ### Entities
 
 A Key-value list of up to 12 entities.
@@ -1300,6 +1356,12 @@ A Key-value list of up to 12 entities.
 | every screen | `entity_1`, `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_7`, `entity_8`, `entity_9`, `entity_10`, `entity_11`, `entity_12`, `entity_1_label`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_7_label`, `entity_8_label`, `entity_9_label`, `entity_10_label`, `entity_11_label`, `entity_12_label` |
 <!-- /registry:inputs-entities -->
 
+<!-- registry:layouts-entities -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, title, stale, error, unavailable | warning, severe, gray, colour, empty | 8 |
+<!-- /registry:layouts-entities -->
+
 ### Plant moisture
 
 A Key-value list of up to 22 plants, driest first if chosen.
@@ -1312,6 +1374,12 @@ A Key-value list of up to 22 plants, driest first if chosen.
 |---|---|
 | every screen | `plant_1`, `plant_2`, `plant_3`, `plant_4`, `plant_5`, `plant_6`, `plant_7`, `plant_8`, `plant_9`, `plant_10`, `plant_11`, `plant_12`, `plant_13`, `plant_14`, `plant_15`, `plant_16`, `plant_17`, `plant_18`, `plant_19`, `plant_20`, `plant_21`, `plant_22`, `plant_1_label`, `plant_2_label`, `plant_3_label`, `plant_4_label`, `plant_5_label`, `plant_6_label`, `plant_7_label`, `plant_8_label`, `plant_9_label`, `plant_10_label`, `plant_11_label`, `plant_12_label`, `plant_13_label`, `plant_14_label`, `plant_15_label`, `plant_16_label`, `plant_17_label`, `plant_18_label`, `plant_19_label`, `plant_20_label`, `plant_21_label`, `plant_22_label`, `sort_driest_first`, `flag_moisture_low`, `warning_moisture_low`, `severe_moisture_low` |
 <!-- /registry:inputs-plants -->
+
+<!-- registry:layouts-plants -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 4.1" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 9 |
+<!-- /registry:layouts-plants -->
 
 ### Calendar
 
@@ -1328,6 +1396,13 @@ A Grouped list: the coming days with their events.
 | every screen | `calendar_entities`, `days_shown` |
 <!-- /registry:inputs-calendar -->
 
+<!-- registry:layouts-calendar -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 4.1" | normal, widest, title, error, empty | warning, severe, gray, colour, stale, unavailable | 7 |
+| 4.26" | normal, widest, title, error, empty | warning, severe, gray, colour, stale, unavailable | 7 |
+<!-- /registry:layouts-calendar -->
+
 ### Next appointment
 
 An Event list, or the event hero when there is one event.
@@ -1342,6 +1417,14 @@ An Event list, or the event hero when there is one event.
 | every screen | `calendar_entities`, `days_ahead` |
 <!-- /registry:inputs-appointment -->
 
+<!-- registry:layouts-appointment -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 3.5" | 104 px | 88 px | normal, widest, title, error, empty | warning, severe, gray, colour, stale, unavailable | 11 |
+| 4.1" | 128 px | 112 px | normal, widest, gray, title, error, empty | warning, severe, colour, stale, unavailable | 11 |
+| 4.26" | 256 px | 224 px | normal, widest, gray, title, error, empty | warning, severe, colour, stale, unavailable | 12 |
+<!-- /registry:layouts-appointment -->
+
 ### Weather and calendar
 
 A *Hero dashboard with a chart or list*: the weather's hero band over the calendar's date-grouped list, in two equal halves, on the 7.5" portrait.
@@ -1355,6 +1438,12 @@ A *Hero dashboard with a chart or list*: the weather's hero band over the calend
 |---|---|
 | every screen | `weather_entity`, `current_temp_sensor`, `pollen_sensor`, `moon_phase_sensor`, `weather_warning_sensor`, `weather_warning_text_sensor`, `calendar_entities`, `pollen_type`, `days_shown`, `flag_temp_low`, `warning_temp_low`, `severe_temp_low`, `flag_temp_high`, `warning_temp_high`, `severe_temp_high`, `flag_wind_high`, `warning_wind_high`, `severe_wind_high`, `flag_rain_hour`, `warning_rain_hour`, `severe_rain_hour`, `flag_rain_day`, `warning_rain_day`, `severe_rain_day`, `flag_pollen_high`, `warning_pollen_high`, `severe_pollen_high`, `warning_conditions`, `severe_conditions`, `location_string` |
 <!-- /registry:inputs-weather-calendar -->
+
+<!-- registry:layouts-weather-calendar -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 7.5" P | 152 px | 128 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty, alert, pollen 0, pollen widest | — | 15 |
+<!-- /registry:layouts-weather-calendar -->
 
 ### Mocked-up pages
 

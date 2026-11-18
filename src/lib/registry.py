@@ -168,6 +168,7 @@ def tables(r, pkg=PKG):
                 rows.append(f'| {r["screen_names"][screen_of(B[b])]} | ' + '; '.join(
                     x for x in (('also ' + code(more)) if more else '', ('without ' + code(less)) if less else '') if x) + ' |')
         T[f'inputs-{k}'] = rows
+        T[f'layouts-{k}'] = layout_rows(r, pg)
     rows = ['| Term | Kind | Part of | What it is |', '|---|---|---|---|']
     G = []
     for n, c in r['components'].items():
@@ -193,6 +194,37 @@ def tables(r, pkg=PKG):
     from tier_tables import tables as tier_tables
     out.update(tier_tables())        # tier-type, tier-space, tier-icon: generated from ep_tokens.jinja
     return out
+
+
+def layout_rows(r, pg):
+    """a page's layouts, one row each: the measured sizes (ep_tokens.jinja EP_LAYOUT), the forecast cells its spec names
+    (HOURS, DAYS), and the kinds of state its check cases cover (lib/coverage.py), with how many cases it has"""
+    from tier_tables import load_layouts
+    from coverage import COVERAGE
+    from pixcmp_cases import CASES, EXTRA_CASES
+    from build_lib import load_spec
+    from layouts import layouts
+    L = {l['key']: l for l in layouts()}
+    tok = load_layouts()
+    keys = [str(b) for b in pg['blueprints']]
+    hero = any((tok[k]['type'].get('heroAlone') or tok[k]['type'].get('heroShared')) for k in keys)
+    cells = any(getattr(load_spec(L[k]['spec']), 'HOURS', None) is not None for k in keys)
+    head = ['Screen'] + (['Hero', 'Hero icon'] if hero else []) + (['Hour / day cells'] if cells else []) + ['Checked in', 'Not applicable', 'Cases']
+    rows = ['| ' + ' | '.join(head) + ' |', '|' + '---|' * len(head)]
+    for k in keys:
+        t, sp, cov = tok[k], load_spec(L[k]['spec']), COVERAGE[k]
+        row = [r['screen_names'][L[k]['screen']]]
+        if hero:
+            h = t['type'].get('heroAlone') or t['type'].get('heroShared')
+            st = t['icon'].get('heroAloneSteps')
+            row += [f'{h} px' if h else '—', (f'{st[0]} → {st[-1]} px' if st else (f"{t['icon']['heroShared']} px" if t['icon'].get('heroShared') else '—'))]
+        if cells:
+            row.append(f'{sp.HOURS} / {sp.DAYS or "—"}' if getattr(sp, 'HOURS', None) is not None else '—')
+        row.append(', '.join(kind for kind, v in cov.items() if not v.startswith('n/a:') and v != 'GAP'))
+        row.append(', '.join(kind for kind, v in cov.items() if v.startswith('n/a:')) or '—')
+        row.append(str(len({c[0] for c in list(CASES) + list(EXTRA_CASES) if c[1] == k})))
+        rows.append('| ' + ' | '.join(row) + ' |')
+    return rows
 
 
 INLINE = re.compile(r'(<!-- v:([A-Za-z0-9_.:-]+) -->)(.*?)(<!-- /v -->)')   # a value inside typed text (lib/doc_values.py)
