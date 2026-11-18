@@ -762,7 +762,6 @@ A module is one block of content on a screen, built from components (and other m
 | **Code block** | The code with its quiet zone and the label/value text lines beside it (under it on a portrait screen); see *Code*. | data, text lines | `tier.pitch`, `space.l` | — (mockup) |
 | **Month grid** | Weekday labels over seven columns of day numbers; today boxed, event dots; see *Month*. | month, events | `type.label`, `type.data`, `space.row`, `line.base` | — (mockup) |
 | **Text block** | Wrapped text and the sender text line; see *Note*. | text, sender | `type.primary`, `type.data`, `type.label`, `space.s` | — (mockup) |
-| **Picture block** | The picture, scaled to cover and dithered to the panel, with its caption; see *Image*. | picture, caption | `type.label` | — (mockup) |
 
 Charts: see *Bar chart and Line chart* under *Patterns*. Key-value rows (the component) are described with the *Key-value list*.
 
@@ -877,7 +876,6 @@ A pattern is what a kind of screen looks like: which modules, in which order, an
 | **Tiles** | Title row, Tiles | — | mock | — |
 | **Month** | Title row, Month grid | — | mock | — |
 | **Note** | Title row, Text block | *with a progress bar* (mock) | mock | — |
-| **Image** | Title row, Picture block | — | mock | — |
 <!-- /registry:patterns -->
 
 Bar chart and Line chart share the chart frame; the Timeline shares its clock-time axis (a Timeline is a Line chart on a compass axis). The lists (Key-value list, Grouped list, Event list, Checklist) share how they fill first and when they show a footer and differ in their rows and how they are grouped. Meters, the Glance *with a progress bar* and the Note *with a progress bar* use the one progress bar.
@@ -1093,10 +1091,6 @@ Patterns and versions that exist as mock-ups only: no blueprint is built from th
 
 *Mockup (Now playing).* The title in the bold cut of `type.primary`, artist · album in `type.label`, the progress bar, then the track count left and the clock time it ends right (`EINDE 14:35`). Unreachable: the error block (`SPEAKER OFFLINE`).
 
-#### Image
-
-*Mockup (Picture).* The picture fills the space under the title row (scaled to cover, cropped, centred), dithered to the panel's own colours, with a caption text line in `type.label` under it. No picture: one empty statement. Meant for colour panels (the 7.09"): on black/white/red/yellow panels a photo turns into dither.
-
 ## Pages
 
 A page is a pattern filled with real content for one use. Each page names the pattern it uses, its layouts (● drawn by a blueprint today; ○ no blueprint yet; — not offered; the 7.09" has no tier yet), the widest reading its entity can show, and the inputs its blueprints add to the ones every blueprint has (*Blueprint mechanics*). Every live page has the same parts, in this order: the pattern it uses, **Shows**, **Tested with**, its own rules, and its inputs. Thresholds for every page are in *Thresholds*.
@@ -1134,7 +1128,6 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | **Month overview** | Month | mock | — | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Message board** | Note | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Now playing** | Note with a progress bar | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Picture** | Image | mock | — | — | — | — | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Guest Wi-Fi** | Code | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Energy overview** | Hero dashboard with a chart or list | mock | 100% | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Air quality** | Hero dashboard with a chart or list | mock | 4000 | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
@@ -1540,7 +1533,7 @@ A *Hero dashboard with a chart or list*: the weather's hero band over the calend
 
 ### Mocked-up pages
 
-Bin day, Room sign, Appliance run, Countdown, Today's date, Energy price, Departures, Solar & battery, Packages, Shopping list, Home status, Month overview, Message board, Now playing, Picture, Guest Wi-Fi, and the Hero dashboards Energy overview, Air quality and Day overview: their patterns and layouts are in the table above, their rules with the pattern versions they use. Countdown is a Glance with whole days as the hero and the date in the Glance secondary; Today's date has the day of the month as its hero, never the clock time.
+Bin day, Room sign, Appliance run, Countdown, Today's date, Energy price, Departures, Solar & battery, Packages, Shopping list, Home status, Month overview, Message board, Now playing, Guest Wi-Fi, and the Hero dashboards Energy overview, Air quality and Day overview: their patterns and layouts are in the table above, their rules with the pattern versions they use. Countdown is a Glance with whole days as the hero and the date in the Glance secondary; Today's date has the day of the month as its hero, never the clock time.
 
 ## Blueprint mechanics
 
@@ -1673,7 +1666,6 @@ Every named part of the design system, with its kind (`—` when it is a region,
 | **page definition** | — | Page | everything a page's blueprints are generated from besides its layouts: inputs, data, texts, description (pages/<page>.yaml) |
 | **Panel** | vocabulary | — | see *Vocabulary* |
 | **Pattern** | vocabulary | — | see *Vocabulary* |
-| **Picture block** | module | — | see *Modules* |
 | **plot** | — | Chart | the area the bars or the series are drawn in (not: plot area) |
 | **pollen row** | component | Detail rows | the weather's last detail row while pollen is above 0: type and count (a forecast row on the 2.7" portrait) (not: pollen slot) |
 | **Progress bar** | component | — | see *Components* (not: usage bar) |

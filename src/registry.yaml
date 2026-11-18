@@ -99,10 +99,6 @@ patterns:
     modules: [Title row, Text block]
     versions:
       progress:     {name: with a progress bar, status: mock}
-  image:
-    name: Image
-    status: mock
-    modules: [Title row, Picture block]
 
 # pages: what a blueprint offers (its blueprints are its layouts in pages/<page>.yaml, never listed here). uses = pattern[/version]; layouts per screen: the page's own pattern (default for the
 # rest) or '-' = not offered; the lint fails on another pattern's name
@@ -137,7 +133,6 @@ pages:
   month:          {name: Month overview, uses: month, status: mock, default: [month], '14': ['-'], '27p': ['-']}
   message:        {name: Message board, uses: note, status: mock, default: [note], '14': ['-']}
   now-playing:    {name: Now playing, uses: note/progress, status: mock, default: [note/progress], '14': ['-']}
-  picture:        {name: Picture, uses: image, status: mock, default: [image], '14': ['-'], '27l': ['-'], '27p': ['-']}
   guest-wifi:     {name: Guest Wi-Fi, uses: code, status: mock, default: [code]}
   energy:         {name: Energy overview, uses: hero-dashboard/module, status: mock, default: [hero-dashboard/module], '14': ['-'], widest: '100%'}
   air:            {name: Air quality, uses: hero-dashboard/module, status: mock, default: [hero-dashboard/module], '14': ['-'], widest: '4000'}
@@ -186,7 +181,6 @@ modules:
   Code block:        {macros: []}
   Month grid:        {macros: []}
   Text block:        {macros: []}
-  Picture block:     {macros: []}
 
 # glossary: every other named thing in the design system, at its vocabulary level (token, component, module,
 # pattern, page, layout, blueprint) or '—' when it isn't a design part (a region, a property, a state); 'of' = what it is
