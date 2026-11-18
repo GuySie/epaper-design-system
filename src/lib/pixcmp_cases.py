@@ -84,8 +84,8 @@ WEATHER_EXTRA = ['wx', 'wx_cond', 'wx_alert', 'wx_warn', 'wx_y', 'wxneg', 'wx_p0
 
 # the weather extras run on every weather layout below, at the layout's canvas size (check.py and baseline.py inject it),
 # with the layout's own gap and bottom rules; the error view is a centred block (no gap or bottom rule)
-EXTRA_KEYS = ('weather_glance_14', 'weather_27l', 'weather_27p', 'weather_35', 'weather_glance_35', 'weather_41', 'weather_75', 'weather_75p')
+EXTRA_KEYS = ('weather_glance_14', 'weather_27l', 'weather_27p', 'weather_35', 'weather_glance_35', 'weather_41', 'weather_75', 'weather_75p', 'weather_426')
 _RULES = {'weather_glance_14': ('skip', 'free'), 'weather_27l': ('C', 'fill'), 'weather_27p': ('C', 'fill'), 'weather_35': ('C', 'fill'), 'weather_glance_35': ('skip', 'free'),
-          'weather_41': ('C', 'fill'), 'weather_75': ('C', 'free'), 'weather_75p': ('C', 'fill')}
+          'weather_41': ('C', 'fill'), 'weather_75': ('C', 'free'), 'weather_75p': ('C', 'fill'), 'weather_426': ('C', 'free')}
 EXTRA_CASES = [(s, key) + (('skip', 'free') if s == 'wx_err' else _RULES[key])
                for key in EXTRA_KEYS for s in WEATHER_EXTRA if s not in {c[0] for c in CASES if c[1] == key}]
