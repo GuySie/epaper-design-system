@@ -19,6 +19,7 @@ Names:
   markerDisc          icon.markerDisc for the inline icon sizes in use
   inputPages:INPUT    the live pages whose definition has that input
   stalePages          the live pages that have a stale state
+  mm:TIER:SIZE:x|cap[:DECIMALS]   a TRMNL cut's x-height or cap height on a tier, in millimetres (1 decimal unless given)
   dv:WxHxWMMxHMM:PATH a token the generator derives for a screen that has no tier yet (space.pad, type.data, icon.min,
                       line.base, pitch, sizeClass); a type token reads as TRMNL<size>
   heroIconMin         the smallest icon on its own, as a fraction of the digit height
@@ -131,6 +132,10 @@ def value(name):
     if kind == 'input':
         page, inp = arg.split(':')
         return input_default(page, inp)
+    if kind == 'mm':           # a cut's x-height or cap height on one tier, in millimetres
+        tier, size, part, *dec = arg.split(':')
+        W, _, wmm, _ = dt.KNOWN[tier][:4]
+        return f"{dt.TRMNL[int(size)][part] * wmm / W:.{int(dec[0]) if dec else 1}f}"
     if kind == 'stalePages':
         return stale_pages()
     if kind == 'shared':
