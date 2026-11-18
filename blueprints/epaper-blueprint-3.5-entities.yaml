@@ -310,7 +310,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'qdgfcr'
+  ds_set: 'qfkbyk'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'
@@ -365,10 +365,7 @@ variables:
       {% endif %}
     {% endfor %} {{ ns.list }}
   header_title_display: '{{ header_title if header_title else language_map[weekday_lang][''default_title''] }}'
-  ds_unavail_msg: |-
-    {{ {'en': 'Most values unavailable.', 'de': 'Die meisten Werte nicht verfügbar.', 'nl': 'Meeste waarden niet beschikbaar.',
-        'fr': 'La plupart des valeurs indisponibles.', 'es': 'La mayoría de los valores no disponibles.',
-        'pl': 'Większość wartości niedostępna.', 'hr': 'Većina vrijednosti nedostupna.', 'sv': 'De flesta värden otillgängliga.'}.get(weekday_lang, 'Most values unavailable.') }}
+  ds_unavail_msg: '{{ language_map[weekday_lang][''most_unavailable''] }}'
   ds_rows: |
     {% set ns = namespace(list=[]) %} {% set slots = [
       [entity_1, entity_1_label], [entity_2, entity_2_label], [entity_3, entity_3_label],

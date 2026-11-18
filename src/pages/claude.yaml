@@ -276,34 +276,50 @@ texts:
     resets_prefix: Resets
     no_bars: No Claude usage sensors configured.
     default_title: Claude Usage
+    on_pace: On pace
+    ahead: '{l} {d}% ahead'
   de:
     resets_prefix: Reset
     no_bars: Keine Claude-Nutzungssensoren konfiguriert.
     default_title: Claude-Nutzung
+    on_pace: Im Plan
+    ahead: '{l} {d}% voraus'
   nl:
     resets_prefix: Reset
     no_bars: Geen Claude-gebruikssensoren geconfigureerd.
     default_title: Claude-gebruik
+    on_pace: Op schema
+    ahead: '{l} {d}% voor'
   fr:
     resets_prefix: Réinit.
     no_bars: Aucun capteur d'utilisation Claude configuré.
     default_title: Utilisation Claude
+    on_pace: Dans les temps
+    ahead: '{l} {d}% d''avance'
   es:
     resets_prefix: Reinicia
     no_bars: No hay sensores de uso de Claude configurados.
     default_title: Uso de Claude
+    on_pace: A tiempo
+    ahead: '{l} {d}% adelantado'
   pl:
     resets_prefix: Reset
     no_bars: Nie skonfigurowano czujników użycia Claude.
     default_title: Użycie Claude
+    on_pace: W normie
+    ahead: '{l} {d}% ponad'
   hr:
     resets_prefix: Reset
     no_bars: Nije konfiguriran nijedan senzor korištenja Claudea.
     default_title: Korištenje Claudea
+    on_pace: U roku
+    ahead: '{l} {d}% iznad'
   sv:
     resets_prefix: Återställs
     no_bars: Inga Claude-användningssensorer konfigurerade.
     default_title: Claude-användning
+    on_pace: I fas
+    ahead: '{l} {d}% före'
 layouts:
   '35':
     spec: claude_35

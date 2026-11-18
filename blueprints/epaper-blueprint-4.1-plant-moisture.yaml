@@ -511,7 +511,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'qdgfcr'
+  ds_set: 'qfkbyk'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'
@@ -658,9 +658,9 @@ action:
         rotate: !input 'rotate'
         payload: '{%- from ''ep_design.jinja'' import ep_draw -%} {{- (ep_draw | as_function)(''plants_41'', ''main'', {''ds_set'':
           ds_set, ''ds_devs'': ds_devs, ''font_dir'': font_dir, ''ds_last_ts'': ds_last_ts, ''ds_plants'': ds_plants, ''ds_stale'':
-          ds_stale, ''flag_moisture_low'': flag_moisture_low, ''header_title_display'': header_title_display, ''severe_moisture_low'':
-          severe_moisture_low, ''time_format'': time_format, ''warning_moisture_low'': warning_moisture_low, ''weekday_lang'':
-          weekday_lang}) -}}'
+          ds_stale, ''flag_moisture_low'': flag_moisture_low, ''header_title_display'': header_title_display, ''language_map'':
+          language_map, ''severe_moisture_low'': severe_moisture_low, ''time_format'': time_format, ''warning_moisture_low'':
+          warning_moisture_low, ''weekday_lang'': weekday_lang}) -}}'
   default:
   - action: opendisplay.drawcustom
     target:

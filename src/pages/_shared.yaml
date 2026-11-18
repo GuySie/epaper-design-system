@@ -226,6 +226,15 @@ integrations:
     url: https://github.com/ngocjohn/lunar-phase
     what: from HACS, for the moon's position on the horizon (the core Moon integration only gives the phase)
 texts:
+  most_unavailable:
+    en: Most values unavailable.
+    de: Die meisten Werte nicht verfügbar.
+    nl: Meeste waarden niet beschikbaar.
+    fr: La plupart des valeurs indisponibles.
+    es: La mayoría de los valores no disponibles.
+    pl: Większość wartości niedostępna.
+    hr: Većina vrijednosti nedostupna.
+    sv: De flesta värden otillgängliga.
   set_mismatch:
     en: Update templates and blueprint
     de: Vorlagen und Blueprint aktualisieren

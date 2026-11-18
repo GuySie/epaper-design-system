@@ -217,7 +217,7 @@ trigger:
   - unknown
 conditions: !input 'automation_conditions'
 variables:
-  ds_set: 'qdgfcr'
+  ds_set: 'qfkbyk'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'
@@ -231,10 +231,8 @@ variables:
   weekday_short_map: "{%- from 'ep_i18n.jinja' import EP_DAYS_SHORT -%}{{ EP_DAYS_SHORT }}"
   months_short_map: "{%- from 'ep_i18n.jinja' import EP_MONTHS_SHORT -%}{{ EP_MONTHS_SHORT }}"
   ds_press_ts: '{{ as_timestamp(states(ds_btn), as_timestamp(now())) }}'
-  header_title_display: '{% set q = {''en'': ''Last taken'', ''nl'': ''Laatst ingenomen'', ''de'': ''Zuletzt genommen'', ''fr'':
-    ''Dernière prise'', ''es'': ''Última toma'', ''pl'': ''Ostatnio przyjęte'', ''hr'': ''Zadnje uzeto'', ''sv'': ''Senast
-    tagen''} %} {{ header_title if header_title else (language_map[weekday_lang][''default_title''] ~ '' · '' ~ (q[weekday_lang]
-    if weekday_lang in q else q[''en''])) }}'
+  header_title_display: '{{ header_title if header_title else (language_map[weekday_lang][''default_title''] ~ '' · '' ~ language_map[weekday_lang][''last_taken''])
+    }}'
   press_time_label: '{{ (ds_press_ts | float(0)) | timestamp_custom(''%-I:%M %p'') if time_format == ''12h'' else (ds_press_ts
     | float(0)) | timestamp_custom(''%H:%M'') }}'
   ds_date: '{% set t = as_local(as_datetime(ds_press_ts | float(0))) %}{{ weekday_short_map[weekday_lang][t.weekday()] }}

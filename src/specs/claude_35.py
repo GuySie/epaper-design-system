@@ -23,8 +23,8 @@ PAYLOAD_MAIN = r'''
 {%- set pace = namespace(d=-999, lab='') -%}
 {%- for b in bars -%}{%- if b.marker_pct is not none and b.percent_text != '--' -%}{%- set d = b.percent - b.marker_pct -%}
 {%- if d > pace.d -%}{%- set pace.d, pace.lab = d, ((b.label | string)[cp.pre | length:] if cp.pre else b.label) -%}{%- endif -%}{%- endif -%}{%- endfor -%}
-{%- set pt = {'en': ['ON PACE', '{l} {d}% AHEAD'], 'de': ['IM PLAN', '{l} {d}% VORAUS'], 'nl': ['OP SCHEMA', '{l} {d}% VOOR'], 'fr': ['DANS LES TEMPS', "{l} {d}% D'AVANCE"], 'es': ['A TIEMPO', '{l} {d}% ADELANTADO'], 'pl': ['W NORMIE', '{l} {d}% PONAD'], 'hr': ['U ROKU', '{l} {d}% IZNAD'], 'sv': ['I FAS', '{l} {d}% FÖRE']}.get(weekday_lang, ['ON PACE', '{l} {d}% AHEAD']) -%}
-{%- set foot = '' if pace.d == -999 else ((pt[1] | replace('{l}', pace.lab | upper) | replace('{d}', pace.d | round | int | string)) if pace.d > 0 else pt[0]) -%}
+{%- set lt = language_map[weekday_lang] -%}
+{%- set foot = '' if pace.d == -999 else (((lt['ahead'] | replace('{l}', pace.lab) | replace('{d}', pace.d | round | int | string)) if pace.d > 0 else lt['on_pace']) | upper) -%}
 {#- pattern 'Meters' -#}
 {{- METERS(ns, header_title_display, right, bl.l, ds_stale, has_pace, foot, 'warn' if (pace.d > 0 and (flag_usage | default(true))) else none) -}}
 '''

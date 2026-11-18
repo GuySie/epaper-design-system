@@ -171,30 +171,58 @@ data:
     - '{{ plants | length > 0 }}'
     steps: []
 texts:
+  use:
+    most_unavailable: most_unavailable
   en:
     no_plants: No plants configured.
     default_title: Plants
+    needs_water:
+    - '{n} plant needs water'
+    - '{n} plants need water'
   de:
     no_plants: Keine Pflanzen konfiguriert.
     default_title: Pflanzen
+    needs_water:
+    - '{n} Pflanze braucht Wasser'
+    - '{n} Pflanzen brauchen Wasser'
   nl:
     no_plants: Geen planten geconfigureerd.
     default_title: Planten
+    needs_water:
+    - '{n} plant water nodig'
+    - '{n} planten water nodig'
   fr:
     no_plants: Aucune plante configurée.
     default_title: Plantes
+    needs_water:
+    - '{n} plante à arroser'
+    - '{n} plantes à arroser'
   es:
     no_plants: No hay plantas configuradas.
     default_title: Plantas
+    needs_water:
+    - '{n} planta necesita agua'
+    - '{n} plantas necesitan agua'
   pl:
     no_plants: Nie skonfigurowano żadnych roślin.
     default_title: Rośliny
+    needs_water:
+    - '{n} roślina potrzebuje wody'
+    - '{n} rośliny potrzebują wody'
+    - '{n} roślin potrzebuje wody'
   hr:
     no_plants: Nije konfigurirana nijedna biljka.
     default_title: Biljke
+    needs_water:
+    - '{n} biljka treba vodu'
+    - '{n} biljke trebaju vodu'
+    - '{n} biljaka treba vodu'
   sv:
     no_plants: Inga växter konfigurerade.
     default_title: Växter
+    needs_water:
+    - '{n} växt behöver vatten'
+    - '{n} växter behöver vatten'
 layouts:
   '41':
     spec: plants_41

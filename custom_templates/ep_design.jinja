@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'qdgfcr' -%}
+{%- set EP_SET = 'qfkbyk' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -1882,8 +1882,8 @@
 {%- set pace = namespace(d=-999, lab='') -%}
 {%- for b in bars -%}{%- if b.marker_pct is not none and b.percent_text != '--' -%}{%- set d = b.percent - b.marker_pct -%}
 {%- if d > pace.d -%}{%- set pace.d, pace.lab = d, ((b.label | string)[cp.pre | length:] if cp.pre else b.label) -%}{%- endif -%}{%- endif -%}{%- endfor -%}
-{%- set pt = {'en': ['ON PACE', '{l} {d}% AHEAD'], 'de': ['IM PLAN', '{l} {d}% VORAUS'], 'nl': ['OP SCHEMA', '{l} {d}% VOOR'], 'fr': ['DANS LES TEMPS', "{l} {d}% D'AVANCE"], 'es': ['A TIEMPO', '{l} {d}% ADELANTADO'], 'pl': ['W NORMIE', '{l} {d}% PONAD'], 'hr': ['U ROKU', '{l} {d}% IZNAD'], 'sv': ['I FAS', '{l} {d}% FÖRE']}.get(weekday_lang, ['ON PACE', '{l} {d}% AHEAD']) -%}
-{%- set foot = '' if pace.d == -999 else ((pt[1] | replace('{l}', pace.lab | upper) | replace('{d}', pace.d | round | int | string)) if pace.d > 0 else pt[0]) -%}
+{%- set lt = language_map[weekday_lang] -%}
+{%- set foot = '' if pace.d == -999 else (((lt['ahead'] | replace('{l}', pace.lab) | replace('{d}', pace.d | round | int | string)) if pace.d > 0 else lt['on_pace']) | upper) -%}
 {#- pattern 'Meters' -#}
 {{- METERS(ns, header_title_display, right, bl.l, ds_stale, has_pace, foot, 'warn' if (pace.d > 0 and (flag_usage | default(true))) else none) -}}
 {%- elif layout == 'claude_35' and view == 'error' -%}
@@ -2017,19 +2017,12 @@
 {%- endfor -%}
 {#- the footer's conclusion: how many plants need water, with the right plural (pl/hr have a few/many form) -#}
 {%- set cnt = namespace(n=0) -%}{%- for p in ds_plants -%}{%- if p.ok and p.pct <= warn -%}{%- set cnt.n = cnt.n + 1 -%}{%- endif -%}{%- endfor -%}
-{%- set wf = {'en': ['{n} plant needs water', '{n} plants need water'], 'nl': ['{n} plant water nodig', '{n} planten water nodig'],
-     'de': ['{n} Pflanze braucht Wasser', '{n} Pflanzen brauchen Wasser'], 'fr': ['{n} plante à arroser', '{n} plantes à arroser'],
-     'es': ['{n} planta necesita agua', '{n} plantas necesitan agua'], 'sv': ['{n} växt behöver vatten', '{n} växter behöver vatten'],
-     'pl': ['{n} roślina potrzebuje wody', '{n} rośliny potrzebują wody', '{n} roślin potrzebuje wody'],
-     'hr': ['{n} biljka treba vodu', '{n} biljke trebaju vodu', '{n} biljaka treba vodu']} -%}
-{%- set wl = wf[weekday_lang] if weekday_lang in wf else wf['en'] -%}
+{%- set wl = language_map[weekday_lang]['needs_water'] -%}
 {%- set nn = cnt.n | int -%}
 {%- set wi = 0 if nn == 1 else ((1 if (nn % 10 in [2, 3, 4] and nn % 100 not in [12, 13, 14]) else 2) if wl | length == 3 else 1) -%}
 {%- set wt = wl[wi] -%}
 {%- set foot = (wt | replace('{n}', cnt.n | string) | upper) if cnt.n > 0 else '' -%}
-{%- set unav = {'en': 'Most values unavailable.', 'de': 'Die meisten Werte nicht verfügbar.', 'nl': 'Meeste waarden niet beschikbaar.',
-     'fr': 'La plupart des valeurs indisponibles.', 'es': 'La mayoría de los valores no disponibles.',
-     'pl': 'Większość wartości niedostępna.', 'hr': 'Većina vrijednosti nedostupna.', 'sv': 'De flesta värden otillgängliga.'}.get(weekday_lang, 'Most values unavailable.') -%}
+{%- set unav = language_map[weekday_lang]['most_unavailable'] -%}
 {#- pattern 'Key-value list', dense rows; the error state when most values are unavailable -#}
 {{- KVPAGE(ns, header_title_display, right, it.l, ds_stale, ds_plants | rejectattr('ok') | list | length, unav, true, foot) -}}
 {%- elif layout == 'plants_41' and view == 'error' -%}
