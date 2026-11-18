@@ -201,7 +201,7 @@ What each font measures on each tier (x-height / cap height):
 <!-- /registry:tier-hero -->
 
 - **TRMNL12 on 1.4" and 2.7".** Never on 1.4". On 2.7" only for **all-caps field labels** beside a value (RAIN, WIND, MAX/MIN) and the **update stamp** (capitals and digits only, `SA 14:10`): capitals are what you read there, and their cap height (<!-- v:mm:384x168-0.17:12:cap -->1.3<!-- /v --> mm) clears the label minimum, while TRMNL12's lowercase (<!-- v:mm:384x168-0.17:12:x -->1.0<!-- /v --> mm) only just meets it. Everything else on 2.7" (data, units, captions, footers) stays TRMNL16 or larger.
-- **On 1.4", data and labels are large** (`type.data`, `type.label`, *Type tokens*). In practice that leaves room for a hero on its own (a Glance: hero, one secondary value, and the title row), a 2 × 2 grid of tiles (*Tiles*) or a code (*Code*); no other page is offered on it (*Pages*).
+- **On 1.4", data and labels are large** (`type.data`, `type.label`, *Type tokens*). In practice that leaves room for a hero on its own (a Glance: hero, one secondary value, and the title row), a single tile (*Tiles*) or a code (*Code*); no other page is offered on it (*Pages*).
 - Forecast cells, chart values and two-column rows are data (`type.data`). Chart axis ticks are labels (`type.label`).
 - **Stroke ≥ `stroke.min`** (*Floors and their thresholds*). Measured stems:
 
@@ -754,7 +754,7 @@ A module is one block of content on a screen, built from components (and other m
 | **Chart** | Plot, label margin, clock-time axis, thresholds, severe fills. | series, thresholds | `type.label`, `line.*`, `space.s` | `CFRAME`, `CTHRESH`, `CBASE`, `CAXIS` (read their tokens); bars, series and notches stay in each chart |
 | **Timeline** | Sun and moon track with markers and the sun path. Rules: *Timeline* under *Patterns*. | sun, moon | `icon.inline`, `icon.markerDisc`, `line.tick`, `type.label` | `TMARK` for markers, `SERIES` for the path, `CAXIS` for the compass row; the heights follow the vertical rhythm in *Sun & moon* |
 | **Checkbox rows** | *Mockup (Checklist), no blueprint yet.* Checkbox (`line.base` outline / ink fill, cap height of `type.data`) + an item on one text line + due day; see *Checklist*. | — | — | — |
-| **Tiles** | *Mockup (Tiles), no blueprint yet.* Repeated icon–value–label unit in a grid (*Tiles*). | — | — | — |
+| **Tiles** | *Mockup (Tiles), no blueprint yet.* Repeated icon–state–label unit in a grid (*Tiles*). | — | — | — |
 | **Level meter** | *Reserved: no blueprint uses it.* A level in four segments. Rules: *Level meter*, below the table. | — | — | — |
 | **Hero block** | The hero group *on its own* and the Glance secondary under it, centred as one block (*Hero group*, hero centring; the secondary's chip box is reserved, so nothing moves when a chip appears). The Glance's one module under the title row; see *Glance*. | hero, icon, levels, Glance secondary | `type.heroAlone`, `icon.heroAloneSteps`, `type.secondary`, `space.heroGap` | `HBLOCK`, `HERO_BLOCK_Y` |
 | **Hero band** | The hero group *beside other content* and the detail rows, **centred by ink between the title line and the next line** (the strip's, or the module's). Rules: *Hero dashboard* under *Patterns*. | hero, icon, rows | `type.heroShared`, `icon.heroShared`, `space.l` | `HBAND` |
@@ -1068,11 +1068,14 @@ Patterns and versions that exist as mock-ups only: no blueprint is built from th
 
 #### Tiles
 
-*Mockup (Home status).* Equal tiles, each an icon above its label and state.
+*Mockup (Home status).* Equal tiles, each a centred stack: the icon, the state in `type.data`, the label in `type.label`. The stack is centred in its tile.
 
-- 2 × 2 on the 1.4", 2 × 3 on portrait screens, 3 × 2 elsewhere; lines between tiles, centred in the gutter, none around the outside.
-- Per tile: the icon (the largest ladder size that leaves room for the label and state under it), the label in `type.label`, the state in `type.data`, all centred.
-- A flagged tile chips its label and state together; the icon never changes.
+- Tiles per screen: one on the 1.4", 1 × 3 on the 2.7" portrait, 3 × 2 on the 2.7" landscape, the 3.5" and the 4.1", 4 × 3 on the 7.5", 3 × 4 on the 7.5" portrait. With fewer entities the grid is the smallest one that holds them (of two equally small, the one whose tiles are closest to square), filled row by row; a tile left over stays empty.
+- Lines between two tiles that both hold an entity, centred in the gutter, each stopping `space.m` short of where it would cross another; none around the outside.
+- The icon is the largest ladder size that leaves room for the state and label under it, and at most four times the size of `type.data`; a single tile's icon has no such limit. All tiles on a screen share one icon size.
+- The icon comes from the tile's icon input, else from the entity's own icon; a tile with neither has none, and its state and label are centred alone.
+- A flagged tile chips its state; the icon and the label never change, and nothing moves.
+- Widest state: 9 characters (`Triggered`). A longer state, and a label wider than its tile, is cut with an ellipsis.
 
 #### Month
 
