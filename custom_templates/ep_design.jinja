@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'iiyqeo' -%}
+{%- set EP_SET = 'pzntog' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -43,6 +43,9 @@
   'plants_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'plants'},
   'rain_27l': {'kit': 'other', 'tier': '384x168-0.17', 'page': 'rain'},
   'rain_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'rain'},
+  'single_value_14': {'kit': 'other', 'tier': '200x200-0.13', 'page': 'single-value'},
+  'single_value_27l': {'kit': 'other', 'tier': '384x168-0.17', 'page': 'single-value'},
+  'single_value_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'single-value'},
   'sun_moon_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'sun-moon'},
   'weather_27l': {'kit': 'weather', 'tier': '384x168-0.17', 'page': 'weather'},
   'weather_27p': {'kit': 'weather', 'tier': '168x384-0.17', 'page': 'weather'},
@@ -84,6 +87,8 @@
 {%- set days_shown = c.days_shown -%}
 {%- set displays = c.displays -%}
 {%- set ds_btn = c.ds_btn -%}
+{%- set ds_icon = c.ds_icon -%}
+{%- set entity = c.entity -%}
 {%- set entity_1 = c.entity_1 -%}
 {%- set entity_10 = c.entity_10 -%}
 {%- set entity_10_label = c.entity_10_label -%}
@@ -109,7 +114,9 @@
 {%- set entity_9 = c.entity_9 -%}
 {%- set entity_9_label = c.entity_9_label -%}
 {%- set flag_co2 = c.flag_co2 -%}
+{%- set flag_high = c.flag_high -%}
 {%- set flag_late = c.flag_late -%}
+{%- set flag_low = c.flag_low -%}
 {%- set flag_moisture_low = c.flag_moisture_low -%}
 {%- set flag_pollen_high = c.flag_pollen_high -%}
 {%- set flag_rain_day = c.flag_rain_day -%}
@@ -173,9 +180,12 @@
 {%- set plant_9_label = c.plant_9_label -%}
 {%- set pollen_sensor = c.pollen_sensor -%}
 {%- set pollen_type = c.pollen_type -%}
+{%- set secondary_entity = c.secondary_entity -%}
 {%- set severe_co2 = c.severe_co2 -%}
 {%- set severe_conditions = c.severe_conditions -%}
+{%- set severe_high = c.severe_high -%}
 {%- set severe_late = c.severe_late -%}
+{%- set severe_low = c.severe_low -%}
 {%- set severe_moisture_low = c.severe_moisture_low -%}
 {%- set severe_openings = c.severe_openings -%}
 {%- set severe_pollen_high = c.severe_pollen_high -%}
@@ -191,7 +201,9 @@
 {%- set time_format = c.time_format -%}
 {%- set warning_co2 = c.warning_co2 -%}
 {%- set warning_conditions = c.warning_conditions -%}
+{%- set warning_high = c.warning_high -%}
 {%- set warning_late = c.warning_late -%}
+{%- set warning_low = c.warning_low -%}
 {%- set warning_moisture_low = c.warning_moisture_low -%}
 {%- set warning_pollen_high = c.warning_pollen_high -%}
 {%- set warning_rain_day = c.warning_rain_day -%}
@@ -707,29 +719,35 @@
 {{- ((wd[weekday_lang] if weekday_lang in wd else wd['en'])[(t | timestamp_custom('%u') | int(1)) - 1] | upper) ~ ' ' ~ (t | timestamp_custom('%H:%M' if time_format == '24h' else '%-I:%M %p')) -}}
 {%- endmacro -%}
 {#- Hero group on its own (the Glance): number first, then icon, centred as one group between y0 and y1.
-     The icon takes the first size in ics that fits; with none, it drops. The number never shrinks. -#}
+     The icon takes the first size in ics that fits; with none (or no icon given), it drops. The number never shrinks.
+     unit: drawn after the number on its baseline, in type.secondary's size and the Regular cut (*Hero group*, A unit
+     beside the number): part of the reading, so inside the fit, the centring and the hero chip. -#}
 {#- DATA_REGULAR: the Regular cut of type.data's size where its stems clear stroke.min (pitch x stem width), else the Bold cut -#}
 {%- macro DATA_REGULAR() -%}{%- set ds = EP_TK.type.data[1] -%}{%- set rk = {12: ['unit12', 1], 16: ['unit16', 1], 21: ['text21', 2], 24: ['unit12x2', 2], 32: ['unit16x2', 2], 42: ['text21x2', 4]}[ds] -%}{{ FONT[rk[0]] if rk[1] * EP_TK.pitch >= EP_STROKE.strokeMinMm else FONT[EP_TK.type.data[0]] }}{%- endmacro -%}
 {#- HERO_CHIP: the chip behind a flagged hero number: the digits' ink (HUP / HDN around the anchor, xl..xr wide) plus
      space.s of type.data on every side -#}
 {%- macro HERO_CHIP(ns, xl, xr, cy, hs, bg) -%}{%- set sx = SPACE_S(EP_TK.type.data[1]) | int -%}{{- R(ns, xl - sx, cy - HUP[hs] - sx, xr + sx, cy + HDN[hs] + sx, 'outline_in' if bg == 'outline' else bg) -}}{%- endmacro -%}
-{%- macro HERO_ALONE(ns, txt, icon_name, W, P, y0, y1, hs, ics, sev=false, sc='red', on_sc='white', moon=false) -%}
+{#- HERO_UNIT_W: what a unit adds to a hero number's width: its gap (none for a symbol that attaches) and its ink -#}
+{%- macro HERO_UNIT_W(unit) -%}{%- set ss = EP_TK.type.secondary[1] -%}{{ ((UGAP(unit, ss) | int) + (TEXT_W(unit, ss, REGULAR_FONT(ss)) | int) - (TAIL(ss) | int) + (SPACE_XS(ss) | int)) if unit else 0 }}{%- endmacro -%}
+{%- macro HERO_ALONE(ns, txt, icon_name, W, P, y0, y1, hs, ics, sev=false, sc='red', on_sc='white', moon=false, unit='') -%}
 {%- set t = txt | string -%}
 {%- set nd = t | select('in', '0123456789') | list | length -%}
 {%- set gap = (hs // EP_SPACE.heroGapDiv) -%}
 {%- set fit = namespace(ic=0) -%}
 {#- fit and centre by INK: the numeral's measured ink width (HERO_INK_W), the icon's full box -#}
 {%- set tin = HERO_INK_W(t, hs) | int -%}
-{%- for c in ics -%}{%- if fit.ic == 0 and tin + gap + c <= W - 2 * P -%}{%- set fit.ic = c -%}{%- endif -%}{%- endfor -%}
+{%- set uw = HERO_UNIT_W(unit) | int -%}
+{%- for c in ics -%}{%- if fit.ic == 0 and icon_name and tin + uw + gap + c <= W - 2 * P -%}{%- set fit.ic = c -%}{%- endif -%}{%- endfor -%}
 {#- the icon is fitted by its box but centred by its ink: its blank right margin (ICB, measured) is left out -#}
 {%- set ik = (icon_name | string | trim)[4:] if (icon_name | string | trim)[:4] == 'mdi:' else (icon_name | string | trim) -%}
 {%- set br = ((ICB[ik][1] if ik in ICB else 0) * fit.ic) | round | int -%}
-{%- set gw = tin + ((gap + fit.ic - br) if fit.ic else 0) -%}
+{%- set gw = tin + uw + ((gap + fit.ic - br) if fit.ic else 0) -%}
 {%- set x0 = ((W - gw) / 2) | round | int -%}
 {%- set cy = ((y0 + y1) / 2) | round | int -%}
-{%- if sev -%}{{- HERO_CHIP(ns, x0, x0 + tin - 1, cy, hs, sc) -}}{%- endif -%}
+{%- if sev -%}{{- HERO_CHIP(ns, x0, x0 + tin + uw - 1, cy, hs, sc) -}}{%- endif -%}
+{%- if unit -%}{%- set ss = EP_TK.type.secondary[1] -%}{{- T(ns, unit, x0 + tin + (SPACE_XS(ss) | int) + (UGAP(unit, ss) | int), cy + HDN[hs] - CAPDN[ss], REGULAR_FONT(ss), ss, on_sc if sev else color.ink, 'lm') -}}{%- endif -%}
 {{- T(ns, t, HERO_INK_X(x0, t, hs) | int, cy, fhero, hs, on_sc if sev else color.ink, 'lm') -}}
-{%- if fit.ic -%}{%- set ix = x0 + tin + gap + fit.ic // 2 -%}{{- I(ns, icon_name, ix, cy, fit.ic) -}}{%- if moon -%}{{- MOON_BADGE(ns, ix, cy, fit.ic, W - P - 1) -}}{%- endif -%}{%- endif -%}
+{%- if fit.ic -%}{%- set ix = x0 + tin + uw + gap + fit.ic // 2 -%}{{- I(ns, icon_name, ix, cy, fit.ic) -}}{%- if moon -%}{{- MOON_BADGE(ns, ix, cy, fit.ic, W - P - 1) -}}{%- endif -%}{%- endif -%}
 {%- endmacro -%}
 {#- title row: title left, timestamp right, 1 px line; stale => timestamp in an ink chip with '!' -#}
 {%- macro TITLE(ns, title, right, W, P, TH, stale=false) -%}
@@ -1062,11 +1080,11 @@
 {#- HERO_BLOCK_Y: Glance vertical layout. The hero group and its Glance secondary are ONE block, centred between the title line and the
      bottom padding. Gap: hero size / 7 from the hero's ink to the secondary's chip box (the box is reserved even without a chip,
      so nothing moves when a chip appears). Returns "hero_cy,second_cy". Mirrors HERO_ALONE's icon fit. -#}
-{%- macro HERO_BLOCK_Y(t, hs, ics, W, P, TH, H) -%}
-{%- set tin = HERO_INK_W(t, hs) | int -%}
+{%- macro HERO_BLOCK_Y(t, hs, ics, W, P, TH, H, uw=0, icon=true) -%}
+{%- set tin = (HERO_INK_W(t, hs) | int) + uw -%}
 {%- set gap = hs // EP_SPACE.heroGapDiv -%}
 {%- set fit = namespace(ic=0) -%}
-{%- for c in ics -%}{%- if fit.ic == 0 and tin + gap + c <= W - 2 * P -%}{%- set fit.ic = c -%}{%- endif -%}{%- endfor -%}
+{%- for c in ics -%}{%- if fit.ic == 0 and icon and tin + gap + c <= W - 2 * P -%}{%- set fit.ic = c -%}{%- endif -%}{%- endfor -%}
 {#- measured: the digits' ink above and below the anchor (HUP, HDN), the icon's typical glyph height (ICH) -#}
 {%- set ih = (ICH[fit.ic] if fit.ic in ICH else 0) / 2 -%}
 {%- set up, dn = [HUP[hs], ih] | max, [HDN[hs], ih] | max -%}
@@ -1083,12 +1101,17 @@
      moon adds the moon badge to the icon. The Glance secondary (sec), in type.secondary, centred:
        sec='text'   txt as plain text, cut to the content width when cut
        sec='chip'   txt as a chip at llevel
-       sec='caller' the page draws it: {% call(y) ... %}...{% endcall %}, y = the secondary's centre -#}
-{%- macro HBLOCK(ns, hero, icon, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true) -%}
+       sec='caller' the page draws it: {% call(y) ... %}...{% endcall %}, y = the secondary's centre
+     unit: the hero's unit (HERO_ALONE). step: a reading too wide for the layout's hero steps down the hero ladder until
+     the number and its unit fit between the paddings (Single value); without it the number never shrinks. -#}
+{%- macro HBLOCK(ns, hero, icon, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true, unit='', step=false) -%}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set hs, ics = EP_TK.type.heroAlone, EP_TK.icon.heroAloneSteps -%}
-{%- set gl = HERO_BLOCK_Y(hero, hs, ics, W, P, TH, H).split(',') | map('int') | list -%}
-{{- HERO_ALONE(ns, hero, icon, W, P, gl[0], gl[0], hs, ics, hlevel != '', LEVEL_FILL(hlevel), LEVEL_TEXT(hlevel), moon) -}}
+{%- set uw = HERO_UNIT_W(unit) | int -%}
+{%- if step -%}{%- set pick = namespace(hs=0) -%}{%- for h in (HUP.keys() | list | sort(reverse=true)) -%}{%- if pick.hs == 0 and h <= hs and (HERO_INK_W(hero, h) | int) + uw <= W - 2 * P -%}{%- set pick.hs = h -%}{%- endif -%}{%- endfor -%}
+{%- set hs = pick.hs if pick.hs else (HUP.keys() | list | sort | first) -%}{%- endif -%}
+{%- set gl = HERO_BLOCK_Y(hero, hs, ics, W, P, TH, H, uw, (icon | string | trim) != '').split(',') | map('int') | list -%}
+{{- HERO_ALONE(ns, hero, icon, W, P, gl[0], gl[0], hs, ics, hlevel != '', LEVEL_FILL(hlevel), LEVEL_TEXT(hlevel), moon, unit) -}}
 {%- set sf, ss = FONT[EP_TK.type.secondary[0]], EP_TK.type.secondary[1] -%}
 {%- if sec == 'caller' -%}{{- caller(gl[1]) -}}
 {%- elif sec == 'chip' -%}{{- CCHIP(ns, txt, W // 2, gl[1], sf, ss, 0, LEVEL_FILL(llevel), LEVEL_TEXT(llevel)) -}}
@@ -1098,13 +1121,13 @@
 {#- GLANCE: the Glance pattern (design system: Patterns > Glance), the one macro every Glance page draws with: the title
      row (module 'Title row'; stamp `right`, '' for none; `stale` makes it a chip) and the hero block (module 'Hero block').
      The other arguments go to HBLOCK; with sec='caller' the page's call block draws the Glance secondary. -#}
-{%- macro GLANCE(ns, title, right, hero, icon, stale=false, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true) -%}
+{%- macro GLANCE(ns, title, right, hero, icon, stale=false, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true, unit='', step=false) -%}
 {{- TITLE(ns, title, right, EP_TK.width, EP_TK.space.pad, EP_TK.space.titleRow, stale) -}}
 {%- if sec == 'caller' -%}
 {%- set outer = caller -%}
 {%- call(y) HBLOCK(ns, hero, icon, hlevel, moon, 'caller') -%}{{- outer(y) -}}{%- endcall -%}
 {%- else -%}
-{{- HBLOCK(ns, hero, icon, hlevel, moon, sec, txt, llevel, cut) -}}
+{{- HBLOCK(ns, hero, icon, hlevel, moon, sec, txt, llevel, cut, unit, step) -}}
 {%- endif -%}
 {%- endmacro -%}
 {#- ===== Pattern macros: a pattern is one macro that puts its modules on the screen; the page passes its content.
@@ -2128,6 +2151,51 @@
 {%- set ds_txt = c.ds_txt -%}
 {%- set language_map = c.language_map -%}
 {{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['no_data']) -}}
+{%- elif layout == 'single_value_14' and view == 'main' -%}
+{%- set ds_last_ts = c.ds_last_ts -%}
+{%- set ds_stale = c.ds_stale -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_value = c.ds_value -%}
+{%- set language_map = c.language_map -%}
+{%- set W, P = EP_TK.width, EP_TK.space.pad -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
+{#- the number as it is read: no decimals from 100 up or when it has none, else one -#}
+{%- macro NUM(raw) -%}{%- set n = raw | float(none) -%}{{ raw if n is none else DECIMAL(((n | round(0) | int) if (n | abs >= 100 or n == (n | round(0))) else (n | round(1))) | string) }}{%- endmacro -%}
+{%- set v = ds_value -%}
+{%- set txt = NUM(v.raw) if v.raw else '—' -%}
+{%- if v.raw and (HERO_INK_W(txt, EP_TK.type.heroAlone) | int) > W - 2 * P -%}
+{#- the hero has one size here, fitted on four digits: a longer reading doesn't step down, it says so -#}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['too_long']) -}}
+{%- else -%}
+{#- pattern 'Glance': the unit is the Glance secondary -#}
+{{- GLANCE(ns, ds_title, right, txt, ds_icon, ds_stale, hlevel=v.level, txt=v.unit) -}}
+{%- endif -%}
+{%- elif layout == 'single_value_27l' and view == 'main' -%}
+{%- set ds_last_ts = c.ds_last_ts -%}
+{%- set ds_stale = c.ds_stale -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_value = c.ds_value -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
+{#- the number as it is read: no decimals from 100 up or when it has none, else one -#}
+{%- macro NUM(raw) -%}{%- set n = raw | float(none) -%}{{ raw if n is none else DECIMAL(((n | round(0) | int) if (n | abs >= 100 or n == (n | round(0))) else (n | round(1))) | string) }}{%- endmacro -%}
+{%- set v = ds_value -%}
+{%- set txt = NUM(v.raw) if v.raw else '—' -%}
+{%- set second = (NUM(v.second) ~ (('¦' ~ v.second_unit) if v.second_unit else '')) if v.second else '' -%}
+{#- pattern 'Glance': the hero with its unit; a longer reading than the layout was fitted on steps down the hero ladder -#}
+{{- GLANCE(ns, ds_title, right, txt, ds_icon, ds_stale, hlevel=v.level, txt=second, unit=v.unit, step=true) -}}
+{%- elif layout == 'single_value_35' and view == 'main' -%}
+{%- set ds_last_ts = c.ds_last_ts -%}
+{%- set ds_stale = c.ds_stale -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_value = c.ds_value -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
+{#- the number as it is read: no decimals from 100 up or when it has none, else one -#}
+{%- macro NUM(raw) -%}{%- set n = raw | float(none) -%}{{ raw if n is none else DECIMAL(((n | round(0) | int) if (n | abs >= 100 or n == (n | round(0))) else (n | round(1))) | string) }}{%- endmacro -%}
+{%- set v = ds_value -%}
+{%- set txt = NUM(v.raw) if v.raw else '—' -%}
+{%- set second = (NUM(v.second) ~ (('¦' ~ v.second_unit) if v.second_unit else '')) if v.second else '' -%}
+{#- pattern 'Glance': the hero with its unit; a longer reading than the layout was fitted on steps down the hero ladder -#}
+{{- GLANCE(ns, ds_title, right, txt, ds_icon, ds_stale, hlevel=v.level, txt=second, unit=v.unit, step=true) -}}
 {%- elif layout == 'sun_moon_35' and view == 'main' -%}
 {%- set ds_txt = c.ds_txt -%}
 {%- set header_title_display = c.header_title_display -%}

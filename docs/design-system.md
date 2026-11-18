@@ -182,6 +182,9 @@ What each font measures on each tier (x-height / cap height):
 |---|---|---|---|---|---|---|---|
 | Weather (Glance) | 1.4" | on its own | 80 px | 80 → 48 | — | 58 px | 7.5 |
 | Weather (Glance) | 3.5" | on its own | 104 px | 104 → 64 | — | 75 px | 15.5 |
+| Single value | 1.4" | on its own | 72 px | 72 → 48 | — | 53 px | 6.9 |
+| Single value | 2.7" L | on its own | 88 px | 88 → 56 | — | 64 px | 10.7 |
+| Single value | 3.5" | on its own | 104 px | 104 → 64 | — | 75 px | 15.5 |
 | Weather | 2.7" L | beside other content | 72 px | 64 | — | 53 px | 8.9 |
 | Weather | 2.7" P | beside other content | 72 px | 64 | — | 53 px | 8.9 |
 | Weather | 3.5" | beside other content | 64 px | 56 | — | 47 px | 9.7 |
@@ -552,7 +555,7 @@ TRMNL12 and TRMNL16 text is always Bold (*Physical size minimums*), so weight ca
 
 ## Units and numbers
 
-1. **Units are drawn one font step down, in the Regular cut**, on the same baseline as the number: TRMNL21 → TRMNL16 Regular, TRMNL16 → TRMNL12 Regular, never below the label floor, and never in a cut the floor allows only in capitals (the 2.7"'s TRMNL12): there the unit keeps the value's size (`type.unit`, *Type tokens*). A unit is predictable from its value and position, so it only has to be recognised, not read: the smaller, lighter cut makes the number stand out. In payloads a value is written `number¦unit` (more segments alternate big / small); the `T` macro splits it, measures each part with the TRMNL advance table plus the fonts' kerning, and places them.
+1. **Units are drawn one font step down, in the Regular cut**, on the same baseline as the number: TRMNL21 → TRMNL16 Regular, TRMNL16 → TRMNL12 Regular (beside a hero number: `type.secondary`'s size, *Hero group*, *A unit beside the number*), never below the label floor, and never in a cut the floor allows only in capitals (the 2.7"'s TRMNL12): there the unit keeps the value's size (`type.unit`, *Type tokens*). A unit is predictable from its value and position, so it only has to be recognised, not read: the smaller, lighter cut makes the number stand out. In payloads a value is written `number¦unit` (more segments alternate big / small); the `T` macro splits it, measures each part with the TRMNL advance table plus the fonts' kerning, and places them.
    - This is the only text below `stroke.min` (1 px strokes, accepted for that). Never use it for anything that has to be read: words after a value are their own segment (`2.6¦mm¦ TODAY`, `922¦ppm¦ · 15:27`).
 2. **A space separates a value from its unit**: one space of the unit's own font (`space.unitGap`, *Space*; the `UGAP` macro): `2.6 mm`, `18 km/h`, `1012 hPa`, `96 ppm`.
    - **Narrow canvases are tight:** a canvas narrower than `space.tightMm` (<!-- v:tightScreens -->1.4" 26 mm, 2.7" P 29 mm<!-- /v -->) keeps units attached (`2.6mm`). Set by canvas width for the whole screen (the `TITLE` macro sets `DS.tight`), never per cell, so one screen never mixes the two. On wide screens a cell that doesn't fit with the space shortens its content first (precision, the compact range), never drops the space.
@@ -630,7 +633,7 @@ Three levels, the same on every module:
 
 **Every value that has a bad direction gets a warning and a severe input**, with a default, on every blueprint that shows it. The same data has the same inputs, names and defaults everywhere.
 
-**Every reading that can be flagged has a switch**, `flag_<what>`, on by default, in front of its `warning_<what>` and `severe_<what>`. Off, the reading is never flagged, on any part of the page. Every number is a real threshold, 0 included: no number means "off". Without a switch: the lists (conditions, the doors and windows that count as severe), where an empty list flags nothing. A chart with its switch off: *Bar chart with thresholds, Line chart with thresholds*, Switched off. Pollen's two count inputs are empty by default: empty, the sensor's own level decides (*Weather thresholds*); a count overrides it.
+**Every reading that can be flagged has a switch**, `flag_<what>`, on by default, in front of its `warning_<what>` and `severe_<what>`. Single value's two switches are off by default: no value fits every sensor. Off, the reading is never flagged, on any part of the page. Every number is a real threshold, 0 included: no number means "off". Without a switch: the lists (conditions, the doors and windows that count as severe), where an empty list flags nothing. A chart with its switch off: *Bar chart with thresholds, Line chart with thresholds*, Switched off. Pollen's two count inputs are empty by default: empty, the sensor's own level decides (*Weather thresholds*); a count overrides it.
 
 | Page | Data | Warning | Severe |
 |---|---|---|---|
@@ -645,6 +648,7 @@ Three levels, the same on every module:
 | CO2 graph | Concentration | ≥ <!-- v:input:co2:warning_co2 -->1000 ppm<!-- /v --> | ≥ <!-- v:input:co2:severe_co2 -->1400 ppm<!-- /v --> |
 | Claude usage | Usage | ≥ <!-- v:input:claude:warning_usage -->90 %<!-- /v --> | ≥ <!-- v:input:claude:severe_usage -->100 %<!-- /v --> |
 | Plant moisture | Soil moisture | ≤ <!-- v:input:plants:warning_moisture_low -->25 %<!-- /v --> | ≤ <!-- v:input:plants:severe_moisture_low -->14 %<!-- /v --> |
+| Single value | The value, high (`*_high`, at or above) and low (`*_low`, at or below) | the user's value | the user's value |
 | Medication | Hours since the last press | ≥ <!-- v:input:medication:warning_late -->24 h<!-- /v --> | ≥ <!-- v:input:medication:severe_late -->36 h<!-- /v --> |
 | Doors & windows | An opening is open | — | the openings in `severe_openings` |
 
@@ -702,6 +706,7 @@ A hero group is a number and its icon. It has two versions (a third, *with a wor
 
 Wherever a hero numeral and a hero icon appear together, the **number comes first and the icon second**: left then right on landscape layouts, above then below on portrait ones where they don't fit side by side. The value is the point; the icon qualifies it. This applies to every pattern.
 
+- **A unit beside the number:** a hero whose reading has a unit (Single value) draws it after the number on the number's baseline, in `type.secondary`'s size and the Regular cut, a space apart (*Units and numbers*, *A space separates a value from its unit*). The number and its unit are one reading: centred as a whole, and flagged in one chip. The hero face has numbers only, so the unit is never in it.
 - **One group:** the icon comes **directly** after the number, at a gap of hero size ÷ <!-- v:dt:HERO_GAP_DIV -->7<!-- /v --> (the hero gap, `space.heroGap`), with nothing in between. Details and other modules come after the group, never between number and icon. The same gap separates the hero from what is stacked under it (the Glance secondary, *Glance*).
 - **Hero centring (one rule, both versions):** a hero group is centred by ink, on both axes, **in the space it owns**. A stacked hero group (the number over its icon, on portrait screens) counts the icon at its nominal ink height, the same for every icon of that size, so the number keeps its height when the icon changes. Its number is centred as a whole reading, degree sign included (*Spacing (internal)*, *A number on a centre axis is centred as a whole reading*). On Glance that space is the canvas between the paddings, below the title line, shared with the Glance secondary as one block. In the Hero dashboard it is the **hero column** (from P to the details minus the gutter L) and the band between the title line and the strip line, which it shares with the details (*Spacing (internal)*, the hero band). Widths are measured ink: the numeral's from its advances and side bearings (`HERO_INK_W`), the icon's from its box less its blank margins (`ICB`, measured per glyph), never a per-digit estimate and never the advance width, which drops the icon on readings that fit (`HERO_ALONE` on its own, `HERO_LEFT` beside other content). The icon is *fitted* by its full box, so the size it gets doesn't change with the condition, but *centred* by its ink. The hero therefore doesn't share the title's left edge in the Hero dashboard: it is its own block. A wide reading (`-12°`) fills its column and lands near the edges; that is the same rule, not an exception.
 - **Hero clearance:** a hero numeral's digits stay at least the hero gap (`space.heroGap`) from any line, above or below. This replaces M when a hero is the first thing under the title line; text, labels and icons keep M.
@@ -879,7 +884,7 @@ Bar chart and Line chart share the chart frame; the Timeline shares its clock-ti
 
 Every Glance page draws with one macro, `GLANCE`: the title row and the hero block (the hero group on its own and the Glance secondary under it, centred as one block; `HBLOCK`). The page passes the title, the stamp, the hero and its icon, and the Glance secondary: plain text, a chip at a level, or one it draws itself (the weather's pick, *Override order*).
 
-- A readout for across the room (Weather (Glance), Medication, Doors & windows: the number open as the hero, the first open one as the chip, redrawn only when the count changes).
+- A readout for across the room (Weather (Glance), Single value, Medication, Doors & windows: the number open as the hero, the first open one as the chip, redrawn only when the count changes).
   1. **Everything with data is large:** the hero (`type.heroAlone`, the hero group *on its own*) and **at most one secondary value**, in `type.secondary` (TRMNL21 Bold). If a value isn't worth that size, it belongs on another pattern.
   2. **Severity takes the Glance secondary**, in the *Override order*: the picked item replaces the secondary value as a chip, at the same large size. Temperature chips the hero itself.
   3. **The only small text is the title and the update stamp**, in the title row. They are metadata, so they only need the label minimum.
@@ -1097,6 +1102,7 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | Page | Uses | Status | Widest reading | 1.4" | 2.7" L | 2.7" P | 3.5" | 4.1" | 4.26" | 7.5" L | 7.5" P | 7.09" (no tier yet) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | **Weather (Glance)** | Glance | live | -12° | ● | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
+| **Single value** | Glance | live | -12.5 | ● | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Weather** | Hero dashboard with forecast strips | live | -12° | — | ● | ● | ● | ● | ● | ● | ● | ○ |
 | **Medication** | Glance | live | 20:00 | — | ● | — | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Doors & windows** | Glance | live | — | ● | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
@@ -1258,6 +1264,34 @@ A Glance, redrawn only when the count changes.
 |---|---|---|---|---|---|
 | 1.4" | 112 px | 112 → 72 px | normal, widest, severe, gray, colour, title, error, unavailable, empty | warning, stale | 9 |
 <!-- /registry:layouts-doors-windows -->
+
+### Single value
+
+A Glance for any sensor: its number, large, with its unit.
+
+- **Shows:** one entity's number as the hero, with its unit. The title is the entity's name unless a header title is given.
+- **Tested with:** `1240 ppm`; the widest reading (`-12.5 °C`); a high reading at warning and at severe, a low one at severe; a yellow and a grey panel; a long title; stale data; an unavailable sensor (`—`); both switches off. As other configurations: an icon with a second value (`21.4 °C`, `48 %`), a short reading with an icon (`48 %`), and a reading longer than the widest (`123456 kWh`: a smaller number on the 2.7" and 3.5", the error state on the 1.4").
+- **Unit:** after the number, on its baseline, as *Hero group*, *A unit beside the number* says. On the 1.4" the unit is the Glance secondary instead: a four-digit number needs the screen's width.
+- **Widest reading:** four characters and a three-letter unit (`1240 ppm`, `-12.5 °C`). A longer reading steps down the hero ladder one rung at a time until it fits, as a word-hero does (*Glance with a word*); it is never cut.
+- **The 1.4" has one size.** Its hero is fitted on the widest four digits (`4000`) and never steps, so the number keeps its size whatever the value; that size is under the Glance floor, the one exception to it (*Physical size minimums*). A reading too wide for it is the error state: "Value too long for this screen."
+- **Icon:** optional, from the `icon` input, beside the number as in every hero group (*Glance*, *Too wide*). An icon the kit has no glyph for is drawn by the renderer's own icon element, a little smaller.
+- **Second value:** optional, from the `secondary_entity` input: its number and unit as the Glance secondary. Not on the 1.4", where the unit has that line.
+- **Flagged:** the number sits in a hero chip at its level, its unit with it, as a flagged temperature does. Two readings can be flagged: high (`*_high`, at or above) and low (`*_low`, at or below). Both switches are off by default (*Thresholds*).
+- **Unavailable:** the number is `—`, with no unit.
+
+<!-- registry:inputs-single-value -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `entity`, `secondary_entity`, `icon`, `flag_high`, `warning_high`, `severe_high`, `flag_low`, `warning_low`, `severe_low` |
+<!-- /registry:inputs-single-value -->
+
+<!-- registry:layouts-single-value -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 1.4" | 72 px | 72 → 48 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 16 |
+| 2.7" L | 88 px | 88 → 56 px | normal, widest, warning, severe, gray, colour, title, stale, unavailable | error, empty | 15 |
+| 3.5" | 104 px | 104 → 64 px | normal, widest, warning, severe, gray, colour, title, stale, unavailable | error, empty | 15 |
+<!-- /registry:layouts-single-value -->
 
 ### Rain forecast
 
@@ -1461,7 +1495,7 @@ What every blueprint does the same way; where it can, through a shared part that
   5. **Advanced** (collapsed): `stale_after`, `led_color`, `led_flash_delay` and `font_dir`. The LED inputs are there wherever a button can start the redraw: the LED confirms the press. A blueprint that redraws on a change (Doors & windows) has none.
 - **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button). Every other input has a default, and an optional entity left empty removes its part of the page. The Rain forecast has no main entity: it needs one of its two sources.
 - **Input names:** the device input is always `displays`, also where it takes one device (Medication). Numbered entries are `<name>_<n>` with `<name>_<n>_label` (`entity_1`, `plant_1`, `bar_1`). Thresholds are `warning_<what>` and `severe_<what>`, their switch `flag_<what>`. A blueprint's variables keep the names its drawing reads, so renaming an input never changes the drawing.
-  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather (Glance), Weather, Rain forecast, CO2 graph, Claude usage, Entities, Plant moisture, Weather and calendar<!-- /v -->); see *Title row* for the exempt blueprints.
+  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather (Glance), Single value, Weather, Rain forecast, CO2 graph, Claude usage, Entities, Plant moisture, Weather and calendar<!-- /v -->); see *Title row* for the exempt blueprints.
   - The panel is never an input: a page drawn on two screens is two blueprints (the Rain forecast on the 3.5" and on the 2.7" landscape).
 - **Texts:** every blueprint's strings live in `ep_i18n.jinja`, written from the page definitions (per page, `EP_TXT['<page>']`, which the blueprint's `language_map` reads; the weekday and month lists once, in `pages/_shared.yaml`) and `wx_txt.yaml` (the weather words, `ds_wtxt`), keyed by the 8 language codes, holding weekday/month names and every user-facing string (including the empty, error and stale strings). Paired with separate `weekday_short_map` / `months_short_map` dicts, which read `EP_DAYS_SHORT` / `EP_MONTHS_SHORT`. The update stamp uses weekday + time (`SU 17:58`); dates in content use `SU 8 NOV`. Don't fold them into `language_map`.
 - **One set.** A release gives its templates and its blueprints the same set id: a short hash of the four templates as built, so it changes when the templates change and only then (`lib/set_id.py`). Every blueprint hands its id to the drawing, and the templates compare it with theirs. When they differ, or the blueprint has none, the templates draw the title row and the error block and nothing else: the message (`UPDATE TEMPLATES AND BLUEPRINT`, translated) and, on new lines under it, the two ids (`BLUEPRINT hjnenx · TEMPLATES udrrap` on one line where that fits, else one each; a blueprint without an id shows `—`), the lines centred as one block in the title's type. Templates from before this rule can't tell a newer blueprint apart, and missing templates still fail with `TemplateNotFound`: nothing can draw then.
@@ -1504,6 +1538,8 @@ Proven: TRMNL text and Space Grotesk heroes on BWRY ESLs (1.4", 2.7", 3.5", 4.1"
 9. Warning outlines in the padding: on the 7.5" and 4.26" a detail-row outline reaches 7 and 8 px into the padding (S + `line.base`); it stays inside the visible area, clear of the bezel.
 10. Lines on the 1.4": every component draws its lines at `line.base`, but no 1.4" layout uses footers, lists or charts yet; the first one is the test.
 11. The history `plot` element: whether OpenDisplay draws a series with it (*Blueprint mechanics*); until then a series is runs of `line` segments.
+12. Single value: the unit beside a large number (`type.secondary`'s size next to an 88 or 104 px numeral) reads as part of the reading; an icon the kit has no glyph for (drawn by the renderer's icon element) sits acceptably beside the number.
+13. Single value on the 1.4": the number at its one size (under the Glance floor) still reads from where the label is used.
 
 ## Open items
 

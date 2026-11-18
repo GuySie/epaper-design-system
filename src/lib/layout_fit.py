@@ -42,7 +42,12 @@ FIT = {
 STRIP = ['weather_41', 'weather_75', 'weather_75p', 'weather_426']
 # layout -> its ordinary readings (scenarios; a one-digit count is every digit the cases have): the hero on its own is the
 # largest rung at which they pass and keep their icon
-GLANCE = {'weather_glance_14': ['wxp16'], 'doors_windows_14': ['openings_0', 'openings_1', 'openings_2en', 'openings_3'], 'medication_27l': ['med29'], 'weather_glance_35': ['wx35']}
+GLANCE = {'weather_glance_14': ['wxp16'], 'doors_windows_14': ['openings_0', 'openings_1', 'openings_2en', 'openings_3'], 'medication_27l': ['med29'], 'weather_glance_35': ['wx35'],
+          # Single value: a reading with an icon (a short one on the 1.4", where the unit has the line below)
+          'single_value_14': ['sv_wide4'], 'single_value_27l': ['sv_icon'], 'single_value_35': ['sv_icon']}
+# of those, the layouts whose hero is fitted on its widest reading instead: the largest rung at which that reading is
+# drawn (the layout has one size for every reading), whatever the Glance floor says. The 1.4" Single value: four digits
+WIDEST_HERO = {'single_value_14'}
 
 PAIRS = pairs()
 
@@ -65,8 +70,9 @@ def with_tokens(src, key, **kv):
     return src[:i] + b + src[j:]
 
 
-def passes(pkg, cases, icon_of=None):
-    """'' when every case passes the check, else the first failure. icon_of: the hero size whose icon must be drawn."""
+def passes(pkg, cases, icon_of=None, hero_of=None):
+    """'' when every case passes the check, else the first failure. icon_of: the hero size whose icon must be drawn;
+    hero_of: the hero size the number must be drawn at."""
     os.environ['EP_CT'] = f'{pkg}/custom_templates'
     # one case at a time: a failing candidate stops at its first failing case, and a try costs about one render either way,
     # so rendering a try's few cases in parallel saves nothing (measured)
@@ -78,17 +84,21 @@ def passes(pkg, cases, icon_of=None):
                 errs = [str(e)]
             except Exception as e:          # a candidate the layout can't draw (a size its tables don't cover) doesn't fit
                 errs = [f'render failed: {type(e).__name__}: {e}']
-        why = first_failure([c], [errs], icon_of)
+        why = first_failure([c], [errs], icon_of, hero_of)
         if why:
             return why
     return ''
 
 
-def first_failure(cases, results, icon_of):
+def first_failure(cases, results, icon_of, hero_of=None):
     for (scen, bp, *_), errs in zip(cases, results):
+        if not errs and hero_of:
+            _, payload, _ = check.PAYLOADS[f'{scen}@{bp}']
+            if not [e for e in payload if e.get('type') == 'text' and 'SpaceGrotesk' in str(e.get('font')) and e.get('size') == hero_of]:
+                errs = ['the number does not fit']
         if not errs and icon_of:
             _, payload, _ = check.PAYLOADS[f'{scen}@{bp}']
-            if not [e for e in payload if e.get('type') == 'text' and 'materialdesign' in str(e.get('font')) and e.get('size', 0) >= icon_of * 0.4]:
+            if not [e for e in payload if ((e.get('type') == 'text' and 'materialdesign' in str(e.get('font'))) or e.get('type') == 'icon') and e.get('size', 0) >= icon_of * 0.4]:
                 errs = ['the icon drops out']
         if errs:
             return f'{scen}: {errs[0]}'
@@ -104,10 +114,10 @@ class Fitter:
         self.top = top
         self.log = []
 
-    def _try(self, key, cases, icon_of=None, **kv):
+    def _try(self, key, cases, icon_of=None, hero_of=None, **kv):
         src = self.path.read_text()
         self.path.write_text(with_tokens(src, key, **kv))
-        why = passes(self.pkg, cases, icon_of)
+        why = passes(self.pkg, cases, icon_of, hero_of)
         if why:
             self.path.write_text(src)
         return why
@@ -145,8 +155,11 @@ class Fitter:
     def hero_alone(self, name, key, floor):
         cases = [c[:4] for c in check.CASES if c[1] == key and c[0] in GLANCE[key]]
         why = ''
+        widest = key in WIDEST_HERO
+        if widest:
+            floor = min(HERO_LADDER)
         for h in sorted((h for h in HERO_LADDER if floor <= h <= self.top), reverse=True):
-            w = self._try(name, cases, icon_of=h, type_heroAlone=h, icon_heroAloneSteps=PAIRS[h][2])
+            w = self._try(name, cases, icon_of=None if widest else h, hero_of=h if widest else None, type_heroAlone=h, icon_heroAloneSteps=PAIRS[h][2])
             if not w:
                 self.log.append(f'{key:22s} type.heroAlone {h}  (next rung up fails on {why or "nothing: the top rung"})')
                 return h

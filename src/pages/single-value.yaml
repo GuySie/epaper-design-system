@@ -1,0 +1,135 @@
+page: single-value
+description:
+  shows: One sensor's value, large enough to read across the room, with its unit beside it. An icon and a second value under
+    it are optional.
+  trigger_advice: 'A state trigger on the sensor, or a time pattern every 15 minutes for a sensor that changes often: every
+    redraw costs battery.'
+  title_default: the sensor's name
+redraw: trigger
+stale:
+- entity
+inputs:
+- name: entity
+  section: content
+  label: Sensor
+  help: The sensor whose value is shown.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  required: true
+- name: secondary_entity
+  section: content
+  label: Second sensor (optional)
+  help: Its value is shown on one line under the number. Leave blank for none.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: icon
+  section: content
+  label: Icon (optional)
+  help: Shown beside the number. Leave blank for none.
+  selector:
+    icon: {}
+  default: ''
+- name: flag_high
+  section: thresholds
+  label: 'High: flag it'
+  help: On, the number is flagged when it is at or above the two values below.
+  selector:
+    boolean: {}
+  default: false
+- name: warning_high
+  section: thresholds
+  label: 'High: warning at or above'
+  help: At or above this the number is a warning.
+  selector:
+    number:
+      mode: box
+      step: any
+  default: 0
+- name: severe_high
+  section: thresholds
+  label: 'High: severe at or above'
+  help: At or above this the number is severe.
+  selector:
+    number:
+      mode: box
+      step: any
+  default: 0
+- name: flag_low
+  section: thresholds
+  label: 'Low: flag it'
+  help: On, the number is flagged when it is at or below the two values below.
+  selector:
+    boolean: {}
+  default: false
+- name: warning_low
+  section: thresholds
+  label: 'Low: warning at or below'
+  help: At or below this the number is a warning.
+  selector:
+    number:
+      mode: box
+      step: any
+  default: 0
+- name: severe_low
+  section: thresholds
+  label: 'Low: severe at or below'
+  help: At or below this the number is severe.
+  selector:
+    number:
+      mode: box
+      step: any
+  default: 0
+bind:
+- entity
+- secondary_entity
+- icon: ds_icon
+- flag_high
+- warning_high
+- severe_high
+- flag_low
+- warning_low
+- severe_low
+data:
+  variables:
+  - ds_title: '{{ header_title if header_title else (entity_name(entity) or device_name(entity) or entity) }}'
+  - ds_value: |
+      {% set raw = states(entity) %} {% set ok = raw not in ['unknown', 'unavailable', 'none', ''] %} {% set n = raw | float(none) %}
+      {% set lvl = '' %}
+      {% if ok and n is not none %}
+        {% if (flag_high and n >= (severe_high | float(0))) or (flag_low and n <= (severe_low | float(0))) %}{% set lvl = 'sev' %}
+        {% elif (flag_high and n >= (warning_high | float(0))) or (flag_low and n <= (warning_low | float(0))) %}{% set lvl = 'warn' %}{% endif %}
+      {% endif %}
+      {% set s2 = states(secondary_entity) if secondary_entity else '' %}
+      {{ {'raw': raw if ok else '', 'unit': (state_attr(entity, 'unit_of_measurement') or '') if ok else '', 'level': lvl,
+          'second': s2 if s2 not in ['unknown', 'unavailable', 'none', ''] else '', 'second_unit': (state_attr(secondary_entity, 'unit_of_measurement') or '') if secondary_entity else ''} }}
+  draw:
+    kind: single
+texts:
+  en:
+    too_long: Value too long for this screen.
+  de:
+    too_long: Wert zu lang für diesen Bildschirm.
+  nl:
+    too_long: Waarde te lang voor dit scherm.
+  fr:
+    too_long: Valeur trop longue pour cet écran.
+  es:
+    too_long: Valor demasiado largo para esta pantalla.
+  pl:
+    too_long: Wartość za długa na ten ekran.
+  hr:
+    too_long: Vrijednost je preduga za ovaj zaslon.
+  sv:
+    too_long: Värdet är för långt för den här skärmen.
+layouts:
+  '14':
+    spec: single_value_14
+  27l:
+    spec: single_value_27l
+  '35':
+    spec: single_value_35

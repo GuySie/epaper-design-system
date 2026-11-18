@@ -67,6 +67,19 @@ CASES = [
     ('med_warn_g', 'medication_27l', 'skip', 'free'), ('rain168_g', 'rain_27l', 'skip', 'fill'), ('openings_3_g', 'doors_windows_14', 'skip', 'free'),
     ('w426_warn_g', 'weather_426', 'C', 'free'), ('a426_9_g', 'appointment_426', 'M', 'free'),
     ('cal42_empty', 'calendar_41', 'skip', 'free'), ('cal426_empty', 'calendar_426', 'skip', 'free'), ('appt_none', 'appointment_35', 'skip', 'free'),
+    # Single value (a Glance for any sensor): its states, then three other configurations (CONFIG_CASES)
+    ('sv', 'single_value_14', 'skip', 'free'), ('sv_widest', 'single_value_14', 'skip', 'free'), ('sv_warn', 'single_value_14', 'skip', 'free'), ('sv_sev', 'single_value_14', 'skip', 'free'),
+    ('sv_low', 'single_value_14', 'skip', 'free'), ('sv_y', 'single_value_14', 'skip', 'free'), ('sv_g', 'single_value_14', 'skip', 'free'), ('sv_title', 'single_value_14', 'skip', 'free'),
+    ('sv_stale', 'single_value_14', 'skip', 'free'), ('sv_unav', 'single_value_14', 'skip', 'free'), ('sv_flagoff', 'single_value_14', 'skip', 'free'), ('sv_icon', 'single_value_14', 'skip', 'free'),
+    ('sv_hum', 'single_value_14', 'skip', 'free'), ('sv_wide4', 'single_value_14', 'skip', 'free'), ('sv_err_long', 'single_value_14', 'skip', 'free'), ('pic_single_value_14', 'single_value_14', 'skip', 'free'),
+    ('sv', 'single_value_27l', 'skip', 'free'), ('sv_widest', 'single_value_27l', 'skip', 'free'), ('sv_warn', 'single_value_27l', 'skip', 'free'), ('sv_sev', 'single_value_27l', 'skip', 'free'),
+    ('sv_low', 'single_value_27l', 'skip', 'free'), ('sv_y', 'single_value_27l', 'skip', 'free'), ('sv_g', 'single_value_27l', 'skip', 'free'), ('sv_title', 'single_value_27l', 'skip', 'free'),
+    ('sv_stale', 'single_value_27l', 'skip', 'free'), ('sv_unav', 'single_value_27l', 'skip', 'free'), ('sv_flagoff', 'single_value_27l', 'skip', 'free'), ('sv_icon', 'single_value_27l', 'skip', 'free'),
+    ('sv_hum', 'single_value_27l', 'skip', 'free'), ('sv_long', 'single_value_27l', 'skip', 'free'), ('pic_single_value_27l', 'single_value_27l', 'skip', 'free'),
+    ('sv', 'single_value_35', 'skip', 'free'), ('sv_widest', 'single_value_35', 'skip', 'free'), ('sv_warn', 'single_value_35', 'skip', 'free'), ('sv_sev', 'single_value_35', 'skip', 'free'),
+    ('sv_low', 'single_value_35', 'skip', 'free'), ('sv_y', 'single_value_35', 'skip', 'free'), ('sv_g', 'single_value_35', 'skip', 'free'), ('sv_title', 'single_value_35', 'skip', 'free'),
+    ('sv_stale', 'single_value_35', 'skip', 'free'), ('sv_unav', 'single_value_35', 'skip', 'free'), ('sv_flagoff', 'single_value_35', 'skip', 'free'), ('sv_icon', 'single_value_35', 'skip', 'free'),
+    ('sv_hum', 'single_value_35', 'skip', 'free'), ('sv_long', 'single_value_35', 'skip', 'free'), ('pic_single_value_35', 'single_value_35', 'skip', 'free'),
     # the reference pictures (lib/pictures.py): each layout's ordinary state in English, `pic_<layout>`
     ('pic_appointment_35', 'appointment_35', 'skip', 'free'), ('pic_appointment_41', 'appointment_41', 'M', 'fill'), ('pic_appointment_426', 'appointment_426', 'M', 'free'),
     ('pic_calendar_41', 'calendar_41', 'skip', 'free'), ('pic_calendar_426', 'calendar_426', 'skip', 'free'), ('pic_claude_35', 'claude_35', 'M', 'free'),
@@ -77,6 +90,10 @@ CASES = [
     ('pic_weather_27p', 'weather_27p', 'C', 'fill'), ('pic_weather_35', 'weather_35', 'C', 'fill'), ('pic_weather_41', 'weather_41', 'C', 'fill'),
     ('pic_weather_426', 'weather_426', 'C', 'free'), ('pic_weather_75', 'weather_75', 'C', 'free'), ('pic_weather_75p', 'weather_75p', 'C', 'fill'),
 ]
+
+# cases that show another configuration of their page (an icon, a second value, a longer reading), not another state of
+# one device: the hero may be another size or sit elsewhere there (check.py same_layout leaves them out)
+CONFIG_CASES = {'sv_icon', 'sv_hum', 'sv_long', 'pic_single_value_14', 'pic_single_value_27l', 'pic_single_value_35'}
 
 SIZES = {l['key']: l['canvas'] for l in layouts()}      # layout key -> canvas (its screen's tier)
 WEATHER_EXTRA = ['wx', 'wx_cond', 'wx_alert', 'wx_warn', 'wx_y', 'wxneg', 'wx_p0', 'wx_warn_g', 'wx_moon', 'tonight', 'tonight_knmi', 'tonight_knmi2',

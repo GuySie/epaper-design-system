@@ -108,6 +108,7 @@ patterns:
 # rest) or '-' = not offered; the lint fails on another pattern's name
 pages:
   weather-glance: {name: Weather (Glance), uses: glance, status: live, default: [glance], widest: '-12°'}
+  single-value:   {name: Single value, uses: glance, status: live, default: [glance], widest: '-12.5'}
   weather:        {name: Weather, uses: hero-dashboard/strips, status: live, default: [hero-dashboard/strips], '14': ['-'], widest: '-12°'}
   medication:     {name: Medication, uses: glance, status: live, default: [glance], '14': ['-'], '27p': ['-'], widest: '20:00'}
   doors-windows:  {name: Doors & windows, uses: glance, status: live, default: [glance]}

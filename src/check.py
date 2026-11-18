@@ -63,7 +63,7 @@ _TOKENS = {}
 sys.path.insert(0, str(ROOT / 'lib'))
 # the one list of check cases, (scenario, blueprint, gap rule, bottom rule); gap 'skip': centred Glance, charts, row
 # layouts, error blocks. Each layout's kinds of state are listed in lib/coverage.py.
-from pixcmp_cases import B, CASES, EXTRA_CASES, SIZES   # noqa: E402
+from pixcmp_cases import B, CASES, EXTRA_CASES, SIZES, CONFIG_CASES   # noqa: E402
 from derive_tokens import HERO_GAP_DIV                  # noqa: E402
 
 
@@ -355,7 +355,8 @@ def same_layout():
     errs = []
     for bp in SAME:
         # states compared: not the error view, and not pollen at 0 or without a pollen sensor (the pollen row makes way)
-        sc = [(s, signature(b, p)) for s, (b, p, _) in PAYLOADS.items() if b == bp and 'err' not in s and not (bp in WEATHER and pollen_off(s.split('@')[0]))]
+        sc = [(s, signature(b, p)) for s, (b, p, _) in PAYLOADS.items() if b == bp and 'err' not in s and s.split('@')[0] not in CONFIG_CASES
+              and not (bp in WEATHER and pollen_off(s.split('@')[0]))]
         if bp in MODULE:          # a Hero dashboard with a module: the hero band and the divider stay put; the module's own lines follow its data
             (P, TH, M, rw), _ = tier_vals(bp)
             ym = (P + TH + SIZES[bp][1] - P) // 2
@@ -363,7 +364,7 @@ def same_layout():
         # the hero stays at its height in every state, pollen at 0 included: what appears takes a place that was kept for it
         ys = {}
         for s, (b, p, _) in PAYLOADS.items():
-            if b == bp and 'err' not in s:
+            if b == bp and 'err' not in s and s.split('@')[0] not in CONFIG_CASES:
                 h = [e['y'] for e in p if e.get('type') == 'text' and 'SpaceGrotesk' in str(e.get('font', ''))]
                 if h:
                     ys.setdefault(h[0], []).append(s.split('@')[0])
@@ -405,6 +406,8 @@ def group_checks(payload, items, L):
     for e, k, b in items:
         if not b or e.get('type') != 'text' or not str(e.get('font', '')).startswith('TRMNL'):
             continue
+        if 'Regular' in str(e.get('font')) and any(abs(b[3] - hb[3]) <= 1 and 0 <= b[0] - hb[2] <= L for _, hb in hero):
+            continue          # the hero's unit
         for h in grp:
             if b[1] <= h[3] and h[1] <= b[3]:
                 gap = max(b[0] - h[2], h[0] - b[2]) - 1

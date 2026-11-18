@@ -29,6 +29,7 @@ NOCHIP = 'n/a: no thresholds, so no warning or severe chips to show on a panel'
 NOSTALE = 'n/a: the page has no stale state (*Title row*, stale chip)'
 NOERR = 'n/a: the page has no error view'
 MONO = 'n/a: the 4.26" kit has no colour panel'
+NOERRV = 'n/a: the page has no error view (its sensor is required; an unavailable one draws a dash)'
 NOLIST = 'n/a: the page has no list or chart that can be empty (pollen at 0 is its own kind)'
 NOEMPTY = 'n/a: the page has no list or chart that can be empty'
 REQ = 'n/a: the first entry is required, so the list is never empty'
@@ -59,6 +60,10 @@ COVERAGE = {
     'doors_windows_14': pg('openings_1', 'openings_3', NOWARN, 'openings_3', 'openings_3_g', 'openings_3', 'openings_1_title', NOSTALE, 'openings_err', 'openings_unav', 'openings_0'),
     # appointment and calendar: no thresholds. An event in progress (NOW) is an ink chip, not a severity (*Severity*, *Now is
     # not a severity*); it is drawn by a35_1now, a41_1now, a426_1now, cal42 and cal426
+    # Single value: any sensor; its other configurations (an icon, a second value, a longer reading) are extra cases
+    'single_value_14': pg('sv', 'sv_wide4', 'sv_warn', 'sv_sev', 'sv_g', 'sv_y', 'sv_title', 'sv_stale', 'sv_err_long', 'sv_unav', NOEMPTY),
+    'single_value_27l': pg('sv', 'sv_widest', 'sv_warn', 'sv_sev', 'sv_g', 'sv_y', 'sv_title', 'sv_stale', NOERRV, 'sv_unav', NOEMPTY),
+    'single_value_35': pg('sv', 'sv_widest', 'sv_warn', 'sv_sev', 'sv_g', 'sv_y', 'sv_title', 'sv_stale', NOERRV, 'sv_unav', NOEMPTY),
     'appointment_35':   pg('appt35', 'a35_1w', NOTHR, NOTHR, NOCHIP, NOCHIP, 'appt35_title', NOSTALE, 'appt35_err', EVENTS, 'appt_none'),
     'appointment_41': pg('a41_6', 'a41_1w', NOTHR, NOTHR, 'a41_6_g', NOCHIP, 'a41_6_title', NOSTALE, 'a41_err', EVENTS, 'a41_0'),
     'appointment_426': pg('a426_9', 'a426_1w', NOTHR, NOTHR, 'a426_9_g', MONO, 'a426_9_title', NOSTALE, 'a426_err', EVENTS, 'a426_0'),
