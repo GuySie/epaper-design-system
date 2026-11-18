@@ -257,7 +257,7 @@ WXM = r'''
 {#- hour labels are short ('15¦h'): the h is styled as a unit and never uppercased -#}
 {%- set la = a if '¦' in a else a | upper -%}
 {%- set cy = y + rh // 2 -%}
-{%- if ak -%}{{- R(ns, P - sx, cy - (rh - 1) // 2, P + (VALUE_W(LEVEL_MARK(ak) ~ la, ds, df) | int) - 2 + sx - 1, cy - (rh - 1) // 2 + rh - 2, LEVEL_FILL(ak)) -}}{%- endif -%}
+{%- if ak -%}{{- R(ns, P - sx, cy - (rh - 1) // 2, P + (VALUE_W(LEVEL_MARK(ak) ~ la, ds, df) | int) - (TAIL(ds) | int) + sx - 1, cy - (rh - 1) // 2 + rh - 2, LEVEL_FILL(ak)) -}}{%- endif -%}
 {{- T(ns, LEVEL_MARK(ak) ~ la, P, cy, df, ds, LEVEL_TEXT(ak), 'lm') -}}
 {%- if sev -%}{{- RCHIP(ns, LEVEL_MARK(sev) ~ MM(mm), mx, cy, df, ds, 0, 0, LEVEL_FILL(sev), LEVEL_TEXT(sev), rh) -}}
 {%- else -%}{{- T(ns, MM(mm), mx, cy, df, ds, color.ink, 'rm') -}}{%- endif -%}

@@ -177,7 +177,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'shthuf'
+  ds_set: 'iiyqeo'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'

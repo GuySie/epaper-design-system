@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'shthuf' -%}
+{%- set EP_SET = 'iiyqeo' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -369,13 +369,16 @@
 {#- LSB: TRMNL left side bearings per font ('_' = every other glyph) -#}
 {#- DS.tight: units sit 2 px from their value (no space) on a canvas narrower than space.tightMm; set by TITLE (*Units and numbers*) -#}
 {%- set DS = namespace(tight=false) -%}
+{#- TAIL: the trailing space a TRMNL advance includes: 2 px at the native sizes, 4 px at a 2x cut (24, 32, 42) -#}
+{%- macro TAIL(s) -%}{{ 4 if (s | int) > 21 else 2 }}{%- endmacro -%}
 {%- macro T(ns, v, x, y, f, s, c='black', a='lm', mw=0) -%}
-{#- TRMNL advances include 2 px of trailing space: shift right/centre anchors so the ink itself ends on x (or centres on it) -#}
+{#- TRMNL advances include trailing space (TAIL): shift right/centre anchors so the ink itself ends on x (or centres on it) -#}
 {#- ...and the first glyph's left side bearing (1 px at 12/16, 2 at 21): left anchors shift left so the ink itself starts on x -#}
 {%- set v = NORMALISE(v) if 'TRMNL' in (f | string) else v -%}
 {%- set vk = (s | string) ~ ('r' if 'Regular' in (f | string) else '') -%}
 {%- set v0 = ((v | string) | replace('¦', ''))[:1] -%}
-{%- set x = x + ((2 if a[0] == 'r' else (1 if a[0] == 'm' else (0 - ((LSB[vk][v0] if v0 in LSB[vk] else LSB[vk]['_']) if (v0 and vk in LSB) else 0)))) if 'TRMNL' in (f | string) else 0) -%}
+{%- set tl = 4 if s > 21 else 2 -%}
+{%- set x = x + ((tl if a[0] == 'r' else ((tl // 2) if a[0] == 'm' else (0 - ((LSB[vk][v0] if v0 in LSB[vk] else LSB[vk]['_']) if (v0 and vk in LSB) else 0)))) if 'TRMNL' in (f | string) else 0) -%}
 {%- set v = SEGS(v, f) -%}
 {%- if '¦' in v -%}
 {%- set parts = v.split('¦') -%}
@@ -604,7 +607,7 @@
 {%- set lf, ls = FONT[lb[0]], lb[1] -%}
 {%- set xs, ss = SPACE_XS(ps) | int, SPACE_S(ps) | int -%}
 {%- set tw = namespace(w=0) -%}{%- for e in events -%}{%- set tw.w = [tw.w, VALUE_W(e.start, ps, fb) | int] | max -%}{%- endfor -%}
-{%- set te = x0 + tw.w - 2 -%}
+{%- set te = x0 + tw.w - (TAIL(ps) | int) -%}
 {%- set tx = te + EP_TK.space.l -%}
 {%- set gap = pitch - (EINK() | int) -%}
 {%- set ro = gap - (gap - 1) // 2 -%}
@@ -678,9 +681,9 @@
 {%- endif -%}
 {%- endmacro -%}
 {#- CCHIP: a centred chip around v at (cx, cy): the text + 2 x space.s wide, s + 2 x space.xs high. On a stacked text line, p is the pitch to the neighbouring text line and the chip is p - 1 high (a 1 px paper gap to a chip next to it) -#}
-{#- CHIP_PAD: what a chip is wider than its text: space.s on both sides, less the text's 2 px trailing bearing.
+{#- CHIP_PAD: what a chip is wider than its text: space.s on both sides, less the text's trailing space (TAIL).
      CHIPW: the width of a chip around v -#}
-{%- macro CHIP_PAD(s) -%}{{ 2 * (SPACE_S(s) | int) - 2 }}{%- endmacro -%}
+{%- macro CHIP_PAD(s) -%}{{ 2 * (SPACE_S(s) | int) - (TAIL(s) | int) }}{%- endmacro -%}
 {%- macro CHIPW(v, s, f) -%}{{ (VALUE_W(v, s, f) | int) + (CHIP_PAD(s) | int) }}{%- endmacro -%}
 {%- macro CCHIP(ns, v, cx, cy, f, s, cw, bg, fg, p=0) -%}
 {%- set xs = SPACE_XS(s) | int -%}
@@ -694,7 +697,7 @@
 {%- set xs, sx = SPACE_XS(s) | int, SPACE_S(s) | int -%}
 {%- set tw = VALUE_W(v, s, f) | int -%}
 {%- set ch = (rh - 1) if rh else (s + 2 * xs) -%}
-{{- R(ns, xr - tw + 2 - sx, cy - (ch // 2), xr + sx, cy - (ch // 2) + ch - 1, bg) -}}
+{{- R(ns, xr - tw + (TAIL(s) | int) - sx, cy - (ch // 2), xr + sx, cy - (ch // 2) + ch - 1, bg) -}}
 {{- T(ns, v, xr, cy, f, s, fg, 'rm') -}}
 {%- endmacro -%}
 {#- update stamp: weekday + time, e.g. ZO 17:58 (TITLE turns a number into this) -#}
@@ -744,7 +747,7 @@
 {%- set sf, ss = FONT[st[0]], st[1] -%}
 {%- set sdy = CAPDN[s] - CAPDN[ss] -%}
 {%- if stale -%}{%- set sf, ss, sdy = fb, s, 0 -%}{%- endif -%}
-{%- set sw = 0 if not right else ((TEXT_W(stxt, ss, sf) | int) - 2 + (sx if stale else 0) + EP_TK.space.l) -%}
+{%- set sw = 0 if not right else ((TEXT_W(stxt, ss, sf) | int) - (TAIL(ss) | int) + (sx if stale else 0) + EP_TK.space.l) -%}
 {{- T(ns, title | upper, P, cy, fb, s, color.ink, 'lm', W - 2 * P - sw) -}}
 {%- if right and stale -%}
 {{- RCHIP(ns, stxt, W - P - 1, cy, fb, s, 0, 0, 'outline' if color.warningChip == 'outline' else color.ink, color.ink if color.warningChip == 'outline' else color.paper) -}}
@@ -817,7 +820,7 @@
 {%- for r in rows -%}{%- if r.k == 'ev' and r.l.time -%}
 {%- set tw.w = [tw.w, VALUE_W(r.l.time, ds, df) | int] | max -%}
 {%- endif -%}{%- endfor -%}
-{%- set te = x0 + tw.w - 2 -%}{%- set tx = te + EP_TK.space.l -%}
+{%- set te = x0 + tw.w - (TAIL(ds) | int) -%}{%- set tx = te + EP_TK.space.l -%}
 {%- set y = namespace(v=top) -%}
 {%- for r in rows -%}
 {%- if r.k == 'head' -%}
@@ -1715,7 +1718,7 @@
 {#- hour labels are short ('15¦h'): the h is styled as a unit and never uppercased -#}
 {%- set la = a if '¦' in a else a | upper -%}
 {%- set cy = y + rh // 2 -%}
-{%- if ak -%}{{- R(ns, P - sx, cy - (rh - 1) // 2, P + (VALUE_W(LEVEL_MARK(ak) ~ la, ds, df) | int) - 2 + sx - 1, cy - (rh - 1) // 2 + rh - 2, LEVEL_FILL(ak)) -}}{%- endif -%}
+{%- if ak -%}{{- R(ns, P - sx, cy - (rh - 1) // 2, P + (VALUE_W(LEVEL_MARK(ak) ~ la, ds, df) | int) - (TAIL(ds) | int) + sx - 1, cy - (rh - 1) // 2 + rh - 2, LEVEL_FILL(ak)) -}}{%- endif -%}
 {{- T(ns, LEVEL_MARK(ak) ~ la, P, cy, df, ds, LEVEL_TEXT(ak), 'lm') -}}
 {%- if sev -%}{{- RCHIP(ns, LEVEL_MARK(sev) ~ MM(mm), mx, cy, df, ds, 0, 0, LEVEL_FILL(sev), LEVEL_TEXT(sev), rh) -}}
 {%- else -%}{{- T(ns, MM(mm), mx, cy, df, ds, color.ink, 'rm') -}}{%- endif -%}
