@@ -12,7 +12,7 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 | [`epaper-blueprint-1.4-doors-windows.yaml`](blueprints/epaper-blueprint-1.4-doors-windows.yaml) | Doors & windows 1.4" | How many of your outside doors and windows are open, and which one, so you can check before you leave. |
 | [`epaper-blueprint-1.4-single-value.yaml`](blueprints/epaper-blueprint-1.4-single-value.yaml) | Single value 1.4" | One sensor's value, large enough to read across the room, with its unit beside it. An icon and a second value under it are optional. |
 | [`epaper-blueprint-1.4-tiles.yaml`](blueprints/epaper-blueprint-1.4-tiles.yaml) | Tiles 1.4" | Up to 12 entities as tiles, each with an icon, its state and its label. How many fit depends on the screen; with fewer entities the tiles grow. |
-| [`epaper-blueprint-1.4-weather-glance.yaml`](blueprints/epaper-blueprint-1.4-weather-glance.yaml) | Weather (Glance) 1.4" | The weather at a glance: the temperature large, with the condition icon, and one more reading under it. |
+| [`epaper-blueprint-1.4-weather-at-a-glance.yaml`](blueprints/epaper-blueprint-1.4-weather-at-a-glance.yaml) | Weather at a glance 1.4" | The weather at a glance: the temperature large, with the condition icon, and one more reading under it. |
 | [`epaper-blueprint-2.7-history-graph-landscape.yaml`](blueprints/epaper-blueprint-2.7-history-graph-landscape.yaml) | History graph 2.7" landscape | One sensor's recent history as a line graph: the last hours, the current value, and the period's lowest and highest. |
 | [`epaper-blueprint-2.7-levels-landscape.yaml`](blueprints/epaper-blueprint-2.7-levels-landscape.yaml) | Levels 2.7" landscape | Up to six sensors as rows, each with its value and a bar that shows how full it is: batteries, tanks, power, humidity. |
 | [`epaper-blueprint-2.7-medication-landscape.yaml`](blueprints/epaper-blueprint-2.7-medication-landscape.yaml) | Medication 2.7" landscape | A medication log on one button: press it after taking your medication, and the device shows the time and date of that press, so a glance answers "did I already take this?" |
@@ -32,7 +32,7 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 | [`epaper-blueprint-3.5-single-value.yaml`](blueprints/epaper-blueprint-3.5-single-value.yaml) | Single value 3.5" | One sensor's value, large enough to read across the room, with its unit beside it. An icon and a second value under it are optional. |
 | [`epaper-blueprint-3.5-sun-moon.yaml`](blueprints/epaper-blueprint-3.5-sun-moon.yaml) | Sun & moon 3.5" | Today's dawn, sunrise, noon, sunset and dusk, with the sun (and optionally the moon) on a horizon track. |
 | [`epaper-blueprint-3.5-tiles.yaml`](blueprints/epaper-blueprint-3.5-tiles.yaml) | Tiles 3.5" | Up to 12 entities as tiles, each with an icon, its state and its label. How many fit depends on the screen; with fewer entities the tiles grow. |
-| [`epaper-blueprint-3.5-weather-glance.yaml`](blueprints/epaper-blueprint-3.5-weather-glance.yaml) | Weather (Glance) 3.5" | The weather at a glance: the temperature large, with the condition icon, and one more reading under it. |
+| [`epaper-blueprint-3.5-weather-at-a-glance.yaml`](blueprints/epaper-blueprint-3.5-weather-at-a-glance.yaml) | Weather at a glance 3.5" | The weather at a glance: the temperature large, with the condition icon, and one more reading under it. |
 | [`epaper-blueprint-3.5-weather.yaml`](blueprints/epaper-blueprint-3.5-weather.yaml) | Weather 3.5" | Current weather with the temperature as the hero, its details, the coming hours and the coming days, with warnings and pollen as chips. |
 | [`epaper-blueprint-4.1-calendar.yaml`](blueprints/epaper-blueprint-4.1-calendar.yaml) | Calendar 4.1" | The coming days, each under its day header with its events, today first; later days fold into one line when they don't fit. |
 | [`epaper-blueprint-4.1-history-graph.yaml`](blueprints/epaper-blueprint-4.1-history-graph.yaml) | History graph 4.1" | One sensor's recent history as a line graph: the last hours, the current value, and the period's lowest and highest. |
@@ -56,15 +56,15 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 Each blueprint on a black, white, red and yellow panel (the 4.26" is black and white), at the panel's own pixels. Where a page has thresholds the picture shows them at work: a warning in yellow and a severe state in red. The pictures are the release's check renders, so they show what the devices get.
 
 <!-- registry:pictures -->
-**Weather (Glance)**
+**Weather at a glance**
 
-Weather (Glance) 1.4"
+Weather at a glance 1.4"
 
-![Weather (Glance) 1.4"](docs/images/epaper-blueprint-1.4-weather-glance.png)
+![Weather at a glance 1.4"](docs/images/epaper-blueprint-1.4-weather-at-a-glance.png)
 
-Weather (Glance) 3.5"
+Weather at a glance 3.5"
 
-![Weather (Glance) 3.5"](docs/images/epaper-blueprint-3.5-weather-glance.png)
+![Weather at a glance 3.5"](docs/images/epaper-blueprint-3.5-weather-at-a-glance.png)
 
 
 **Single value**

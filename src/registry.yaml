@@ -104,7 +104,7 @@ patterns:
 # pages: what a blueprint offers (its blueprints are its layouts in pages/<page>.yaml, never listed here). uses = pattern[/version]; layouts per screen: the page's own pattern (default for the
 # rest) or '-' = not offered; the lint fails on another pattern's name
 pages:
-  weather-glance: {name: Weather (Glance), uses: glance, status: live, default: [glance], widest: '-12°'}
+  weather-glance: {name: Weather at a glance, uses: glance, status: live, default: [glance], widest: '-12°'}
   single-value:   {name: Single value, uses: glance, status: live, default: [glance], widest: '-12.5'}
   weather:        {name: Weather, uses: hero-dashboard/strips, status: live, default: [hero-dashboard/strips], '14': ['-'], widest: '-12°'}
   medication:     {name: Medication, uses: glance, status: live, default: [glance], '14': ['-'], '27p': ['-'], widest: '20:00'}
@@ -123,12 +123,9 @@ pages:
   bin-day:        {name: Bin day, uses: glance/word, status: mock, default: [glance/word]}
   room-sign:      {name: Room sign, uses: glance/word, status: mock, default: [glance/word]}
   appliance:      {name: Appliance run, uses: glance/progress, status: mock, default: [glance/progress], '14': ['-'], '27p': ['-'], widest: '20:00'}
-  countdown:      {name: Countdown, uses: glance, status: mock, default: [glance]}
-  date:           {name: Today's date, uses: glance, status: mock, default: [glance], widest: '28'}
   energy-price:   {name: Energy price, uses: bar-chart/prices, status: mock, default: [bar-chart/prices], '14': ['-'], '27p': ['-']}
   departures:     {name: Departures, uses: event-list/line-numbers, status: mock, default: [event-list/line-numbers], '14': ['-']}
   energy-flows:   {name: Solar & battery, uses: meters/both-ways, status: mock, default: [meters/both-ways], '14': ['-'], widest: '100%'}
-  packages:       {name: Packages, uses: key-value-list, status: mock, default: [key-value-list], '14': ['-']}
   todo:           {name: To-do list, uses: checklist, status: mock, default: [checklist], '14': ['-']}
   tiles:          {name: Tiles, uses: tiles, status: live, default: [tiles], widest: 'Triggered'}
   month:          {name: Month overview, uses: month, status: mock, default: [month], '14': ['-'], '27p': ['-']}

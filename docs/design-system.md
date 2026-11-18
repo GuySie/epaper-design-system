@@ -180,8 +180,8 @@ What each font measures on each tier (x-height / cap height):
 <!-- registry:tier-hero -->
 | Page | Screen | Hero group | Hero | Hero icon | Strip icons (hour / day) | Digit height | mm |
 |---|---|---|---|---|---|---|---|
-| Weather (Glance) | 1.4" | on its own | 80 px | 80 → 48 | — | 58 px | 7.5 |
-| Weather (Glance) | 3.5" | on its own | 104 px | 104 → 64 | — | 75 px | 15.5 |
+| Weather at a glance | 1.4" | on its own | 80 px | 80 → 48 | — | 58 px | 7.5 |
+| Weather at a glance | 3.5" | on its own | 104 px | 104 → 64 | — | 75 px | 15.5 |
 | Single value | 1.4" | on its own | 72 px | 72 → 48 | — | 53 px | 6.9 |
 | Single value | 2.7" L | on its own | 88 px | 88 → 56 | — | 64 px | 10.7 |
 | Single value | 3.5" | on its own | 104 px | 104 → 64 | — | 75 px | 15.5 |
@@ -637,7 +637,7 @@ Three levels, the same on every module:
 
 | Page | Data | Warning | Severe |
 |---|---|---|---|
-| <!-- v:inputPages:warning_temp_low -->Weather (Glance), Weather, Weather and calendar<!-- /v --> | Cold (`*_temp_low`) | ≤ <!-- v:input:weather:warning_temp_low -->3°<!-- /v --> | ≤ <!-- v:input:weather:severe_temp_low -->0°<!-- /v --> |
+| <!-- v:inputPages:warning_temp_low -->Weather at a glance, Weather, Weather and calendar<!-- /v --> | Cold (`*_temp_low`) | ≤ <!-- v:input:weather:warning_temp_low -->3°<!-- /v --> | ≤ <!-- v:input:weather:severe_temp_low -->0°<!-- /v --> |
 | | Heat (`*_temp_high`) | ≥ <!-- v:input:weather:warning_temp_high -->27°<!-- /v --> | ≥ <!-- v:input:weather:severe_temp_high -->35°<!-- /v --> |
 | | Wind (`*_wind_high`) | ≥ <!-- v:input:weather:warning_wind_high -->50 km/h<!-- /v --> | ≥ <!-- v:input:weather:severe_wind_high -->75 km/h<!-- /v --> |
 | | Rain per hour (`*_rain_hour`) | ≥ <!-- v:input:weather:warning_rain_hour -->2.5 mm/h<!-- /v --> | ≥ <!-- v:input:weather:severe_rain_hour -->10 mm/h<!-- /v --> |
@@ -655,7 +655,7 @@ Three levels, the same on every module:
 | Doors & windows | An opening is open | — | the openings in `severe_openings` |
 
 - **No thresholds** where nothing can be bad: Calendar, Next appointment, Sun & moon. The Entities list has none either: one pair can't fit up to 12 arbitrary sensors; it shows "—" and its error state instead.
-- **Page-specific threshold rules** are with their page: weather (pollen levels, conditions, official warnings, high/low, the *Override order*) in *Weather (Glance) and Weather*, the redraw at a deadline in *Medication*.
+- **Page-specific threshold rules** are with their page: weather (pollen levels, conditions, official warnings, high/low, the *Override order*) in *Weather at a glance and Weather*, the redraw at a deadline in *Medication*.
 
 ### Unavailable, stale, empty and error
 
@@ -810,7 +810,7 @@ The footer is an **optional single text line at the bottom of a screen**. It say
 
 | Page and screens | Footer |
 |---|---|
-| Weather (Glance) 1.4", 3.5"; Medication 2.7"; Doors & windows 1.4" | none (Glance) |
+| Weather at a glance 1.4", 3.5"; Medication 2.7"; Doors & windows 1.4" | none (Glance) |
 | Weather 2.7" landscape, 3.5" | none (no room; the strip is the last module) |
 | Weather 2.7" portrait, 4.1", 7.5" portrait | (a) forecast conclusion |
 | Weather 7.5" landscape, 4.26" | none (strips fill the panel; sunrise/sunset in the detail rows) |
@@ -884,7 +884,7 @@ Bar chart and Line chart share the chart frame; the Timeline shares its clock-ti
 
 Every Glance page draws with one macro, `GLANCE`: the title row and the hero block (the hero group on its own and the Glance secondary under it, centred as one block; `HBLOCK`). The page passes the title, the stamp, the hero and its icon, and the Glance secondary: plain text, a chip at a level, or one it draws itself (the weather's pick, *Override order*).
 
-- A readout for across the room (Weather (Glance), Single value, Medication, Doors & windows: the number open as the hero, the first open one as the chip, redrawn only when the count changes).
+- A readout for across the room (Weather at a glance, Single value, Medication, Doors & windows: the number open as the hero, the first open one as the chip, redrawn only when the count changes).
   1. **Everything with data is large:** the hero (`type.heroAlone`, the hero group *on its own*) and **at most one secondary value**, in `type.secondary` (TRMNL21 Bold). If a value isn't worth that size, it belongs on another pattern.
   2. **Severity takes the Glance secondary**, in the *Override order*: the picked item replaces the secondary value as a chip, at the same large size. Temperature chips the hero itself.
   3. **The only small text is the title and the update stamp**, in the title row. They are metadata, so they only need the label minimum.
@@ -1101,7 +1101,7 @@ A page is a pattern filled with real content for one use. Each page names the pa
 <!-- registry:pages -->
 | Page | Uses | Status | Widest reading | 1.4" | 2.7" L | 2.7" P | 3.5" | 4.1" | 4.26" | 7.5" L | 7.5" P | 7.09" (no tier yet) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Weather (Glance)** | Glance | live | -12° | ● | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
+| **Weather at a glance** | Glance | live | -12° | ● | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Single value** | Glance | live | -12.5 | ● | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Weather** | Hero dashboard with forecast strips | live | -12° | — | ● | ● | ● | ● | ● | ● | ● | ○ |
 | **Medication** | Glance | live | 20:00 | — | ● | — | ○ | ○ | ○ | ○ | ○ | ○ |
@@ -1120,12 +1120,9 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | **Bin day** | Glance with a word | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Room sign** | Glance with a word | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Appliance run** | Glance with a progress bar | mock | 20:00 | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Countdown** | Glance | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Today's date** | Glance | mock | 28 | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Energy price** | Bar chart for prices | mock | — | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Departures** | Event list with line numbers | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Solar & battery** | Meters both ways | mock | 100% | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Packages** | Key-value list | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **To-do list** | Checklist | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Tiles** | Tiles | live | Triggered | ● | ● | ● | ● | ● | ○ | ● | ● | ○ |
 | **Month overview** | Month | mock | — | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
@@ -1137,14 +1134,14 @@ A page is a pattern filled with real content for one use. Each page names the pa
 
 **Rules for every page:**
 
-- **One page, one pattern.** A page fills the same pattern on every screen it is offered on. The same content in another pattern is a page of its own, named after it: Weather (Glance) beside Weather. Where a page's pattern doesn't fit a screen, it isn't offered there; Rain forecast, Energy price, Solar & battery and Value with details get a Glance page for the 1.4" when one is built.
+- **One page, one pattern.** A page fills the same pattern on every screen it is offered on. The same content in another pattern is a page of its own with a name of its own; the Glance page beside a larger one is called *<page> at a glance*: Weather at a glance beside Weather. Where a page's pattern doesn't fit a screen, it isn't offered there; Rain forecast, Energy price, Solar & battery and Value with details get a Glance page for the 1.4" when one is built.
 - **Clock times, never countdowns of minutes** (*Text rules*, *Clock times, never relative times*).
 - **The widest reading decides the layout.** Every size and every layout is chosen for the widest reading the page's entity can show (`100%`, `4000`, `-12°`, day `28`), so a screen keeps its layout from one reading, and one state, to the next. The one exception is the hero on its own, fitted on its ordinary reading: at a wider one its icon gives way (*Hero group*, *Wide readings*).
 - **Labels don't change with the state** (`NET`, not `NET IMPORT` / `NET EXPORT`): a direction goes in the value (`-0.4 kW`).
 
-### Weather (Glance) and Weather
+### Weather at a glance and Weather
 
-Two pages with the same content: Weather (Glance), on the 1.4" and the 3.5", and Weather, the Hero dashboard *with forecast strips*, from the 2.7" to the 7.5", landscape and portrait.
+Two pages with the same content: Weather at a glance, on the 1.4" and the 3.5", and Weather, the Hero dashboard *with forecast strips*, from the 2.7" to the 7.5", landscape and portrait.
 
 - **Shows:** the current temperature as the hero, with the condition icon (and the moon badge, day and night: *When to use an icon*); on the Hero dashboard the detail rows (today's rain, wind, high/low; humidity, pressure, sunrise and sunset where there is room; the pollen row), the hour strip and the day strip; on the Glance the Glance secondary (*Override order*).
 - **Tested with:** −12° (the widest reading), a negative temperature with the moon badge, an official warning (KNMI code orange), a current condition alert, pollen at 0 and high, stale data, no data (the error block), a black/white panel, a 4-gray panel, 12-hour English, a long title.
@@ -1175,7 +1172,7 @@ One order everywhere a single place has to choose (the `PICK` macro):
 
 Where it applies:
 
-- **Glance secondary** (Weather (Glance), Medication): the picked item as a chip. With nothing flagged: pollen above zero (`BIRCH 40ppm`, *Pollen*), else high/low. Medication: the date becomes the overdue chip (date · status; its redraws are under *Medication*).
+- **Glance secondary** (Weather at a glance, Medication): the picked item as a chip. With nothing flagged: pollen above zero (`BIRCH 40ppm`, *Pollen*), else high/low. Medication: the date becomes the overdue chip (date · status; its redraws are under *Medication*).
 - **2.7" portrait, the text line under the icon:** high/low stays; the second item is the picked item as a chip (pollen excluded: it has its own block), else today's rain (or wind). The chip's full text (`CODE YELLOW FOG`) beats keeping high/low on the text line: the chip takes the whole text line when both don't fit. When high/low itself is picked, it is the chip (`MAX/MIN 11°/3°`) and rain follows only if it fits.
 - **Detail rows (Hero dashboard):** the alert row (official warning, else the current condition) becomes the first row, and the pollen row (pollen above 0) the last. Each takes a row's place so the block keeps its size, and **a row with a chip makes way last**. Each layout names a make-way order for the alert row and one for the pollen row. The alert row chooses first: the first unflagged row still shown in its order makes way, else the first warning-level one, else the first in the order. Then the pollen row chooses the same way. One rule for every layout (`DROWS`):
   - 7.5" (landscape and portrait, and *Weather and calendar*), 4.26": alert row and pollen row: pressure, wind, high/low. Sunrise and sunset never make way.
@@ -1270,6 +1267,7 @@ A Glance for any sensor: its number, large, with its unit.
 
 - **Shows:** one entity's number as the hero, with its unit. The title is the entity's name unless a header title is given.
 - **Tested with:** `1240 ppm`; the widest reading (`-12.5 °C`); a high reading at warning and at severe, a low one at severe; a yellow and a grey panel; a long title; stale data; an unavailable sensor (`—`); both switches off. As other configurations: an icon with a second value (`21.4 °C`, `48 %`), a short reading with an icon (`48 %`), and a reading longer than the widest (`123456 kWh`: a smaller number on the 2.7" and 3.5", the error state on the 1.4").
+- **Examples:** a room's CO2 or temperature; a countdown (whole days as the number, the date as the second value); today's date (the day of the month as the number, never the clock time).
 - **Unit:** after the number, on its baseline, as *Hero group*, *A unit beside the number* says. On the 1.4" the unit is the Glance secondary instead: a four-digit number needs the screen's width.
 - **Widest reading:** four characters and a three-letter unit (`1240 ppm`, `-12.5 °C`). A longer reading steps down the hero ladder one rung at a time until it fits, as a word-hero does (*Glance with a word*); it is never cut.
 - **The 1.4" has one size.** Its hero is fitted on the widest four digits (`4000`) and never steps, so the number keeps its size whatever the value; that size is under the Glance floor, the one exception to it (*Physical size minimums*). A reading too wide for it is the error state: "Value too long for this screen."
@@ -1436,6 +1434,7 @@ A Key-value list of up to 12 entities.
 
 - **Shows:** name and state with its unit, one or two columns.
 - **Tested with:** 12 entities (two columns), unavailable values, more than half unavailable (the error state), stale data, Home Assistant's own unit glyphs (µg/m³, ℃).
+- **Examples:** a room's sensors; packages on their way, one row per parcel with where it is.
 
 <!-- registry:inputs-entities -->
 | Screen | Inputs of this page |
@@ -1554,7 +1553,7 @@ A *Hero dashboard with a chart or list*: the weather's hero band over the calend
 
 - **Shows:** the current temperature as the hero with its condition icon (and the moon badge) and the 7.5" detail rows in the top half; the coming days with their events in the bottom half.
 - **Tested with:** −12° with the moon badge, an official warning with pollen at severe (both take a detail row), an event in progress, a full calendar that overflows, an empty day, no calendar chosen, weather unavailable, stale weather, a grayscale panel, a long title.
-- **Rules:** the weather's (*Weather (Glance) and Weather*: thresholds, *Pollen*, *Override order*, with the 7.5" detail rows and their make-way order) and the calendar's (*Calendar*: an event in progress is an ink row chip, today by name).
+- **Rules:** the weather's (*Weather at a glance and Weather*: thresholds, *Pollen*, *Override order*, with the 7.5" detail rows and their make-way order) and the calendar's (*Calendar*: an event in progress is an ink row chip, today by name).
 
 <!-- registry:inputs-weather-calendar -->
 | Screen | Inputs of this page |
@@ -1570,7 +1569,7 @@ A *Hero dashboard with a chart or list*: the weather's hero band over the calend
 
 ### Mocked-up pages
 
-Bin day, Room sign, Appliance run, Countdown, Today's date, Energy price, Departures, Solar & battery, Packages, To-do list, Month overview, Message board, Now playing, Guest Wi-Fi, and the Hero dashboard Value with details: their patterns and layouts are in the table above, their rules with the pattern versions they use. Countdown is a Glance with whole days as the hero and the date in the Glance secondary; Today's date has the day of the month as its hero, never the clock time.
+Bin day, Room sign, Appliance run, Energy price, Departures, Solar & battery, To-do list, Month overview, Message board, Now playing, Guest Wi-Fi, and the Hero dashboard Value with details: their patterns and layouts are in the table above, their rules with the pattern versions they use.
 
 ## Blueprint mechanics
 
@@ -1584,7 +1583,7 @@ What every blueprint does the same way; where it can, through a shared part that
   5. **Advanced** (collapsed): `stale_after`, `led_color`, `led_flash_delay` and `font_dir`. The LED inputs are there wherever a button can start the redraw: the LED confirms the press. A blueprint that redraws on a change (Doors & windows) has none.
 - **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button). Every other input has a default, and an optional entity left empty removes its part of the page. The Rain forecast has no main entity: it needs one of its two sources.
 - **Input names:** the device input is always `displays`, also where it takes one device (Medication). Numbered entries are `<name>_<n>` with `<name>_<n>_label` (`entity_1`, `plant_1`, `bar_1`). Thresholds are `warning_<what>` and `severe_<what>`, their switch `flag_<what>`. A blueprint's variables keep the names its drawing reads, so renaming an input never changes the drawing.
-  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather (Glance), Single value, Weather, Rain forecast, CO2 graph, History graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar, Tiles<!-- /v -->); see *Title row* for the exempt blueprints.
+  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather at a glance, Single value, Weather, Rain forecast, CO2 graph, History graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar, Tiles<!-- /v -->); see *Title row* for the exempt blueprints.
   - The panel is never an input: a page drawn on two screens is two blueprints (the Rain forecast on the 3.5" and on the 2.7" landscape).
 - **Texts:** every blueprint's strings live in `ep_i18n.jinja`, written from the page definitions (per page, `EP_TXT['<page>']`, which the blueprint's `language_map` reads; the weekday and month lists once, in `pages/_shared.yaml`) and `wx_txt.yaml` (the weather words, `ds_wtxt`), keyed by the 8 language codes, holding weekday/month names and every user-facing string (including the empty, error and stale strings). Paired with separate `weekday_short_map` / `months_short_map` dicts, which read `EP_DAYS_SHORT` / `EP_MONTHS_SHORT`. The update stamp uses weekday + time (`SU 17:58`); dates in content use `SU 8 NOV`. Don't fold them into `language_map`.
 - **One set.** A release gives its templates and its blueprints the same set id: a short hash of the four templates as built, so it changes when the templates change and only then (`lib/set_id.py`). Every blueprint hands its id to the drawing, and the templates compare it with theirs. When they differ, or the blueprint has none, the templates draw the title row and the error block and nothing else: the message (`UPDATE TEMPLATES AND BLUEPRINT`, translated) and, on new lines under it, the two ids (`BLUEPRINT hjnenx · TEMPLATES udrrap` on one line where that fits, else one each; a blueprint without an id shows `—`), the lines centred as one block in the title's type. Templates from before this rule can't tell a newer blueprint apart, and missing templates still fail with `TemplateNotFound`: nothing can draw then.
