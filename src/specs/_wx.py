@@ -121,6 +121,20 @@ WXM = r'''
      under a line, M above and below them, as wide as the hero group for the widest reading and never narrower than DCOLW;
      the alert row takes the first row and the pollen row the last, each in place of a row (od, op), as on the landscape screens. The hero group stacks: the number, then the icon under it a hero
      gap (hero / 7) apart by ink, centred by ink between the title line and the details' line. -#}
+{#- HERO_STACK: a stacked hero group (component 'Hero group' on a portrait screen): the number centred on cx as a whole
+     reading, degree sign included, and its icon a hero gap under it, counted at its nominal ink height (ICH) so the
+     number keeps its height when the icon changes. cy: the number's anchor. A flagged number gets the hero chip: hugging
+     the number, or from chip_x0 to chip_x1 when the layout gives them. -#}
+{%- macro HERO_STACK(ns, txt, level, icon, cx, cy, hs, hic, chip_x0=none, chip_x1=none) -%}
+{%- set hg = hs // EP_SPACE.heroGapDiv -%}
+{%- set iu = (ICH[hic] if hic in ICH else hic) / 2 -%}
+{%- set tw = HERO_INK_W(txt, hs) | int -%}
+{%- set x0 = (cx - tw / 2) | round | int -%}
+{%- if level -%}{{- HERO_CHIP(ns, x0 if chip_x0 is none else chip_x0, (x0 + tw - 1) if chip_x1 is none else chip_x1, cy, hs, LEVEL_FILL(level)) -}}{%- endif -%}
+{{- T(ns, txt, HERO_INK_X(x0, txt, hs) | int, cy, fhero, hs, LEVEL_TEXT(level), 'lm') -}}
+{%- set iy = (cy + HDN[hs] + hg + iu) | round | int -%}
+{{- I(ns, icon, cx, iy, hic) -}}{{- MOON_BADGE(ns, cx, iy, hic) -}}
+{%- endmacro -%}
 {%- macro WXDASH(ns, title, right, stale, rows, od, wl, wv, hours, days=0, foot=false, op=[]) -%}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set r = namespace(pol=none, wl=[], wv=[]) -%}{{- POLROW(r, wl, wv) -}}{%- set pol, wl, wv = r.pol, r.wl, r.wv -%}
@@ -141,14 +155,8 @@ WXM = r'''
 {#- the group is centred by ink (Hero group); stacked, the icon counts at its nominal ink height (ICH: the same for every
      icon of this size), so the number keeps its height when the icon changes -#}
 {%- set iua = (ICH[hic] if hic in ICH else hic) / 2 -%}{%- set ida = iua -%}
-{%- set ts = (wx.temp | string) ~ '°' -%}
-{%- set tw = HERO_INK_W(ts, hs) | int -%}
 {%- set cy = (P + TH + (ly - (P + TH) - (HUP[hs] + HDN[hs] + hg + iua + ida)) / 2 + HUP[hs]) | round | int -%}
-{%- set x0 = ((W - tw) / 2) | round | int -%}
-{%- if wx.temp_k -%}{{- HERO_CHIP(ns, x0, x0 + tw - 1, cy, hs, LEVEL_FILL(wx.temp_k)) -}}{%- endif -%}
-{{- T(ns, ts, HERO_INK_X(x0, ts, hs) | int, cy, fhero, hs, LEVEL_TEXT(wx.temp_k), 'lm') -}}
-{%- set iy = (cy + HDN[hs] + hg + iua) | round | int -%}
-{{- I(ns, wx.icon, W // 2, iy, hic) -}}{{- MOON_BADGE(ns, W // 2, iy, hic) -}}
+{{- HERO_STACK(ns, (wx.temp | string) ~ '°', wx.temp_k, wx.icon, W // 2, cy, hs, hic) -}}
 {{- L(ns, P, ly, W - P - 1, ly) -}}
 {#- the detail rows: a centred block as wide as the hero group for the widest reading (-12°), never narrower than DCOLW -#}
 {%- set bw = [DCOLW(wl, wv) | int, HERO_INK_W(''' + WIDEST + r''', hs) | int, ICH[hic] if hic in ICH else hic] | max -%}
@@ -172,7 +180,7 @@ WXM = r'''
 {#- Bottom up, like the other weather layouts with a hero band: the footer, then the table as one block of fixed rows (3 hours, as many
      days as fit up to 3, the pollen row), each section under a line. The hero group (the number, the icon, then the line
      under them, a hero gap (hero / 7) apart by ink) is centred by ink between the title line and the table's line. The
-     digits' ink is HUP / HDN around the anchor, the icon's ink about 0.83 x its box -#}
+     digits' ink is HUP / HDN around the anchor; the group itself is HERO_STACK -#}
 {%- set hs, hic = EP_TK.type.heroShared, EP_TK.icon.heroShared -%}{%- set hg = hs // EP_SPACE.heroGapDiv -%}
 {%- set ih = (0.417 * hic) | int -%}
 {%- set ds, df = EP_TK.type.data[1], FONT[EP_TK.type.data[0]] -%}
@@ -196,18 +204,9 @@ WXM = r'''
 {%- set yt = yb - fixed - nd * rh -%}
 {%- set nd = nd if hp else nd + 1 -%}
 {%- set cy = P + TH + (yt - (P + TH) - Gi) // 2 + HUP[hs] -%}
-{%- if wx.temp_k -%}{{- HERO_CHIP(ns, P, W - P - 1, cy, hs, LEVEL_FILL(wx.temp_k)) -}}{%- endif -%}
-{#- the digits are centred on the axis; the degree sign hangs outside, like punctuation in a margin, while it stays inside
-     the padding; a wider reading (-12°) centres the whole number, degree sign included -#}
-{%- set ts = wx.temp | string -%}
-{%- set dw = HERO_INK_W(ts, hs) | int -%}
-{#- the degree sign's ink ends this far right of the digits' ink: the last digit's right bearing, then the sign's own ink -#}
-{%- set gr = (SGR[hs][ts[-1:]] + (HERO_ADVANCE('°', hs) | int) - SGR[hs]['°']) | int -%}
-{%- set xi = (W / 2 - dw / 2) if (W / 2 + dw / 2 + gr) <= W - P - 1 else (W / 2 - (dw + gr) / 2) -%}
-{%- set ax = HERO_INK_X(xi | round | int, ts, hs) | int -%}
-{{- T(ns, ts, ax, cy, fhero, hs, LEVEL_TEXT(wx.temp_k), 'lm') -}}{{- T(ns, '°', ax + (HERO_ADVANCE(ts, hs) | int), cy, fhero, hs, LEVEL_TEXT(wx.temp_k), 'lm') -}}
+{#- the hero group: the number over its icon; here a flagged number's fill spans the width between the paddings -#}
+{{- HERO_STACK(ns, (wx.temp | string) ~ '°', wx.temp_k, wx.icon, W // 2, cy, hs, hic, P, W - P - 1) -}}
 {%- set icy = cy + HDN[hs] + hg + ih -%}
-{{- I(ns, wx.icon, W // 2, icy, hic) -}}{{- MOON_BADGE(ns, W // 2, icy, hic) -}}
 {%- set ly = icy + ih + hg + lb // 2 -%}
 {#- ranges: hi°/lo° when the widest label, mm and range fit the row with space.l between them, else hi/lo everywhere (*Units and numbers*, *Ranges*) -#}
 {%- set wl = namespace(l=0, m=0, r=0) -%}

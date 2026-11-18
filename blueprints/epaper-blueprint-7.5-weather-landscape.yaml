@@ -444,7 +444,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'qtekll'
+  ds_set: 'qdgfcr'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'
