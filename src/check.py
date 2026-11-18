@@ -234,7 +234,8 @@ def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
                 errs.append(f'hero {el["value"]!r} only {r[1] - b[3] - 1} px above a rule (min {want})')
     # the footer's line: whatever is above it keeps M clear of it (*Footer*: room)
     fy = H - P - footer_height(bp)
-    if [1 for el, k, b in items if el.get('type') == 'line' and b[1] == fy and b[2] - b[0] > W * 0.6]:
+    # (a footer's line runs from padding to padding; a chart's axis on the same row stops short for its labels)
+    if [1 for el, k, b in items if el.get('type') == 'line' and b[1] == fy and b[0] <= P and b[2] >= W - P - 1]:
         above = [b[3] for el, k, b in items if k == 'ink' and b[3] < fy]
         if above and fy - max(above) - 1 < M:
             errs.append(f'ink ends {fy - max(above) - 1} px above the footer line (min M={M})')

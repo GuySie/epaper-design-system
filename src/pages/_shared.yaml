@@ -994,3 +994,33 @@ groups:
         }] %}
         {% set ns.prior = ns.prior + count %}
       {% endfor %} {{ ns.list }}
+  # a sensor's last hours as points for a line (entity, hours, hist_points): History graph, Value with details
+  sensor_history:
+  - action: recorder.get_statistics
+    continue_on_error: true
+    data:
+      statistic_ids:
+      - '{{ entity }}'
+      start_time: '{{ (now() - timedelta(hours=hours | int(12))).strftime(''%Y-%m-%d %H:%M:%S'') }}'
+      period: 5minute
+      types:
+      - mean
+      - max
+      - min
+    response_variable: hist_stats
+  - variables:
+      ds_t1: '{{ as_timestamp(now()) }}'
+      ds_t0: '{{ as_timestamp(now()) - (hours | int(12)) * 3600 }}'
+      ds_bucket: '{{ [((hours | int(12)) * 12 / hist_points) | round(0, ''ceil'') | int, 1] | max }}'
+      ds_pts: |
+        {% set st = hist_stats.statistics if (hist_stats is defined and hist_stats is mapping and hist_stats.statistics is defined) else {} %} {% set raw = (st[entity] if entity in st else []) | selectattr('mean', 'defined') | list %} {% set ns = namespace(list=[]) %} {% for g in raw | batch(ds_bucket | int(1)) %}
+          {% set vals = g | map(attribute='mean') | reject('none') | list %}
+          {% set mxs = g | map(attribute='max') | reject('none') | list %}
+          {% set mns = g | map(attribute='min') | reject('none') | list %}
+          {% if vals | length > 0 %}
+            {% set ts = ((as_timestamp(g[0].start) + as_timestamp(g[-1].end)) / 2) %}
+            {% set ns.list = ns.list + [{'ts': ts, 'v': (vals | sum) / (vals | length), 'mx': (mxs | max) if mxs else (vals | max), 'mn': (mns | min) if mns else (vals | min)}] %}
+          {% endif %}
+        {% endfor %} {% set cur = states(entity) | float(none) %} {% if cur is not none and (ns.list | length) > 0 %}
+          {% set ns.list = ns.list + [{'ts': as_timestamp(now()), 'v': cur, 'mx': cur, 'mn': cur}] %}
+        {% endif %} {{ ns.list }}

@@ -158,11 +158,26 @@ CASES = [
     ('td', 'todo_75p', 'M+', 'free'), ('td_many', 'todo_75p', 'M+', 'free'), ('td_title', 'todo_75p', 'M+', 'free'), ('td_g', 'todo_75p', 'M+', 'free'),
     ('td_y', 'todo_75p', 'M+', 'free'), ('td_err', 'todo_75p', 'skip', 'free'), ('td_empty', 'todo_75p', 'skip', 'free'), ('td_flagoff', 'todo_75p', 'M+', 'free'),
     ('td_nodone', 'todo_75p', 'M+', 'free'), ('td_duefirst', 'todo_75p', 'M+', 'free'), ('td_alldone', 'todo_75p', 'M+', 'free'), ('pic_todo_75p', 'todo_75p', 'M+', 'free'),
+    # Value with details (a Hero dashboard with a chart for any sensor): its states, then other configurations (CONFIG_CASES)
+    # (no history: the error block ends above the padding; an unavailable number on the portrait screen is a dash, whose
+    # ink is not a numeral's, so the band's centring by ink is not checked there)
+    ('vd', 'value_details_41', 'C', 'fill'), ('vd_warn', 'value_details_41', 'C', 'fill'), ('vd_sev', 'value_details_41', 'C', 'fill'), ('vd_widest', 'value_details_41', 'C', 'fill'),
+    ('vd_y', 'value_details_41', 'C', 'fill'), ('vd_g', 'value_details_41', 'C', 'fill'), ('vd_title', 'value_details_41', 'C', 'fill'), ('vd_stale', 'value_details_41', 'C', 'fill'),
+    ('vd_unav', 'value_details_41', 'C', 'fill'), ('vd_nohist', 'value_details_41', 'C', 'free'), ('vd_flagoff', 'value_details_41', 'C', 'fill'), ('vd_one', 'value_details_41', 'C', 'fill'),
+    ('vd_none', 'value_details_41', 'C', 'fill'), ('pic_value_details_41', 'value_details_41', 'C', 'fill'),
+    ('vd', 'value_details_75', 'C', 'fill'), ('vd_warn', 'value_details_75', 'C', 'fill'), ('vd_sev', 'value_details_75', 'C', 'fill'), ('vd_widest', 'value_details_75', 'C', 'fill'),
+    ('vd_y', 'value_details_75', 'C', 'fill'), ('vd_g', 'value_details_75', 'C', 'fill'), ('vd_title', 'value_details_75', 'C', 'fill'), ('vd_stale', 'value_details_75', 'C', 'fill'),
+    ('vd_unav', 'value_details_75', 'C', 'fill'), ('vd_nohist', 'value_details_75', 'C', 'free'), ('vd_flagoff', 'value_details_75', 'C', 'fill'), ('vd_one', 'value_details_75', 'C', 'fill'),
+    ('vd_none', 'value_details_75', 'C', 'fill'), ('pic_value_details_75', 'value_details_75', 'C', 'fill'),
+    ('vd', 'value_details_75p', 'C', 'fill'), ('vd_warn', 'value_details_75p', 'C', 'fill'), ('vd_sev', 'value_details_75p', 'C', 'fill'), ('vd_widest', 'value_details_75p', 'C', 'fill'),
+    ('vd_y', 'value_details_75p', 'C', 'fill'), ('vd_g', 'value_details_75p', 'C', 'fill'), ('vd_title', 'value_details_75p', 'C', 'fill'), ('vd_stale', 'value_details_75p', 'C', 'fill'),
+    ('vd_unav', 'value_details_75p', 'skip', 'fill'), ('vd_nohist', 'value_details_75p', 'C', 'free'), ('vd_flagoff', 'value_details_75p', 'C', 'fill'), ('vd_one', 'value_details_75p', 'C', 'fill'),
+    ('vd_none', 'value_details_75p', 'C', 'fill'), ('pic_value_details_75p', 'value_details_75p', 'C', 'fill'),
 ]
 
 # cases that show another configuration of their page (an icon, a second value, a longer reading), not another state of
 # one device: the hero may be another size or sit elsewhere there (check.py same_layout leaves them out)
-CONFIG_CASES = {'sv_icon', 'sv_hum', 'sv_long', 'pic_single_value_14', 'pic_single_value_27l', 'pic_single_value_35'} | {'tl_few', 'tl_two'} | {'td_flagoff', 'td_nodone', 'td_duefirst', 'td_alldone'} | {f'pic_todo_{k}' for k in ('27l', '27p', '35', '41', '75', '75p')} | {f'pic_tiles_{k}' for k in ('14', '27l', '27p', '35', '41', '75', '75p')}
+CONFIG_CASES = {'sv_icon', 'sv_hum', 'sv_long', 'pic_single_value_14', 'pic_single_value_27l', 'pic_single_value_35'} | {'tl_few', 'tl_two'} | {'vd_flagoff', 'vd_one', 'vd_none'} | {f'pic_value_details_{k}' for k in ('41', '75', '75p')} | {'td_flagoff', 'td_nodone', 'td_duefirst', 'td_alldone'} | {f'pic_todo_{k}' for k in ('27l', '27p', '35', '41', '75', '75p')} | {f'pic_tiles_{k}' for k in ('14', '27l', '27p', '35', '41', '75', '75p')}
 
 # a page's examples (pages/<page>.yaml `examples`) are check cases of their layout, checked as its first case is unless the example names its own gap rule
 from layouts import examples as _examples       # noqa: E402

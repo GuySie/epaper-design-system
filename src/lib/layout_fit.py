@@ -33,6 +33,10 @@ FIT = {
     'weather_75p': [('wx75p_negmoon', 'C'), ('wx75p_neg', 'C'), ('wx75p_plong', 'C')],
     'weather_426': [('w426_negmoon', 'C'), ('w426neg', 'C'), ('w426_plong', 'C')],
     'weather_calendar_75p': [('wxag_widest', 'C')],
+    # Value with details: the widest number (-12.5 °C, flagged) and a four-digit one at severe, both with an icon
+    'value_details_41': [('vd_widest', 'C'), ('vd_sev', 'C')],
+    'value_details_75': [('vd_widest', 'C'), ('vd_sev', 'C')],
+    'value_details_75p': [('vd_widest', 'C'), ('vd_sev', 'C')],
     # the event hero: one event, one in progress, and the widest clock time (20:00)
     'appointment_35': [('a35_1', 'M'), ('a35_1now', 'M'), ('a35_1w', 'M')],
     'appointment_41': [('a41_1', 'M'), ('a41_1now', 'M'), ('a41_1w', 'M')],

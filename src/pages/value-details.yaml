@@ -1,0 +1,188 @@
+page: value-details
+description:
+  shows: "One sensor's value, large, with up to four other values beside it and a graph of its last hours under it."
+  trigger_advice: 'A time pattern every 15 minutes: every redraw costs battery.'
+  title_default: the sensor's name
+redraw: trigger
+stale:
+- entity
+inputs:
+- name: entity
+  section: content
+  label: Sensor
+  help: The sensor to graph (with long-term statistics).
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  required: true
+- name: hours
+  section: content
+  label: Time span
+  help: How much history the graph shows
+  selector:
+    select:
+      options:
+      - label: 3 hours
+        value: '3'
+      - label: 6 hours
+        value: '6'
+      - label: 12 hours
+        value: '12'
+      - label: 24 hours
+        value: '24'
+  default: '12'
+- name: icon
+  section: content
+  label: Icon (optional)
+  help: Shown after the number. Leave blank for none.
+  selector:
+    icon: {}
+  default: ''
+- repeat:
+    from: 1
+    to: 4
+    items:
+    - name: detail_{n}
+      section: content
+      label: Detail {n}
+      help: An entity shown beside the number, with its label and its value. Leave blank for no row.
+      selector:
+        entity: {}
+      default: ''
+- repeat:
+    from: 1
+    to: 4
+    items:
+    - name: detail_{n}_label
+      section: content
+      label: Detail {n} - label
+      help: Optional label. Leave blank to use the entity's name.
+      selector:
+        text: {}
+      default: ''
+- name: flag_high
+  section: thresholds
+  label: 'High: flag it'
+  help: On, the number is flagged at or above the two values below, and the graph draws them as lines and fills the spans at or above them.
+  selector:
+    boolean: {}
+  default: false
+- name: warning_high
+  section: thresholds
+  label: 'High: warning at or above'
+  help: A span at or above this is a warning.
+  selector:
+    number:
+      mode: box
+      step: any
+  default: 0
+- name: severe_high
+  section: thresholds
+  label: 'High: severe at or above'
+  help: A span at or above this is severe.
+  selector:
+    number:
+      mode: box
+      step: any
+  default: 0
+- name: flag_low
+  section: thresholds
+  label: 'Low: flag it'
+  help: On, the graph draws the two values below as lines and fills the spans at or below them.
+  selector:
+    boolean: {}
+  default: false
+- name: warning_low
+  section: thresholds
+  label: 'Low: warning at or below'
+  help: A span at or below this is a warning.
+  selector:
+    number:
+      mode: box
+      step: any
+  default: 0
+- name: severe_low
+  section: thresholds
+  label: 'Low: severe at or below'
+  help: A span at or below this is severe.
+  selector:
+    number:
+      mode: box
+      step: any
+  default: 0
+bind:
+- entity
+- hours
+- icon: ds_icon
+- repeat:
+    from: 1
+    to: 4
+    items:
+    - detail_{n}
+    - detail_{n}_label
+- flag_high
+- warning_high
+- severe_high
+- flag_low
+- warning_low
+- severe_low
+data:
+  variables:
+  - ds_title: '{{ header_title if header_title else (entity_name(entity) or device_name(entity) or entity) }}'
+  - ds_unit: '{{ state_attr(entity, ''unit_of_measurement'') or '''' }}'
+  - ds_value: |
+      {% set raw = states(entity) %} {% set ok = raw not in ['unknown', 'unavailable', 'none', ''] %} {% set n = raw | float(none) %}
+      {% set lvl = '' %}
+      {% if ok and n is not none %}
+        {% if (flag_high and n >= (severe_high | float(0))) or (flag_low and n <= (severe_low | float(0))) %}{% set lvl = 'sev' %}
+        {% elif (flag_high and n >= (warning_high | float(0))) or (flag_low and n <= (warning_low | float(0))) %}{% set lvl = 'warn' %}{% endif %}
+      {% endif %}
+      {{ {'raw': raw if ok else '', 'unit': (state_attr(entity, 'unit_of_measurement') or '') if ok else '', 'level': lvl} }}
+  - ds_details: |
+      {% set ns = namespace(list=[]) %} {% for e, lab in [[detail_1 | default(''), detail_1_label | default('')], [detail_2 | default(''), detail_2_label | default('')], [detail_3 | default(''), detail_3_label | default('')], [detail_4 | default(''), detail_4_label | default('')]] %}
+        {% if e and e != '' %}
+          {% set raw = states(e) %} {% set ok = raw not in ['unknown', 'unavailable', 'none', ''] %}
+          {% set word = state_translated(e) if (ok and raw | float(none) is none) else raw %}
+          {% set ns.list = ns.list + [{'label': lab if lab else (entity_name(e) or device_name(e) or e), 'raw': word, 'unit': (state_attr(e, 'unit_of_measurement') or '') if ok else '', 'ok': ok}] %}
+        {% endif %}
+      {% endfor %} {{ ns.list }}
+  steps:
+  - include: sensor_history
+  draw:
+    kind: single
+texts:
+  en:
+    no_data: No history for this sensor.
+  de:
+    no_data: Kein Verlauf für diesen Sensor.
+  nl:
+    no_data: Geen geschiedenis voor deze sensor.
+  fr:
+    no_data: Pas d'historique pour ce capteur.
+  es:
+    no_data: Sin historial para este sensor.
+  pl:
+    no_data: Brak historii tego czujnika.
+  hr:
+    no_data: Nema povijesti za ovaj senzor.
+  sv:
+    no_data: Ingen historik för den här sensorn.
+examples:
+- case: ex_value_details_power
+  screen: '75'
+  shows: "the house's power use with solar, battery and grid"
+- case: ex_value_details_outside
+  screen: '41'
+  shows: "the temperature outside with humidity, wind and rain"
+layouts:
+  '41':
+    spec: value_details_41
+    drop_inputs:
+    - icon
+    - detail_4
+    - detail_4_label
+  '75':
+    spec: value_details_75
+  75p:
+    spec: value_details_75p

@@ -84,6 +84,10 @@ COVERAGE = {
     'todo_41': pg('td', 'td_many', 'td', 'td', 'td_g', 'td_y', 'td_title', NOSTALE, 'td_err', NOITEM, 'td_empty'),
     'todo_75': pg('td', 'td_many', 'td', 'td', 'td_g', 'td_y', 'td_title', NOSTALE, 'td_err', NOITEM, 'td_empty'),
     'todo_75p': pg('td', 'td_many', 'td', 'td', 'td_g', 'td_y', 'td_title', NOSTALE, 'td_err', NOITEM, 'td_empty'),
+    # Value with details: without history the chart's half is the error block
+    'value_details_41': pg('vd', 'vd_widest', 'vd_warn', 'vd_sev', 'vd_g', 'vd_y', 'vd_title', 'vd_stale', 'vd_nohist', 'vd_unav', NOHIST),
+    'value_details_75': pg('vd', 'vd_widest', 'vd_warn', 'vd_sev', 'vd_g', 'vd_y', 'vd_title', 'vd_stale', 'vd_nohist', 'vd_unav', NOHIST),
+    'value_details_75p': pg('vd', 'vd_widest', 'vd_warn', 'vd_sev', 'vd_g', 'vd_y', 'vd_title', 'vd_stale', 'vd_nohist', 'vd_unav', NOHIST),
     # History graph
     'history_27l': pg('hg', 'hg_widest', 'hg_warn', 'hg_sev', 'hg_g', 'hg_y', 'hg_title', 'hg_stale', 'hg_err', 'hg_unav', NOHIST),
     'history_35': pg('hg', 'hg_widest', 'hg_warn', 'hg_sev', 'hg_g', 'hg_y', 'hg_title', 'hg_stale', 'hg_err', 'hg_unav', NOHIST),

@@ -198,6 +198,9 @@ What each font measures on each tier (x-height / cap height):
 | Next appointment | 3.5" | beside other content | 104 px | 88 | — | 75 px | 15.5 |
 | Next appointment | 4.1" | beside other content | 128 px | 112 | — | 93 px | 19.5 |
 | Next appointment | 4.26" | beside other content | 256 px | 224 | — | 187 px | 21.7 |
+| Value with details | 4.1" | beside other content | 56 px | 48 | — | 41 px | 8.6 |
+| Value with details | 7.5" L | beside other content | 104 px | 88 | — | 75 px | 15.3 |
+| Value with details | 7.5" P | beside other content | 104 px | 88 | — | 75 px | 15.3 |
 <!-- /registry:tier-hero -->
 
 - **TRMNL12 on 1.4" and 2.7".** Never on 1.4". On 2.7" only for **all-caps field labels** beside a value (RAIN, WIND, MAX/MIN) and the **update stamp** (capitals and digits only, `SA 14:10`): capitals are what you read there, and their cap height (<!-- v:mm:384x168-0.17:12:cap -->1.3<!-- /v --> mm) clears the label minimum, while TRMNL12's lowercase (<!-- v:mm:384x168-0.17:12:x -->1.0<!-- /v --> mm) only just meets it. Everything else on 2.7" (data, units, captions, footers) stays TRMNL16 or larger.
@@ -327,7 +330,7 @@ The same on every screen. Each one could be different; this is why it is what it
 | `space.xs`, `space.s` | <!-- v:xs.12 -->2<!-- /v --> / <!-- v:s.12 -->4<!-- /v --> px around TRMNL12/16; <!-- v:xs.21 -->3<!-- /v --> / <!-- v:s.21 -->6<!-- /v --> px around TRMNL21; a 2× cut doubles its base (<!-- v:xs.24 -->4<!-- /v --> / <!-- v:s.24 -->8<!-- /v --> around 24 and 32, <!-- v:xs.42 -->6<!-- /v --> / <!-- v:s.42 -->12<!-- /v --> around 42) | XS is the smallest gap that reads as a gap; S = 2 × XS; around TRMNL21 both scale × 1.5 with the type | chips, every line gap, rows, footer, title row |
 | Row air steps | the steps of the fixed-row ladder (*Fixed rows*, *Space*) | detail rows sit beside a hero and must stay compact; lists are scanned and get the most air | row heights, row budgets |
 | `type.title` base | TRMNL<!-- v:dt:TITLE_BASE -->16<!-- /v --> Bold | the title is chrome: it names the screen and never outranks the data | title row height |
-| Hero ladder | <!-- v:heroLadder -->multiples of 8 from 56 to 160, then multiples of 32 to 320<!-- /v --> | Space Grotesk is an outline font, so in 1-bit every size is equally crisp; what matters is that the floor and *fill before you float* find a close fit. Below 160 steps of 8 px are <!-- v:heroStepPct -->5–14 %<!-- /v -->; above it 32 px steps are as fine as anyone can see. <!-- v:heroMinUsed -->64<!-- /v --> is the smallest hero of any layout today; 320 fills the 7.09" Glance | every hero; the measured tables (`SGB`, `HUP`, `HDN`) are generated for every rung by `lib/hero_metrics.py` |
+| Hero ladder | <!-- v:heroLadder -->multiples of 8 from 56 to 160, then multiples of 32 to 320<!-- /v --> | Space Grotesk is an outline font, so in 1-bit every size is equally crisp; what matters is that the floor and *fill before you float* find a close fit. Below 160 steps of 8 px are <!-- v:heroStepPct -->5–14 %<!-- /v -->; above it 32 px steps are as fine as anyone can see. <!-- v:heroMinUsed -->56<!-- /v --> is the smallest hero of any layout today; 320 fills the 7.09" Glance | every hero; the measured tables (`SGB`, `HUP`, `HDN`) are generated for every rung by `lib/hero_metrics.py` |
 | Icon ladder | <!-- v:iconLadder -->16 · 20, then multiples of 8 to 160, then multiples of 32 to 320<!-- /v --> | the hero ladder's steps, so an icon can follow its hero; 16, 20 and 24 stay because the stroke floor picks them (`icon.min`). An icon's size is compared through its glyph height: the median ink of the weather glyphs, measured per rung (`lib/hero_metrics.py`) | `icon.heroShared`, `icon.heroAloneSteps`, every icon slot |
 | Stroke multiples | `line.*` in *Lines and strokes* (multiples of `line.base`) | a heavy divider works without other lines; a tick reads as a tick without touching the axis labels' `space.s`; an even dash reads as "a level", the longer forecast dash never reads as a threshold; dots are the quietest line; a data line outweighs the other lines without filling in. Multiples of `line.base` keep all of it in proportion on dense screens | every line and data stroke, `space.axis` |
 | `space.tightMm` | <!-- v:dt:TIGHT_MM -->40<!-- /v --> mm | a canvas narrower than this (<!-- v:tightScreens -->1.4" 26 mm, 2.7" P 29 mm<!-- /v -->) attaches units to their value; physical, so a dense screen isn't judged by its pixels. Any value <!-- v:tightRange -->above 29 mm up to 62 mm<!-- /v --> gives the same result on today's screens | unit spacing |
@@ -920,19 +923,20 @@ The weather page: the hour strip and the day strip under the hero band; on the 2
 
 #### Hero dashboard with a chart or list
 
-Any module that can be drawn at the size the hero band leaves: a bar or line chart, a list, meters, the timeline, the month. *Weather and calendar* uses it with the date-grouped list on the 7.5" portrait; the other uses are mockups.
+Any module that can be drawn at the size the hero band leaves: a bar or line chart, a list, meters, the timeline, the month. *Weather and calendar* uses it with the date-grouped list on the 7.5" portrait, *Value with details* with a chart of one line on the 4.1" and the 7.5".
 
 - **The module in a Hero dashboard** has no title row of its own and three axis labels; where space runs out, it is drawn **without axis labels**. It is at least two rows (`space.row`) of plot or list, 1.5 without axis labels.
 - **What gives way** is settled when a layout is made, never at redraw: a blueprint knows its screen, so only the values change. It holds for every Hero dashboard, in two steps:
   1. **The arrangement is the layout's**, chosen at the mock-up for the page's widest reading, in this order of preference: the detail rows beside the hero group, then under it (portrait screens), then no detail rows; the module with axis labels, then without.
   2. **The build fits the sizes** (*Token register*, *Measured*): the largest hero rung at which the layout's widest readings pass, then the largest strip icons that pass with that hero. The hero never goes below the hero ladder's smallest rung (*Style choices*, Hero ladder); where even that doesn't fit, the page isn't offered on that screen (*Pages*, *One page, one pattern*).
-- **Two equal halves (portrait screens)**, drawn by `HERODASH`. A line at the middle of the content area (between the title line and H − P) divides the hero band from the module; neither half grows into the other, so nothing moves between states.
-  - **Top half:** the hero group (number, then the icon a hero gap after it) across the full width; under it, a hero gap apart, the detail rows (*Hero dashboard*, *Portrait screens*); the whole centred by ink between the title line and the divider (the `C` rule).
+- **Two equal halves**, drawn by `HERODASH`. A line at the middle of the content area (between the title line and H − P) divides the hero band from the module; neither half grows into the other, so nothing moves between states.
+  - **Top half, portrait screens:** the hero group (number, then the icon a hero gap after it) across the full width; under it, a hero gap apart, the detail rows (*Hero dashboard*, *Portrait screens*); the whole centred by ink between the title line and the divider (the `C` rule).
+  - **Top half, landscape screens:** the hero band as every Hero dashboard has it: the detail rows beside the hero group, each centred by ink between the title line and the divider. Without detail rows the group has the full width.
+  - **A unit** follows the number on its baseline in `type.secondary`, as *Hero group*, *A unit beside the number* says; it starts past the hero chip's reach, so it keeps its place when the number is flagged. The icon is optional and comes after the unit.
   - **The hero size** is the layout's own `type.heroShared` (*Measured*).
   - **Bottom half:** the module, its first text S below the divider (*Spacing (internal)*, *Dividers are symmetric*), top-aligned.
   - **Errors per half:** when one module's data is missing, its half shows the error block, in that half, and the other half keeps drawing.
 - One module (*Open items*: two side by side).
-- Mockup (Value with details): one large value with a chart or a list beside it for any sensors, such as energy (battery, flows, price bars), air quality (CO₂, climate, the 24 h line chart) or the day (date, counts, events).
 
 ### Bar chart and Line chart
 
@@ -1098,7 +1102,7 @@ Patterns and versions that exist as mock-ups only: no blueprint is built from th
 
 ## Pages
 
-A page is a pattern filled with real content for one use. Each page names the pattern it uses, its layouts (● drawn by a blueprint today; ○ no blueprint yet; — not offered; the 7.09" has no tier yet), the widest reading its entity can show, and the inputs its blueprints add to the ones every blueprint has (*Blueprint mechanics*). Every live page has the same parts, in this order: the pattern it uses, **Shows**, **Tested with**, its own rules, and its inputs. A page for any entities (Single value, Levels, Entities, History graph, Tiles, To-do list) also has **Examples** after **Tested with**: uses people have e-paper screens for, each a scenario drawn by the page's own blueprint and shown in the README. Thresholds for every page are in *Thresholds*.
+A page is a pattern filled with real content for one use. Each page names the pattern it uses, its layouts (● drawn by a blueprint today; ○ no blueprint yet; — not offered; the 7.09" has no tier yet), the widest reading its entity can show, and the inputs its blueprints add to the ones every blueprint has (*Blueprint mechanics*). Every live page has the same parts, in this order: the pattern it uses, **Shows**, **Tested with**, its own rules, and its inputs. A page for any entities (Single value, Value with details, Levels, Entities, History graph, Tiles, To-do list) also has **Examples** after **Tested with**: uses people have e-paper screens for, each a scenario drawn by the page's own blueprint and shown in the README. Thresholds for every page are in *Thresholds*.
 
 <!-- registry:pages -->
 | Page | Uses | Status | Widest reading | 1.4" | 2.7" L | 2.7" P | 3.5" | 4.1" | 4.26" | 7.5" L | 7.5" P | 7.09" (no tier yet) |
@@ -1131,12 +1135,12 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | **Message board** | Note | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Now playing** | Note with a progress bar | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Guest Wi-Fi** | Code | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Value with details** | Hero dashboard with a chart or list | mock | 4000 | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Value with details** | Hero dashboard with a chart or list | live | -12.5 | — | — | — | — | ● | — | ● | ● | — |
 <!-- /registry:pages -->
 
 **Rules for every page:**
 
-- **One page, one pattern.** A page fills the same pattern on every screen it is offered on. The same content in another pattern is a page of its own with a name of its own; the Glance page beside a larger one is called *<page> at a glance*: Weather at a glance beside Weather. Where a page's pattern doesn't fit a screen, it isn't offered there; Rain forecast, Energy price, Solar & battery and Value with details get a Glance page for the 1.4" when one is built.
+- **One page, one pattern.** A page fills the same pattern on every screen it is offered on. The same content in another pattern is a page of its own with a name of its own; the Glance page beside a larger one is called *<page> at a glance*: Weather at a glance beside Weather. Where a page's pattern doesn't fit a screen, it isn't offered there; Rain forecast, Energy price, Solar & battery get a Glance page for the 1.4" when one is built.
 - **Clock times, never countdowns of minutes** (*Text rules*, *Clock times, never relative times*).
 - **The widest reading decides the layout.** Every size and every layout is chosen for the widest reading the page's entity can show (`100%`, `4000`, `-12°`, day `28`), so a screen keeps its layout from one reading, and one state, to the next. The one exception is the hero on its own, fitted on its ordinary reading: at a wider one its icon gives way (*Hero group*, *Wide readings*).
 - **Labels don't change with the state** (`NET`, not `NET IMPORT` / `NET EXPORT`): a direction goes in the value (`-0.4 kW`).
@@ -1293,6 +1297,37 @@ A Glance for any sensor: its number, large, with its unit.
 | 2.7" L | 88 px | 88 → 56 px | normal, widest, warning, severe, gray, colour, title, stale, unavailable | error, empty | 15 |
 | 3.5" | 104 px | 104 → 64 px | normal, widest, warning, severe, gray, colour, title, stale, unavailable | error, empty | 17 |
 <!-- /registry:layouts-single-value -->
+
+### Value with details
+
+A Hero dashboard *with a chart or list* for any sensor: its number large, other values beside it, its last hours under it.
+
+- **Shows:** one sensor's number as the hero with its unit and an optional icon; up to four detail rows, each another entity's label and value; a chart of the sensor's last hours as one line on the automatic scale (*Bar chart and Line chart*), without a footer.
+- **Tested with:** a room's CO2 with its climate beside it; the number at warning and at severe, on a colour, a yellow and a grey panel; the widest readings (`-12.5 °C`, flagged low, with a label too long for its row); a long title; stale data; the sensor and a detail unavailable; no history (the error block in the chart's half); thresholds set with both switches off; one detail row; no detail rows and no icon.
+<!-- registry:examples-value-details -->
+- **Examples:** the house's power use with solar, battery and grid; the temperature outside with humidity, wind and rain. Each is drawn in the README.
+<!-- /registry:examples-value-details -->
+- **Number and unit:** as *Single value* writes them. An unavailable sensor is a dash without unit or icon.
+- **Detail rows:** three on the 4.1", four on the 7.5"; the 4.1" has no icon, the number, its unit and the rows fill the width. A row's value as *Entities* writes it, or Home Assistant's own wording of a state; the detail column is as wide as a label of 11 characters (`TEMPERATURE`) and the widest value (`1240 ppm`), and a longer label is cut.
+- **Chart:** as *History graph* draws it: the hours input, the automatic scale, the threshold lines and fills.
+- **Flagged:** the high and low thresholds flag the number (the hero chip) and the chart alike (`*_high`, `*_low`; both switches off by default, *Thresholds*). Detail rows are never flagged.
+- **Screens:** the 4.1", the 7.5" and the 7.5" portrait. On smaller screens the number and the chart don't fit together: *Single value* and *History graph* each show one of them.
+
+<!-- registry:inputs-value-details -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `entity`, `detail_1`, `detail_2`, `detail_3`, `hours`, `detail_1_label`, `detail_2_label`, `detail_3_label`, `flag_high`, `warning_high`, `severe_high`, `flag_low`, `warning_low`, `severe_low` |
+| 7.5" L | also `detail_4`, `icon`, `detail_4_label` |
+| 7.5" P | also `detail_4`, `icon`, `detail_4_label` |
+<!-- /registry:inputs-value-details -->
+
+<!-- registry:layouts-value-details -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 4.1" | 56 px | 48 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 15 |
+| 7.5" L | 104 px | 88 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 15 |
+| 7.5" P | 104 px | 88 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 14 |
+<!-- /registry:layouts-value-details -->
 
 ### Rain forecast
 
@@ -1614,7 +1649,7 @@ A *Hero dashboard with a chart or list*: the weather's hero band over the calend
 
 ### Mocked-up pages
 
-Bin day, Room sign, Appliance run, Energy price, Departures, Solar & battery, Month overview, Message board, Now playing, Guest Wi-Fi, and the Hero dashboard Value with details: their patterns and layouts are in the table above, their rules with the pattern versions they use.
+Bin day, Room sign, Appliance run, Energy price, Departures, Solar & battery, Month overview, Message board, Now playing and Guest Wi-Fi: their patterns and layouts are in the table above, their rules with the pattern versions they use.
 
 ## Blueprint mechanics
 
@@ -1628,7 +1663,7 @@ What every blueprint does the same way; where it can, through a shared part that
   5. **Advanced** (collapsed): `stale_after`, `led_color`, `led_flash_delay` and `font_dir`. The LED inputs are there wherever a button can start the redraw: the LED confirms the press. A blueprint that redraws on a change (Doors & windows) has none.
 - **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button). Every other input has a default, and an optional entity left empty removes its part of the page. The Rain forecast has no main entity: it needs one of its two sources.
 - **Input names:** the device input is always `displays`, also where it takes one device (Medication). Numbered entries are `<name>_<n>` with `<name>_<n>_label` (`entity_1`, `plant_1`, `bar_1`). Thresholds are `warning_<what>` and `severe_<what>`, their switch `flag_<what>`. A blueprint's variables keep the names its drawing reads, so renaming an input never changes the drawing.
-  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather at a glance, Single value, Weather, Rain forecast, CO2 graph, History graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar, Tiles<!-- /v -->); see *Title row* for the exempt blueprints.
+  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather at a glance, Single value, Weather, Rain forecast, CO2 graph, History graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar, Tiles, Value with details<!-- /v -->); see *Title row* for the exempt blueprints.
   - The panel is never an input: a page drawn on two screens is two blueprints (the Rain forecast on the 3.5" and on the 2.7" landscape).
 - **Texts:** every blueprint's strings live in `ep_i18n.jinja`, written from the page definitions (per page, `EP_TXT['<page>']`, which the blueprint's `language_map` reads; the weekday and month lists once, in `pages/_shared.yaml`) and `wx_txt.yaml` (the weather words, `ds_wtxt`), keyed by the 8 language codes, holding weekday/month names and every user-facing string (including the empty, error and stale strings). Paired with separate `weekday_short_map` / `months_short_map` dicts, which read `EP_DAYS_SHORT` / `EP_MONTHS_SHORT`. The update stamp uses weekday + time (`SU 17:58`); dates in content use `SU 8 NOV`. Don't fold them into `language_map`.
 - **One set.** A release gives its templates and its blueprints the same set id: a short hash of the four templates as built, so it changes when the templates change and only then (`lib/set_id.py`). Every blueprint hands its id to the drawing, and the templates compare it with theirs. When they differ, or the blueprint has none, the templates draw the title row and the error block and nothing else: the message (`UPDATE TEMPLATES AND BLUEPRINT`, translated) and, on new lines under it, the two ids (`BLUEPRINT hjnenx · TEMPLATES udrrap` on one line where that fits, else one each; a blueprint without an id shows `—`), the lines centred as one block in the title's type. Templates from before this rule can't tell a newer blueprint apart, and missing templates still fail with `TemplateNotFound`: nothing can draw then.
@@ -1674,6 +1709,7 @@ Proven: TRMNL text and Space Grotesk heroes on BWRY ESLs (1.4", 2.7", 3.5", 4.1"
 12. Single value: the unit beside a large number (`type.secondary`'s size next to an 88 or 104 px numeral) reads as part of the reading; an icon the kit has no glyph for (drawn by the renderer's icon element) sits acceptably beside the number.
 13. Single value on the 1.4": the number at its one size (under the Glance floor) still reads from where the label is used.
 14. Tiles: icons the kit has no glyph for, drawn by the renderer's icon element at tile size (their soft edges on a panel with colour); Home Assistant's wording of a state in a language other than English at the tile's width.
+15. Value with details: the unit after a flagged number (it starts past the chip) and the number at its fitted size on the 4.1" beside three detail rows.
 
 ## Open items
 

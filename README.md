@@ -44,6 +44,7 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 | [`epaper-blueprint-4.1-plant-moisture.yaml`](blueprints/epaper-blueprint-4.1-plant-moisture.yaml) | Plant moisture 4.1" | Soil moisture for up to 22 plants in two columns, the driest first if you like, with dry plants as warning or severe chips. |
 | [`epaper-blueprint-4.1-tiles.yaml`](blueprints/epaper-blueprint-4.1-tiles.yaml) | Tiles 4.1" | Up to 12 entities as tiles, each with an icon, its state and its label. How many fit depends on the screen; with fewer entities the tiles grow. |
 | [`epaper-blueprint-4.1-to-do-list.yaml`](blueprints/epaper-blueprint-4.1-to-do-list.yaml) | To-do list 4.1" | A to-do list: the open items first, each with its box and its due day, then the done ones while there is room. An overdue item and one due today are flagged. |
+| [`epaper-blueprint-4.1-value-with-details.yaml`](blueprints/epaper-blueprint-4.1-value-with-details.yaml) | Value with details 4.1" | One sensor's value, large, with up to four other values beside it and a graph of its last hours under it. |
 | [`epaper-blueprint-4.1-weather.yaml`](blueprints/epaper-blueprint-4.1-weather.yaml) | Weather 4.1" | Current weather with the temperature as the hero, its details, the coming hours and the coming days, with warnings and pollen as chips. |
 | [`epaper-blueprint-4.26-calendar.yaml`](blueprints/epaper-blueprint-4.26-calendar.yaml) | Calendar 4.26" | The coming days, each under its day header with its events, today first; later days fold into one line when they don't fit. |
 | [`epaper-blueprint-4.26-next-appointment.yaml`](blueprints/epaper-blueprint-4.26-next-appointment.yaml) | Next appointment 4.26" | Your next appointments: start time, title and a label line, a meeting in progress marked "now", and the next free moment in the footer. A single event gets its start time large. |
@@ -52,6 +53,8 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 | [`epaper-blueprint-7.5-tiles-portrait.yaml`](blueprints/epaper-blueprint-7.5-tiles-portrait.yaml) | Tiles 7.5" portrait | Up to 12 entities as tiles, each with an icon, its state and its label. How many fit depends on the screen; with fewer entities the tiles grow. |
 | [`epaper-blueprint-7.5-to-do-list-landscape.yaml`](blueprints/epaper-blueprint-7.5-to-do-list-landscape.yaml) | To-do list 7.5" landscape | A to-do list: the open items first, each with its box and its due day, then the done ones while there is room. An overdue item and one due today are flagged. |
 | [`epaper-blueprint-7.5-to-do-list-portrait.yaml`](blueprints/epaper-blueprint-7.5-to-do-list-portrait.yaml) | To-do list 7.5" portrait | A to-do list: the open items first, each with its box and its due day, then the done ones while there is room. An overdue item and one due today are flagged. |
+| [`epaper-blueprint-7.5-value-with-details-landscape.yaml`](blueprints/epaper-blueprint-7.5-value-with-details-landscape.yaml) | Value with details 7.5" landscape | One sensor's value, large, with up to four other values beside it and a graph of its last hours under it. |
+| [`epaper-blueprint-7.5-value-with-details-portrait.yaml`](blueprints/epaper-blueprint-7.5-value-with-details-portrait.yaml) | Value with details 7.5" portrait | One sensor's value, large, with up to four other values beside it and a graph of its last hours under it. |
 | [`epaper-blueprint-7.5-weather-and-calendar-portrait.yaml`](blueprints/epaper-blueprint-7.5-weather-and-calendar-portrait.yaml) | Weather and calendar 7.5" portrait | The weather's temperature as the hero with its details in the top half, the coming days with their events in the bottom half, with warnings and pollen as chips. |
 | [`epaper-blueprint-7.5-weather-landscape.yaml`](blueprints/epaper-blueprint-7.5-weather-landscape.yaml) | Weather 7.5" landscape | Current weather with the temperature as the hero, its details, the coming hours and the coming days, with warnings and pollen as chips. |
 | [`epaper-blueprint-7.5-weather-portrait.yaml`](blueprints/epaper-blueprint-7.5-weather-portrait.yaml) | Weather 7.5" portrait | Current weather with the temperature as the hero, its details, the coming hours and the coming days, with warnings and pollen as chips. |
@@ -339,6 +342,7 @@ Tiles 7.5" portrait
 
 ![Tiles 7.5" portrait](docs/images/epaper-blueprint-7.5-tiles-portrait.png)
 
+
 Example: what is still open or on before you leave
 
 ![Example: what is still open or on before you leave](docs/images/example-tiles-leaving.png)
@@ -346,6 +350,28 @@ Example: what is still open or on before you leave
 Example: the appliances and what they are doing
 
 ![Example: the appliances and what they are doing](docs/images/example-tiles-appliances.png)
+
+**Value with details**
+
+Value with details 4.1"
+
+![Value with details 4.1"](docs/images/epaper-blueprint-4.1-value-with-details.png)
+
+Value with details 7.5" landscape
+
+![Value with details 7.5" landscape](docs/images/epaper-blueprint-7.5-value-with-details-landscape.png)
+
+Value with details 7.5" portrait
+
+![Value with details 7.5" portrait](docs/images/epaper-blueprint-7.5-value-with-details-portrait.png)
+
+Example: the house's power use with solar, battery and grid
+
+![Example: the house's power use with solar, battery and grid](docs/images/example-value-details-power.png)
+
+Example: the temperature outside with humidity, wind and rain
+
+![Example: the temperature outside with humidity, wind and rain](docs/images/example-value-details-outside.png)
 <!-- /registry:pictures -->
 
 The design itself is written down in [docs/design-system.md](docs/design-system.md): screens and their tokens, colour, type, icons, states, components, modules, patterns and pages.

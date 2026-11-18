@@ -133,7 +133,7 @@ pages:
   message:        {name: Message board, uses: note, status: mock, default: [note], '14': ['-']}
   now-playing:    {name: Now playing, uses: note/progress, status: mock, default: [note/progress], '14': ['-']}
   guest-wifi:     {name: Guest Wi-Fi, uses: code, status: mock, default: [code]}
-  value-details:  {name: Value with details, uses: hero-dashboard/module, status: mock, default: [hero-dashboard/module], '14': ['-'], widest: '4000'}
+  value-details:  {name: Value with details, uses: hero-dashboard/module, status: live, default: ['-'], '41': [hero-dashboard/module], '75': [hero-dashboard/module], '75p': [hero-dashboard/module], widest: '-12.5'}
 
 # words that are not terms of the design system; the lint fails the design system when one is used as a term
 withdrawn: [preset, presets, row kind, row kinds, fallback chain, page frame, Matrix, body module, compact form, short form, family, families]

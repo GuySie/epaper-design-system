@@ -707,11 +707,23 @@
 {#- HERO_SHARED (component 'Hero group', beside other content): the group drawn. h is the hero's content: {'text': the number,
      'level': '' or its flag (a flagged number sits in a hero chip), 'icon', 'moon': the icon carries the moon badge, 'widest':
      the page's widest reading}. The number from hx0, the icon a hero gap after it -#}
+{#- HERO_SHARED_UNIT: the room a unit takes after the number of a hero group beside other content (0 without one): the
+     hero chip's reach (so the unit keeps its place when the number is flagged), the unit's own gap, and its ink.
+     HERO_SHARED_EXTRA: what follows the number in the group, by ink: the unit and, with an icon, the hero gap and the icon
+     less its blank right margin (ICB). h.bare: the icon is not drawn (an unavailable number), though a layout still counts
+     its height, so the number keeps its place -#}
+{%- macro HERO_SHARED_UNIT(unit) -%}{%- set ss = EP_TK.type.secondary[1] -%}{{ ((SPACE_S(EP_TK.type.data[1]) | int) + (SPACE_XS(ss) | int) + (UGAP(unit, ss) | int) + (TEXT_W(unit, ss, REGULAR_FONT(ss)) | int) - (TAIL(ss) | int)) if unit else 0 }}{%- endmacro -%}
+{%- macro HERO_SHARED_EXTRA(h, hs, hic) -%}
+{%- set ik = (h.icon | string)[4:] if (h.icon | string)[:4] == 'mdi:' else (h.icon | string) -%}
+{{ (HERO_SHARED_UNIT(h.unit | default('')) | int) + ((hs // EP_SPACE.heroGapDiv + hic - (((ICB[ik][1] if ik in ICB else 0) * hic) | round | int)) if (h.icon and not (h.bare | default(false))) else 0) }}
+{%- endmacro -%}
 {%- macro HERO_SHARED(ns, h, hx0, cy, hs, hic) -%}
 {%- set ts = h.text -%}{%- set tw, hg = HERO_INK_W(ts, hs) | int, hs // EP_SPACE.heroGapDiv -%}
+{%- set unit = h.unit | default('') -%}{%- set uw = HERO_SHARED_UNIT(unit) | int -%}
 {%- if h.level -%}{{- HERO_CHIP(ns, hx0, hx0 + tw - 1, cy, hs, LEVEL_FILL(h.level)) -}}{%- endif -%}
 {{- T(ns, ts, HERO_INK_X(hx0, ts, hs) | int, cy, fhero, hs, LEVEL_TEXT(h.level), 'lm') -}}
-{{- I(ns, h.icon, hx0 + tw + hg + hic // 2, cy, hic) -}}{%- if h.moon -%}{{- MOON_BADGE(ns, hx0 + tw + hg + hic // 2, cy, hic) -}}{%- endif -%}
+{%- if unit -%}{%- set ss = EP_TK.type.secondary[1] -%}{{- T(ns, unit, hx0 + tw + (SPACE_S(EP_TK.type.data[1]) | int) + (SPACE_XS(ss) | int) + (UGAP(unit, ss) | int), cy + HDN[hs] - CAPDN[ss], REGULAR_FONT(ss), ss, color.ink, 'lm') -}}{%- endif -%}
+{%- if h.icon and not (h.bare | default(false)) -%}{{- I(ns, h.icon, hx0 + tw + uw + hg + hic // 2, cy, hic) -}}{%- if h.moon -%}{{- MOON_BADGE(ns, hx0 + tw + uw + hg + hic // 2, cy, hic) -}}{%- endif -%}{%- endif -%}
 {%- endmacro -%}
 {#- HBAND (module 'Hero band'): the hero band between the title line (its lower edge at ty) and the next line at sy. The
      detail column (right, from dx) is as wide as its content; the hero group (HERO_SHARED) is centred by ink in what is left,
@@ -719,16 +731,16 @@
      detail rows, the alert row and the make-way orders (DROWS) -#}
 {%- macro HBAND(ns, h, ty, sy, rows, flag, od, dx, W, P, pol=none, op=[]) -%}
 {%- set hs, hic = EP_TK.type.heroShared, EP_TK.icon.heroShared -%}{%- set hg = hs // EP_SPACE.heroGapDiv -%}
-{%- set ik = (h.icon | string)[4:] if (h.icon | string)[:4] == 'mdi:' else (h.icon | string) -%}
 {#- the group is centred by ink: the icon's blank right margin (ICB) is left out -#}
-{%- set hx0 = HERO_LEFT(h.text, hs, hg, hic - (((ICB[ik][1] if ik in ICB else 0) * hic) | round | int), P, dx - EP_TK.space.l) | int -%}
+{%- set hx0 = HERO_LEFT(h.text, hs, 0, HERO_SHARED_EXTRA(h, hs, hic) | int, P, dx - EP_TK.space.l) | int -%}
 {%- set cy = (ty + sy) // 2 -%}
 {{- HERO_SHARED(ns, h, hx0, cy, hs, hic) -}}
 {%- set dr = EP_TK.space.detailRow -%}
 {#- DROWS takes the first row's centre y -#}
 {%- if rows -%}{{- DROWS(ns, rows, flag, od, dx, W - P - 1, cy - ((rows | length) - 1) * dr // 2, dr, EP_TK.type.fieldLabel, EP_TK.type.data, pol, op) -}}{%- endif -%}
 {%- endmacro -%}
-{#- HERODASH: pattern 'Hero dashboard', the version with a chart or list, in two equal halves (portrait screens). The title
+{#- HERODASH: pattern 'Hero dashboard', the version with a chart or list, in two equal halves. On a landscape screen the
+     top half is the hero band (HBAND: the detail rows beside the hero group); on a portrait screen as follows. The title
      row; the top half: the hero group (HERO_SHARED, at the layout's type.heroShared) across the full width and, a hero gap under it, the detail
      rows as a centred block as wide as the group for the widest reading and never narrower than the detail column (wl, wv),
      the whole centred by ink between the title line and the divider; the divider at the middle of the content; the bottom
@@ -739,21 +751,25 @@
 {{- TITLE(ns, title, right, W, P, TH, stale) -}}
 {%- set ym = (P + TH + H - P) // 2 -%}
 {%- set hs, hic = EP_TK.type.heroShared, EP_TK.icon.heroShared -%}{%- set hg = hs // EP_SPACE.heroGapDiv -%}
-{%- set ik = (h.icon | string)[4:] if (h.icon | string)[:4] == 'mdi:' else (h.icon | string) -%}
+{%- if W > H -%}
+{#- a landscape screen: the detail rows beside the hero group (HBAND), both centred in the top half; without rows the group has the width -#}
+{{- HBAND(ns, h, P + TH, ym, rows, flag, od, (W - P - (DCOLW(wl, wv) | int)) if rows else (W - P + EP_TK.space.l), W, P, pol, op) -}}
+{%- else -%}
 {#- the group's ink above and below its centre line: the digits' or the drawn icon's (ICONINK) -#}
-{%- set g = namespace(up=0, dn=0) -%}{{- ICONINK(g, h.icon, hic) -}}
+{%- set g = namespace(up=0, dn=0) -%}{%- if h.icon -%}{{- ICONINK(g, h.icon, hic) -}}{%- endif -%}
 {%- set gup, gdn = [HUP[hs], g.up] | max, [HDN[hs], g.dn] | max -%}
 {%- set dr = EP_TK.space.detailRow -%}{%- set n = rows | length -%}{%- set ds = EP_TK.type.data[1] -%}
 {#- the rows by ink: the first row's caps to the last row's baseline (a hero gap under the group) -#}
 {%- set tot = gup + gdn + hg + (n - 1) * dr + CAPUP[ds] + CAPDN[ds] + 1 -%}
 {%- set cy = (P + TH + (ym - (P + TH) - tot) / 2 + gup) | round | int -%}
 {#- the group centred by ink across the width -#}
-{%- set hx0 = HERO_LEFT(h.text, hs, hg, hic - (((ICB[ik][1] if ik in ICB else 0) * hic) | round | int), P, W - P) | int -%}
+{%- set hx0 = HERO_LEFT(h.text, hs, 0, HERO_SHARED_EXTRA(h, hs, hic) | int, P, W - P) | int -%}
 {{- HERO_SHARED(ns, h, hx0, cy, hs, hic) -}}
-{%- set bw = [DCOLW(wl, wv) | int, (HERO_INK_W(h.widest, hs) | int) + hg + hic] | max -%}
+{%- set bw = [DCOLW(wl, wv) | int, (HERO_INK_W(h.widest, hs) | int) + (HERO_SHARED_UNIT(h.unit | default('')) | int) + ((hg + hic) if h.icon else 0)] | max -%}
 {%- set bx = ((W - bw) / 2) | round | int -%}
 {%- set r0 = (cy + gdn + hg + CAPUP[ds]) | round | int -%}
-{{- DROWS(ns, rows, flag, od, bx, bx + bw - 1, r0, dr, EP_TK.type.fieldLabel, EP_TK.type.data, pol, op) -}}
+{%- if rows -%}{{- DROWS(ns, rows, flag, od, bx, bx + bw - 1, r0, dr, EP_TK.type.fieldLabel, EP_TK.type.data, pol, op) -}}{%- endif -%}
+{%- endif -%}
 {{- L(ns, P, ym, W - P - 1, ym) -}}
 {{- caller(ym + EP_TK.line.base + (SPACE_S(EP_TK.type.label[1]) | int), H - P) -}}
 {%- endmacro -%}
