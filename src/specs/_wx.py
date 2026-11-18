@@ -218,7 +218,7 @@ WXM = r'''
 {%- set pk = PICK(false) -%}
 {%- set lft = RANGE(wx.hi, wx.lo) ~ ' · ' -%}
 {%- set sec = (WIND()) if wind else MM(wx.mm_today) -%}
-{%- set cpad = 2 * sx - 2 -%}
+{%- set cpad = CHIP_PAD(ds) | int -%}
 {%- if pk and pk.split('§')[2] == wx.hi ~ '° / ' ~ wx.lo ~ '°' -%}
 {%- set kind = pk.split('§')[0] -%}
 {%- set ctxt = LEVEL_MARK(kind) ~ (ds_wtxt['hilo'] | upper) ~ ' ' ~ RANGE(wx.hi, wx.lo) -%}
@@ -291,7 +291,7 @@ GLANCE2 = r"""
 {%- set kind, lab, val, short = pk.split('§') -%}
 {%- set mark = LEVEL_MARK(kind) -%}
 {%- set full = mark ~ ((lab ~ ' ' ~ val) if lab else val) -%}
-{%- set pad = 2 * (SPACE_S(s) | int) - 2 -%}
+{%- set pad = CHIP_PAD(s) | int -%}
 {%- if (VALUE_W(full, s, fb) | int) + pad <= maxw -%}{%- set v = full -%}
 {%- elif (VALUE_W(mark ~ short, s, fb) | int) + pad <= maxw -%}{%- set v = mark ~ short -%}
 {%- elif wx.alert -%}{%- set v = mark ~ wx.flag.code -%}

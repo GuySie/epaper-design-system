@@ -371,8 +371,10 @@
 {%- endif -%}
 {%- endmacro -%}
 {#- CCHIP: a centred chip around v at (cx, cy): the text + 2 x space.s wide, s + 2 x space.xs high. On a stacked text line, p is the pitch to the neighbouring text line and the chip is p - 1 high (a 1 px paper gap to a chip next to it) -#}
-{#- CHIPW: the width of a centred chip around v (space.s past the text on both sides) -#}
-{%- macro CHIPW(v, s, f) -%}{{ (VALUE_W(v, s, f) | int) - 2 + 2 * (SPACE_S(s) | int) }}{%- endmacro -%}
+{#- CHIP_PAD: what a chip is wider than its text: space.s on both sides, less the text's 2 px trailing bearing.
+     CHIPW: the width of a chip around v -#}
+{%- macro CHIP_PAD(s) -%}{{ 2 * (SPACE_S(s) | int) - 2 }}{%- endmacro -%}
+{%- macro CHIPW(v, s, f) -%}{{ (VALUE_W(v, s, f) | int) + (CHIP_PAD(s) | int) }}{%- endmacro -%}
 {%- macro CCHIP(ns, v, cx, cy, f, s, cw, bg, fg, p=0) -%}
 {%- set xs = SPACE_XS(s) | int -%}
 {%- set w = CHIPW(v, s, f) | int -%}

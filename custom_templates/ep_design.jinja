@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'tgqmqg' -%}
+{%- set EP_SET = 'shthuf' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -678,8 +678,10 @@
 {%- endif -%}
 {%- endmacro -%}
 {#- CCHIP: a centred chip around v at (cx, cy): the text + 2 x space.s wide, s + 2 x space.xs high. On a stacked text line, p is the pitch to the neighbouring text line and the chip is p - 1 high (a 1 px paper gap to a chip next to it) -#}
-{#- CHIPW: the width of a centred chip around v (space.s past the text on both sides) -#}
-{%- macro CHIPW(v, s, f) -%}{{ (VALUE_W(v, s, f) | int) - 2 + 2 * (SPACE_S(s) | int) }}{%- endmacro -%}
+{#- CHIP_PAD: what a chip is wider than its text: space.s on both sides, less the text's 2 px trailing bearing.
+     CHIPW: the width of a chip around v -#}
+{%- macro CHIP_PAD(s) -%}{{ 2 * (SPACE_S(s) | int) - 2 }}{%- endmacro -%}
+{%- macro CHIPW(v, s, f) -%}{{ (VALUE_W(v, s, f) | int) + (CHIP_PAD(s) | int) }}{%- endmacro -%}
 {%- macro CCHIP(ns, v, cx, cy, f, s, cw, bg, fg, p=0) -%}
 {%- set xs = SPACE_XS(s) | int -%}
 {%- set w = CHIPW(v, s, f) | int -%}
@@ -1674,7 +1676,7 @@
 {%- set pk = PICK(false) -%}
 {%- set lft = RANGE(wx.hi, wx.lo) ~ ' · ' -%}
 {%- set sec = (WIND()) if wind else MM(wx.mm_today) -%}
-{%- set cpad = 2 * sx - 2 -%}
+{%- set cpad = CHIP_PAD(ds) | int -%}
 {%- if pk and pk.split('§')[2] == wx.hi ~ '° / ' ~ wx.lo ~ '°' -%}
 {%- set kind = pk.split('§')[0] -%}
 {%- set ctxt = LEVEL_MARK(kind) ~ (ds_wtxt['hilo'] | upper) ~ ' ' ~ RANGE(wx.hi, wx.lo) -%}
@@ -1947,8 +1949,7 @@
 {%- set full = LEVEL_MARK(kind) ~ (items[0].label | upper) ~ more -%}
 {%- set short = LEVEL_MARK(kind) ~ (items[0].area | upper) ~ more -%}
 {%- set sf, ss = FONT[EP_TK.type.secondary[0]], EP_TK.type.secondary[1] -%}
-{#- a chip is the text + 2 x space.s wide (less the 2 px trailing bearing) -#}
-{%- set v = full if (VALUE_W(full, ss, sf) | int) + 2 * (SPACE_S(ss) | int) - 2 <= W - 2 * P else short -%}
+{%- set v = full if (CHIPW(full, ss, sf) | int) <= W - 2 * P else short -%}
 {{- GLANCE(ns, title, as_timestamp(now()), n | string, icon, sec='chip', txt=v, llevel=kind) -}}
 {%- endif -%}
 {%- elif layout == 'doors_windows_14' and view == 'error' -%}
@@ -2307,7 +2308,7 @@
 {%- set kind, lab, val, short = pk.split('§') -%}
 {%- set mark = LEVEL_MARK(kind) -%}
 {%- set full = mark ~ ((lab ~ ' ' ~ val) if lab else val) -%}
-{%- set pad = 2 * (SPACE_S(s) | int) - 2 -%}
+{%- set pad = CHIP_PAD(s) | int -%}
 {%- if (VALUE_W(full, s, fb) | int) + pad <= maxw -%}{%- set v = full -%}
 {%- elif (VALUE_W(mark ~ short, s, fb) | int) + pad <= maxw -%}{%- set v = mark ~ short -%}
 {%- elif wx.alert -%}{%- set v = mark ~ wx.flag.code -%}
@@ -2336,7 +2337,7 @@
 {%- set kind, lab, val, short = pk.split('§') -%}
 {%- set mark = LEVEL_MARK(kind) -%}
 {%- set full = mark ~ ((lab ~ ' ' ~ val) if lab else val) -%}
-{%- set pad = 2 * (SPACE_S(s) | int) - 2 -%}
+{%- set pad = CHIP_PAD(s) | int -%}
 {%- if (VALUE_W(full, s, fb) | int) + pad <= maxw -%}{%- set v = full -%}
 {%- elif (VALUE_W(mark ~ short, s, fb) | int) + pad <= maxw -%}{%- set v = mark ~ short -%}
 {%- elif wx.alert -%}{%- set v = mark ~ wx.flag.code -%}

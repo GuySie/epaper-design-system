@@ -310,7 +310,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'tgqmqg'
+  ds_set: 'shthuf'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'

@@ -15,8 +15,7 @@ PAYLOAD_MAIN = WXM + r'''
 {%- set full = LEVEL_MARK(kind) ~ (items[0].label | upper) ~ more -%}
 {%- set short = LEVEL_MARK(kind) ~ (items[0].area | upper) ~ more -%}
 {%- set sf, ss = FONT[EP_TK.type.secondary[0]], EP_TK.type.secondary[1] -%}
-{#- a chip is the text + 2 x space.s wide (less the 2 px trailing bearing) -#}
-{%- set v = full if (VALUE_W(full, ss, sf) | int) + 2 * (SPACE_S(ss) | int) - 2 <= W - 2 * P else short -%}
+{%- set v = full if (CHIPW(full, ss, sf) | int) <= W - 2 * P else short -%}
 {{- GLANCE(ns, title, as_timestamp(now()), n | string, icon, sec='chip', txt=v, llevel=kind) -}}
 {%- endif -%}
 '''
