@@ -60,8 +60,11 @@ def validate(r):
     for p in r['patterns'].values(): kinds.setdefault(p['name'].lower(), set()).add('pattern')
     for p in r['pages'].values(): kinds.setdefault(p['name'].lower(), set()).add('page')
     for n in (r.get('terms') or {}): kinds.setdefault(n.lower(), set()).add('term')
+    # a pattern may share its name with its main module, and with a page that uses that pattern (design system: Names)
+    own = {p['name'].lower() for p in r['pages'].values()
+           if r['patterns'].get(parse_use(p['uses'])[0], {}).get('name', '').lower() == p['name'].lower()}
     for n, ks in kinds.items():
-        if len(ks) > 1 and ks != {'pattern', 'module'}:
+        if len(ks) > 1 and not ('pattern' in ks and ks <= {'pattern', 'module', 'page'} and ('page' not in ks or n in own)):
             errs.append(f'name "{n}" is used for {", ".join(sorted(ks))}')
     seen = {}
     root = pathlib.Path(__file__).parent.parent

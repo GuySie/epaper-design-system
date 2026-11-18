@@ -129,7 +129,7 @@ pages:
   energy-flows:   {name: Solar & battery, uses: meters/both-ways, status: mock, default: [meters/both-ways], '14': ['-'], widest: '100%'}
   packages:       {name: Packages, uses: key-value-list, status: mock, default: [key-value-list], '14': ['-']}
   shopping:       {name: Shopping list, uses: checklist, status: mock, default: [checklist], '14': ['-']}
-  home-status:    {name: Home status, uses: tiles, status: mock, default: [tiles]}
+  tiles:          {name: Tiles, uses: tiles, status: mock, default: [tiles]}
   month:          {name: Month overview, uses: month, status: mock, default: [month], '14': ['-'], '27p': ['-']}
   message:        {name: Message board, uses: note, status: mock, default: [note], '14': ['-']}
   now-playing:    {name: Now playing, uses: note/progress, status: mock, default: [note/progress], '14': ['-']}

@@ -37,7 +37,7 @@ Our hierarchy follows **Atomic Design** (Brad Frost): small parts combine into l
 
 A page can reuse another page's modules without becoming a version of it: a Hero dashboard with CO2 as its hero and the CO2 chart under it is its own page.
 
-**Names.** Patterns and pages are proper names, written with a capital: the Line chart, the Rain forecast. Components and modules are ordinary nouns, in lowercase in running text: a key-value row, the strip. A pattern may be named after its main module (Timeline, Meters, Tiles): the glossary then has one row for both. The same word in its ordinary sense stays lowercase: a dry rain forecast, an appliance run.
+**Names.** Patterns and pages are proper names, written with a capital: the Line chart, the Rain forecast. Components and modules are ordinary nouns, in lowercase in running text: a key-value row, the strip. A pattern may be named after its main module (Timeline, Meters, Tiles): the glossary then has one row for both. A page that offers its pattern for any entities may carry the pattern's name too (Tiles); where the two could be confused the text says *the Tiles page*. The same word in its ordinary sense stays lowercase: a dry rain forecast, an appliance run.
 
 **What we design for**
 
@@ -1068,7 +1068,7 @@ Patterns and versions that exist as mock-ups only: no blueprint is built from th
 
 #### Tiles
 
-*Mockup (Home status).* Equal tiles, each a centred stack: the icon, the state in `type.data`, the label in `type.label`. The stack is centred in its tile.
+*Mockup (Tiles).* Equal tiles, each a centred stack: the icon, the state in `type.data`, the label in `type.label`. The stack is centred in its tile.
 
 - Tiles per screen: one on the 1.4", 1 × 3 on the 2.7" portrait, 3 × 2 on the 2.7" landscape, the 3.5" and the 4.1", 4 × 3 on the 7.5", 3 × 4 on the 7.5" portrait. With fewer entities the grid is the smallest one that holds them (of two equally small, the one whose tiles are closest to square), filled row by row; a tile left over stays empty.
 - Lines between two tiles that both hold an entity, centred in the gutter, each stopping `space.m` short of where it would cross another; none around the outside.
@@ -1127,7 +1127,7 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | **Solar & battery** | Meters both ways | mock | 100% | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Packages** | Key-value list | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Shopping list** | Checklist | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Home status** | Tiles | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Tiles** | Tiles | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Month overview** | Month | mock | — | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Message board** | Note | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Now playing** | Note with a progress bar | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
@@ -1536,7 +1536,7 @@ A *Hero dashboard with a chart or list*: the weather's hero band over the calend
 
 ### Mocked-up pages
 
-Bin day, Room sign, Appliance run, Countdown, Today's date, Energy price, Departures, Solar & battery, Packages, Shopping list, Home status, Month overview, Message board, Now playing, Guest Wi-Fi, and the Hero dashboards Energy overview, Air quality and Day overview: their patterns and layouts are in the table above, their rules with the pattern versions they use. Countdown is a Glance with whole days as the hero and the date in the Glance secondary; Today's date has the day of the month as its hero, never the clock time.
+Bin day, Room sign, Appliance run, Countdown, Today's date, Energy price, Departures, Solar & battery, Packages, Shopping list, Tiles, Month overview, Message board, Now playing, Guest Wi-Fi, and the Hero dashboards Energy overview, Air quality and Day overview: their patterns and layouts are in the table above, their rules with the pattern versions they use. Countdown is a Glance with whole days as the hero and the date in the Glance secondary; Today's date has the day of the month as its hero, never the clock time.
 
 ## Blueprint mechanics
 
