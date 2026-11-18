@@ -102,9 +102,6 @@ data:
     ds_sev_h: !input 'severe_late'
     ds_flag_late: !input 'flag_late'
 texts:
-  use:
-    weekdays: weekdays
-    months: months
   en:
     overdue: Overdue
     missed: Missed

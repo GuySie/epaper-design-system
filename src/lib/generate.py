@@ -182,9 +182,11 @@ def variables(p, lay):
                 v[x] = I(i)
     if p.get('texts'):                     # a page's own texts, whether it passes its inputs as ds_in or one by one
         v['language_map'] = PY.load(shared.TEXTS['language_map'].replace('PAGE', p['page']))
-        if 'weekdays' in (p['texts'].get('use') or {}):
-            v['weekday_short_map'] = PY.load(shared.TEXTS['weekday_short_map'])
-            v['months_short_map'] = PY.load(shared.TEXTS['months_short_map'])
+    # the short weekday and month names, for a page whose data or drawing reads them
+    reads = PY.dump(p['data']) + ''.join(load_spec(lay['spec']).PAYLOADS)
+    if 'weekday_short_map' in reads or 'months_short_map' in reads:
+        v['weekday_short_map'] = PY.load(shared.TEXTS['weekday_short_map'])
+        v['months_short_map'] = PY.load(shared.TEXTS['months_short_map'])
     for k, x in (lay.get('constants') or {}).items():
         v[k] = x
     # what the layout's spec fixes and the page's data must follow (a chart's number of bars, its scale's top)

@@ -223,7 +223,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'qfkbyk'
+  ds_set: 'tgqmqg'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'
