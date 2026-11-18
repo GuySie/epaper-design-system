@@ -1249,6 +1249,7 @@ A Line chart *with thresholds*: the last hours of CO2 with the current value at 
 - **Shows:** the series over the chosen hours, the warning and severe lines, the current value as a square at the end, the footer's conclusion.
 - **Tested with:** a severe reading, the same reading with the switch off, a warning on a yellow panel and on a grey panel, 12-hour time, no data; widest reading `4000`.
 - **Current value:** the square of *Line charts*, *Current value*, centred on the line's last point.
+- **Points:** at most <!-- v:spec:co2_35:POINTS -->165<!-- /v --> on the 3.5" (*Chart frame (all charts)*, *Density*): the readings are grouped so the chosen hours stay under it.
 
 <!-- registry:inputs-co2 -->
 | Screen | Inputs of this page |

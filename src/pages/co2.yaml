@@ -97,7 +97,7 @@ data:
   - variables:
       ds_t1: '{{ as_timestamp(now()) }}'
       ds_t0: '{{ as_timestamp(now()) - (hours | int(12)) * 3600 }}'
-      ds_bucket: '{{ [((hours | int(12)) * 12 / 160) | round(0, ''ceil'') | int, 1] | max }}'
+      ds_bucket: '{{ [((hours | int(12)) * 12 / co2_points) | round(0, ''ceil'') | int, 1] | max }}'
       ds_pts: |
         {% set st = co2_stats.statistics if (co2_stats is defined and co2_stats is mapping and co2_stats.statistics is defined) else {} %} {% set raw = (st[co2_entity] if co2_entity in st else []) | selectattr('mean', 'defined') | list %} {% set ns = namespace(list=[]) %} {% for g in raw | batch(ds_bucket | int(1)) %}
           {% set vals = g | map(attribute='mean') | reject('none') | list %}

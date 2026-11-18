@@ -1,5 +1,10 @@
-from _defaults import default
+from _defaults import default, chart_points
+from layouts import registry
 SCALE_FROM = 400        # ppm: outdoor air, which indoor air rarely goes below (*Chart frame (all charts)*, *Fixed y-scale*)
+# the most points the line shows on this screen, for the widest value label the page can have; the page's data groups
+# its readings to stay under it
+POINTS = chart_points('co2_35', registry()['pages']['co2']['widest'])
+VARIABLES = {'co2_points': POINTS}
 PAYLOAD_MAIN = r'''
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set h12 = time_format != '24h' -%}
