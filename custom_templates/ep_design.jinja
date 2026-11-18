@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_MONTHS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'sfvvoj' -%}
+{%- set EP_SET = 'bmxllv' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -49,6 +49,8 @@
   'plants_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'plants'},
   'rain_27l': {'kit': 'other', 'tier': '384x168-0.17', 'page': 'rain'},
   'rain_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'rain'},
+  'rain_hourly_27l': {'kit': 'other', 'tier': '384x168-0.17', 'page': 'rain-hourly'},
+  'rain_hourly_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'rain-hourly'},
   'single_value_14': {'kit': 'other', 'tier': '200x200-0.13', 'page': 'single-value'},
   'single_value_27l': {'kit': 'other', 'tier': '384x168-0.17', 'page': 'single-value'},
   'single_value_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'single-value'},
@@ -1016,7 +1018,7 @@
      drawn in type.label): where that cut is allowed in capitals only (type.unit is larger than type.label) it is written
      in capitals at the label's size (2:05PM). CLOCK_SPAN: from-to; a span within one half of the day carries it once. -#}
 {%- macro CLOCK(ts, h12, label=false) -%}{{ (ts | timestamp_custom('%H:%M')) if not h12 else ((ts | timestamp_custom('%-I:%M%p')) if (label and EP_TK.type.unit[1] > EP_TK.type.label[1]) else ((ts | timestamp_custom('%-I:%M')) ~ '¦' ~ (ts | timestamp_custom('%p') | lower))) }}{%- endmacro -%}
-{%- macro CLOCK_SPAN(a, b, h12) -%}{{ ((a | timestamp_custom('%H:%M')) ~ '–' ~ (b | timestamp_custom('%H:%M'))) if not h12 else (((a | timestamp_custom('%-I:%M')) ~ '–' ~ CLOCK(b, true)) if (a | timestamp_custom('%p')) == (b | timestamp_custom('%p')) else (CLOCK(a, true) ~ '¦–' ~ CLOCK(b, true))) }}{%- endmacro -%}
+{%- macro CLOCK_SPAN(a, b, h12) -%}{{ ((a | timestamp_custom('%H:%M')) ~ '–' ~ (b | timestamp_custom('%H:%M'))) if not h12 else (((a | timestamp_custom('%-I:%M')) ~ '–' ~ CLOCK(b, true)) if ((a | timestamp_custom('%p')) == (b | timestamp_custom('%p')) and (b - a) < 43200) else (CLOCK(a, true) ~ '¦–' ~ CLOCK(b, true))) }}{%- endmacro -%}
 {#- UPPER_VALUE: capitals for the text of a value, never for its units (the segments after a ¦) -#}
 {%- macro UPPER_VALUE(v) -%}{%- set o = namespace(l=[]) -%}{%- for p in (v | string).split('¦') -%}{%- set o.l = o.l + [(p | upper) if loop.index0 % 2 == 0 else p] -%}{%- endfor -%}{{ o.l | join('¦') }}{%- endmacro -%}
 {%- macro EMPTY(ns, msg, x0, x1, y0, y1) -%}
@@ -2493,7 +2495,7 @@
 {%- set ds_title = c.ds_title -%}
 {%- set ds_txt = c.ds_txt -%}
 {%- set language_map = c.language_map -%}
-{#- the rain chart fills its tier's canvas: 384 x 184 (3.5"), or 384 x 168 on the 2.7" (specs/rain_27l.py) -#}
+{#- the rain chart fills its tier's canvas: 384 x 184 (3.5"), or 384 x 168 on the 2.7" -#}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set h12 = time_format != '24h' -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
@@ -2503,14 +2505,14 @@
 {%- set flag = flag_rain_hour | default(true) -%}
 {#- the bars, the threshold lines with their labels, and the footer's conclusion in clock times -#}
 {%- set bl = namespace(l=[]) -%}
-{%- for b in buckets -%}{%- set bl.l = bl.l + [{'i': b.index, 'v': b.mm_h, 'f': b.scaled, 'level': ('sev' if b.is_severe else ('warn' if b.mm_h >= warn else '')) if flag else ''}] -%}{%- endfor -%}
+{%- for b in buckets -%}{%- set bl.l = bl.l + [{'i': b.index, 'v': b.mm_h, 'f': b.scaled, 'level': ('sev' if b.mm_h >= sev else ('warn' if b.mm_h >= warn else '')) if flag else ''}] -%}{%- endfor -%}
 {%- set lines = [[warn, DECIMAL((warn | round(1) | string).replace('.0', ''))], [sev, DECIMAL((sev | round(1) | string).replace('.0', ''))]] -%}
 {%- set st = namespace(first=none, last=none, peak=0, peak_ts=0, sev_first=none, sev_last=none) -%}
 {%- for b in buckets -%}{%- if b.mm_h > 0 -%}
 {%- if st.first is none -%}{%- set st.first = b.ts -%}{%- endif -%}
 {%- set st.last = b.ts -%}
 {%- if b.mm_h > st.peak -%}{%- set st.peak, st.peak_ts = b.mm_h, b.ts -%}{%- endif -%}
-{%- if b.is_severe -%}{%- if st.sev_first is none -%}{%- set st.sev_first = b.ts -%}{%- endif -%}{%- set st.sev_last = b.ts -%}{%- endif -%}
+{%- if b.mm_h >= sev -%}{%- if st.sev_first is none -%}{%- set st.sev_first = b.ts -%}{%- endif -%}{%- set st.sev_last = b.ts -%}{%- endif -%}
 {%- endif -%}{%- endfor -%}
 {%- set u = ds_txt['unit'] -%}
 {%- set pk = DECIMAL((st.peak | round(0 if st.peak >= 10 else 1) | string).replace('.0', '')) ~ '¦' ~ u -%}
@@ -2522,7 +2524,7 @@
 {%- set ticks = [[0, CLOCK(buckets[0].ts, h12, true)], [6, CLOCK(buckets[6].ts, h12, true)], [12, CLOCK(buckets[12].ts, h12, true)], [18, CLOCK(buckets[18].ts, h12, true)]] -%}
 {%- set endtxt = CLOCK(buckets[23].ts + 300, h12, true) -%}
 {%- set dry = (ds_txt['dry'] | upper) ~ ' ' ~ CLOCK(buckets[23].ts + 300, h12) -%}
-{#- pattern 'Bar chart' with thresholds: BARS five-minute bars on a log scale up to SCALE_TOP; a wet bar is at least 3 x line.base high -#}
+{#- pattern 'Bar chart' with thresholds: BARS bars on a log scale up to SCALE_TOP; a wet bar is at least 3 x line.base high -#}
 {{- BARCHART(ns, ds_title, right, 24, bl.l, lines, ticks, endtxt, foot, dry, ds_stale, 50, 0, 3, flag) -}}
 {%- elif layout == 'rain_27l' and view == 'error' -%}
 {%- set buckets = c.buckets -%}
@@ -2539,7 +2541,7 @@
 {%- set ds_title = c.ds_title -%}
 {%- set ds_txt = c.ds_txt -%}
 {%- set language_map = c.language_map -%}
-{#- the rain chart fills its tier's canvas: 384 x 184 (3.5"), or 384 x 168 on the 2.7" (specs/rain_27l.py) -#}
+{#- the rain chart fills its tier's canvas: 384 x 184 (3.5"), or 384 x 168 on the 2.7" -#}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set h12 = time_format != '24h' -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
@@ -2549,14 +2551,14 @@
 {%- set flag = flag_rain_hour | default(true) -%}
 {#- the bars, the threshold lines with their labels, and the footer's conclusion in clock times -#}
 {%- set bl = namespace(l=[]) -%}
-{%- for b in buckets -%}{%- set bl.l = bl.l + [{'i': b.index, 'v': b.mm_h, 'f': b.scaled, 'level': ('sev' if b.is_severe else ('warn' if b.mm_h >= warn else '')) if flag else ''}] -%}{%- endfor -%}
+{%- for b in buckets -%}{%- set bl.l = bl.l + [{'i': b.index, 'v': b.mm_h, 'f': b.scaled, 'level': ('sev' if b.mm_h >= sev else ('warn' if b.mm_h >= warn else '')) if flag else ''}] -%}{%- endfor -%}
 {%- set lines = [[warn, DECIMAL((warn | round(1) | string).replace('.0', ''))], [sev, DECIMAL((sev | round(1) | string).replace('.0', ''))]] -%}
 {%- set st = namespace(first=none, last=none, peak=0, peak_ts=0, sev_first=none, sev_last=none) -%}
 {%- for b in buckets -%}{%- if b.mm_h > 0 -%}
 {%- if st.first is none -%}{%- set st.first = b.ts -%}{%- endif -%}
 {%- set st.last = b.ts -%}
 {%- if b.mm_h > st.peak -%}{%- set st.peak, st.peak_ts = b.mm_h, b.ts -%}{%- endif -%}
-{%- if b.is_severe -%}{%- if st.sev_first is none -%}{%- set st.sev_first = b.ts -%}{%- endif -%}{%- set st.sev_last = b.ts -%}{%- endif -%}
+{%- if b.mm_h >= sev -%}{%- if st.sev_first is none -%}{%- set st.sev_first = b.ts -%}{%- endif -%}{%- set st.sev_last = b.ts -%}{%- endif -%}
 {%- endif -%}{%- endfor -%}
 {%- set u = ds_txt['unit'] -%}
 {%- set pk = DECIMAL((st.peak | round(0 if st.peak >= 10 else 1) | string).replace('.0', '')) ~ '¦' ~ u -%}
@@ -2568,9 +2570,101 @@
 {%- set ticks = [[0, CLOCK(buckets[0].ts, h12, true)], [6, CLOCK(buckets[6].ts, h12, true)], [12, CLOCK(buckets[12].ts, h12, true)], [18, CLOCK(buckets[18].ts, h12, true)]] -%}
 {%- set endtxt = CLOCK(buckets[23].ts + 300, h12, true) -%}
 {%- set dry = (ds_txt['dry'] | upper) ~ ' ' ~ CLOCK(buckets[23].ts + 300, h12) -%}
-{#- pattern 'Bar chart' with thresholds: BARS five-minute bars on a log scale up to SCALE_TOP; a wet bar is at least 3 x line.base high -#}
+{#- pattern 'Bar chart' with thresholds: BARS bars on a log scale up to SCALE_TOP; a wet bar is at least 3 x line.base high -#}
 {{- BARCHART(ns, ds_title, right, 24, bl.l, lines, ticks, endtxt, foot, dry, ds_stale, 50, 0, 3, flag) -}}
 {%- elif layout == 'rain_35' and view == 'error' -%}
+{%- set buckets = c.buckets -%}
+{%- set ds_last_ts = c.ds_last_ts -%}
+{%- set ds_stale = c.ds_stale -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_txt = c.ds_txt -%}
+{%- set language_map = c.language_map -%}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['no_data']) -}}
+{%- elif layout == 'rain_hourly_27l' and view == 'main' -%}
+{%- set buckets = c.buckets -%}
+{%- set ds_last_ts = c.ds_last_ts -%}
+{%- set ds_stale = c.ds_stale -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_txt = c.ds_txt -%}
+{%- set language_map = c.language_map -%}
+{#- the rain chart fills its tier's canvas: 384 x 184 (3.5"), or 384 x 168 on the 2.7" -#}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{%- set h12 = time_format != '24h' -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
+{%- set warn = warning_rain_hour | float(2.5) -%}
+{%- set sev = severe_rain_hour | float(10) -%}
+{#- the switch off: no bar is flagged, no threshold is drawn, the footer states the rain without a chip -#}
+{%- set flag = flag_rain_hour | default(true) -%}
+{#- the bars, the threshold lines with their labels, and the footer's conclusion in clock times -#}
+{%- set bl = namespace(l=[]) -%}
+{%- for b in buckets -%}{%- set bl.l = bl.l + [{'i': b.index, 'v': b.mm_h, 'f': b.scaled, 'level': ('sev' if b.mm_h >= sev else ('warn' if b.mm_h >= warn else '')) if flag else ''}] -%}{%- endfor -%}
+{%- set lines = [[warn, DECIMAL((warn | round(1) | string).replace('.0', ''))], [sev, DECIMAL((sev | round(1) | string).replace('.0', ''))]] -%}
+{%- set st = namespace(first=none, last=none, peak=0, peak_ts=0, sev_first=none, sev_last=none) -%}
+{%- for b in buckets -%}{%- if b.mm_h > 0 -%}
+{%- if st.first is none -%}{%- set st.first = b.ts -%}{%- endif -%}
+{%- set st.last = b.ts -%}
+{%- if b.mm_h > st.peak -%}{%- set st.peak, st.peak_ts = b.mm_h, b.ts -%}{%- endif -%}
+{%- if b.mm_h >= sev -%}{%- if st.sev_first is none -%}{%- set st.sev_first = b.ts -%}{%- endif -%}{%- set st.sev_last = b.ts -%}{%- endif -%}
+{%- endif -%}{%- endfor -%}
+{%- set u = ds_txt['unit'] -%}
+{%- set pk = DECIMAL((st.peak | round(0 if st.peak >= 10 else 1) | string).replace('.0', '')) ~ '¦' ~ u -%}
+{%- if flag and st.sev_first is not none -%}
+{%- set foot = [(ds_txt['heavy'] | upper) ~ ' ' ~ CLOCK_SPAN(st.sev_first, st.sev_last + 3600, h12), (ds_txt['peak'] | upper) ~ ' ' ~ pk, 'sev'] -%}
+{%- elif st.first is not none -%}
+{%- set foot = [(ds_txt['rain'] | upper) ~ ' ' ~ CLOCK_SPAN(st.first, st.last + 3600, h12), (ds_txt['peak'] | upper) ~ ' ' ~ pk ~ '¦ · ' ~ CLOCK(st.peak_ts, h12), none] -%}
+{%- else -%}{%- set foot = ['', '', none] -%}{%- endif -%}
+{%- set ticks = [[0, CLOCK(buckets[0].ts, h12, true)], [6, CLOCK(buckets[6].ts, h12, true)], [12, CLOCK(buckets[12].ts, h12, true)], [18, CLOCK(buckets[18].ts, h12, true)]] -%}
+{%- set endtxt = CLOCK(buckets[23].ts + 3600, h12, true) -%}
+{%- set dry = (ds_txt['dry'] | upper) ~ ' ' ~ STAMP(buckets[23].ts + 3600) -%}
+{#- pattern 'Bar chart' with thresholds: BARS bars on a log scale up to SCALE_TOP; a wet bar is at least 3 x line.base high -#}
+{{- BARCHART(ns, ds_title, right, 24, bl.l, lines, ticks, endtxt, foot, dry, ds_stale, 50, 0, 3, flag) -}}
+{%- elif layout == 'rain_hourly_27l' and view == 'error' -%}
+{%- set buckets = c.buckets -%}
+{%- set ds_last_ts = c.ds_last_ts -%}
+{%- set ds_stale = c.ds_stale -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_txt = c.ds_txt -%}
+{%- set language_map = c.language_map -%}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['no_data']) -}}
+{%- elif layout == 'rain_hourly_35' and view == 'main' -%}
+{%- set buckets = c.buckets -%}
+{%- set ds_last_ts = c.ds_last_ts -%}
+{%- set ds_stale = c.ds_stale -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_txt = c.ds_txt -%}
+{%- set language_map = c.language_map -%}
+{#- the rain chart fills its tier's canvas: 384 x 184 (3.5"), or 384 x 168 on the 2.7" -#}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{%- set h12 = time_format != '24h' -%}
+{%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
+{%- set warn = warning_rain_hour | float(2.5) -%}
+{%- set sev = severe_rain_hour | float(10) -%}
+{#- the switch off: no bar is flagged, no threshold is drawn, the footer states the rain without a chip -#}
+{%- set flag = flag_rain_hour | default(true) -%}
+{#- the bars, the threshold lines with their labels, and the footer's conclusion in clock times -#}
+{%- set bl = namespace(l=[]) -%}
+{%- for b in buckets -%}{%- set bl.l = bl.l + [{'i': b.index, 'v': b.mm_h, 'f': b.scaled, 'level': ('sev' if b.mm_h >= sev else ('warn' if b.mm_h >= warn else '')) if flag else ''}] -%}{%- endfor -%}
+{%- set lines = [[warn, DECIMAL((warn | round(1) | string).replace('.0', ''))], [sev, DECIMAL((sev | round(1) | string).replace('.0', ''))]] -%}
+{%- set st = namespace(first=none, last=none, peak=0, peak_ts=0, sev_first=none, sev_last=none) -%}
+{%- for b in buckets -%}{%- if b.mm_h > 0 -%}
+{%- if st.first is none -%}{%- set st.first = b.ts -%}{%- endif -%}
+{%- set st.last = b.ts -%}
+{%- if b.mm_h > st.peak -%}{%- set st.peak, st.peak_ts = b.mm_h, b.ts -%}{%- endif -%}
+{%- if b.mm_h >= sev -%}{%- if st.sev_first is none -%}{%- set st.sev_first = b.ts -%}{%- endif -%}{%- set st.sev_last = b.ts -%}{%- endif -%}
+{%- endif -%}{%- endfor -%}
+{%- set u = ds_txt['unit'] -%}
+{%- set pk = DECIMAL((st.peak | round(0 if st.peak >= 10 else 1) | string).replace('.0', '')) ~ '¦' ~ u -%}
+{%- if flag and st.sev_first is not none -%}
+{%- set foot = [(ds_txt['heavy'] | upper) ~ ' ' ~ CLOCK_SPAN(st.sev_first, st.sev_last + 3600, h12), (ds_txt['peak'] | upper) ~ ' ' ~ pk, 'sev'] -%}
+{%- elif st.first is not none -%}
+{%- set foot = [(ds_txt['rain'] | upper) ~ ' ' ~ CLOCK_SPAN(st.first, st.last + 3600, h12), (ds_txt['peak'] | upper) ~ ' ' ~ pk ~ '¦ · ' ~ CLOCK(st.peak_ts, h12), none] -%}
+{%- else -%}{%- set foot = ['', '', none] -%}{%- endif -%}
+{%- set ticks = [[0, CLOCK(buckets[0].ts, h12, true)], [6, CLOCK(buckets[6].ts, h12, true)], [12, CLOCK(buckets[12].ts, h12, true)], [18, CLOCK(buckets[18].ts, h12, true)]] -%}
+{%- set endtxt = CLOCK(buckets[23].ts + 3600, h12, true) -%}
+{%- set dry = (ds_txt['dry'] | upper) ~ ' ' ~ STAMP(buckets[23].ts + 3600) -%}
+{#- pattern 'Bar chart' with thresholds: BARS bars on a log scale up to SCALE_TOP; a wet bar is at least 3 x line.base high -#}
+{{- BARCHART(ns, ds_title, right, 24, bl.l, lines, ticks, endtxt, foot, dry, ds_stale, 50, 0, 3, flag) -}}
+{%- elif layout == 'rain_hourly_35' and view == 'error' -%}
 {%- set buckets = c.buckets -%}
 {%- set ds_last_ts = c.ds_last_ts -%}
 {%- set ds_stale = c.ds_stale -%}

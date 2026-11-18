@@ -55,6 +55,8 @@ COVERAGE = {
     'co2_35':    pg('co2', 'co2_widest', 'co2_warn_y', 'co2_sev', 'co2_warn_y_g', 'co2_warn_y', 'co2_title', 'co2_stale', 'co2_err', 'co2_sev', NOHIST),
     'rain_35':   pg('rain35', 'rain35_widest', 'rain35_warn', 'rain35', 'rain35_g', 'rain35_y', 'rain35_title', 'rain_stale', 'rain_err', 'rain_radar', 'rain_dry'),
     'rain_27l': pg('rain168', 'rain168_widest', 'rain168_warn', 'rain168', 'rain168_g', 'rain168_y', 'rain168_title', 'rain168_stale', 'rain168_err', 'rain168_radar', 'rain168_dry'),
+    'rain_hourly_35':  pg('rh_light', 'rh_widest', 'rh_warn', 'rh', 'rh_g', 'rh_y', 'rh_title', 'rh_stale', 'rh_err', 'rh_unav', 'rh_dry'),
+    'rain_hourly_27l': pg('rh_light', 'rh_widest', 'rh_warn', 'rh', 'rh_g', 'rh_y', 'rh_title', 'rh_stale', 'rh_err', 'rh_unav', 'rh_dry'),
     'sun_moon_35':    pg('sun35', 'sun_widest', NOTHR, NOTHR, NOCHIP, NOCHIP, 'sun35_title', NOSTALE, 'sun_err', 'sun_nomoon', NOEMPTY),
     'entities_35':    pg('entities35', 'ent12', NOTHR, NOTHR, NOCHIP, NOCHIP, 'entities35_title', 'ent_stale', 'ent_err', 'ent_unav', REQ),
     'plants_41': pg('plants42', 'plants20', 'plants42_y', 'plants42', 'plants42_g', 'plants42_y', 'plants42_title', 'plants_stale', 'plants_unav', 'plants42', REQ),

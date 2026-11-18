@@ -1,0 +1,91 @@
+page: rain-hourly
+description:
+  shows: The next 24 hours of rain in hourly bars, from the hourly forecast of any weather entity, on a log scale so drizzle
+    stays visible next to a downpour.
+  needs:
+  - weather
+  trigger_advice: A time pattern every 30 or 60 minutes; an hourly forecast changes slowly.
+  notes:
+  - The weather entity must offer an hourly forecast.
+  - 'In the Netherlands and Belgium, the Rain forecast (Netherlands) blueprint shows the next two hours in 5-minute bars.'
+redraw: trigger
+stale:
+- weather_entity
+inputs:
+- include: weather_entity
+- include: rain_chart_thresholds
+bind:
+- weather_entity
+- flag_rain_hour
+- severe_rain_hour
+- warning_rain_hour
+data:
+  variables:
+  - include: weather_forecast_entity
+  - include: rain_chart_texts
+  steps:
+  - if:
+    - "{{ forecast_entity != 'unavailable' and (state_attr(forecast_entity, 'supported_features') | int(0)) | bitwise_and(2) > 0 }}"
+    then:
+    - action: weather.get_forecasts
+      target:
+        entity_id: '{{ forecast_entity }}'
+      data:
+        type: hourly
+      response_variable: ds_fh
+  - variables:
+      buckets: |
+        {% set ns = namespace(list=[]) %} {% set cap = rain_top %}
+        {% set fc = (ds_fh[forecast_entity].forecast | default([])) if (ds_fh is defined and ds_fh is mapping and forecast_entity in ds_fh) else [] %}
+        {% set hour_ts = (now().timestamp() // 3600) * 3600 %}
+        {% if fc | length > 0 %}
+        {% for i in range(rain_bars) %}
+          {% set bucket_ts = hour_ts + (i * 3600) %}
+          {% set hit = namespace(v=0) %}
+          {% for f in fc %}
+            {% if ((as_timestamp(f.datetime, 0) - bucket_ts) | abs) < 1800 %}
+              {% set hit.v = f.precipitation | default(0) | float(0) %}
+            {% endif %}
+          {% endfor %}
+          {% set mm_h = [hit.v, 0] | max %}
+          {% set scaled = 0 if mm_h <= 0 else [[(((mm_h + 1) | log(10)) / ((cap + 1) | log(10))), 0] | max, 1] | min %}
+          {% set ns.list = ns.list + [{'index': i, 'ts': bucket_ts, 'mm_h': mm_h, 'scaled': scaled}] %}
+        {% endfor %}
+        {% endif %} {{ ns.list }}
+  draw:
+    kind: choose
+    when:
+    - '{{ buckets | length > 0 }}'
+    steps: []
+texts:
+  en:
+    no_data: No rain forecast data available.
+    default_title: Rain (next 24h)
+  de:
+    no_data: Keine Regenvorhersagedaten verfügbar.
+    default_title: Regen (nächste 24 Std.)
+  nl:
+    no_data: Geen regenvoorspellingsgegevens beschikbaar.
+    default_title: Regen (komende 24u)
+  fr:
+    no_data: Aucune donnée de prévision de pluie disponible.
+    default_title: Pluie (24 prochaines h)
+  es:
+    no_data: No hay datos de previsión de lluvia disponibles.
+    default_title: Lluvia (próximas 24h)
+  pl:
+    no_data: Brak dostępnych danych prognozy opadów.
+    default_title: Deszcz (najbliższe 24h)
+  hr:
+    no_data: Nema dostupnih podataka o prognozi kiše.
+    default_title: Kiša (sljedeća 24h)
+  sv:
+    no_data: Ingen nederbördsprognosdata tillgänglig.
+    default_title: Regn (nästa 24h)
+layouts:
+  '35':
+    spec: rain_hourly_35
+  27l:
+    spec: rain_hourly_27l
+    notes:
+    - 'Button devices sold as 2.9": configure the firmware for 168 x 384, or the top 16 px are cut off.'

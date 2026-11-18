@@ -612,7 +612,7 @@ screen_facts:
 # groups: what several page definitions share, written once. A page names one with `include: <group>`: as an item of a
 # list (the group's items take its place) or as a key of a mapping (the group's keys take its place). lib/pages.py resolves them.
 groups:
-  weather_sources:
+  weather_entity:
   - name: weather_entity
     section: content
     label: Weather entity
@@ -622,6 +622,8 @@ groups:
         filter:
           domain: weather
     required: true
+  weather_sources:
+  - include: weather_entity
   - name: current_temp_sensor
     section: content
     label: Current temperature sensor
@@ -680,6 +682,50 @@ groups:
     selector:
       text: null
     default: ''
+  rain_chart_thresholds:
+  - name: flag_rain_hour
+    section: thresholds
+    label: 'Rain per hour: flag it'
+    help: Off, no bar is flagged and the chart shows no threshold lines, whatever the two values below say.
+    selector:
+      boolean: {}
+    default: true
+  - name: warning_rain_hour
+    section: thresholds
+    label: 'Rain per hour: warning at or above'
+    help: A bar at or above this is a warning. The chart marks the value with the lower dashed line.
+    selector:
+      number:
+        min: 0
+        step: 0.1
+        unit_of_measurement: mm/h
+        mode: box
+    default: 2.5
+  - name: severe_rain_hour
+    section: thresholds
+    label: 'Rain per hour: severe at or above'
+    help: If a timeframe's combined rain intensity is at or above this value, its bar switches to the severe colour. The graph
+      uses a log scale up to 50 mm/h (violent rain).
+    selector:
+      number:
+        min: 0
+        step: 0.1
+        unit_of_measurement: mm/h
+        mode: box
+    default: 10
+  rain_chart_texts:
+  - ds_txt: |
+      {% set m = {
+        "en": {"title": "Rain", "dry": "Dry until", "rain": "Rain", "heavy": "Heavy rain", "peak": "peak", "unit": "mm/h"},
+        "de": {"title": "Regen", "dry": "Trocken bis", "rain": "Regen", "heavy": "Starkregen", "peak": "Spitze", "unit": "mm/h"},
+        "nl": {"title": "Regen", "dry": "Droog tot", "rain": "Regen", "heavy": "Zware bui", "peak": "piek", "unit": "mm/h"},
+        "fr": {"title": "Pluie", "dry": "Sec jusqu'à", "rain": "Pluie", "heavy": "Forte pluie", "peak": "pic", "unit": "mm/h"},
+        "es": {"title": "Lluvia", "dry": "Seco hasta", "rain": "Lluvia", "heavy": "Lluvia fuerte", "peak": "pico", "unit": "mm/h"},
+        "pl": {"title": "Deszcz", "dry": "Sucho do", "rain": "Deszcz", "heavy": "Ulewa", "peak": "szczyt", "unit": "mm/h"},
+        "hr": {"title": "Kiša", "dry": "Suho do", "rain": "Kiša", "heavy": "Jaka kiša", "peak": "vrh", "unit": "mm/h"},
+        "sv": {"title": "Regn", "dry": "Torrt till", "rain": "Regn", "heavy": "Skyfall", "peak": "topp", "unit": "mm/h"}
+      } %} {{ m[weekday_lang] }}
+  - ds_title: '{{ header_title if header_title else ds_txt[''title''] }}'
   weather_thresholds:
   - name: flag_temp_low
     section: thresholds

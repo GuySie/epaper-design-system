@@ -647,7 +647,7 @@ Three levels, the same on every module:
 | | Rain per day, today's total included (`*_rain_day`) | ≥ <!-- v:input:weather:warning_rain_day -->10 mm<!-- /v --> | ≥ <!-- v:input:weather:severe_rain_day -->25 mm<!-- /v --> |
 | | Pollen (`*_pollen_high`, where a pollen sensor is an input) | sensor level *high* | sensor level *very high* |
 | | Condition (`*_conditions`, a list) | <!-- v:input:weather:warning_conditions -->`hail`, `lightning`, `lightning-rainy`, `exceptional`<!-- /v --> | <!-- v:input:weather:severe_conditions -->none (empty list)<!-- /v --> |
-| Rain forecast | Rain per hour | ≥ <!-- v:input:rain:warning_rain_hour -->2.5 mm/h<!-- /v --> | ≥ <!-- v:input:rain:severe_rain_hour -->10 mm/h<!-- /v --> |
+| Rain forecast, Rain forecast (Netherlands) | Rain per hour | ≥ <!-- v:input:rain:warning_rain_hour -->2.5 mm/h<!-- /v --> | ≥ <!-- v:input:rain:severe_rain_hour -->10 mm/h<!-- /v --> |
 | CO2 graph | Concentration | ≥ <!-- v:input:co2:warning_co2 -->1000 ppm<!-- /v --> | ≥ <!-- v:input:co2:severe_co2 -->1400 ppm<!-- /v --> |
 | Claude usage | Usage | ≥ <!-- v:input:claude:warning_usage -->90 %<!-- /v --> | ≥ <!-- v:input:claude:severe_usage -->100 %<!-- /v --> |
 | Plant moisture | Soil moisture | ≤ <!-- v:input:plants:warning_moisture_low -->25 %<!-- /v --> | ≤ <!-- v:input:plants:severe_moisture_low -->14 %<!-- /v --> |
@@ -800,7 +800,7 @@ The label left in `type.fieldLabel`, the value right on the padding in the data 
 The footer is an **optional single text line at the bottom of a screen**. It says what the screen adds up to.
 
 - **What goes in it**, one of two things:
-  - **(a) the conclusion of the main module**: what the chart, list or forecast adds up to, in words and clock times. Examples: Rain forecast `HEAVY RAIN 14:50–15:00 · PEAK 13mm/h`, CO2 `NOW 495ppm · PEAK 2703ppm · 09:15`, Sun & moon `DAY LENGTH 9h09min`, Claude usage `ON PACE` / `WEEK 7% AHEAD`, Next appointment `FREE UNTIL TOMORROW 09:00` / `FREE FROM 11:30`, Plant moisture `7 PLANTS NEED WATER`, Weather `RAIN UNTIL 17:00` / `DRY UNTIL 16:00` / `DRY`.
+  - **(a) the conclusion of the main module**: what the chart, list or forecast adds up to, in words and clock times. Examples: Rain forecast (Netherlands) `HEAVY RAIN 14:50–15:00 · PEAK 13mm/h`, CO2 `NOW 495ppm · PEAK 2703ppm · 09:15`, Sun & moon `DAY LENGTH 9h09min`, Claude usage `ON PACE` / `WEEK 7% AHEAD`, Next appointment `FREE UNTIL TOMORROW 09:00` / `FREE FROM 11:30`, Plant moisture `7 PLANTS NEED WATER`, Weather `RAIN UNTIL 17:00` / `DRY UNTIL 16:00` / `DRY`.
   - **(b) context for the whole screen** that belongs to no module and needs no action (sunrise/sunset).
 
   (a) beats (b). A layout has a footer only when there is such a conclusion or context **that isn't shown anywhere else on the screen**; otherwise it has none.
@@ -817,7 +817,7 @@ The footer is an **optional single text line at the bottom of a screen**. It say
 | Weather 2.7" landscape, 3.5" | none (no room; the strip is the last module) |
 | Weather 2.7" portrait, 4.1", 7.5" portrait | (a) forecast conclusion |
 | Weather 7.5" landscape, 4.26" | none (strips fill the panel; sunrise/sunset in the detail rows) |
-| Rain forecast 3.5", 2.7" landscape; CO2 graph 3.5" | (a) chart summary; none when there's nothing to show |
+| Rain forecast and Rain forecast (Netherlands) 3.5", 2.7" landscape; CO2 graph 3.5" | (a) chart summary; none when there's nothing to show |
 | Sun & moon 3.5" | (a) day length (the moon and its phase are on the timeline) |
 | Claude usage 3.5" | (a) on schedule / furthest ahead, when it fits |
 | Next appointment 3.5", 4.1", 4.26" | (a) free until / free from, when it fits |
@@ -954,7 +954,7 @@ Bar and line charts share one frame. The Rain forecast is the reference Bar char
    - Never re-stretch to the data on each refresh: a scale built from thresholds or set by the page stays put, and the automatic scale only changes when a value crosses a round step. Clip values beyond the scale at the edge.
    - **An end label gives way to a threshold label** that would come closer to it than a label's height: the threshold's value then stands for that end.
    - **The logarithmic scale** is the other scale a page can name, for a reading that spans orders of magnitude: from 0 to a fixed top, each value placed at log(value + 1), so a small reading stays visible next to a large one. Thresholds sit at their log position. Rain intensity uses it, up to <!-- v:spec:rain_35:SCALE_TOP -->50<!-- /v --> mm/h (violent rain): drizzle (0.1–1 mm/h) stays visible next to a downpour.
-3. **Clock-time axis.** Evenly spaced labels from start to end (*Style choices*, Axis ticks). The rain chart marks a fixed number of bars and the end instead. Clock times, never relative ones (*Text rules*, *Clock times, never relative times*). **12-hour form:** every axis label carries its half of the day as a unit attached to the time (*Text rules*, *Short hour labels*): `8:47am · 2:47pm`. The widest is `12:47pm`; five still fit on the 3.5". Where the label's cut is allowed in capitals only (the 2.7", *TRMNL12 on 1.4" and 2.7"*), it is written in capitals at the label's size: `2:05PM`. The footer's times and the empty statement's carry it the same way; a span within one half of the day carries it once, at the end (`2:50–3:00pm`), and a span across noon or midnight at both ends (`11:15am–1:00pm`). Ticks are `line.tick` long, starting on the row under the baseline; the labels' caps start `space.s` below the ticks. The Sun & moon compass row is the same axis under the horizon: same ticks, same label text line, and a marker below the horizon sits on that label text line. Ticks that point up from a line (sunrise and sunset) are `line.tick` long too.
+3. **Clock-time axis.** Evenly spaced labels from start to end (*Style choices*, Axis ticks). The rain chart marks a fixed number of bars and the end instead. Clock times, never relative ones (*Text rules*, *Clock times, never relative times*). **12-hour form:** every axis label carries its half of the day as a unit attached to the time (*Text rules*, *Short hour labels*): `8:47am · 2:47pm`. The widest is `12:47pm`; five still fit on the 3.5". Where the label's cut is allowed in capitals only (the 2.7", *TRMNL12 on 1.4" and 2.7"*), it is written in capitals at the label's size: `2:05PM`. The footer's times and the empty statement's carry it the same way; a span within one half of the day carries it once, at the end (`2:50–3:00pm`), and a span across noon or midnight, or of half a day or more, at both ends (`11:15am–1:00pm`, `11:00am–8:00am`). Ticks are `line.tick` long, starting on the row under the baseline; the labels' caps start `space.s` below the ticks. The Sun & moon compass row is the same axis under the horizon: same ticks, same label text line, and a marker below the horizon sits on that label text line. Ticks that point up from a line (sunrise and sunset) are `line.tick` long too.
    - **Vertical frame:** the plot's top is M under the title line (moved down by half a label's cap height when a value label sits on the top line). The baseline sits `space.axis` + M + `space.footer` above the bottom padding, so the axis labels keep M from the footer line.
 4. **Baseline.** `line.base`, solid. No gridlines other than thresholds.
 5. **Summary.** The footer (see *Footer*) states the facts in clock times (peak and when; the span above severe). It becomes a severe chip when severe occurs in the plotted range.
@@ -963,7 +963,7 @@ Bar and line charts share one frame. The Rain forecast is the reference Bar char
 
 #### Bar chart with thresholds, Line chart with thresholds
 
-The chart frame with a warning and a severe input (*Thresholds*); its scale is the one with thresholds, the rain intensity's log scale included (*Chart frame (all charts)*, *Fixed y-scale*). The Rain forecast and the CO2 graph use it.
+The chart frame with a warning and a severe input (*Thresholds*); its scale is the one with thresholds, the rain intensity's log scale included (*Chart frame (all charts)*, *Fixed y-scale*). Rain forecast, Rain forecast (Netherlands) and the CO2 graph use it.
 
 - **Thresholds.** At most two (warning, severe), left out when the chart has nothing to show (*Chart frame (all charts)*, *Exception, nothing to show*). Each is a dashed line at `line.base` (`line.dash`) across the full plot width. Warning is a reference only.
 - **Switched off** (`flag_<what>` off, *Thresholds*): the chart is drawn without its thresholds. No threshold lines and no values beside them, no severe fill, no warning colour, and the footer states its facts without a chip. The scale and the plot stay as they are: the scale is still built from the severe value (*Chart frame (all charts)*, *Fixed y-scale*) and keeps its top value where it shows one, and the label margin keeps the width it has with the switch on, so switching off never rescales or moves the chart.
@@ -1112,6 +1112,7 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | **Weather** | Hero dashboard with forecast strips | live | -12° | — | ● | ● | ● | ● | ● | ● | ● | ○ |
 | **Medication** | Glance | live | 20:00 | — | ● | — | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Doors & windows** | Glance | live | — | ● | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Rain forecast (Netherlands)** | Bar chart with thresholds | live | 50 mm/h | — | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Rain forecast** | Bar chart with thresholds | live | 50 mm/h | — | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **CO2 graph** | Line chart with thresholds | live | 4000 | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **History graph** | Line chart with thresholds | live | -12.5 | — | ● | ○ | ● | ● | ○ | ○ | ○ | ○ |
@@ -1331,7 +1332,31 @@ A Hero dashboard *with a chart or list* for any sensor: its number large, other 
 
 ### Rain forecast
 
-A Bar chart *with thresholds*: the next two hours in 5-minute bars on a log scale; the dry state is one statement (*Chart frame (all charts)*, *Exception, nothing to show*).
+A Bar chart *with thresholds*: the next 24 hours in hourly bars on a log scale, from the hourly forecast of any weather entity; the dry state is one statement (*Chart frame (all charts)*, *Exception, nothing to show*).
+
+- **Shows:** the bars against the warning and severe lines, the clock-time axis, and the footer's conclusion (the heaviest rain and its peak).
+- **Tested with:** light rain, a heavy shower (severe), rain past the warning line, the top of the scale all day (Spanish), the same with the switch off, dry, 12-hour time (a shower, a span of more than half a day, dry), stale data, a weather entity without an hourly forecast, an unavailable weather entity with another one working, a grey panel.
+- **Bars:** one per hour, starting with the current hour; a bar's value is the rain the forecast gives for that hour, read as mm/h. An hour the forecast doesn't have is dry. A wet bar's least height, the scale and the ticks are those of *Rain forecast (Netherlands)*.
+- **Dry statement:** it names the end of the last bar, the current hour a day on, so it carries its weekday as a time a day away does (*Text rules*, *Dates in captions*): `DRY UNTIL SU 14:00`.
+- **Thresholds:** rain per hour (*Thresholds*).
+- **No hourly forecast:** the error view.
+
+<!-- registry:inputs-rain-hourly -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `weather_entity`, `flag_rain_hour`, `warning_rain_hour`, `severe_rain_hour` |
+<!-- /registry:inputs-rain-hourly -->
+
+<!-- registry:layouts-rain-hourly -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 16 |
+| 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 16 |
+<!-- /registry:layouts-rain-hourly -->
+
+### Rain forecast (Netherlands)
+
+A Bar chart *with thresholds*: the next two hours in 5-minute bars on a log scale, from the Neerslag app's Buienalarm and Buienradar sensors; the dry state is one statement (*Chart frame (all charts)*, *Exception, nothing to show*).
 
 - **Shows:** the bars against the warning and severe lines, the clock-time axis, and the footer's conclusion (the heaviest shower and its peak).
 - **Tested with:** light rain, a heavy shower (severe), the same shower with the switch off, dry, 12-hour time (afternoon, across noon, dry), stale data, no data, the 2.7" canvas (384 × 168), a grey panel.
@@ -1661,10 +1686,10 @@ What every blueprint does the same way; where it can, through a shared part that
   3. **Thresholds** (collapsed): `flag_<what>`, `warning_<what>`, `severe_<what>` for each reading (*Thresholds*). The page sets its chart scale; it is not an input.
   4. **Appearance** (collapsed): `header_title` (blank for the translated default), `location_string`, `time_format` (12h/24h), `weekday_format` (en/de/nl/fr/es/pl/hr/sv) and `rotate` (0/90/180/270, all four always offered; the description explains native vs upright).
   5. **Advanced** (collapsed): `stale_after`, `led_color`, `led_flash_delay` and `font_dir`. The LED inputs are there wherever a button can start the redraw: the LED confirms the press. A blueprint that redraws on a change (Doors & windows) has none.
-- **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button). Every other input has a default, and an optional entity left empty removes its part of the page. The Rain forecast has no main entity: it needs one of its two sources.
+- **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button). Every other input has a default, and an optional entity left empty removes its part of the page. Rain forecast (Netherlands) has no main entity: it needs one of its two sources.
 - **Input names:** the device input is always `displays`, also where it takes one device (Medication). Numbered entries are `<name>_<n>` with `<name>_<n>_label` (`entity_1`, `plant_1`, `bar_1`). Thresholds are `warning_<what>` and `severe_<what>`, their switch `flag_<what>`. A blueprint's variables keep the names its drawing reads, so renaming an input never changes the drawing.
-  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather at a glance, Single value, Weather, Rain forecast, CO2 graph, History graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar, Tiles, Value with details<!-- /v -->); see *Title row* for the exempt blueprints.
-  - The panel is never an input: a page drawn on two screens is two blueprints (the Rain forecast on the 3.5" and on the 2.7" landscape).
+  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather at a glance, Single value, Weather, Rain forecast (Netherlands), Rain forecast, CO2 graph, History graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar, Tiles, Value with details<!-- /v -->); see *Title row* for the exempt blueprints.
+  - The panel is never an input: a page drawn on two screens is two blueprints (Rain forecast on the 3.5" and on the 2.7" landscape).
 - **Texts:** every blueprint's strings live in `ep_i18n.jinja`, written from the page definitions (per page, `EP_TXT['<page>']`, which the blueprint's `language_map` reads; the weekday and month lists once, in `pages/_shared.yaml`) and `wx_txt.yaml` (the weather words, `ds_wtxt`), keyed by the 8 language codes, holding weekday/month names and every user-facing string (including the empty, error and stale strings). Paired with separate `weekday_short_map` / `months_short_map` dicts, which read `EP_DAYS_SHORT` / `EP_MONTHS_SHORT`. The update stamp uses weekday + time (`SU 17:58`); dates in content use `SU 8 NOV`. Don't fold them into `language_map`.
 - **One set.** A release gives its templates and its blueprints the same set id: a short hash of the four templates as built, so it changes when the templates change and only then (`lib/set_id.py`). Every blueprint hands its id to the drawing, and the templates compare it with theirs. When they differ, or the blueprint has none, the templates draw the title row and the error block and nothing else: the message (`UPDATE TEMPLATES AND BLUEPRINT`, translated) and, on new lines under it, the two ids (`BLUEPRINT hjnenx · TEMPLATES udrrap` on one line where that fits, else one each; a blueprint without an id shows `—`), the lines centred as one block in the title's type. Templates from before this rule can't tell a newer blueprint apart, and missing templates still fail with `TemplateNotFound`: nothing can draw then.
 - **Shared parts:** the texts, the stale test (`ds_stale`), the drawing step, the button flash and the description's template note are one copy each, in `lib/shared.py`, which writes them into every blueprint; its `--lint` fails a blueprint whose copy differs.
@@ -1710,6 +1735,7 @@ Proven: TRMNL text and Space Grotesk heroes on BWRY ESLs (1.4", 2.7", 3.5", 4.1"
 13. Single value on the 1.4": the number at its one size (under the Glance floor) still reads from where the label is used.
 14. Tiles: icons the kit has no glyph for, drawn by the renderer's icon element at tile size (their soft edges on a panel with colour); Home Assistant's wording of a state in a language other than English at the tile's width.
 15. Value with details: the unit after a flagged number (it starts past the chip) and the number at its fitted size on the 4.1" beside three detail rows.
+16. Rain forecast: the hourly forecast of real weather entities (one whose forecast starts at the next hour leaves the first bar dry; one that reports rain in inches is read as mm).
 
 ## Open items
 

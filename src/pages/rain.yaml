@@ -32,36 +32,7 @@ inputs:
         domain: sensor
         integration: neerslag
   default: sensor.neerslag_buienradar_regen_data
-- name: flag_rain_hour
-  section: thresholds
-  label: 'Rain per hour: flag it'
-  help: Off, no bar is flagged and the chart shows no threshold lines, whatever the two values below say.
-  selector:
-    boolean: {}
-  default: true
-- name: warning_rain_hour
-  section: thresholds
-  label: 'Rain per hour: warning at or above'
-  help: A bar at or above this is a warning. The chart marks the value with the lower dashed line.
-  selector:
-    number:
-      min: 0
-      step: 0.1
-      unit_of_measurement: mm/h
-      mode: box
-  default: 2.5
-- name: severe_rain_hour
-  section: thresholds
-  label: 'Rain per hour: severe at or above'
-  help: If a timeframe's combined rain intensity is at or above this value, its bar switches to the severe colour. The graph
-    uses a log scale up to 50 mm/h (violent rain).
-  selector:
-    number:
-      min: 0
-      step: 0.1
-      unit_of_measurement: mm/h
-      mode: box
-  default: 10
+- include: rain_chart_thresholds
 bind:
 - buienalarm_entity
 - buienradar_entity
@@ -73,7 +44,7 @@ data:
   - has_any_data: |
       {% set raw1 = state_attr(buienalarm_entity, 'data') %} {% set raw2 = state_attr(buienradar_entity, 'data') %} {% set d1 = raw1 is mapping and raw1.get('success', False) and (raw1.get('precip', []) | length > 0) %} {% set d2 = raw2 is string and (raw2 | trim | length > 0) %} {{ d1 or d2 }}
   - buckets: |
-      {% set ns = namespace(list=[]) %} {% set cap = rain_top %} {% set threshold = severe_rain_hour | float(10) %} {% set now_ts = now().timestamp() %} {% set now_5_ts = (now_ts // 300) * 300 %}
+      {% set ns = namespace(list=[]) %} {% set cap = rain_top %} {% set now_ts = now().timestamp() %} {% set now_5_ts = (now_ts // 300) * 300 %}
       {% set raw1 = state_attr(buienalarm_entity, 'data') %} {% set has_data1 = raw1 is mapping and raw1.get('success', False) and (raw1.get('precip', []) | length > 0) %} {% if has_data1 %}
         {% set start1 = raw1.start | float %}
         {% set start1 = (start1 / 1000) if start1 > 10000000000 else start1 %}
@@ -124,22 +95,10 @@ data:
           'ts': bucket_ts,
           'mm_h': mm_h,
           'scaled': scaled,
-          'is_severe': mm_h >= threshold,
           'label': label
         }] %}
       {% endfor %} {{ ns.list }}
-  - ds_txt: |
-      {% set m = {
-        "en": {"title": "Rain", "dry": "Dry until", "rain": "Rain", "heavy": "Heavy rain", "peak": "peak", "unit": "mm/h"},
-        "de": {"title": "Regen", "dry": "Trocken bis", "rain": "Regen", "heavy": "Starkregen", "peak": "Spitze", "unit": "mm/h"},
-        "nl": {"title": "Regen", "dry": "Droog tot", "rain": "Regen", "heavy": "Zware bui", "peak": "piek", "unit": "mm/h"},
-        "fr": {"title": "Pluie", "dry": "Sec jusqu'à", "rain": "Pluie", "heavy": "Forte pluie", "peak": "pic", "unit": "mm/h"},
-        "es": {"title": "Lluvia", "dry": "Seco hasta", "rain": "Lluvia", "heavy": "Lluvia fuerte", "peak": "pico", "unit": "mm/h"},
-        "pl": {"title": "Deszcz", "dry": "Sucho do", "rain": "Deszcz", "heavy": "Ulewa", "peak": "szczyt", "unit": "mm/h"},
-        "hr": {"title": "Kiša", "dry": "Suho do", "rain": "Kiša", "heavy": "Jaka kiša", "peak": "vrh", "unit": "mm/h"},
-        "sv": {"title": "Regn", "dry": "Torrt till", "rain": "Regn", "heavy": "Skyfall", "peak": "topp", "unit": "mm/h"}
-      } %} {{ m[weekday_lang] }}
-  - ds_title: '{{ header_title if header_title else ds_txt[''title''] }}'
+  - include: rain_chart_texts
   draw:
     kind: choose
     when:

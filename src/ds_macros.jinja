@@ -641,7 +641,7 @@
      drawn in type.label): where that cut is allowed in capitals only (type.unit is larger than type.label) it is written
      in capitals at the label's size (2:05PM). CLOCK_SPAN: from-to; a span within one half of the day carries it once. -#}
 {%- macro CLOCK(ts, h12, label=false) -%}{{ (ts | timestamp_custom('%H:%M')) if not h12 else ((ts | timestamp_custom('%-I:%M%p')) if (label and EP_TK.type.unit[1] > EP_TK.type.label[1]) else ((ts | timestamp_custom('%-I:%M')) ~ '¦' ~ (ts | timestamp_custom('%p') | lower))) }}{%- endmacro -%}
-{%- macro CLOCK_SPAN(a, b, h12) -%}{{ ((a | timestamp_custom('%H:%M')) ~ '–' ~ (b | timestamp_custom('%H:%M'))) if not h12 else (((a | timestamp_custom('%-I:%M')) ~ '–' ~ CLOCK(b, true)) if (a | timestamp_custom('%p')) == (b | timestamp_custom('%p')) else (CLOCK(a, true) ~ '¦–' ~ CLOCK(b, true))) }}{%- endmacro -%}
+{%- macro CLOCK_SPAN(a, b, h12) -%}{{ ((a | timestamp_custom('%H:%M')) ~ '–' ~ (b | timestamp_custom('%H:%M'))) if not h12 else (((a | timestamp_custom('%-I:%M')) ~ '–' ~ CLOCK(b, true)) if ((a | timestamp_custom('%p')) == (b | timestamp_custom('%p')) and (b - a) < 43200) else (CLOCK(a, true) ~ '¦–' ~ CLOCK(b, true))) }}{%- endmacro -%}
 {#- UPPER_VALUE: capitals for the text of a value, never for its units (the segments after a ¦) -#}
 {%- macro UPPER_VALUE(v) -%}{%- set o = namespace(l=[]) -%}{%- for p in (v | string).split('¦') -%}{%- set o.l = o.l + [(p | upper) if loop.index0 % 2 == 0 else p] -%}{%- endfor -%}{{ o.l | join('¦') }}{%- endmacro -%}
 {%- macro EMPTY(ns, msg, x0, x1, y0, y1) -%}
