@@ -1,0 +1,139 @@
+page: energy-price
+description:
+  shows: Today's electricity price per hour from EnergyZero, with the current price and the cheapest hours still to come.
+  needs:
+  - energyzero
+  trigger_advice: A time pattern at the start of every hour; a price lasts an hour.
+  notes:
+  - 'The price is EnergyZero''s market price with VAT, without energy tax and purchase costs.'
+redraw: trigger
+inputs:
+- name: energyzero_entry
+  section: content
+  label: EnergyZero
+  help: The EnergyZero integration whose prices are shown.
+  selector:
+    config_entry:
+      integration: energyzero
+  required: true
+- name: cheapest_hours
+  section: content
+  label: Length of the cheapest run
+  help: The footer names the cheapest run of this many hours in a row among the hours still to come today.
+  selector:
+    number:
+      min: 1
+      max: 12
+      step: 1
+      unit_of_measurement: h
+      mode: box
+  default: 3
+- name: flag_price
+  section: thresholds
+  label: 'Price: flag it'
+  help: Off, no bar is flagged and the chart shows no threshold lines, whatever the two values below say.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_price
+  section: thresholds
+  label: 'Price: warning at or above'
+  help: An hour at or above this price is a warning. The chart marks the value with the lower dashed line.
+  selector:
+    number:
+      min: 0
+      step: 1
+      unit_of_measurement: ct/kWh
+      mode: box
+  default: 15
+- name: severe_price
+  section: thresholds
+  label: 'Price: severe at or above'
+  help: An hour at or above this price is severe. The chart's scale runs up to one and a half times this value.
+  selector:
+    number:
+      min: 0
+      step: 1
+      unit_of_measurement: ct/kWh
+      mode: box
+  default: 25
+bind:
+- cheapest_hours
+- flag_price
+- severe_price
+- warning_price
+data:
+  variables:
+  - ds_txt: |
+      {% set m = {
+        "en": {"title": "Energy price", "now": "Now", "cheapest": "Cheapest", "none": "No prices", "unit": "ct"},
+        "de": {"title": "Strompreis", "now": "Jetzt", "cheapest": "Günstig", "none": "Keine Preise", "unit": "ct"},
+        "nl": {"title": "Stroomprijs", "now": "Nu", "cheapest": "Goedkoopst", "none": "Geen prijzen", "unit": "ct"},
+        "fr": {"title": "Prix de l'électricité", "now": "Actuel", "cheapest": "Moins cher", "none": "Pas de prix", "unit": "ct"},
+        "es": {"title": "Precio de la luz", "now": "Ahora", "cheapest": "Más barato", "none": "Sin precios", "unit": "ct"},
+        "pl": {"title": "Cena prądu", "now": "Teraz", "cheapest": "Najtaniej", "none": "Brak cen", "unit": "ct"},
+        "hr": {"title": "Cijena struje", "now": "Sada", "cheapest": "Najjeftinije", "none": "Nema cijena", "unit": "ct"},
+        "sv": {"title": "Elpris", "now": "Nu", "cheapest": "Billigast", "none": "Inga priser", "unit": "ct"}
+      } %} {{ m[weekday_lang] }}
+  - ds_title: '{{ header_title if header_title else ds_txt[''title''] }}'
+  steps:
+  - action: energyzero.get_energy_prices
+    continue_on_error: true
+    data:
+      config_entry: !input energyzero_entry
+      incl_vat: true
+    response_variable: ds_prices
+  - variables:
+      hours: |
+        {% set ns = namespace(list=[], n=0) %}
+        {% set raw = (ds_prices.prices | default([])) if (ds_prices is defined and ds_prices is mapping) else [] %}
+        {% set day = as_timestamp(today_at('00:00')) %}
+        {% for i in range(price_bars) %}
+          {% set ts = day + i * 3600 %}
+          {% set hit = namespace(v=none) %}
+          {% for p in raw %}
+            {% if ((as_timestamp(p.start | default(p.timestamp), 0) - ts) | abs) < 60 and p.price is number %}
+              {% set hit.v = (p.price * 100) | round | int %}
+            {% endif %}
+          {% endfor %}
+          {% if hit.v is not none %}{% set ns.n = ns.n + 1 %}{% endif %}
+          {% set ns.list = ns.list + [{'index': i, 'ts': ts, 'ct': hit.v}] %}
+        {% endfor %}
+        {{ ns.list if ns.n > 0 else [] }}
+  draw:
+    kind: choose
+    when:
+    - '{{ hours | length > 0 }}'
+    steps: []
+texts:
+  en:
+    no_data: No energy prices available.
+    default_title: Energy price
+  de:
+    no_data: Keine Strompreise verfügbar.
+    default_title: Strompreis
+  nl:
+    no_data: Geen stroomprijzen beschikbaar.
+    default_title: Stroomprijs
+  fr:
+    no_data: Aucun prix de l'électricité disponible.
+    default_title: Prix de l'électricité
+  es:
+    no_data: No hay precios de la luz disponibles.
+    default_title: Precio de la luz
+  pl:
+    no_data: Brak dostępnych cen prądu.
+    default_title: Cena prądu
+  hr:
+    no_data: Nema dostupnih cijena struje.
+    default_title: Cijena struje
+  sv:
+    no_data: Inga elpriser tillgängliga.
+    default_title: Elpris
+layouts:
+  '35':
+    spec: energy_price_35
+  27l:
+    spec: energy_price_27l
+    notes:
+    - 'Button devices sold as 2.9": configure the firmware for 168 x 384, or the top 16 px are cut off.'

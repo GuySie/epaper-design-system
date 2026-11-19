@@ -1098,44 +1098,61 @@
      plot when nothing is above zero (the thresholds are left out then). BARCHART: pattern 'Bar chart', the version
      with thresholds: the title row, the chart between it and the footer, and the footer (left out when nothing is
      above zero); foot = [left, right, level]. flag=false (the reading's switch is
-     off): no threshold line or value is drawn; the label margin keeps its width, so the plot doesn't move. -#}
-{%- macro CHART_BARS(ns, x0, x1, y0, y1, n, bars, lines, ticks, endtxt, empty, cap=0, hi=0, minbar=1, flag=true) -%}
-{%- set lw = namespace(w=0) -%}{%- for v, l in lines -%}{%- set lw.w = [lw.w, VALUE_W(l, EP_TK.type.label[1], FONT[EP_TK.type.label[0]]) | int] | max -%}{%- endfor -%}
+     off): no threshold line or value is drawn; the label margin keeps its width, so the plot doesn't move.
+     opt (version 'for prices'): {'signed': every bar given is drawn, a negative one ('f' below 0) hanging under the zero
+     line, and the thresholds run across the slots that have a bar; 'lo': the scale's bottom when it is under zero, with
+     'lolabel' its value; 'widest': a label the margin is sized for; 'tail': the statement in the slots after the last
+     bar}; a bar with 'out' is outlined instead of filled. -#}
+{%- macro CHART_BARS(ns, x0, x1, y0, y1, n, bars, lines, ticks, endtxt, empty, cap=0, hi=0, minbar=1, flag=true, opt={}) -%}
+{%- set lw = namespace(w=0) -%}{%- for l in (lines | map(attribute=1) | list) + ([opt.widest] if opt.widest else []) -%}{%- set lw.w = [lw.w, VALUE_W(l, EP_TK.type.label[1], FONT[EP_TK.type.label[0]]) | int] | max -%}{%- endfor -%}
 {%- set cf = namespace() -%}{{- CFRAME(cf, x0, x1, y0, y1, lw.w) -}}
 {%- set x0, top, base, ph = cf.x0, cf.top, cf.base, cf.ph -%}
 {%- set slot = cf.w // n -%}
 {%- set bw = slot - EP_TK.line.barGap -%}
 {%- set xe = x0 + n * slot - 1 -%}{%- set cf.xe = xe -%}
+{#- the scale's bottom (0 unless the page gives a negative one) and the zero line the bars stand on or hang under -#}
+{%- set lo = (opt.lo | default(0)) if not cap else 0 -%}
+{%- set zero = base if lo >= 0 else (base - ((0 - lo) / (hi - lo)) * ph) | round | int -%}
 {%- set ly = namespace(l=[]) -%}
 {%- for v, l in lines -%}
-{%- set f = ((((v | float + 1) | log(10)) / ((cap + 1) | log(10))) if cap else ((v | float) / hi)) -%}
+{%- set f = ((((v | float + 1) | log(10)) / ((cap + 1) | log(10))) if cap else ((v | float - lo) / (hi - lo))) -%}
 {%- set ly.l = ly.l + [[l, (base - ([[f, 0] | max, 1] | min) * ph) | round | int]] -%}
 {%- endfor -%}
-{%- set wet = (bars | selectattr('v', 'gt', 0) | list | length) > 0 -%}
-{#- dashed threshold lines first, bars on top -#}
+{%- set drawn = (bars | list) if opt.signed else (bars | selectattr('v', 'gt', 0) | list) -%}
+{%- set wet = (drawn | length) > 0 -%}
+{%- set last = (drawn | map(attribute='i') | max) if wet else -1 -%}
+{#- dashed threshold lines first, bars on top; opt.signed: across the slots that have a bar -#}
+{%- if opt.signed and wet -%}{%- set cf.xe = x0 + (last + 1) * slot - EP_TK.line.barGap - 1 -%}{%- endif -%}
 {%- for l, y in (ly.l if (wet and flag) else []) -%}{{- CTHRESH(ns, cf, l, y) -}}{%- endfor -%}
-{%- for b in bars -%}
-{%- if b.v > 0 -%}
+{%- set cf.xe = xe -%}
+{%- for b in drawn -%}
 {%- set bx = x0 + b.i * slot -%}
-{%- set bh = [(b.f * ph) | round | int, minbar * EP_TK.line.base] | max -%}
-{%- set by = base - bh -%}
+{%- set bh = [((b.f | abs) * ph) | round | int, minbar * EP_TK.line.base] | max -%}
+{%- if b.f >= 0 -%}{%- set by, bb = zero - bh, zero - 1 -%}{%- else -%}{%- set by, bb = zero + 1, [zero + bh, base - 1] | min -%}{%- endif -%}
+{%- if b.out -%}
+{#- an outlined bar: paper inside, so no threshold runs through it -#}
+{{- R(ns, bx, by, bx + bw - 1, bb, color.paper) -}}{{- BOX(ns, bx, by, bx + bw - 1, bb, color.ink, EP_TK.line.base) -}}
+{%- else -%}
 {%- set c = color.severe if b.level == 'sev' else (color.warning if b.level == 'warn' else color.ink) -%}
-{{- R(ns, bx, by, bx + bw - 1, base - 1, c) -}}
+{{- R(ns, bx, by, bx + bw - 1, bb, c) -}}
 {#- a paper notch where a threshold crosses the bar; on a yellow bar the dashes stay black -#}
-{%- for l, y in (ly.l if flag else []) -%}{%- if by < y -%}{{- L(ns, bx, y, bx + bw - 1, y, 1, color.ink if c == 'yellow' else color.paper) -}}{%- endif -%}{%- endfor -%}
+{%- for l, y in (ly.l if flag else []) -%}{%- if by < y and bb >= y -%}{{- L(ns, bx, y, bx + bw - 1, y, 1, color.ink if c == 'yellow' else color.paper) -}}{%- endif -%}{%- endfor -%}
 {%- endif -%}
 {%- endfor -%}
-{{- CBASE(ns, cf) -}}
+{#- the baseline is the zero line; a scale that goes under it labels its bottom -#}
+{%- if lo < 0 -%}{{- L(ns, x0, zero, xe, zero, EP_TK.line.base) -}}{{- CTHRESH(ns, cf, opt.lolabel, base, false) -}}
+{%- else -%}{{- CBASE(ns, cf) -}}{%- endif -%}
 {%- set tk = namespace(l=[]) -%}
 {%- for i, t in ticks -%}{%- set tk.l = tk.l + [[x0 + i * slot, t, 'lm' if i == 0 else 'mm']] -%}{%- endfor -%}
 {{- CAXIS(ns, cf, tk.l + [[xe, endtxt, 'rm']]) -}}
-{%- if not wet -%}{{- EMPTY(ns, empty, x0, xe - 1, top, base) -}}{%- endif -%}
+{%- if not wet -%}{{- EMPTY(ns, empty, x0, xe - 1, top, base) -}}
+{%- elif opt.tail and last < n - 1 -%}{{- EMPTY(ns, opt.tail, x0 + (last + 1) * slot, xe - 1, top, base) -}}{%- endif -%}
 {%- endmacro -%}
-{%- macro BARCHART(ns, title, right, n, bars, lines, ticks, endtxt, foot, empty, stale=false, cap=0, hi=0, minbar=1, flag=true) -%}
+{%- macro BARCHART(ns, title, right, n, bars, lines, ticks, endtxt, foot, empty, stale=false, cap=0, hi=0, minbar=1, flag=true, opt={}) -%}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {{- TITLE(ns, title, right, W, P, TH, stale) -}}
-{{- CHART_BARS(ns, P, W - P - 1, CHART_Y0() | int, CHART_Y1() | int, n, bars, lines, ticks, endtxt, empty, cap, hi, minbar, flag) -}}
-{%- if (bars | selectattr('v', 'gt', 0) | list | length) > 0 -%}{{- FOOT(ns, foot[0], foot[1], W, H, P, foot[2]) -}}{%- endif -%}
+{{- CHART_BARS(ns, P, W - P - 1, CHART_Y0() | int, CHART_Y1() | int, n, bars, lines, ticks, endtxt, empty, cap, hi, minbar, flag, opt) -}}
+{%- if opt.signed or (bars | selectattr('v', 'gt', 0) | list | length) > 0 -%}{{- FOOT(ns, foot[0], foot[1], W, H, P, foot[2]) -}}{%- endif -%}
 {%- endmacro -%}
 {#- CHART_LINE: module 'Chart' as a line, inside the box x0 to x1, y0 to y1. pts = [{'ts', 'v': value, 'mx': the sample's maximum}],
      t0 to t1 the time axis (h12: 12-hour labels, CLOCK), lo to hi the fixed y-scale, warn and sev the thresholds, gap: a longer step breaks the line.

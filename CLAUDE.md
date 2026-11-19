@@ -5,6 +5,7 @@ Read this before changing anything. `work/` holds local working notes and is not
 ## Ground rules
 
 - **Don't invent words.** Use the vocabulary in `docs/design-system.md` (*Vocabulary* and the *Glossary*). A new term needs the user's agreement first, then goes into `src/registry.yaml` (`terms`) so the glossary and the lint know it.
+- **Example texts in rule text are English** (`NOW 19 ct`, `NO PRICES`), in the document and in a proposal, also when the mock-up or render they come from is in another language.
 - Markdown: no hard wraps for readability on mobile.
 - Metric units as default. Imperial for screen sizes only. 
 - Don't over-explain; deliver, then say in a few lines what changed.

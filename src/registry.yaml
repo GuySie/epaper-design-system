@@ -39,7 +39,7 @@ patterns:
     modules: [Title row, Chart, Footer]
     versions:
       thresholds:   {name: with thresholds, status: live}
-      prices:       {name: for prices, status: mock}
+      prices:       {name: for prices, status: live}
   line-chart:
     name: Line chart
     status: live
@@ -125,7 +125,7 @@ pages:
   bin-day:        {name: Bin day, uses: glance/word, status: mock, default: [glance/word]}
   room-sign:      {name: Room sign, uses: glance/word, status: mock, default: [glance/word]}
   appliance:      {name: Appliance run, uses: glance/progress, status: mock, default: [glance/progress], '14': ['-'], '27p': ['-'], widest: '20:00'}
-  energy-price:   {name: Energy price, uses: bar-chart/prices, status: mock, default: [bar-chart/prices], '14': ['-'], '27p': ['-']}
+  energy-price:   {name: 'Energy price (EnergyZero)', uses: bar-chart/prices, status: live, default: [bar-chart/prices], '14': ['-'], '27p': ['-'], widest: '-10 ct'}
   departures:     {name: Departures, uses: event-list/line-numbers, status: mock, default: [event-list/line-numbers], '14': ['-']}
   energy-flows:   {name: Solar & battery, uses: meters/both-ways, status: mock, default: [meters/both-ways], '14': ['-'], widest: '100%'}
   todo:           {name: To-do list, uses: checklist, status: live, default: [checklist], '14': ['-']}

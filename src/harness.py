@@ -351,6 +351,8 @@ def run(bp_path, sc_path, out_png, choose_index=None):
                 ctx[st['response_variable']] = sc.CALENDAR_RESPONSE
             elif st.get('action') == 'todo.get_items':
                 ctx[st['response_variable']] = getattr(sc, 'TODO_RESPONSE', {})
+            elif st.get('action') == 'energyzero.get_energy_prices':
+                ctx[st['response_variable']] = getattr(sc, 'PRICE_RESPONSE', {})
             elif 'action' in st and st['action'] == 'recorder.get_statistics':
                 ctx[st['response_variable']] = getattr(sc, 'STATS_RESPONSE', {'statistics': {}})
             elif 'action' in st and st['action'].startswith('weather.get_forecasts'):

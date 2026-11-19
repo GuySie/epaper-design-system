@@ -177,7 +177,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'bmxllv'
+  ds_set: 'ebqxmi'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'

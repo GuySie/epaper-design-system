@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_MONTHS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'bmxllv' -%}
+{%- set EP_SET = 'ebqxmi' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -38,6 +38,8 @@
   'claude_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'claude'},
   'co2_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'co2'},
   'doors_windows_14': {'kit': 'other', 'tier': '200x200-0.13', 'page': 'doors-windows'},
+  'energy_price_27l': {'kit': 'other', 'tier': '384x168-0.17', 'page': 'energy-price'},
+  'energy_price_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'energy-price'},
   'entities_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'entities'},
   'history_27l': {'kit': 'other', 'tier': '384x168-0.17', 'page': 'history'},
   'history_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'history'},
@@ -115,6 +117,7 @@
 {%- set buienalarm_entity = c.buienalarm_entity -%}
 {%- set buienradar_entity = c.buienradar_entity -%}
 {%- set calendar_entities = c.calendar_entities -%}
+{%- set cheapest_hours = c.cheapest_hours -%}
 {%- set co2_entity = c.co2_entity -%}
 {%- set current_temp_sensor = c.current_temp_sensor -%}
 {%- set days_ahead = c.days_ahead -%}
@@ -175,6 +178,7 @@
 {%- set flag_low = c.flag_low -%}
 {%- set flag_moisture_low = c.flag_moisture_low -%}
 {%- set flag_pollen_high = c.flag_pollen_high -%}
+{%- set flag_price = c.flag_price -%}
 {%- set flag_rain_day = c.flag_rain_day -%}
 {%- set flag_rain_hour = c.flag_rain_hour -%}
 {%- set flag_temp_high = c.flag_temp_high -%}
@@ -245,6 +249,7 @@
 {%- set severe_moisture_low = c.severe_moisture_low -%}
 {%- set severe_openings = c.severe_openings -%}
 {%- set severe_pollen_high = c.severe_pollen_high -%}
+{%- set severe_price = c.severe_price -%}
 {%- set severe_rain_day = c.severe_rain_day -%}
 {%- set severe_rain_hour = c.severe_rain_hour -%}
 {%- set severe_temp_high = c.severe_temp_high -%}
@@ -264,6 +269,7 @@
 {%- set warning_low = c.warning_low -%}
 {%- set warning_moisture_low = c.warning_moisture_low -%}
 {%- set warning_pollen_high = c.warning_pollen_high -%}
+{%- set warning_price = c.warning_price -%}
 {%- set warning_rain_day = c.warning_rain_day -%}
 {%- set warning_rain_hour = c.warning_rain_hour -%}
 {%- set warning_temp_high = c.warning_temp_high -%}
@@ -1475,44 +1481,61 @@
      plot when nothing is above zero (the thresholds are left out then). BARCHART: pattern 'Bar chart', the version
      with thresholds: the title row, the chart between it and the footer, and the footer (left out when nothing is
      above zero); foot = [left, right, level]. flag=false (the reading's switch is
-     off): no threshold line or value is drawn; the label margin keeps its width, so the plot doesn't move. -#}
-{%- macro CHART_BARS(ns, x0, x1, y0, y1, n, bars, lines, ticks, endtxt, empty, cap=0, hi=0, minbar=1, flag=true) -%}
-{%- set lw = namespace(w=0) -%}{%- for v, l in lines -%}{%- set lw.w = [lw.w, VALUE_W(l, EP_TK.type.label[1], FONT[EP_TK.type.label[0]]) | int] | max -%}{%- endfor -%}
+     off): no threshold line or value is drawn; the label margin keeps its width, so the plot doesn't move.
+     opt (version 'for prices'): {'signed': every bar given is drawn, a negative one ('f' below 0) hanging under the zero
+     line, and the thresholds run across the slots that have a bar; 'lo': the scale's bottom when it is under zero, with
+     'lolabel' its value; 'widest': a label the margin is sized for; 'tail': the statement in the slots after the last
+     bar}; a bar with 'out' is outlined instead of filled. -#}
+{%- macro CHART_BARS(ns, x0, x1, y0, y1, n, bars, lines, ticks, endtxt, empty, cap=0, hi=0, minbar=1, flag=true, opt={}) -%}
+{%- set lw = namespace(w=0) -%}{%- for l in (lines | map(attribute=1) | list) + ([opt.widest] if opt.widest else []) -%}{%- set lw.w = [lw.w, VALUE_W(l, EP_TK.type.label[1], FONT[EP_TK.type.label[0]]) | int] | max -%}{%- endfor -%}
 {%- set cf = namespace() -%}{{- CFRAME(cf, x0, x1, y0, y1, lw.w) -}}
 {%- set x0, top, base, ph = cf.x0, cf.top, cf.base, cf.ph -%}
 {%- set slot = cf.w // n -%}
 {%- set bw = slot - EP_TK.line.barGap -%}
 {%- set xe = x0 + n * slot - 1 -%}{%- set cf.xe = xe -%}
+{#- the scale's bottom (0 unless the page gives a negative one) and the zero line the bars stand on or hang under -#}
+{%- set lo = (opt.lo | default(0)) if not cap else 0 -%}
+{%- set zero = base if lo >= 0 else (base - ((0 - lo) / (hi - lo)) * ph) | round | int -%}
 {%- set ly = namespace(l=[]) -%}
 {%- for v, l in lines -%}
-{%- set f = ((((v | float + 1) | log(10)) / ((cap + 1) | log(10))) if cap else ((v | float) / hi)) -%}
+{%- set f = ((((v | float + 1) | log(10)) / ((cap + 1) | log(10))) if cap else ((v | float - lo) / (hi - lo))) -%}
 {%- set ly.l = ly.l + [[l, (base - ([[f, 0] | max, 1] | min) * ph) | round | int]] -%}
 {%- endfor -%}
-{%- set wet = (bars | selectattr('v', 'gt', 0) | list | length) > 0 -%}
-{#- dashed threshold lines first, bars on top -#}
+{%- set drawn = (bars | list) if opt.signed else (bars | selectattr('v', 'gt', 0) | list) -%}
+{%- set wet = (drawn | length) > 0 -%}
+{%- set last = (drawn | map(attribute='i') | max) if wet else -1 -%}
+{#- dashed threshold lines first, bars on top; opt.signed: across the slots that have a bar -#}
+{%- if opt.signed and wet -%}{%- set cf.xe = x0 + (last + 1) * slot - EP_TK.line.barGap - 1 -%}{%- endif -%}
 {%- for l, y in (ly.l if (wet and flag) else []) -%}{{- CTHRESH(ns, cf, l, y) -}}{%- endfor -%}
-{%- for b in bars -%}
-{%- if b.v > 0 -%}
+{%- set cf.xe = xe -%}
+{%- for b in drawn -%}
 {%- set bx = x0 + b.i * slot -%}
-{%- set bh = [(b.f * ph) | round | int, minbar * EP_TK.line.base] | max -%}
-{%- set by = base - bh -%}
+{%- set bh = [((b.f | abs) * ph) | round | int, minbar * EP_TK.line.base] | max -%}
+{%- if b.f >= 0 -%}{%- set by, bb = zero - bh, zero - 1 -%}{%- else -%}{%- set by, bb = zero + 1, [zero + bh, base - 1] | min -%}{%- endif -%}
+{%- if b.out -%}
+{#- an outlined bar: paper inside, so no threshold runs through it -#}
+{{- R(ns, bx, by, bx + bw - 1, bb, color.paper) -}}{{- BOX(ns, bx, by, bx + bw - 1, bb, color.ink, EP_TK.line.base) -}}
+{%- else -%}
 {%- set c = color.severe if b.level == 'sev' else (color.warning if b.level == 'warn' else color.ink) -%}
-{{- R(ns, bx, by, bx + bw - 1, base - 1, c) -}}
+{{- R(ns, bx, by, bx + bw - 1, bb, c) -}}
 {#- a paper notch where a threshold crosses the bar; on a yellow bar the dashes stay black -#}
-{%- for l, y in (ly.l if flag else []) -%}{%- if by < y -%}{{- L(ns, bx, y, bx + bw - 1, y, 1, color.ink if c == 'yellow' else color.paper) -}}{%- endif -%}{%- endfor -%}
+{%- for l, y in (ly.l if flag else []) -%}{%- if by < y and bb >= y -%}{{- L(ns, bx, y, bx + bw - 1, y, 1, color.ink if c == 'yellow' else color.paper) -}}{%- endif -%}{%- endfor -%}
 {%- endif -%}
 {%- endfor -%}
-{{- CBASE(ns, cf) -}}
+{#- the baseline is the zero line; a scale that goes under it labels its bottom -#}
+{%- if lo < 0 -%}{{- L(ns, x0, zero, xe, zero, EP_TK.line.base) -}}{{- CTHRESH(ns, cf, opt.lolabel, base, false) -}}
+{%- else -%}{{- CBASE(ns, cf) -}}{%- endif -%}
 {%- set tk = namespace(l=[]) -%}
 {%- for i, t in ticks -%}{%- set tk.l = tk.l + [[x0 + i * slot, t, 'lm' if i == 0 else 'mm']] -%}{%- endfor -%}
 {{- CAXIS(ns, cf, tk.l + [[xe, endtxt, 'rm']]) -}}
-{%- if not wet -%}{{- EMPTY(ns, empty, x0, xe - 1, top, base) -}}{%- endif -%}
+{%- if not wet -%}{{- EMPTY(ns, empty, x0, xe - 1, top, base) -}}
+{%- elif opt.tail and last < n - 1 -%}{{- EMPTY(ns, opt.tail, x0 + (last + 1) * slot, xe - 1, top, base) -}}{%- endif -%}
 {%- endmacro -%}
-{%- macro BARCHART(ns, title, right, n, bars, lines, ticks, endtxt, foot, empty, stale=false, cap=0, hi=0, minbar=1, flag=true) -%}
+{%- macro BARCHART(ns, title, right, n, bars, lines, ticks, endtxt, foot, empty, stale=false, cap=0, hi=0, minbar=1, flag=true, opt={}) -%}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {{- TITLE(ns, title, right, W, P, TH, stale) -}}
-{{- CHART_BARS(ns, P, W - P - 1, CHART_Y0() | int, CHART_Y1() | int, n, bars, lines, ticks, endtxt, empty, cap, hi, minbar, flag) -}}
-{%- if (bars | selectattr('v', 'gt', 0) | list | length) > 0 -%}{{- FOOT(ns, foot[0], foot[1], W, H, P, foot[2]) -}}{%- endif -%}
+{{- CHART_BARS(ns, P, W - P - 1, CHART_Y0() | int, CHART_Y1() | int, n, bars, lines, ticks, endtxt, empty, cap, hi, minbar, flag, opt) -}}
+{%- if opt.signed or (bars | selectattr('v', 'gt', 0) | list | length) > 0 -%}{{- FOOT(ns, foot[0], foot[1], W, H, P, foot[2]) -}}{%- endif -%}
 {%- endmacro -%}
 {#- CHART_LINE: module 'Chart' as a line, inside the box x0 to x1, y0 to y1. pts = [{'ts', 'v': value, 'mx': the sample's maximum}],
      t0 to t1 the time axis (h12: 12-hour labels, CLOCK), lo to hi the fixed y-scale, warn and sev the thresholds, gap: a longer step breaks the line.
@@ -2216,6 +2239,92 @@
 {%- set ds_open = c.ds_open -%}
 {%- set ds_otxt = c.ds_otxt -%}
 {{- ERRPAGE(ns, (header_title if header_title else ds_otxt['title']), ds_otxt['none']) -}}
+{%- elif layout == 'energy_price_27l' and view == 'main' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_txt = c.ds_txt -%}
+{%- set language_map = c.language_map -%}
+{%- set h12 = time_format != '24h' -%}
+{%- set warn = warning_price | float(15) -%}
+{%- set sev = severe_price | float(25) -%}
+{%- set run = [cheapest_hours | int(3), 1] | max -%}
+{#- the switch off: no bar is flagged, no threshold is drawn, the footer states its facts without a chip -#}
+{%- set flag = flag_price | default(true) -%}
+{%- set n = 24 -%}
+{%- set cur = [[((as_timestamp(now()) - hours[0].ts) // 3600) | int, 0] | max, n - 1] | min -%}
+{%- set known = hours | rejectattr('ct', 'none') | list -%}
+{#- the scale: 0 up to the top of a chart with thresholds; under zero on a day with a negative price -#}
+{%- set top = [EP_CHART.top * sev, 1] | max -%}
+{%- set lowest = known | map(attribute='ct') | min -%}
+{%- set bot = 0 if lowest >= 0 else ((lowest / 10) | round(0, 'floor') * 10) | int -%}
+{#- the bars: an hour gone is outlined; the current hour and the hours to come carry their level -#}
+{%- set bl = namespace(l=[]) -%}
+{%- for h in known -%}
+{%- set gone = h.index < cur -%}
+{%- set bl.l = bl.l + [{'i': h.index, 'v': h.ct, 'f': ([h.ct, top] | min) / (top - bot), 'out': gone, 'level': ('sev' if h.ct >= sev else ('warn' if h.ct >= warn else '')) if (flag and not gone) else ''}] -%}
+{%- endfor -%}
+{%- set lines = [[warn, DECIMAL((warn | round(1) | string).replace('.0', ''))], [sev, DECIMAL((sev | round(1) | string).replace('.0', ''))]] -%}
+{#- the footer: the current price, and the cheapest run of hours still to come -#}
+{%- set u = ds_txt['unit'] -%}
+{%- set nowp = hours[cur].ct -%}
+{%- set best = namespace(i=none, s=0) -%}
+{%- for i in range(cur, n - run + 1) -%}{%- set w = hours[i:i + run] | map(attribute='ct') | reject('none') | list -%}
+{%- if (w | length) == run and (best.i is none or (w | sum) < best.s) -%}{%- set best.i, best.s = i, w | sum -%}{%- endif -%}{%- endfor -%}
+{%- set foot = [((ds_txt['now'] | upper) ~ ' ' ~ nowp ~ '¦' ~ u) if nowp is not none else '',
+                ((ds_txt['cheapest'] | upper) ~ ' ' ~ CLOCK_SPAN(hours[best.i].ts, hours[best.i].ts + run * 3600, h12)) if best.i is not none else '',
+                (('sev' if nowp >= sev else ('warn' if nowp >= warn else none)) if (flag and nowp is not none) else none)] -%}
+{%- set ticks = [[0, CLOCK(hours[0].ts, h12, true)], [6, CLOCK(hours[6].ts, h12, true)], [12, CLOCK(hours[12].ts, h12, true)], [18, CLOCK(hours[18].ts, h12, true)]] -%}
+{%- set endtxt = CLOCK(hours[n - 1].ts + 3600, h12, true) -%}
+{#- pattern 'Bar chart' for prices: BARS bars on the scale with thresholds; a bar is at least 3 x line.base high -#}
+{{- BARCHART(ns, ds_title, as_timestamp(now()), n, bl.l, lines, ticks, endtxt, foot, '', false, 0, top, 3, flag,
+             {'signed': true, 'lo': bot, 'lolabel': bot | string, 'widest': '-10', 'tail': ds_txt['none']}) -}}
+{%- elif layout == 'energy_price_27l' and view == 'error' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_txt = c.ds_txt -%}
+{%- set language_map = c.language_map -%}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['no_data']) -}}
+{%- elif layout == 'energy_price_35' and view == 'main' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_txt = c.ds_txt -%}
+{%- set language_map = c.language_map -%}
+{%- set h12 = time_format != '24h' -%}
+{%- set warn = warning_price | float(15) -%}
+{%- set sev = severe_price | float(25) -%}
+{%- set run = [cheapest_hours | int(3), 1] | max -%}
+{#- the switch off: no bar is flagged, no threshold is drawn, the footer states its facts without a chip -#}
+{%- set flag = flag_price | default(true) -%}
+{%- set n = 24 -%}
+{%- set cur = [[((as_timestamp(now()) - hours[0].ts) // 3600) | int, 0] | max, n - 1] | min -%}
+{%- set known = hours | rejectattr('ct', 'none') | list -%}
+{#- the scale: 0 up to the top of a chart with thresholds; under zero on a day with a negative price -#}
+{%- set top = [EP_CHART.top * sev, 1] | max -%}
+{%- set lowest = known | map(attribute='ct') | min -%}
+{%- set bot = 0 if lowest >= 0 else ((lowest / 10) | round(0, 'floor') * 10) | int -%}
+{#- the bars: an hour gone is outlined; the current hour and the hours to come carry their level -#}
+{%- set bl = namespace(l=[]) -%}
+{%- for h in known -%}
+{%- set gone = h.index < cur -%}
+{%- set bl.l = bl.l + [{'i': h.index, 'v': h.ct, 'f': ([h.ct, top] | min) / (top - bot), 'out': gone, 'level': ('sev' if h.ct >= sev else ('warn' if h.ct >= warn else '')) if (flag and not gone) else ''}] -%}
+{%- endfor -%}
+{%- set lines = [[warn, DECIMAL((warn | round(1) | string).replace('.0', ''))], [sev, DECIMAL((sev | round(1) | string).replace('.0', ''))]] -%}
+{#- the footer: the current price, and the cheapest run of hours still to come -#}
+{%- set u = ds_txt['unit'] -%}
+{%- set nowp = hours[cur].ct -%}
+{%- set best = namespace(i=none, s=0) -%}
+{%- for i in range(cur, n - run + 1) -%}{%- set w = hours[i:i + run] | map(attribute='ct') | reject('none') | list -%}
+{%- if (w | length) == run and (best.i is none or (w | sum) < best.s) -%}{%- set best.i, best.s = i, w | sum -%}{%- endif -%}{%- endfor -%}
+{%- set foot = [((ds_txt['now'] | upper) ~ ' ' ~ nowp ~ '¦' ~ u) if nowp is not none else '',
+                ((ds_txt['cheapest'] | upper) ~ ' ' ~ CLOCK_SPAN(hours[best.i].ts, hours[best.i].ts + run * 3600, h12)) if best.i is not none else '',
+                (('sev' if nowp >= sev else ('warn' if nowp >= warn else none)) if (flag and nowp is not none) else none)] -%}
+{%- set ticks = [[0, CLOCK(hours[0].ts, h12, true)], [6, CLOCK(hours[6].ts, h12, true)], [12, CLOCK(hours[12].ts, h12, true)], [18, CLOCK(hours[18].ts, h12, true)]] -%}
+{%- set endtxt = CLOCK(hours[n - 1].ts + 3600, h12, true) -%}
+{#- pattern 'Bar chart' for prices: BARS bars on the scale with thresholds; a bar is at least 3 x line.base high -#}
+{{- BARCHART(ns, ds_title, as_timestamp(now()), n, bl.l, lines, ticks, endtxt, foot, '', false, 0, top, 3, flag,
+             {'signed': true, 'lo': bot, 'lolabel': bot | string, 'widest': '-10', 'tail': ds_txt['none']}) -}}
+{%- elif layout == 'energy_price_35' and view == 'error' -%}
+{%- set ds_title = c.ds_title -%}
+{%- set ds_txt = c.ds_txt -%}
+{%- set language_map = c.language_map -%}
+{{- ERRPAGE(ns, ds_title, language_map[weekday_lang]['no_data']) -}}
 {%- elif layout == 'entities_35' and view == 'main' -%}
 {%- set ds_last_ts = c.ds_last_ts -%}
 {%- set ds_rows = c.ds_rows -%}

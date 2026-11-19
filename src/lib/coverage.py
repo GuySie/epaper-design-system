@@ -33,6 +33,7 @@ NOERRV = 'n/a: the page has no error view (its sensor is required; an unavailabl
 NOLIST = 'n/a: the page has no list or chart that can be empty (pollen at 0 is its own kind)'
 NOEMPTY = 'n/a: the page has no list or chart that can be empty'
 REQ = 'n/a: the first entry is required, so the list is never empty'
+NOPRICE = 'n/a: a chart without a price is the error view'
 NOHIST = 'n/a: a chart without history is the error view'
 EVENTS = 'n/a: an event has no value that can be unavailable; an unavailable calendar is the error view'
 NOITEM = 'n/a: an item has no value that can be unavailable; an unavailable list is the error view'
@@ -57,6 +58,8 @@ COVERAGE = {
     'rain_27l': pg('rain168', 'rain168_widest', 'rain168_warn', 'rain168', 'rain168_g', 'rain168_y', 'rain168_title', 'rain168_stale', 'rain168_err', 'rain168_radar', 'rain168_dry'),
     'rain_hourly_35':  pg('rh_light', 'rh_widest', 'rh_warn', 'rh', 'rh_g', 'rh_y', 'rh_title', 'rh_stale', 'rh_err', 'rh_unav', 'rh_dry'),
     'rain_hourly_27l': pg('rh_light', 'rh_widest', 'rh_warn', 'rh', 'rh_g', 'rh_y', 'rh_title', 'rh_stale', 'rh_err', 'rh_unav', 'rh_dry'),
+    'energy_price_35':  pg('ep', 'ep_widest', 'ep_warn', 'ep_sev', 'ep_g', 'ep_y', 'ep_title', NOSTALE, 'ep_err', 'ep_partial', NOPRICE),
+    'energy_price_27l': pg('ep', 'ep_widest', 'ep_warn', 'ep_sev', 'ep_g', 'ep_y', 'ep_title', NOSTALE, 'ep_err', 'ep_partial', NOPRICE),
     'sun_moon_35':    pg('sun35', 'sun_widest', NOTHR, NOTHR, NOCHIP, NOCHIP, 'sun35_title', NOSTALE, 'sun_err', 'sun_nomoon', NOEMPTY),
     'entities_35':    pg('entities35', 'ent12', NOTHR, NOTHR, NOCHIP, NOCHIP, 'entities35_title', 'ent_stale', 'ent_err', 'ent_unav', REQ),
     'plants_41': pg('plants42', 'plants20', 'plants42_y', 'plants42', 'plants42_g', 'plants42_y', 'plants42_title', 'plants_stale', 'plants_unav', 'plants42', REQ),

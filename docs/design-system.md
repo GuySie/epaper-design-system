@@ -648,6 +648,7 @@ Three levels, the same on every module:
 | | Pollen (`*_pollen_high`, where a pollen sensor is an input) | sensor level *high* | sensor level *very high* |
 | | Condition (`*_conditions`, a list) | <!-- v:input:weather:warning_conditions -->`hail`, `lightning`, `lightning-rainy`, `exceptional`<!-- /v --> | <!-- v:input:weather:severe_conditions -->none (empty list)<!-- /v --> |
 | Rain forecast, Rain forecast (Netherlands) | Rain per hour | ≥ <!-- v:input:rain:warning_rain_hour -->2.5 mm/h<!-- /v --> | ≥ <!-- v:input:rain:severe_rain_hour -->10 mm/h<!-- /v --> |
+| Energy price (EnergyZero) | Price per kWh | ≥ <!-- v:input:energy-price:warning_price -->15 ct/kWh<!-- /v --> | ≥ <!-- v:input:energy-price:severe_price -->25 ct/kWh<!-- /v --> |
 | CO2 graph | Concentration | ≥ <!-- v:input:co2:warning_co2 -->1000 ppm<!-- /v --> | ≥ <!-- v:input:co2:severe_co2 -->1400 ppm<!-- /v --> |
 | Claude usage | Usage | ≥ <!-- v:input:claude:warning_usage -->90 %<!-- /v --> | ≥ <!-- v:input:claude:severe_usage -->100 %<!-- /v --> |
 | Plant moisture | Soil moisture | ≤ <!-- v:input:plants:warning_moisture_low -->25 %<!-- /v --> | ≤ <!-- v:input:plants:severe_moisture_low -->14 %<!-- /v --> |
@@ -818,6 +819,7 @@ The footer is an **optional single text line at the bottom of a screen**. It say
 | Weather 2.7" portrait, 4.1", 7.5" portrait | (a) forecast conclusion |
 | Weather 7.5" landscape, 4.26" | none (strips fill the panel; sunrise/sunset in the detail rows) |
 | Rain forecast and Rain forecast (Netherlands) 3.5", 2.7" landscape; CO2 graph 3.5" | (a) chart summary; none when there's nothing to show |
+| Energy price (EnergyZero) 3.5", 2.7" landscape | (a) the current price and the cheapest run (*Bar chart for prices*, Footer) |
 | Sun & moon 3.5" | (a) day length (the moon and its phase are on the timeline) |
 | Claude usage 3.5" | (a) on schedule / furthest ahead, when it fits |
 | Next appointment 3.5", 4.1", 4.26" | (a) free until / free from, when it fits |
@@ -867,7 +869,7 @@ A pattern is what a kind of screen looks like: which modules, in which order, an
 |---|---|---|---|---|
 | **Glance** | Title row, Hero block | *with the hero in a chip*<br>*with a word* (mock)<br>*with a progress bar* (mock) | live | `GLANCE` |
 | **Hero dashboard** | Title row, Hero band, Strip, Footer | *with forecast strips*<br>*with a chart or list* | live | `HERODASH`, `WXDASH`, `WXPORT` |
-| **Bar chart** | Title row, Chart, Footer | *with thresholds*<br>*for prices* (mock) | live | `BARCHART` |
+| **Bar chart** | Title row, Chart, Footer | *with thresholds*<br>*for prices* | live | `BARCHART` |
 | **Line chart** | Title row, Chart, Footer | *with thresholds* | live | `LINECHART` |
 | **Timeline** | Title row, Timeline, Footer | — | live | `TIMELINE` |
 | **Key-value list** | Title row, Key-value list, Footer | — | live | `KVPAGE` |
@@ -1063,7 +1065,15 @@ Patterns and versions that exist as mock-ups only: no blueprint is built from th
 
 #### Bar chart for prices
 
-*Mockup (Energy price).* Hours gone outlined, hours to come filled; the current hour a tick under the axis; the cheapest run of three hours a bar of tick height under the axis; the day's average dashed with its value; negative prices under the zero line; hours over the expensive threshold in warning.
+The chart frame with a warning and a severe input, as *Bar chart with thresholds, Line chart with thresholds*, for the hours of a day. What differs is written here. Energy price (EnergyZero) uses it.
+
+- **Bars:** today from midnight to midnight, one bar per hour. Hours gone are outlined and never coloured. The current hour and the hours to come are filled: in the warning colour at or above warning, in the severe colour at or above severe.
+- **Scale:** the one with thresholds (*Chart frame (all charts)*, *Fixed y-scale*). On a day with a negative price its bottom is the lowest price, rounded down to a whole 10, and that value is labelled in the margin. The label margin is sized for `-10` on every day, so the plot never moves.
+- **Baseline:** the zero line. Negative bars hang under it; the time axis keeps its ticks and labels at the bottom of the plot, without a second line.
+- **Thresholds:** both lines run across the hours that have a price.
+- **Hours without a price:** nothing is drawn. When they are the last hours of the day the fact is stated once, centred in their part of the plot (`EMPTY`: `NO PRICES`). No price at all is the error view.
+- **Footer:** the current price at the left (`NOW 19 ct`), the cheapest run of hours still to come at the right (`CHEAPEST 21:00–00:00`); the length of the run is an input. The footer is a chip at the current hour's level, not at the highest level in the plot: the chart is read for what to do now. With fewer hours left than the run, the right side stays empty.
+- **Worst case:** `NOW -10 ct` beside `CHEAPEST 21:00–00:00`; in 12-hour time `CHEAPEST 9:00pm–12:00am`.
 
 #### Event list with line numbers
 
@@ -1127,7 +1137,7 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | **Bin day** | Glance with a word | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Room sign** | Glance with a word | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Appliance run** | Glance with a progress bar | mock | 20:00 | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Energy price** | Bar chart for prices | mock | — | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Energy price (EnergyZero)** | Bar chart for prices | live | -10 ct | — | ● | — | ● | ○ | ○ | ○ | ○ | ○ |
 | **Departures** | Event list with line numbers | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Solar & battery** | Meters both ways | mock | 100% | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **To-do list** | Checklist | live | — | — | ● | ● | ● | ● | ○ | ● | ● | ○ |
@@ -1353,6 +1363,30 @@ A Bar chart *with thresholds*: the next 24 hours in hourly bars on a log scale, 
 | 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 16 |
 | 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 16 |
 <!-- /registry:layouts-rain-hourly -->
+
+### Energy price (EnergyZero)
+
+A Bar chart *for prices*: today's electricity price per hour, from the EnergyZero integration's own action.
+
+- **Shows:** the bars of the day against the warning and severe lines, the clock-time axis, and in the footer the current price and the cheapest run of hours still to come.
+- **Tested with:** an ordinary afternoon, the current hour at warning and at severe, the worst case of the footer (12-hour time), negative prices at midday, a price above the scale, the last hours without a price, an hour without a price in the middle of the day, the first and the last hour of the day, the switch off, 12-hour time, no prices, a grey panel.
+- **Price:** EnergyZero's market price with VAT, without energy tax and purchase costs, in whole cents per kWh. An hour's level is decided on the price as shown.
+- **Thresholds:** price per kWh (*Thresholds*).
+- **No stale state:** the prices come from an action, not from a reporting entity.
+- **No prices:** the error view.
+
+<!-- registry:inputs-energy-price -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `energyzero_entry`, `cheapest_hours`, `flag_price`, `warning_price`, `severe_price` |
+<!-- /registry:inputs-energy-price -->
+
+<!-- registry:layouts-energy-price -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, warning, severe, gray, colour, title, error, unavailable | stale, empty | 18 |
+| 2.7" L | normal, widest, warning, severe, gray, colour, title, error, unavailable | stale, empty | 18 |
+<!-- /registry:layouts-energy-price -->
 
 ### Rain forecast (Netherlands)
 
@@ -1674,7 +1708,7 @@ A *Hero dashboard with a chart or list*: the weather's hero band over the calend
 
 ### Mocked-up pages
 
-Bin day, Room sign, Appliance run, Energy price, Departures, Solar & battery, Month overview, Message board, Now playing and Guest Wi-Fi: their patterns and layouts are in the table above, their rules with the pattern versions they use.
+Bin day, Room sign, Appliance run, Departures, Solar & battery, Month overview, Message board, Now playing and Guest Wi-Fi: their patterns and layouts are in the table above, their rules with the pattern versions they use.
 
 ## Blueprint mechanics
 
@@ -1686,7 +1720,7 @@ What every blueprint does the same way; where it can, through a shared part that
   3. **Thresholds** (collapsed): `flag_<what>`, `warning_<what>`, `severe_<what>` for each reading (*Thresholds*). The page sets its chart scale; it is not an input.
   4. **Appearance** (collapsed): `header_title` (blank for the translated default), `location_string`, `time_format` (12h/24h), `weekday_format` (en/de/nl/fr/es/pl/hr/sv) and `rotate` (0/90/180/270, all four always offered; the description explains native vs upright).
   5. **Advanced** (collapsed): `stale_after`, `led_color`, `led_flash_delay` and `font_dir`. The LED inputs are there wherever a button can start the redraw: the LED confirms the press. A blueprint that redraws on a change (Doors & windows) has none.
-- **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button). Every other input has a default, and an optional entity left empty removes its part of the page. Rain forecast (Netherlands) has no main entity: it needs one of its two sources.
+- **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button, the EnergyZero integration). Every other input has a default, and an optional entity left empty removes its part of the page. Rain forecast (Netherlands) has no main entity: it needs one of its two sources.
 - **Input names:** the device input is always `displays`, also where it takes one device (Medication). Numbered entries are `<name>_<n>` with `<name>_<n>_label` (`entity_1`, `plant_1`, `bar_1`). Thresholds are `warning_<what>` and `severe_<what>`, their switch `flag_<what>`. A blueprint's variables keep the names its drawing reads, so renaming an input never changes the drawing.
   - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather at a glance, Single value, Weather, Rain forecast (Netherlands), Rain forecast, CO2 graph, History graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar, Tiles, Value with details<!-- /v -->); see *Title row* for the exempt blueprints.
   - The panel is never an input: a page drawn on two screens is two blueprints (Rain forecast on the 3.5" and on the 2.7" landscape).
@@ -1736,6 +1770,7 @@ Proven: TRMNL text and Space Grotesk heroes on BWRY ESLs (1.4", 2.7", 3.5", 4.1"
 14. Tiles: icons the kit has no glyph for, drawn by the renderer's icon element at tile size (their soft edges on a panel with colour); Home Assistant's wording of a state in a language other than English at the tile's width.
 15. Value with details: the unit after a flagged number (it starts past the chip) and the number at its fitted size on the 4.1" beside three detail rows.
 16. Rain forecast: the hourly forecast of real weather entities (one whose forecast starts at the next hour leaves the first bar dry; one that reports rain in inches is read as mm).
+17. Energy price (EnergyZero): not yet run against a real EnergyZero entry. To prove there: the price arrives in euros per kWh, an hour's start is read as the right hour of the day, and the day the clock changes (23 or 25 hours).
 
 ## Open items
 

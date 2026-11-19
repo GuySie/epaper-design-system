@@ -201,6 +201,10 @@ integrations:
     name: Claude Usage integration
     url: https://github.com/trickv/hass-claude-usage
     what: from HACS, configured with your Anthropic account
+  energyzero:
+    name: EnergyZero integration
+    url: https://www.home-assistant.io/integrations/energyzero/
+    what: set up in Home Assistant
   weather:
     name: a weather integration
     url: https://www.home-assistant.io/integrations/#weather
