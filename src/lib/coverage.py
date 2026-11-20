@@ -34,6 +34,7 @@ NOEMPTY = 'n/a: the page has no list or chart that can be empty'
 REQ = 'n/a: the first entry is required, so the list is never empty'
 NOPRICE = 'n/a: a chart without a price is the error view'
 NOHIST = 'n/a: a chart without history is the error view'
+NODATE = 'n/a: a page without a date to come is the error view'
 EVENTS = 'n/a: an event has no value that can be unavailable; an unavailable calendar is the error view'
 NOITEM = 'n/a: an item has no value that can be unavailable; an unavailable list is the error view'
 COVERAGE = {
@@ -62,6 +63,9 @@ COVERAGE = {
     'sun_moon_35':    pg('sun35', 'sun_widest', NOTHR, NOTHR, NOCHIP, NOCHIP, 'sun35_title', NOSTALE, 'sun_err', 'sun_nomoon', NOEMPTY),
     'entities_35':    pg('entities35', 'ent12', NOTHR, NOTHR, NOCHIP, NOCHIP, 'entities35_title', 'ent_stale', 'ent_err', 'ent_unav', REQ),
     'plants_41': pg('plants42', 'plants20', 'plants42_y', 'plants42', 'plants42_g', 'plants42_y', 'plants42_title', 'plants_stale', 'plants_unav', 'plants42', REQ),
+    'bin_day_27l': pg('bd', 'bd_cut', 'bd_long', 'bd_today', 'bd_g', 'bd_y', 'bd_title', NOSTALE, 'bd_err', 'bd_unav', NODATE),
+    'bin_day_35': pg('bd', 'bd_cut', 'bd_long', 'bd_today', 'bd_g', 'bd_y', 'bd_title', NOSTALE, 'bd_err', 'bd_unav', NODATE),
+    'bin_day_41': pg('bd', 'bd_cut', 'bd_long', 'bd_today', 'bd_g', 'bd_y', 'bd_title', NOSTALE, 'bd_err', 'bd_unav', NODATE),
     'doors_windows_14': pg('openings_1', 'openings_3', 'openings_1', 'openings_3', 'openings_3_g', 'openings_3', 'openings_1_title', NOSTALE, 'openings_err', 'openings_unav', 'openings_0'),
     # appointment and calendar: no thresholds. An event in progress (NOW) is an ink chip, not a severity (*Severity*, *Now is
     # not a severity*); it is drawn by a35_1now, a41_1now, a426_1now, cal42 and cal426

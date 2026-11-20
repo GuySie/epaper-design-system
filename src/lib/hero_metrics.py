@@ -29,7 +29,8 @@ from PIL import ImageFont
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from derive_tokens import HERO_SIZES as HERO_LADDER, ICON_LADDER     # noqa: E402  the ladders' one home
-CHARS = '-0123456789°.,:%'
+# the digits and their signs, and for a word as the hero (*Glance with a word*) the capitals of the eight languages
+CHARS = '-0123456789°.,:%' + ' +&/ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜÅÉÈÊËÁÀÂÍÓÚÑÇŁŚŻŹĆĘĄŃČŠŽĐ'
 WEATHER = ['weather-night', 'weather-cloudy', 'weather-fog', 'weather-hail', 'weather-lightning', 'weather-lightning-rainy',
            'weather-partly-cloudy', 'weather-pouring', 'weather-rainy', 'weather-snowy', 'weather-snowy-rainy', 'weather-sunny',
            'weather-windy', 'weather-windy-variant', 'alert-circle-outline', 'weather-night-partly-cloudy']
@@ -63,7 +64,7 @@ def measure(s):
     sgb, sgr, up, dn = {}, {}, [], []
     for c in CHARS:
         m, off = f.getmask2(c, mode='1', anchor='lm')
-        x0, y0, x1, y1 = m.getbbox()
+        x0, y0, x1, y1 = m.getbbox() or (0, 0, 0, 0)      # a space has no ink
         sgb[c] = off[0] + x0
         sgr[c] = round(f.getlength(c) - (off[0] + x1))
         if c.isdigit():

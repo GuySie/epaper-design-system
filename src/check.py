@@ -226,7 +226,8 @@ def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
     # hero clearance from every full-width rule (above and below)
     rules_h = [b for el, k, b in items if el.get('type') == 'line' and b[1] == b[3] - (int(el.get('width', 1)) - 1) and b[2] - b[0] > W * 0.4]
     for el, b in heroes:
-        want = int(el['size']) // HERO_GAP_DIV
+        # the hero clearance is the numerals'; a word as the hero is text and keeps M (*Hero group*, hero clearance)
+        want = (int(el['size']) // HERO_GAP_DIV) if any(c.isdigit() for c in str(el['value'])) else M
         for r in rules_h:
             if r[3] < b[1] and b[1] - r[3] - 1 < want:
                 errs.append(f'hero {el["value"]!r} only {b[1] - r[3] - 1} px below a rule (min {want})')
@@ -317,6 +318,7 @@ WEATHER = _layouts(lambda d, u: any(i.get('name') == 'pollen_sensor' for i in d.
 SAME = _layouts(lambda d, u: u.split('/')[0] in ('glance', 'hero-dashboard', 'bar-chart', 'line-chart', 'timeline'))   # nothing moves between states: a hero, a chart's frame
 MODULE = _layouts(lambda d, u: u == 'hero-dashboard/module')   # two halves (design system: Hero dashboard with a chart or list)
 DASH = _layouts(lambda d, u: u.split('/')[0] == 'hero-dashboard')
+WORD = _layouts(lambda d, u: u == 'glance/word')   # the hero is a word: its size and place follow the word (*Glance with a word*)
 CHART = _layouts(lambda d, u: u.split('/')[0] in ('bar-chart', 'line-chart', 'timeline'))   # the frame stays put: title line, baseline, footer line
 ZERO = _layouts(lambda d, u: u == 'bar-chart/prices')   # the baseline is the zero line, so it moves on a day with a negative price (*Bar chart for prices*, Baseline)
 
@@ -384,7 +386,7 @@ def same_layout():
         # the hero stays at its height in every state, pollen at 0 included: what appears takes a place that was kept for it
         ys = {}
         for s, (b, p, _) in PAYLOADS.items():
-            if b == bp and 'err' not in s and s.split('@')[0] not in CONFIG_CASES:
+            if b == bp and bp not in WORD and 'err' not in s and s.split('@')[0] not in CONFIG_CASES:
                 h = [e['y'] for e in p if e.get('type') == 'text' and 'SpaceGrotesk' in str(e.get('font', ''))]
                 if h:
                     ys.setdefault(h[0], []).append(s.split('@')[0])
@@ -415,6 +417,8 @@ def same_layout():
                     odd = [l for l in a - b if not replaced(*l, ref['_fills'])] + [l for l in b - a if not replaced(*l, sig['_fills'])]
                     if odd:
                         errs.append(f'{bp}: lines in {s} differ from {ref_s}: {sorted(odd)}')
+                elif k == 'hero size' and bp in WORD:
+                    continue
                 elif sig.get(k) != ref[k]:
                     errs.append(f'{bp}: {k} in {s} differs from {ref_s}: {sig.get(k)} vs {ref[k]}')
     return errs

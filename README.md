@@ -13,6 +13,7 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 | [`epaper-blueprint-1.4-single-value.yaml`](blueprints/epaper-blueprint-1.4-single-value.yaml) | Single value 1.4" | One sensor's value, large enough to read across the room, with its unit beside it. An icon and a second value under it are optional. |
 | [`epaper-blueprint-1.4-tiles.yaml`](blueprints/epaper-blueprint-1.4-tiles.yaml) | Tiles 1.4" | One entity as a single tile, with an icon, its state and its label. |
 | [`epaper-blueprint-1.4-weather-at-a-glance.yaml`](blueprints/epaper-blueprint-1.4-weather-at-a-glance.yaml) | Weather at a glance 1.4" | The weather at a glance: the temperature large, with the condition icon, and one more reading under it. |
+| [`epaper-blueprint-2.7-bin-day-landscape.yaml`](blueprints/epaper-blueprint-2.7-bin-day-landscape.yaml) | Bin day 2.7" landscape | The bin that is collected next, as a word large enough to read across the room, with the day under it. Two bins on the same day are both shown. |
 | [`epaper-blueprint-2.7-energy-price-energyzero-landscape.yaml`](blueprints/epaper-blueprint-2.7-energy-price-energyzero-landscape.yaml) | Energy price (EnergyZero) 2.7" landscape | Today's electricity price per hour from EnergyZero, with the current price and the cheapest hours still to come. |
 | [`epaper-blueprint-2.7-history-graph-landscape.yaml`](blueprints/epaper-blueprint-2.7-history-graph-landscape.yaml) | History graph 2.7" landscape | One sensor's recent history as a line graph: the last hours, the current value, and the period's lowest and highest. |
 | [`epaper-blueprint-2.7-levels-landscape.yaml`](blueprints/epaper-blueprint-2.7-levels-landscape.yaml) | Levels 2.7" landscape | Up to four sensors as rows, each with its value and a bar that shows how full it is: batteries, tanks, power, humidity. |
@@ -26,6 +27,7 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 | [`epaper-blueprint-2.7-to-do-list-portrait.yaml`](blueprints/epaper-blueprint-2.7-to-do-list-portrait.yaml) | To-do list 2.7" portrait | A to-do list: the open items first, each with its box and its due day, then the done ones while there is room. An overdue item and one due today are flagged. |
 | [`epaper-blueprint-2.7-weather-landscape.yaml`](blueprints/epaper-blueprint-2.7-weather-landscape.yaml) | Weather 2.7" landscape | Current weather with the temperature as the hero, its details and the coming hours, with warnings and pollen as chips. |
 | [`epaper-blueprint-2.7-weather-portrait.yaml`](blueprints/epaper-blueprint-2.7-weather-portrait.yaml) | Weather 2.7" portrait | Current weather with the temperature as the hero, its details, the coming hours and the coming days, with warnings and pollen as chips. |
+| [`epaper-blueprint-3.5-bin-day.yaml`](blueprints/epaper-blueprint-3.5-bin-day.yaml) | Bin day 3.5" | The bin that is collected next, as a word large enough to read across the room, with the day under it. Two bins on the same day are both shown. |
 | [`epaper-blueprint-3.5-claude-usage.yaml`](blueprints/epaper-blueprint-3.5-claude-usage.yaml) | Claude usage 3.5" | Claude usage as up to four progress bars, each with its reset time, and optionally a marker for how far through its period you are. |
 | [`epaper-blueprint-3.5-co2-graph.yaml`](blueprints/epaper-blueprint-3.5-co2-graph.yaml) | CO2 graph 3.5" | A CO2 sensor's recent history as a line graph, with the warning and severe levels, the spans above them filled, and the current value and the peak in the footer. |
 | [`epaper-blueprint-3.5-energy-price-energyzero.yaml`](blueprints/epaper-blueprint-3.5-energy-price-energyzero.yaml) | Energy price (EnergyZero) 3.5" | Today's electricity price per hour from EnergyZero, with the current price and the cheapest hours still to come. |
@@ -41,6 +43,7 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 | [`epaper-blueprint-3.5-to-do-list.yaml`](blueprints/epaper-blueprint-3.5-to-do-list.yaml) | To-do list 3.5" | A to-do list: the open items first, each with its box and its due day, then the done ones while there is room. An overdue item and one due today are flagged. |
 | [`epaper-blueprint-3.5-weather-at-a-glance.yaml`](blueprints/epaper-blueprint-3.5-weather-at-a-glance.yaml) | Weather at a glance 3.5" | The weather at a glance: the temperature large, with the condition icon, and one more reading under it. |
 | [`epaper-blueprint-3.5-weather.yaml`](blueprints/epaper-blueprint-3.5-weather.yaml) | Weather 3.5" | Current weather with the temperature as the hero, its details and the coming hours, with warnings and pollen as chips. |
+| [`epaper-blueprint-4.1-bin-day.yaml`](blueprints/epaper-blueprint-4.1-bin-day.yaml) | Bin day 4.1" | The bin that is collected next, as a word large enough to read across the room, with the day under it. Two bins on the same day are both shown. |
 | [`epaper-blueprint-4.1-calendar.yaml`](blueprints/epaper-blueprint-4.1-calendar.yaml) | Calendar 4.1" | The coming days, each under its day header with its events, today first; later days fold into one line when they don't fit. |
 | [`epaper-blueprint-4.1-history-graph.yaml`](blueprints/epaper-blueprint-4.1-history-graph.yaml) | History graph 4.1" | One sensor's recent history as a line graph: the last hours, the current value, and the period's lowest and highest. |
 | [`epaper-blueprint-4.1-levels.yaml`](blueprints/epaper-blueprint-4.1-levels.yaml) | Levels 4.1" | Up to six sensors as rows, each with its value and a bar that shows how full it is: batteries, tanks, power, humidity. |
@@ -69,6 +72,21 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 Each blueprint on a black, white, red and yellow panel (the 4.26" is black and white), at the panel's own pixels. Where a page has thresholds the picture shows them at work: a warning in yellow and a severe state in red. The pictures are the release's check renders, so they show what the devices get.
 
 <!-- registry:pictures -->
+**Bin day**
+
+Bin day 2.7" landscape
+
+![Bin day 2.7" landscape](docs/images/epaper-blueprint-2.7-bin-day-landscape.png)
+
+Bin day 3.5"
+
+![Bin day 3.5"](docs/images/epaper-blueprint-3.5-bin-day.png)
+
+Bin day 4.1"
+
+![Bin day 4.1"](docs/images/epaper-blueprint-4.1-bin-day.png)
+
+
 **Calendar**
 
 Calendar 4.1"

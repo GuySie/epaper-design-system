@@ -1,0 +1,145 @@
+page: bin-day
+description:
+  shows: The bin that is collected next, as a word large enough to read across the room, with the day under it. Two bins on the same day are both shown.
+  trigger_advice: 'A time trigger a few times a day (for example at 00:05, 07:00 and 18:00): the screen only changes with the date.'
+  title_default: '"Waste"'
+redraw: trigger
+inputs:
+- name: bin_1
+  section: content
+  label: Bin 1 - date sensor
+  help: A sensor whose state is the next collection date of this bin (a date, or a date and time).
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  required: true
+- repeat:
+    from: 2
+    to: 4
+    items:
+    - name: bin_{n}
+      section: content
+      label: Bin {n} - date sensor
+      help: The next collection date of bin {n}. Leave blank to leave the bin out.
+      selector:
+        entity:
+          filter:
+            domain: sensor
+      default: ''
+- repeat:
+    from: 1
+    to: 4
+    items:
+    - name: bin_{n}_label
+      section: content
+      label: Bin {n} - word
+      help: The word shown for this bin, in capitals. Short words stay large. Leave blank to use the sensor's name.
+      selector:
+        text: {}
+      default: ''
+- repeat:
+    from: 1
+    to: 4
+    items:
+    - name: bin_{n}_icon
+      section: content
+      label: Bin {n} - icon
+      help: Optional icon shown after the word.
+      selector:
+        icon: {}
+      default: ''
+- name: flag_soon
+  section: thresholds
+  label: 'Collection day: flag it'
+  help: On, the day is a warning chip the day before a collection and a severe chip on the day itself.
+  selector:
+    boolean: {}
+  default: true
+bind:
+- repeat:
+    from: 1
+    to: 4
+    items:
+    - bin_{n}
+    - bin_{n}_label
+    - bin_{n}_icon
+- flag_soon
+data:
+  variables:
+  - include: default_title
+  - ds_bins: |
+      {% set ns = namespace(l=[]) %} {% set slots = [
+              {'e': bin_1 | default(''), 'label': bin_1_label | default(''), 'icon': bin_1_icon | default('')},
+              {'e': bin_2 | default(''), 'label': bin_2_label | default(''), 'icon': bin_2_icon | default('')},
+              {'e': bin_3 | default(''), 'label': bin_3_label | default(''), 'icon': bin_3_icon | default('')},
+              {'e': bin_4 | default(''), 'label': bin_4_label | default(''), 'icon': bin_4_icon | default('')}
+            ] %} {% for s in slots %}{% if s.e %}
+              {% set raw = states(s.e) %}
+              {% if raw not in ['unknown', 'unavailable', 'none', ''] and raw | length >= 10 %}
+                {% set dt = as_datetime(raw, none) if raw | length > 10 else none %}
+                {% set d = as_local(dt) if dt is not none else strptime(raw[:10], '%Y-%m-%d', none) %}
+                {% if d is not none %}{% set n = (d.date() - now().date()).days %}
+                  {% if n >= 0 %}{% set ns.l = ns.l + [{'word': s.label if s.label else (entity_name(s.e) or device_name(s.e) or s.e), 'icon': s.icon, 'd': n, 'wd': d.weekday(), 'day': d.day, 'mon': d.month}] %}{% endif %}
+                {% endif %}
+              {% endif %}
+            {% endif %}{% endfor %} {{ ns.l | sort(attribute='d') }}
+  draw:
+    kind: choose
+    when:
+    - condition: template
+      value_template: '{{ ds_bins | count > 0 }}'
+    steps: []
+texts:
+  en:
+    default_title: Waste
+    today: "Today"
+    tomorrow: Tomorrow
+    no_dates: No collection dates.
+  de:
+    default_title: Abfall
+    today: "Heute"
+    tomorrow: Morgen
+    no_dates: Keine Abholtermine.
+  nl:
+    default_title: Afval
+    today: "Vandaag"
+    tomorrow: Morgen
+    no_dates: Geen ophaaldagen.
+  fr:
+    default_title: Déchets
+    today: "Aujourd'hui"
+    tomorrow: Demain
+    no_dates: Aucune date de collecte.
+  es:
+    default_title: Residuos
+    today: "Hoy"
+    tomorrow: Mañana
+    no_dates: Sin fechas de recogida.
+  pl:
+    default_title: Odpady
+    today: "Dziś"
+    tomorrow: Jutro
+    no_dates: Brak terminów odbioru.
+  hr:
+    default_title: Otpad
+    today: "Danas"
+    tomorrow: Sutra
+    no_dates: Nema termina odvoza.
+  sv:
+    default_title: Avfall
+    today: "Idag"
+    tomorrow: Imorgon
+    no_dates: Inga hämtningsdagar.
+layouts:
+  27l:
+    spec: bin_day_27l
+  '35':
+    spec: bin_day_35
+  '41':
+    spec: bin_day_41
+thresholds:
+- data: "The next collection day"
+  warning: "tomorrow"
+  severe: "today"
+footer: "none (Glance)"

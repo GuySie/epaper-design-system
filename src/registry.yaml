@@ -23,7 +23,7 @@ patterns:
     versions:
       hero-chip:    {name: with the hero in a chip, status: live}
       footer:       {name: with a footer, status: live}
-      word:         {name: with a word, status: mock}
+      word:         {name: with a word, status: live}
       progress:     {name: with a progress bar, status: mock}
   hero-dashboard:
     name: Hero dashboard
@@ -107,7 +107,7 @@ patterns:
 # rest) or '-' = not offered; the lint fails on another pattern's name
 pages:
   appliance:      {name: Appliance run, uses: glance/progress, status: mock, default: [glance/progress], '14': ['-'], '27p': ['-'], widest: '20:00'}
-  bin-day:        {name: Bin day, uses: glance/word, status: mock, default: [glance/word]}
+  bin-day:        {name: Bin day, uses: glance/word, status: live, default: [glance/word]}
   calendar:       {name: Calendar, uses: grouped-list, status: live, default: [grouped-list], '14': ['-']}
   claude:         {name: Claude usage, uses: meters, status: live, default: [meters], '14': ['-']}
   co2:            {name: CO2 graph, uses: line-chart/thresholds, status: live, default: [line-chart/thresholds], '14': ['-'], widest: '4000'}
@@ -160,7 +160,7 @@ components:
   Progress bar:         {macros: [PBAR]}
 modules:
   Title row:         {macros: [TITLE]}
-  Hero block:        {macros: [HBLOCK, HERO_BLOCK_Y]}
+  Hero block:        {macros: [HBLOCK, HERO_BLOCK_Y, WORD_STACK]}
   Hero band:         {macros: [HBAND]}
   Footer:            {macros: [FOOT, WXFOOT]}
   Error block:       {macros: [ERRBLOCK, ERRPAGE]}

@@ -28,11 +28,14 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_MONTHS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'evgtmi' -%}
+{%- set EP_SET = 'mlaygv' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
   'appointment_426': {'kit': 'other', 'tier': '800x480-0.12', 'page': 'appointment'},
+  'bin_day_27l': {'kit': 'other', 'tier': '384x168-0.17', 'page': 'bin-day'},
+  'bin_day_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'bin-day'},
+  'bin_day_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'bin-day'},
   'calendar_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'calendar'},
   'calendar_426': {'kit': 'other', 'tier': '800x480-0.12', 'page': 'calendar'},
   'claude_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'claude'},
@@ -114,6 +117,18 @@
 {%- set bar_6 = c.bar_6 -%}
 {%- set bar_6_label = c.bar_6_label -%}
 {%- set bar_6_max = c.bar_6_max -%}
+{%- set bin_1 = c.bin_1 -%}
+{%- set bin_1_icon = c.bin_1_icon -%}
+{%- set bin_1_label = c.bin_1_label -%}
+{%- set bin_2 = c.bin_2 -%}
+{%- set bin_2_icon = c.bin_2_icon -%}
+{%- set bin_2_label = c.bin_2_label -%}
+{%- set bin_3 = c.bin_3 -%}
+{%- set bin_3_icon = c.bin_3_icon -%}
+{%- set bin_3_label = c.bin_3_label -%}
+{%- set bin_4 = c.bin_4 -%}
+{%- set bin_4_icon = c.bin_4_icon -%}
+{%- set bin_4_label = c.bin_4_label -%}
 {%- set buienalarm_entity = c.buienalarm_entity -%}
 {%- set buienradar_entity = c.buienradar_entity -%}
 {%- set calendar_entities = c.calendar_entities -%}
@@ -181,6 +196,7 @@
 {%- set flag_price = c.flag_price -%}
 {%- set flag_rain_day = c.flag_rain_day -%}
 {%- set flag_rain_hour = c.flag_rain_hour -%}
+{%- set flag_soon = c.flag_soon -%}
 {%- set flag_temp_high = c.flag_temp_high -%}
 {%- set flag_temp_low = c.flag_temp_low -%}
 {%- set flag_usage = c.flag_usage -%}
@@ -800,11 +816,12 @@
 {%- set ik = (icon_name | string | trim)[4:] if (icon_name | string | trim)[:4] == 'mdi:' else (icon_name | string | trim) -%}
 {%- set br = ((ICB[ik][1] if ik in ICB else 0) * fit.ic) | round | int -%}
 {%- set gw = tin + uw + ((gap + fit.ic - br) if fit.ic else 0) -%}
-{%- set x0 = ((W - gw) / 2) | round | int -%}
+{#- a reading too wide at the smallest rung starts at the padding and is cut with an ellipsis (*Glance with a word*) -#}
+{%- set x0 = [((W - gw) / 2) | round | int, P] | max -%}
 {%- set cy = ((y0 + y1) / 2) | round | int -%}
 {%- if sev -%}{{- HERO_CHIP(ns, x0, x0 + tin + uw - 1, cy, hs, sc) -}}{%- endif -%}
 {%- if unit -%}{%- set ss = EP_TK.type.secondary[1] -%}{{- T(ns, unit, x0 + tin + (SPACE_XS(ss) | int) + (UGAP(unit, ss) | int), cy + HDN[hs] - CAPDN[ss], REGULAR_FONT(ss), ss, on_sc if sev else color.ink, 'lm') -}}{%- endif -%}
-{{- T(ns, t, HERO_INK_X(x0, t, hs) | int, cy, fhero, hs, on_sc if sev else color.ink, 'lm') -}}
+{{- T(ns, t, HERO_INK_X(x0, t, hs) | int, cy, fhero, hs, on_sc if sev else color.ink, 'lm', (W - 2 * P) if tin + uw > W - 2 * P else 0) -}}
 {%- if fit.ic -%}{%- set ix = x0 + tin + uw + gap + fit.ic // 2 -%}{{- I(ns, icon_name, ix, cy, fit.ic) -}}{%- if moon -%}{{- MOON_BADGE(ns, ix, cy, fit.ic, W - P - 1) -}}{%- endif -%}{%- endif -%}
 {%- endmacro -%}
 {#- title row: title left, timestamp right, 1 px line; stale => timestamp in an ink chip with '!' -#}
@@ -1178,6 +1195,35 @@
      unit: the hero's unit (HERO_ALONE). step: a reading too wide for the layout's hero steps down the hero ladder until
      the number and its unit fit between the paddings (Single value); without it the number never shrinks.
      foot: the version 'with a footer': the block is centred between the title line and the footer the page draws. -#}
+{#- WORD_STACK: module 'Hero block' with two words as the hero (*Glance with a word*, two words stack): one line each, the
+     first on top, a hero gap apart, at the largest rung (at most type.heroAlone) at which the wider word fits the width and
+     the block, with the Glance secondary under it, fits the height with M to spare above and below (a word is text, so it
+     keeps M from the title line where a numeral keeps the hero clearance); no icon. A word too wide at the
+     smallest rung is cut with an ellipsis. The block is centred by ink like every hero block -#}
+{%- macro WORD_STACK(ns, w1, w2, sec='text', txt='', llevel='') -%}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{%- set sf, ss = FONT[EP_TK.type.secondary[0]], EP_TK.type.secondary[1] -%}
+{%- set lb = ss + 2 * (SPACE_XS(ss) | int) -%}
+{%- set z0, z1 = P + TH, H - P -%}
+{%- set pick = namespace(hs=0) -%}
+{%- for h in (HUP.keys() | list | sort(reverse=true)) -%}
+{%- set g = h // EP_SPACE.heroGapDiv -%}
+{%- if pick.hs == 0 and h <= EP_TK.type.heroAlone and ([HERO_INK_W(w1, h) | int, HERO_INK_W(w2, h) | int] | max) <= W - 2 * P and 2 * (HUP[h] + HDN[h] + 1) + 2 * g + lb + 2 * EP_TK.space.m <= z1 - z0 -%}{%- set pick.hs = h -%}{%- endif -%}
+{%- endfor -%}
+{%- set hs = pick.hs if pick.hs else (HUP.keys() | list | sort | first) -%}
+{%- set g = hs // EP_SPACE.heroGapDiv -%}
+{%- set top = z0 + (z1 - z0 - (2 * (HUP[hs] + HDN[hs] + 1) + 2 * g + lb)) / 2 -%}
+{%- set c1 = (top + HUP[hs]) | round | int -%}
+{%- set c2 = c1 + HDN[hs] + 1 + g + HUP[hs] -%}
+{%- for w, cy in [[w1, c1], [w2, c2]] -%}
+{%- set iw = HERO_INK_W(w, hs) | int -%}
+{%- set x0 = [((W - iw) / 2) | round | int, P] | max -%}
+{{- T(ns, w, HERO_INK_X(x0, w, hs) | int, cy, fhero, hs, color.ink, 'lm', (W - 2 * P) if iw > W - 2 * P else 0) -}}
+{%- endfor -%}
+{%- set sy = c2 + HDN[hs] + g + lb // 2 -%}
+{%- if sec == 'chip' -%}{{- CCHIP(ns, txt, W // 2, sy, sf, ss, 0, LEVEL_FILL(llevel), LEVEL_TEXT(llevel)) -}}
+{%- elif txt -%}{{- T(ns, txt, W // 2, sy, sf, ss, color.ink, 'mm', W - 2 * P) -}}{%- endif -%}
+{%- endmacro -%}
 {%- macro HBLOCK(ns, hero, icon, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true, unit='', step=false, foot=false) -%}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set hs, ics = EP_TK.type.heroAlone, EP_TK.icon.heroAloneSteps -%}
@@ -1195,10 +1241,12 @@
 {#- GLANCE: the Glance pattern (design system: Patterns > Glance), the one macro every Glance page draws with: the title
      row (module 'Title row'; stamp `right`, '' for none; `stale` makes it a chip) and the hero block (module 'Hero block').
      The other arguments go to HBLOCK; with sec='caller' the page's call block draws the Glance secondary. foot: the
-     version 'with a footer' (the page draws the footer itself). -#}
-{%- macro GLANCE(ns, title, right, hero, icon, stale=false, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true, unit='', step=false, foot=false) -%}
+     version 'with a footer' (the page draws the footer itself). hero2: a second word, stacked under the first (the
+     version 'with a word'; WORD_STACK). -#}
+{%- macro GLANCE(ns, title, right, hero, icon, stale=false, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true, unit='', step=false, foot=false, hero2='') -%}
 {{- TITLE(ns, title, right, EP_TK.width, EP_TK.space.pad, EP_TK.space.titleRow, stale) -}}
-{%- if sec == 'caller' -%}
+{%- if hero2 -%}{{- WORD_STACK(ns, hero, hero2, sec, txt, llevel) -}}
+{%- elif sec == 'caller' -%}
 {%- set outer = caller -%}
 {%- call(y) HBLOCK(ns, hero, icon, hlevel, moon, 'caller', foot=foot) -%}{{- outer(y) -}}{%- endcall -%}
 {%- else -%}
@@ -2095,6 +2143,72 @@
 {%- set header_title_display = c.header_title_display -%}
 {%- set language_map = c.language_map -%}
 {{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_calendars']) -}}
+{%- elif layout == 'bin_day_27l' and view == 'main' -%}
+{%- set ds_bins = c.ds_bins -%}
+{%- set header_title_display = c.header_title_display -%}
+{%- set language_map = c.language_map -%}
+{%- set tx = language_map[weekday_lang] -%}
+{%- set wd = EP_DAYS_SHORT[weekday_lang] if weekday_lang in EP_DAYS_SHORT else EP_DAYS_SHORT['en'] -%}
+{%- set mo = EP_MONTHS_SHORT[weekday_lang] if weekday_lang in EP_MONTHS_SHORT else EP_MONTHS_SHORT['en'] -%}
+{%- set right = as_timestamp(now()) -%}
+{%- set first = ds_bins[0] -%}
+{%- set same = ds_bins | selectattr('d', 'eq', first.d) | list -%}
+{%- set when = (tx['today'] | upper) if first.d == 0 else ((tx['tomorrow'] | upper) if first.d == 1 else ((wd[first.wd] | upper) ~ ' ' ~ first.day ~ ' ' ~ (mo[first.mon - 1] | upper))) -%}
+{%- set lvl = ('sev' if first.d == 0 else ('warn' if first.d == 1 else '')) if flag_soon else '' -%}
+{%- set when = when ~ ((' · +' ~ ((same | length) - 2)) if (same | length) > 2 else '') -%}
+{#- pattern 'Glance', version 'with a word': the word steps down the hero ladder when it is longer than the layout was fitted
+     on; two bins on one day stack (hero2) -#}
+{{- GLANCE(ns, header_title_display, right, first.word | upper, first.icon, false, sec=('chip' if lvl else 'text'), txt=when, llevel=lvl, step=true,
+     hero2=((same[1].word | upper) if (same | length) > 1 else '')) -}}
+{%- elif layout == 'bin_day_27l' and view == 'error' -%}
+{%- set ds_bins = c.ds_bins -%}
+{%- set header_title_display = c.header_title_display -%}
+{%- set language_map = c.language_map -%}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_dates']) -}}
+{%- elif layout == 'bin_day_35' and view == 'main' -%}
+{%- set ds_bins = c.ds_bins -%}
+{%- set header_title_display = c.header_title_display -%}
+{%- set language_map = c.language_map -%}
+{%- set tx = language_map[weekday_lang] -%}
+{%- set wd = EP_DAYS_SHORT[weekday_lang] if weekday_lang in EP_DAYS_SHORT else EP_DAYS_SHORT['en'] -%}
+{%- set mo = EP_MONTHS_SHORT[weekday_lang] if weekday_lang in EP_MONTHS_SHORT else EP_MONTHS_SHORT['en'] -%}
+{%- set right = as_timestamp(now()) -%}
+{%- set first = ds_bins[0] -%}
+{%- set same = ds_bins | selectattr('d', 'eq', first.d) | list -%}
+{%- set when = (tx['today'] | upper) if first.d == 0 else ((tx['tomorrow'] | upper) if first.d == 1 else ((wd[first.wd] | upper) ~ ' ' ~ first.day ~ ' ' ~ (mo[first.mon - 1] | upper))) -%}
+{%- set lvl = ('sev' if first.d == 0 else ('warn' if first.d == 1 else '')) if flag_soon else '' -%}
+{%- set when = when ~ ((' · +' ~ ((same | length) - 2)) if (same | length) > 2 else '') -%}
+{#- pattern 'Glance', version 'with a word': the word steps down the hero ladder when it is longer than the layout was fitted
+     on; two bins on one day stack (hero2) -#}
+{{- GLANCE(ns, header_title_display, right, first.word | upper, first.icon, false, sec=('chip' if lvl else 'text'), txt=when, llevel=lvl, step=true,
+     hero2=((same[1].word | upper) if (same | length) > 1 else '')) -}}
+{%- elif layout == 'bin_day_35' and view == 'error' -%}
+{%- set ds_bins = c.ds_bins -%}
+{%- set header_title_display = c.header_title_display -%}
+{%- set language_map = c.language_map -%}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_dates']) -}}
+{%- elif layout == 'bin_day_41' and view == 'main' -%}
+{%- set ds_bins = c.ds_bins -%}
+{%- set header_title_display = c.header_title_display -%}
+{%- set language_map = c.language_map -%}
+{%- set tx = language_map[weekday_lang] -%}
+{%- set wd = EP_DAYS_SHORT[weekday_lang] if weekday_lang in EP_DAYS_SHORT else EP_DAYS_SHORT['en'] -%}
+{%- set mo = EP_MONTHS_SHORT[weekday_lang] if weekday_lang in EP_MONTHS_SHORT else EP_MONTHS_SHORT['en'] -%}
+{%- set right = as_timestamp(now()) -%}
+{%- set first = ds_bins[0] -%}
+{%- set same = ds_bins | selectattr('d', 'eq', first.d) | list -%}
+{%- set when = (tx['today'] | upper) if first.d == 0 else ((tx['tomorrow'] | upper) if first.d == 1 else ((wd[first.wd] | upper) ~ ' ' ~ first.day ~ ' ' ~ (mo[first.mon - 1] | upper))) -%}
+{%- set lvl = ('sev' if first.d == 0 else ('warn' if first.d == 1 else '')) if flag_soon else '' -%}
+{%- set when = when ~ ((' · +' ~ ((same | length) - 2)) if (same | length) > 2 else '') -%}
+{#- pattern 'Glance', version 'with a word': the word steps down the hero ladder when it is longer than the layout was fitted
+     on; two bins on one day stack (hero2) -#}
+{{- GLANCE(ns, header_title_display, right, first.word | upper, first.icon, false, sec=('chip' if lvl else 'text'), txt=when, llevel=lvl, step=true,
+     hero2=((same[1].word | upper) if (same | length) > 1 else '')) -}}
+{%- elif layout == 'bin_day_41' and view == 'error' -%}
+{%- set ds_bins = c.ds_bins -%}
+{%- set header_title_display = c.header_title_display -%}
+{%- set language_map = c.language_map -%}
+{{- ERRPAGE(ns, header_title_display, language_map[weekday_lang]['no_dates']) -}}
 {%- elif layout == 'calendar_41' and view == 'main' -%}
 {%- set days = c.days -%}
 {%- set header_title_display = c.header_title_display -%}

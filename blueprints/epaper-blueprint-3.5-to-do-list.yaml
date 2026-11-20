@@ -187,7 +187,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'evgtmi'
+  ds_set: 'mlaygv'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'
