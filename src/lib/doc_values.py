@@ -16,7 +16,7 @@ Names:
   spec:LAYOUT:NAME    a constant of specs/LAYOUT.py (or specs/_wx.py as spec:_wx:NAME)
   order:LAYOUT        the order in which a weather layout's detail rows make way (its spec's ROW_NAMES and ORDER), in words
   color:PATH          a colour role value (lib/derive_tokens.py COLOR, a dotted path), in backticks
-  heroMinUsed, heroStepPct   the smallest hero any tier uses (the tokens), the ladder's step below 160
+  heroMinUsed, heroStepPct, heroStepPctUp   the smallest hero any tier uses (the tokens), the ladder's step below 160 and above it
   markerDisc          icon.markerDisc for the inline icon sizes in use
   inputPages:INPUT    the live pages whose definition has that input
   stalePages          the live pages that have a stale state
@@ -218,6 +218,10 @@ def value(name):
     if name == 'heroStepPct':
         eight = [x for x in dt.HERO_SIZES if x <= 160]
         return f'{8 / eight[-2] * 100:.0f}–{8 / eight[0] * 100:.0f} %'
+    if name == 'heroStepPctUp':
+        up = [x for x in dt.HERO_SIZES if x >= 160]
+        pc = [round((b - a) / a * 100) for a, b in zip(up, up[1:])]
+        return f'{min(pc)}–{max(pc)} %'
     if name == 'heroLadder':
         return ladder(dt.HERO_SIZES)
     if name == 'iconLadder':
