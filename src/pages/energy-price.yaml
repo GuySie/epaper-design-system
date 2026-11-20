@@ -137,3 +137,8 @@ layouts:
     spec: energy_price_27l
     notes:
     - 'Button devices sold as 2.9": configure the firmware for 168 x 384, or the top 16 px are cut off.'
+thresholds:
+- data: "Price per kWh"
+  what: "price"
+  at: "≥"
+footer: "(a) the current price and the cheapest run (*Bar chart for prices*, Footer)"

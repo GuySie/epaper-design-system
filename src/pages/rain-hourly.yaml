@@ -82,3 +82,6 @@ layouts:
     spec: rain_hourly_27l
     notes:
     - 'Button devices sold as 2.9": configure the firmware for 168 x 384, or the top 16 px are cut off.'
+thresholds:
+- include: rain_threshold_rows
+footer: "(a) chart summary; none when there's nothing to show"

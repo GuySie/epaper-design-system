@@ -140,3 +140,7 @@ layouts:
     spec: single_value_27l
   '35':
     spec: single_value_35
+thresholds:
+- data: "The value, high (`*_high`, at or above) and low (`*_low`, at or below)"
+  what: "high"
+footer: "none (Glance)"

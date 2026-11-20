@@ -13,7 +13,8 @@ TITLE_WIDE = r"""(header_title if header_title else (ds_wtxt['title'] ~ ((' · '
 ROWS_WIDE = r"""[[ds_wtxt['rain'], MM(wx.mm_today), wx.mm_today_k], [ds_wtxt['wind'], WIND(), wx.wind_k], [ds_wtxt['pres_l'], ((wx.pres | string) ~ '¦' ~ wx.pres_unit) if wx.pres is not none else '—', false], [ds_wtxt['rise_l'], wx.rise, false], [ds_wtxt['set_l'], wx.set, false], [ds_wtxt['hilo'], wx.hi ~ '° / ' ~ wx.lo ~ '°', wx.hilo_k]]"""
 LABELS_WIDE = r"""[ds_wtxt['rain'], ds_wtxt['wind'], ds_wtxt['pres_l'], ds_wtxt['rise_l'], ds_wtxt['set_l'], ds_wtxt['hilo']]"""
 VALUES_WIDE = r"""[MM(99), MM(9.9), DECIMAL(100) ~ '¦' ~ wx.wind_unit, '1050¦' ~ wx.pres_unit, '12:00 PM' if time_format == '12h' else '00:00', '-10° / -15°']"""
-ORDER_WIDE = '[2, 1, 5]'
+ROW_NAMES, ORDER = ('rain', 'wind', 'pres', 'rise', 'set', 'hilo'), [2, 1, 5]      # the detail rows by name, and the order in which they make way for the alert row and the pollen row (*Override order*; the design system prints it from here)
+ORDER_WIDE = str(ORDER)
 # the weather's hero as the kit's hero group takes it (HERO_SHARED): the temperature, its flag, the condition icon with the moon
 # badge, and the widest reading the page must show (registry.yaml: widest)
 WIDEST = "'-12°'"

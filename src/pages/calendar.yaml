@@ -66,3 +66,4 @@ layouts:
     spec: calendar_426
     defaults:
       rotate: '0'
+footer: "none"

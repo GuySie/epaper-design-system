@@ -250,3 +250,4 @@ layouts:
     spec: tiles_75
   75p:
     spec: tiles_75p
+footer: "none"

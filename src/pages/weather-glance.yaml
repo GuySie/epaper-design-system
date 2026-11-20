@@ -63,3 +63,6 @@ layouts:
         entity:
           domain: sensor
       default: ''
+thresholds:
+- include: weather_threshold_rows
+footer: "the alert, else (a) forecast conclusion with pollen at the right (*Glance with a footer*)"

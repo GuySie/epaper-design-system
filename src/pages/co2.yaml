@@ -158,3 +158,8 @@ texts:
 layouts:
   '35':
     spec: co2_35
+thresholds:
+- data: "Concentration"
+  what: "co2"
+  at: "≥"
+footer: "(a) chart summary; none when there's nothing to show"

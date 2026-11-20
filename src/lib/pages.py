@@ -15,8 +15,9 @@ PAGES = LIB.parent / 'pages'
 sys.path.insert(0, str(LIB))
 
 # what a page definition may hold: its name and description, when it redraws and goes stale, its inputs and which of
-# them the drawing is handed (bind, ds_in), its data, its texts, and its layouts (one per screen)
-KEYS = ('page', 'description', 'redraw', 'stale', 'inputs', 'bind', 'ds_in', 'data', 'texts', 'examples', 'layouts')
+# them the drawing is handed (bind, ds_in), its data, its texts, and its layouts (one per screen); and its rule words for the
+# design system's tables: its rows of *Thresholds* (thresholds) and what its footer says (footer; a layout may give its own)
+KEYS = ('page', 'description', 'redraw', 'stale', 'inputs', 'bind', 'ds_in', 'data', 'texts', 'examples', 'layouts', 'thresholds', 'footer')
 
 
 def names():

@@ -8,6 +8,6 @@ PAYLOAD_MAIN = WXM + STALE_TITLE + r'''
 {#- Hero dashboard with forecast strips, portrait: bottom up the footer, the day strip, the hour strip, the detail rows (the alert row and the pollen row in pressure's place, then wind's, then max/min's; sunrise and sunset never make way), the hero group -#}
 {{- WXDASH(ns, ''' + TITLE_WIDE + r''', right, stale,
      ''' + ROWS_WIDE + r''', ''' + ORDER_WIDE + r''',
-     ''' + LABELS_WIDE + r''', ''' + VALUES_WIDE + r''', ''' + f'{HOURS}, {DAYS}' + r''', true, [2, 1, 5]) -}}
+     ''' + LABELS_WIDE + r''', ''' + VALUES_WIDE + r''', ''' + f'{HOURS}, {DAYS}' + r''', true, ''' + ORDER_WIDE + r''') -}}
 '''
 PAYLOADS = [PAYLOAD_MAIN, ERR]

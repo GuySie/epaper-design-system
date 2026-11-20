@@ -121,3 +121,6 @@ layouts:
     title_default: '"Weather" plus the location'
 texts:
   include: calendar_texts
+thresholds:
+- include: weather_threshold_rows
+footer: "none"

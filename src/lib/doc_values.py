@@ -14,6 +14,7 @@ Names:
   layout:KEY:PATH     a measured token of one layout (ep_tokens.jinja EP_LAYOUT), e.g. layout:weather_41:icon.stripDay
   const:PAGE:SCREEN:NAME   a constant a page definition gives one of its layouts
   spec:LAYOUT:NAME    a constant of specs/LAYOUT.py (or specs/_wx.py as spec:_wx:NAME)
+  order:LAYOUT        the order in which a weather layout's detail rows make way (its spec's ROW_NAMES and ORDER), in words
   color:PATH          a colour role value (lib/derive_tokens.py COLOR, a dotted path), in backticks
   heroMinUsed, heroStepPct   the smallest hero any tier uses (the tokens), the ladder's step below 160
   markerDisc          icon.markerDisc for the inline icon sizes in use
@@ -177,6 +178,13 @@ def value(name):
     if kind == 'const':
         page, screen, n = arg.split(':')
         return num(page_def(page)['layouts'][screen]['constants'][n])
+    if kind == 'order':
+        import importlib.util
+        sys.path.insert(0, str(SRC / 'specs'))
+        sp = importlib.util.spec_from_file_location(arg, SRC / 'specs' / f'{arg}.py')
+        m = importlib.util.module_from_spec(sp); sp.loader.exec_module(m)
+        words = {'rain': 'rain', 'wind': 'wind', 'hum': 'humidity', 'hilo': 'high/low', 'pres': 'pressure', 'rise': 'sunrise', 'set': 'sunset'}
+        return ', '.join(words[m.ROW_NAMES[i]] for i in m.ORDER)
     if kind == 'spec':
         import importlib.util
         key, n = arg.split(':')

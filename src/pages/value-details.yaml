@@ -186,3 +186,7 @@ layouts:
     spec: value_details_75
   75p:
     spec: value_details_75p
+thresholds:
+- data: "The value, high and low, as on Single value"
+  what: "high"
+footer: "none"

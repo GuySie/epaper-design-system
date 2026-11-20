@@ -86,3 +86,8 @@ layouts:
     spec: doors_windows_14
     defaults:
       rotate: '0'
+thresholds:
+- data: "An opening is open"
+  warning: "any opening"
+  severe: "the openings in `severe_openings`"
+footer: "none (Glance)"

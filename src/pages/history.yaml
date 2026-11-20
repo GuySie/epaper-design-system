@@ -161,3 +161,7 @@ layouts:
     spec: history_35
   '41':
     spec: history_41
+thresholds:
+- data: "The value, high (`*_high`, at or above) and low (`*_low`, at or below)"
+  what: "high"
+footer: "(a) the current value, and the period's lowest and highest"

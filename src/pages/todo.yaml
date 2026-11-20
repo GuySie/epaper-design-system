@@ -152,3 +152,8 @@ layouts:
     spec: todo_75
   75p:
     spec: todo_75p
+thresholds:
+- data: "An item's due day"
+  warning: "due today"
+  severe: "overdue"
+footer: "(a) the count of open and done items"

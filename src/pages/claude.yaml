@@ -322,3 +322,8 @@ texts:
 layouts:
   '35':
     spec: claude_35
+thresholds:
+- data: "Usage"
+  what: "usage"
+  at: "≥"
+footer: "(a) on schedule / furthest ahead, when it fits"

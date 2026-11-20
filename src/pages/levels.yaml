@@ -202,3 +202,7 @@ layouts:
     - bar_6_max
   '41':
     spec: levels_41
+thresholds:
+- data: "Each row's share of its maximum, high and low"
+  what: "high"
+footer: "none"

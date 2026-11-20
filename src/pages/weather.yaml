@@ -57,6 +57,7 @@ data:
 layouts:
   27l:
     spec: weather_27l
+    footer: "none (no room; the strip is the last module)"
     shows_instead: Current weather with the temperature as the hero, its details and the coming hours, with warnings and pollen as chips.
     drop_inputs:
     - start_with_today
@@ -64,6 +65,7 @@ layouts:
     - 'Button devices sold as 2.9": configure the firmware for 168 x 384, or the top 16 px are cut off.'
   27p:
     spec: weather_27p
+    footer: "the alert, else (a) forecast conclusion (*Override order*, Footer)"
     defaults:
       rotate: '0'
     inputs:
@@ -85,11 +87,13 @@ layouts:
     - 'Button devices sold as 2.9": configure the firmware for 168 x 384, or the top 16 px are cut off.'
   '35':
     spec: weather_35
+    footer: "none (no room; the strip is the last module)"
     shows_instead: Current weather with the temperature as the hero, its details and the coming hours, with warnings and pollen as chips.
     drop_inputs:
     - start_with_today
   '41':
     spec: weather_41
+    footer: "(a) forecast conclusion"
     defaults:
       rotate: '0'
     inputs:
@@ -104,6 +108,7 @@ layouts:
       default: ''
   '426':
     spec: weather_426
+    footer: "none (strips fill the panel; sunrise/sunset in the detail rows)"
     defaults:
       rotate: '0'
     inputs:
@@ -141,6 +146,7 @@ layouts:
     title_default: '"Weather" plus the location'
   '75':
     spec: weather_75
+    footer: "none (strips fill the panel; sunrise/sunset in the detail rows)"
     defaults:
       rotate: '0'
     inputs:
@@ -178,6 +184,7 @@ layouts:
     title_default: '"Weather" plus the location'
   75p:
     spec: weather_75p
+    footer: "(a) forecast conclusion"
     inputs:
     - name: weather_entity
       section: content
@@ -211,3 +218,5 @@ layouts:
     - name: OpenDisplay Weather blueprint by davelee98
       url: https://github.com/davelee98/ha-epaper-blueprints/blob/main/opendisplay_weather_800x480_bw.yaml
     title_default: '"Weather" plus the location'
+thresholds:
+- include: weather_threshold_rows

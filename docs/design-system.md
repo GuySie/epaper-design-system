@@ -638,27 +638,28 @@ Three levels, the same on every module:
 
 **Every reading that can be flagged has a switch**, `flag_<what>`, on by default, in front of its `warning_<what>` and `severe_<what>`. The switches of Single value, Value with details, Levels and History graph are off by default: no value fits every sensor. Off, the reading is never flagged, on any part of the page. Every number is a real threshold, 0 included: no number means "off". Without a switch: the lists (conditions, the doors and windows that count as severe), where an empty list flags nothing, and an open door or window, which is always a warning. The To-do list's switch (`flag_due`) has no numbers: the due day decides (*Checklist*, Flagged). A chart with its switch off: *Bar chart with thresholds, Line chart with thresholds*, Switched off. Pollen's two count inputs are empty by default: empty, the sensor's own level decides (*Weather thresholds*); a count overrides it.
 
+<!-- registry:thresholds -->
 | Page | Data | Warning | Severe |
 |---|---|---|---|
-| <!-- v:inputPages:warning_temp_low -->Weather at a glance, Weather, Weather and calendar<!-- /v --> | Cold (`*_temp_low`) | ≤ <!-- v:input:weather:warning_temp_low -->3°<!-- /v --> | ≤ <!-- v:input:weather:severe_temp_low -->0°<!-- /v --> |
-| | Heat (`*_temp_high`) | ≥ <!-- v:input:weather:warning_temp_high -->27°<!-- /v --> | ≥ <!-- v:input:weather:severe_temp_high -->35°<!-- /v --> |
-| | Wind, in the weather entity's own wind unit; the defaults suit km/h (`*_wind_high`) | ≥ <!-- v:input:weather:warning_wind_high -->50<!-- /v --> | ≥ <!-- v:input:weather:severe_wind_high -->75<!-- /v --> |
-| | Rain per hour (`*_rain_hour`) | ≥ <!-- v:input:weather:warning_rain_hour -->2.5 mm/h<!-- /v --> | ≥ <!-- v:input:weather:severe_rain_hour -->10 mm/h<!-- /v --> |
-| | Rain per day, today's total included (`*_rain_day`) | ≥ <!-- v:input:weather:warning_rain_day -->10 mm<!-- /v --> | ≥ <!-- v:input:weather:severe_rain_day -->25 mm<!-- /v --> |
-| | Pollen (`*_pollen_high`, where a pollen sensor is an input) | sensor level *high* | sensor level *very high* |
-| | Condition (`*_conditions`, a list) | <!-- v:input:weather:warning_conditions -->`hail`, `lightning`, `lightning-rainy`, `exceptional`<!-- /v --> | <!-- v:input:weather:severe_conditions -->none (empty list)<!-- /v --> |
-| Rain forecast, Rain forecast (Netherlands) | Rain per hour | ≥ <!-- v:input:rain:warning_rain_hour -->2.5 mm/h<!-- /v --> | ≥ <!-- v:input:rain:severe_rain_hour -->10 mm/h<!-- /v --> |
-| Energy price (EnergyZero) | Price per kWh | ≥ <!-- v:input:energy-price:warning_price -->15 ct/kWh<!-- /v --> | ≥ <!-- v:input:energy-price:severe_price -->25 ct/kWh<!-- /v --> |
-| CO2 graph | Concentration | ≥ <!-- v:input:co2:warning_co2 -->1000 ppm<!-- /v --> | ≥ <!-- v:input:co2:severe_co2 -->1400 ppm<!-- /v --> |
-| Claude usage | Usage | ≥ <!-- v:input:claude:warning_usage -->90 %<!-- /v --> | ≥ <!-- v:input:claude:severe_usage -->100 %<!-- /v --> |
-| Plant moisture | Soil moisture | ≤ <!-- v:input:plants:warning_moisture_low -->25 %<!-- /v --> | ≤ <!-- v:input:plants:severe_moisture_low -->14 %<!-- /v --> |
-| Single value | The value, high (`*_high`, at or above) and low (`*_low`, at or below) | the user's value | the user's value |
-| Levels | Each row's share of its maximum, high and low | the user's value | the user's value |
-| History graph | The value, high (`*_high`, at or above) and low (`*_low`, at or below) | the user's value | the user's value |
-| Value with details | The value, high and low, as on Single value | the user's value | the user's value |
-| To-do list | An item's due day | due today | overdue |
-| Medication | Hours since the last press | ≥ <!-- v:input:medication:warning_late -->24 h<!-- /v --> | ≥ <!-- v:input:medication:severe_late -->36 h<!-- /v --> |
+| Weather at a glance, Weather, Weather and calendar | Cold (`*_temp_low`) | ≤ 3° | ≤ 0° |
+|  | Heat (`*_temp_high`) | ≥ 27° | ≥ 35° |
+|  | Wind, in the weather entity's own wind unit; the defaults suit km/h (`*_wind_high`) | ≥ 50 | ≥ 75 |
+|  | Rain per hour (`*_rain_hour`) | ≥ 2.5 mm/h | ≥ 10 mm/h |
+|  | Rain per day, today's total included (`*_rain_day`) | ≥ 10 mm | ≥ 25 mm |
+|  | Pollen (`*_pollen_high`, where a pollen sensor is an input) | sensor level *high* | sensor level *very high* |
+|  | Condition (`*_conditions`, a list) | `hail`, `lightning`, `lightning-rainy`, `exceptional` | none (empty list) |
+| Single value, History graph | The value, high (`*_high`, at or above) and low (`*_low`, at or below) | the user's value | the user's value |
+| Medication | Hours since the last press | ≥ 24 h | ≥ 36 h |
 | Doors & windows | An opening is open | any opening | the openings in `severe_openings` |
+| Rain forecast (Netherlands), Rain forecast | Rain per hour | ≥ 2.5 mm/h | ≥ 10 mm/h |
+| CO2 graph | Concentration | ≥ 1000 ppm | ≥ 1400 ppm |
+| Claude usage | Usage | ≥ 90 % | ≥ 100 % |
+| Levels | Each row's share of its maximum, high and low | the user's value | the user's value |
+| Plant moisture | Soil moisture | ≤ 25 % | ≤ 14 % |
+| Energy price (EnergyZero) | Price per kWh | ≥ 15 ct/kWh | ≥ 25 ct/kWh |
+| To-do list | An item's due day | due today | overdue |
+| Value with details | The value, high and low, as on Single value | the user's value | the user's value |
+<!-- /registry:thresholds -->
 
 - **No thresholds** on <!-- v:noThresholdPages -->Sun & moon, Entities, Calendar, Next appointment, Tiles<!-- /v -->: nothing can be bad there, or (Entities, Tiles) one pair can't fit up to 12 arbitrary sensors, which show "—" and the error state instead.
 - **Page-specific threshold rules** are with their page: weather (pollen levels, conditions, official warnings, high/low, the *Override order*) in *Weather at a glance and Weather*, the redraw at a deadline in *Medication*.
@@ -814,23 +815,25 @@ The footer is an **optional single text line at the bottom of a screen**. It say
 - **Priority:** fill → footer → spread (fill before you float, *Spacing (internal)*, *Fill before you float*, with the footer between fill and spread). The footer gives way to content (one more event, one more plant; the Checklist's footer is the exception, *Checklist*, Footer) but takes precedence over extra white space (Claude bars move from L to M apart to make room).
 - **Never on Glance:** a Glance layout's bottom is its Glance secondary. The one exception is the version *Glance with a footer*.
 
+<!-- registry:footers -->
 | Page and screens | Footer |
 |---|---|
 | Weather at a glance 1.4", 3.5" | the alert, else (a) forecast conclusion with pollen at the right (*Glance with a footer*) |
-| Single value; Medication 2.7"; Doors & windows 1.4" | none (Glance) |
-| Weather 2.7" landscape, 3.5" | none (no room; the strip is the last module) |
-| Weather 2.7" portrait | the alert, else (a) forecast conclusion (*Override order*, Footer) |
-| Weather 4.1", 7.5" portrait | (a) forecast conclusion |
-| Weather 7.5" landscape, 4.26" | none (strips fill the panel; sunrise/sunset in the detail rows) |
-| Rain forecast and Rain forecast (Netherlands) 3.5", 2.7" landscape; CO2 graph 3.5" | (a) chart summary; none when there's nothing to show |
-| Energy price (EnergyZero) 3.5", 2.7" landscape | (a) the current price and the cheapest run (*Bar chart for prices*, Footer) |
+| Single value 1.4", 2.7" L, 3.5"; Medication 2.7" L; Doors & windows 1.4" | none (Glance) |
+| Weather 2.7" L, 3.5" | none (no room; the strip is the last module) |
+| Weather 2.7" P | the alert, else (a) forecast conclusion (*Override order*, Footer) |
+| Weather 4.1", 7.5" P | (a) forecast conclusion |
+| Weather 4.26", 7.5" L | none (strips fill the panel; sunrise/sunset in the detail rows) |
+| Rain forecast (Netherlands) 3.5", 2.7" L; Rain forecast 3.5", 2.7" L; CO2 graph 3.5" | (a) chart summary; none when there's nothing to show |
+| History graph 2.7" L, 3.5", 4.1" | (a) the current value, and the period's lowest and highest |
 | Sun & moon 3.5" | (a) day length (the moon and its phase are on the timeline) |
 | Claude usage 3.5" | (a) on schedule / furthest ahead, when it fits |
-| Next appointment 3.5", 4.1", 4.26" | (a) free until / free from, when it fits |
+| Levels 2.7" L, 3.5", 4.1"; Entities 3.5"; Weather and calendar 7.5" P; Calendar 4.1", 4.26"; Tiles 1.4", 2.7" P, 2.7" L, 3.5", 4.1", 7.5" L, 7.5" P; Value with details 4.1", 7.5" L, 7.5" P | none |
 | Plant moisture 4.1" | (a) number to water, when any and when it fits |
-| History graph 2.7" landscape, 3.5", 4.1" | (a) the current value, and the period's lowest and highest |
-| To-do list, every screen | (a) the count of open and done items |
-| Entities 3.5"; Calendar 4.1", 4.26"; Weather and calendar 7.5" portrait; Levels; Tiles; Value with details | none |
+| Next appointment 3.5", 4.1", 4.26" | (a) free until / free from, when it fits |
+| Energy price (EnergyZero) 3.5", 2.7" L | (a) the current price and the cheapest run (*Bar chart for prices*, Footer) |
+| To-do list 2.7" L, 2.7" P, 3.5", 4.1", 7.5" L, 7.5" P | (a) the count of open and done items |
+<!-- /registry:footers -->
 
 ## Composition
 
@@ -914,7 +917,7 @@ Temperature chips the hero itself: the chip is the digits' ink plus `space.s` on
 
 #### Glance with a footer
 
-For a Glance whose alerts would otherwise take the place of a value you always need. Only Weather at a glance uses it: an alert used to replace today's high/low.
+For a Glance whose alerts would otherwise take the place of a value you always need. Used by <!-- v:uses:glance/footer -->Weather at a glance<!-- /v --> only: an alert used to replace today's high/low.
 
 - **The footer is always there** (*Footer*: room and look), so nothing moves when an alert appears. The hero block is centred between the title line and the footer's room (`FNEED`), not the bottom padding.
 - **The Glance secondary is the value that always shows** and never makes way for an alert: on the weather today's high/low (`13° / 6°`). Flagged, it is a chip with its label (`MAX/MIN 13° / 6°`), the values alone where that doesn't fit.
@@ -988,7 +991,7 @@ The chart frame with a warning and a severe input (*Thresholds*); its scale is t
 
 #### Bar chart for prices
 
-The chart frame with a warning and a severe input, as *Bar chart with thresholds, Line chart with thresholds*, for the hours of a day. What differs is written here. Energy price (EnergyZero) uses it.
+The chart frame with a warning and a severe input, as *Bar chart with thresholds, Line chart with thresholds*, for the hours of a day. What differs is written here. Used by <!-- v:uses:bar-chart/prices -->Energy price (EnergyZero)<!-- /v -->.
 
 - **Bars:** today from midnight to midnight, one bar per hour. Hours gone are outlined and never coloured. The current hour and the hours to come are filled: in the warning colour at or above warning, in the severe colour at or above severe.
 - **Scale:** the one with thresholds (*Chart frame (all charts)*, *Fixed y-scale*). On a day with a negative price its bottom is the lowest price, rounded down to a whole 10, and that value is labelled in the margin. The label margin is sized for `-10` on every day, so the plot never moves.
@@ -1014,7 +1017,7 @@ The chart frame with a warning and a severe input, as *Bar chart with thresholds
 
 ### Timeline
 
-The title row, the timeline and the footer. The Sun & moon page uses it.
+The title row, the timeline and the footer. Used by <!-- v:uses:timeline -->Sun & moon<!-- /v -->.
 
 - **Horizon and markers:** `line.base` baseline and ticks, inline-size icons as markers (Sun & moon horizon). Sun and moon are always on the track: above the horizon at their altitude, below it under the line at their azimuth; the moon marker shows its phase and moves clear of the sun when they meet, above or below the horizon (two marker discs aside (2 × `icon.markerDisc`), on the side it is already on, flipped at the track's ends). Above the horizon both markers are centred on their altitude, each over a paper disc (`icon.markerDisc`), so the sun path passes behind them.
 - **Compass axis:** azimuth runs left to right as a time track (east, south, west in the north; east, north, west in the south, labelled accordingly). The sky's height maps 0° to the highest elevation the sun can reach at the home latitude (90° − latitude + 23.44°), not to 90°. Short upward ticks mark today's sunrise and sunset azimuths (cos Az = sin δ / cos φ), so the sun's real path is visible next to the compass ticks.
@@ -1207,10 +1210,10 @@ Where it applies:
 - **Glance secondary:** Weather at a glance: today's high/low, always; flagged, it is the chip (*Glance with a footer*). Medication: the date becomes the overdue chip (date · status; its redraws are under *Medication*).
 - **2.7" portrait, the text line under the icon:** high/low · today's rain (or wind), always (`13°/6° · 2.6mm`). Flagged high/low is the chip (`MAX/MIN 11°/3°`) and rain follows only if it fits. No other chip takes this line: an alert goes to the footer.
 - **Detail rows (Hero dashboard):** the alert row (official warning, else the current condition) becomes the first row, and the pollen row (pollen above 0) the last. Each takes a row's place so the block keeps its size, and **a row with a chip makes way last**. Each layout names a make-way order for the alert row and one for the pollen row. The alert row chooses first: the first unflagged row still shown in its order makes way, else the first warning-level one, else the first in the order. Then the pollen row chooses the same way. One rule for every layout (`DROWS`):
-  - 7.5" (landscape and portrait, and *Weather and calendar*), 4.26": alert row and pollen row: pressure, wind, high/low. Sunrise and sunset never make way.
-  - 3.5": both: humidity, wind, high/low, rain.
-  - 4.1": both: humidity, wind, rain.
-  - 2.7" landscape: both: wind, high/low, rain.
+  - 7.5" (landscape and portrait, and *Weather and calendar*), 4.26": alert row and pollen row: <!-- v:order:_wx -->pressure, wind, high/low<!-- /v -->. Sunrise and sunset never make way.
+  - 3.5": both: <!-- v:order:weather_35 -->humidity, wind, high/low, rain<!-- /v -->.
+  - 4.1": both: <!-- v:order:weather_41 -->humidity, wind, rain<!-- /v -->.
+  - 2.7" landscape: both: <!-- v:order:weather_27l -->wind, high/low, rain<!-- /v -->.
 - **Footer:** keeps its conclusion; it becomes the chip when the rain it is about is flagged (the most severe of today's total and the forecast hours; never when the whole forecast is dry). Alerts never move to the footer: you read a screen from the top, and not every layout has one. **The exception is a layout without detail rows** (Weather at a glance, the 2.7" portrait): there the footer is the alert's place, so the alert never takes a value's. The picked item is the footer chip and goes before the conclusion and its rain chip; high/low is left out of the pick (it is flagged on its own line), and on the 2.7" portrait pollen too (it has its row). An official warning follows *Weather thresholds* (whole or not at all: `CODE ORANGE THUNDERSTORM`, else `THUNDERSTORM`, else `CODE ORANGE`). With no alert: the conclusion where it fits whole (`RAIN UNTIL 17:00`), and on Glance pollen at the right (`BIRCH 96 ppm`, *Pollen*).
 - **Title row:** the stale chip replaces the stamp. **Error state:** replaces everything below the title.
 

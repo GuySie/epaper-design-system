@@ -199,10 +199,51 @@ def tables(r, pkg=PKG):
         other = al.get(n.lower())
         rows.append(f'| **{n}** | {lv} | {of} | {what}' + (f' (not: {", ".join(other)})' if other else '') + ' |')
     T['glossary'] = rows
+    T['thresholds'], T['footers'] = page_rule_tables(r)
     out = {k: '\n'.join(v) for k, v in T.items()}
     from tier_tables import tables as tier_tables
     out.update(tier_tables())        # tier-type, tier-space, tier-icon: generated from ep_tokens.jinja
     return out
+
+
+def page_rule_tables(r):
+    """the *Thresholds* and *Footer* tables: each live page's rule words come from its page definition (`thresholds`, `footer`
+    and a layout's own `footer`), the values from its inputs' defaults, so a page can't be missing or out of date"""
+    import doc_values
+    live = doc_values.live_pages()
+    def cell(page, d, row, level):
+        if level in row:
+            return row[level]
+        ins = {i['name']: i for i in d.get('inputs') or []}
+        if ins.get(f"flag_{row['what']}", {}).get('default') is False:      # a switch that is off by default: no value fits every sensor
+            return "the user's value"
+        return (row.get('at', '') + ' ' + doc_values.input_default(page, f"{level}_{row['what']}")).strip()
+    groups = []                               # pages with the same rows share them (the weather pages, the rain pages)
+    for page, v, d in live:
+        rows = [(x['data'], cell(page, d, x, 'warning'), cell(page, d, x, 'severe')) for x in d.get('thresholds') or []]
+        if not rows:
+            continue
+        for g in groups:
+            if g[1] == rows:
+                g[0].append(v['name']); break
+        else:
+            groups.append(([v['name']], rows))
+    th = ['| Page | Data | Warning | Severe |', '|---|---|---|---|']
+    for names, rows in groups:
+        for i, (data, w, s) in enumerate(rows):
+            th.append(f"| {', '.join(names) if i == 0 else ''} | {data} | {w} | {s} |")
+    foot = {}                                 # footer text -> [page and its screens]
+    for page, v, d in live:
+        per = {}
+        for scr, lay in d['layouts'].items():
+            text = lay.get('footer') or d.get('footer')
+            if not text:
+                sys.exit(f'pages/{page}.yaml: no footer for the layout {scr} (footer: what it says, or none and why)')
+            per.setdefault(text, []).append(r['screen_names'][str(scr)])
+        for text, scrs in per.items():
+            foot.setdefault(text, []).append(f"{v['name']} {', '.join(scrs)}")
+    ft = ['| Page and screens | Footer |', '|---|---|'] + [f"| {'; '.join(who)} | {text} |" for text, who in foot.items()]
+    return th, ft
 
 
 def layout_rows(r, pg):

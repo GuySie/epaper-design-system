@@ -228,3 +228,8 @@ layouts:
     spec: plants_41
     defaults:
       rotate: '0'
+thresholds:
+- data: "Soil moisture"
+  what: "moisture_low"
+  at: "≤"
+footer: "(a) number to water, when any and when it fits"

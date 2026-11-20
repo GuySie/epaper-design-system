@@ -140,3 +140,4 @@ examples:
 layouts:
   '35':
     spec: entities_35
+footer: "none"

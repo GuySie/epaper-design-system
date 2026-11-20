@@ -730,6 +730,31 @@ groups:
         "sv": {"title": "Regn", "dry": "Torrt till", "rain": "Regn", "heavy": "Skyfall", "peak": "topp", "unit": "mm/h"}
       } %} {{ m[weekday_lang] }}
   - ds_title: '{{ header_title if header_title else ds_txt[''title''] }}'
+  weather_threshold_rows:
+  - data: "Cold (`*_temp_low`)"
+    what: "temp_low"
+    at: "≤"
+  - data: "Heat (`*_temp_high`)"
+    what: "temp_high"
+    at: "≥"
+  - data: "Wind, in the weather entity's own wind unit; the defaults suit km/h (`*_wind_high`)"
+    what: "wind_high"
+    at: "≥"
+  - data: "Rain per hour (`*_rain_hour`)"
+    what: "rain_hour"
+    at: "≥"
+  - data: "Rain per day, today's total included (`*_rain_day`)"
+    what: "rain_day"
+    at: "≥"
+  - data: "Pollen (`*_pollen_high`, where a pollen sensor is an input)"
+    warning: "sensor level *high*"
+    severe: "sensor level *very high*"
+  - data: "Condition (`*_conditions`, a list)"
+    what: "conditions"
+  rain_threshold_rows:
+  - data: "Rain per hour"
+    what: "rain_hour"
+    at: "≥"
   weather_thresholds:
   - name: flag_temp_low
     section: thresholds
