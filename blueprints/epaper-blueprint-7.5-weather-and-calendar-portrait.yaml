@@ -463,7 +463,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'thlfyq'
+  ds_set: 'evgtmi'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'

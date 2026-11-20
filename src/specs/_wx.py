@@ -163,7 +163,7 @@ WXM = r'''
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set r = namespace(pol=none, wl=[], wv=[]) -%}{{- POLROW(r, wl, wv) -}}{%- set pol, wl, wv = r.pol, r.wl, r.wv -%}
 {{- TITLE(ns, title, right, W, P, TH, stale) -}}
-{%- set yb = H - P - ((FNEED(P) | int) if foot else 0) -%}
+{%- set yb = H - P - ((FNEED() | int) if foot else 0) -%}
 {%- set ih = EP_TK.icon.stripHour or 0 -%}
 {%- if days -%}
 {%- set dy = STRIPY(yb, EP_TK.icon.stripDay) | int -%}

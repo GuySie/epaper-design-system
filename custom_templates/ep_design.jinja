@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_MONTHS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'thlfyq' -%}
+{%- set EP_SET = 'evgtmi' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -424,7 +424,7 @@
      and never below the screen's unit size (type.unit) while the value is that large: where 12 px lowercase is under the
      floor, a 16 px value keeps a 16 px unit -#}
 {%- macro USTEP0(s) -%}{{ ({42: '32|' ~ f16r, 32: '24|' ~ f12r, 24: '21|' ~ f21}[s]) if s > 21 else ('16|' ~ f16r) if s >= 21 else (('12|' ~ f12r) if s >= 16 else ((s | string) ~ '|' ~ f12r)) }}{%- endmacro -%}
-{%- macro USTEP(s, f) -%}{%- set u = USTEP0(s).split('|') -%}{%- set ls = [EP_TK.type.label[1], [EP_TK.type.unit[1], s | int] | min] | max -%}{{ (u | join('|')) if (u[0] | int) >= ls else ((ls | string) ~ '|' ~ {12: f12r, 16: f16r, 21: f21, 24: f12r, 32: f16r, 42: f21}[ls]) }}{%- endmacro -%}
+{%- macro USTEP(s) -%}{%- set u = USTEP0(s).split('|') -%}{%- set ls = [EP_TK.type.label[1], [EP_TK.type.unit[1], s | int] | min] | max -%}{{ (u | join('|')) if (u[0] | int) >= ls else ((ls | string) ~ '|' ~ {12: f12r, 16: f16r, 21: f21, 24: f12r, 32: f16r, 42: f21}[ls]) }}{%- endmacro -%}
 {#- SEGS: the degree sign is its own segment, drawn at the VALUE's size in the Regular cut, attached; a C or F after it, and %, are small unit segments -#}
 {%- macro SEGS(v, f) -%}{%- set v = v | string -%}{{ (((v | regex_replace('(\\d)°([CF])', '\\1¦°¦¦\\2¦')) | regex_replace('(\\d)°(?!¦)', '\\1¦°¦')) | regex_replace('(\\d)%', '\\1¦%¦')) if 'TRMNL' in (f | string) else v }}{%- endmacro -%}
 {#- REGULAR_FONT: the Regular cut at a TRMNL size (the degree sign: value size, Regular) -#}
@@ -434,7 +434,7 @@
 {%- macro UGAP(p, su) -%}{{ 0 if (DS.tight or (p | trim) in EP_SPACE.unitGapNone) else ADV[(su | string) ~ 'r'][' '] }}{%- endmacro -%}
 {%- macro VALUE_W(v, s, f) -%}
 {%- set parts = SEGS(v, f).split('¦') -%}
-{%- set u = USTEP(s, f).split('|') -%}
+{%- set u = USTEP(s).split('|') -%}
 {%- set w = namespace(n=0) -%}
 {%- for p in parts -%}{%- if p -%}
 {%- if loop.index0 % 2 == 1 and p == '°' -%}{%- set w.n = w.n + (TEXT_W(p, s, REGULAR_FONT(s)) | int) -%}
@@ -458,7 +458,7 @@
 {%- set v = SEGS(v, f) -%}
 {%- if '¦' in v -%}
 {%- set parts = v.split('¦') -%}
-{%- set u = USTEP(s, f).split('|') -%}
+{%- set u = USTEP(s).split('|') -%}
 {%- set su, fu = u[0] | int, u[1] -%}
 {%- set tot = VALUE_W(v, s, f) | int -%}
 {%- set base = y + CAPDN[s] + 1 -%}
@@ -981,7 +981,7 @@
 {%- endif -%}
 {%- endmacro -%}
 {#- FNEED: the room a footer takes under a module: space.m above the line + the footer -#}
-{%- macro FNEED(P) -%}{{ EP_TK.space.m + EP_TK.space.footer }}{%- endmacro -%}
+{%- macro FNEED() -%}{{ EP_TK.space.m + EP_TK.space.footer }}{%- endmacro -%}
 {#- 4-step level meter, left edge x, vertically centred on cy -#}
 {%- macro METER(ns, level, x, cy, seg, fg='black') -%}
 {%- for i in range(4) -%}
@@ -1164,7 +1164,7 @@
 {#- the line under the hero (type.secondary) takes a chip's height: its size + 2 x space.xs -#}
 {%- set lb = EP_TK.type.secondary[1] + 2 * (SPACE_XS(EP_TK.type.secondary[1]) | int) -%}
 {%- set block = up + dn + gap + lb -%}
-{%- set z0, z1 = P + TH, H - P - ((FNEED(P) | int) if foot else 0) -%}
+{%- set z0, z1 = P + TH, H - P - ((FNEED() | int) if foot else 0) -%}
 {%- set top = z0 + (z1 - z0 - block) / 2 -%}
 {%- set cy = (top + up) | round | int -%}
 {{ cy }},{{ (cy + dn + gap + lb // 2) | round | int }}
@@ -1223,7 +1223,7 @@
 {%- set per = ((n + 1) // 2) if two else n -%}
 {{- KVLIST(ns, items, P, W - P - 1, top, per, two, dense) -}}
 {%- set rh = EP_TK.space.rowDense if dense else EP_TK.space.row -%}
-{%- if foot and top + per * rh + (FNEED(P) | int) <= H - P -%}
+{%- if foot and top + per * rh + (FNEED() | int) <= H - P -%}
 {{- FOOT(ns, foot, '', W, H, P, flevel) -}}
 {%- endif -%}
 {%- endif -%}
@@ -1354,7 +1354,7 @@
 {%- if not open and not done -%}
 {{- EMPTY(ns, nothing, P, W - P - 1, top, H - P) -}}
 {%- else -%}
-{{- CHECKROWS(ns, open, done, P, W - P - 1, top, H - P - (FNEED(P) | int), W > H, more) -}}
+{{- CHECKROWS(ns, open, done, P, W - P - 1, top, H - P - (FNEED() | int), W > H, more) -}}
 {%- set dt = EP_TK.type.data -%}
 {{- FOOT(ns, foot if (VALUE_W(foot, dt[1], FONT[dt[0]]) | int) <= W - 2 * P else short, '', W, H, P) -}}
 {%- endif -%}
@@ -1408,7 +1408,7 @@
 {{- EHERO(ns, events[0], W, P, y0) -}}
 {{- EFREE(ns, events, ft, today, W, H, P) -}}
 {%- else -%}
-{%- set foot_h = FNEED(P) | int -%}{%- set rih = EINK() | int -%}
+{%- set foot_h = FNEED() | int -%}{%- set rih = EINK() | int -%}
 {%- set ep = EPITCH() | int -%}
 {%- set shown = [n, ((H - P - rih - y0) // ep) + 1] | min -%}
 {%- set pitch = ep + (SL - SM) if (y0 + (shown - 1) * (ep + SL - SM) + rih + foot_h <= H - P) else ep -%}
@@ -1470,7 +1470,7 @@
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {{- TITLE(ns, title, right, W, P, TH, stale) -}}
 {%- set mt = namespace(kept=false) -%}
-{{- METER_ROWS(ns, mt, P, W - P - 1, P + TH + EP_TK.space.m, H - P - 1, bars, (FNEED(P) | int) if reserve else 0) -}}
+{{- METER_ROWS(ns, mt, P, W - P - 1, P + TH + EP_TK.space.m, H - P - 1, bars, (FNEED() | int) if reserve else 0) -}}
 {%- if foot and mt.kept -%}{{- FOOT(ns, foot, '', W, H, P, flevel) -}}{%- endif -%}
 {%- endmacro -%}
 {#- CHART_BARS: module 'Chart' as bars, inside the box x0 to x1, y0 to y1 (its first and last column and row). n slots; bars = [{'i': slot, 'v': value, 'f': height as a
@@ -1911,7 +1911,7 @@
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set r = namespace(pol=none, wl=[], wv=[]) -%}{{- POLROW(r, wl, wv) -}}{%- set pol, wl, wv = r.pol, r.wl, r.wv -%}
 {{- TITLE(ns, title, right, W, P, TH, stale) -}}
-{%- set yb = H - P - ((FNEED(P) | int) if foot else 0) -%}
+{%- set yb = H - P - ((FNEED() | int) if foot else 0) -%}
 {%- set ih = EP_TK.icon.stripHour or 0 -%}
 {%- if days -%}
 {%- set dy = STRIPY(yb, EP_TK.icon.stripDay) | int -%}

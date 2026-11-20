@@ -120,7 +120,7 @@ The tokens are not tied to the devices above. A screen is described by four numb
 
 **Same pixels, same spec.** A layout's spec draws it in pixels, so the layout for a screen with the same canvas reuses it with its own tokens: the 4.26" weather layout is the 7.5" spec. A spec that takes all of its geometry from the tokens also works on another canvas: the 4.26" Calendar and Next appointment layouts are the 4.1" specs. Literal sizes in a shared spec must come from tokens (lines at `line.base`, Regular lines in the regular cut of `type.primary`), or the denser screen inherits values below its floors.
 
-**What still needs design per screen: the layout.** Tokens give every size; which modules a screen shows, and where, depends on its shape (square, landscape, portrait) and its row budget. A new screen of an existing shape gets layouts that reuse that shape's drawings with its own tokens; a new shape needs drawings of its own.
+**What still needs design per screen: the layout.** Tokens give every size; which modules a screen shows, and where, depends on its shape (square, landscape, portrait) and its row budget. A new screen of an existing shape reuses that shape's specs (*Same pixels, same spec*); a new shape needs specs of its own.
 
 **Example.** A 13.3" panel (1600 × 1200 px, 270 × 202 mm): pitch <!-- v:dv:1600x1200x270x202:pitch -->0.169<!-- /v --> mm, `space.pad` <!-- v:dv:1600x1200x270x202:space.pad -->60<!-- /v -->, base line <!-- v:dv:1600x1200x270x202:line.base -->1<!-- /v --> px, smallest icon <!-- v:dv:1600x1200x270x202:icon.min -->20<!-- /v --> px, and after the step up <!-- v:dv:1600x1200x270x202:type.data -->TRMNL21<!-- /v --> data and <!-- v:dv:1600x1200x270x202:type.label -->TRMNL16<!-- /v --> labels. Large size class: one step up, because floors alone would give it the type of a 2.7". That is the 7.5"'s type on a screen twice as large; whether a larger screen should step further is open (*Open items*, type on large and dense screens).
 
@@ -290,11 +290,7 @@ These are rules of thumb from print and signage, for e-paper's lower contrast. *
 | chart top and baseline | *Chart frame* rules |
 | `color.severe`, `color.warning` and their text colours | the panel capability (*Colour tokens*); the most limited panel decides |
 
-Rules over tokens that place things (font metrics, physics, time units, input defaults and the style choices below are the only constants):
-
-- **Lists fill first.** A list shows as many rows as fit down to the content's bottom: its last row's ink must end above it, so the row box may hang its lower margin into the padding (`KVFIT` for key-value rows, the same sum for the event list). The footer, the lowest priority, follows only when it still fits (*Footer*). How many rows that is on each screen: *Panel tiers*.
-
-Every value a layout uses is a token, a rule over tokens, a measured font or icon metric (including the 1–3 px ink corrections for side bearings), or a recorded style choice.
+Every value a layout uses is a token, a rule over tokens, a measured font or icon metric (including the 1–3 px ink corrections for side bearings), or a recorded style choice; font metrics, physics, time units, input defaults and the style choices below are the only constants.
 
 #### Step up (large screens)
 
@@ -379,10 +375,10 @@ Text-bound (follow the text, not the tier):
 | Token | Value |
 |---|---|
 | `line.base` | 1 or 2 px, the floor in *Floors and their thresholds*: enough for a divider you don't need to read |
-| `line.heavy` | <!-- v:strokes.heavy -->4<!-- /v --> × `line.base`, only on a screen without other dividers |
+| `line.heavy` | <!-- v:strokes.heavy -->4<!-- /v --> × `line.base`, only on a screen without other dividers (no layout draws one yet) |
 | `line.dash` | <!-- v:strokes.dash -->4 on / 4 off<!-- /v --> × `line.base` (thresholds, reference lines) |
 | `line.tick` | <!-- v:strokes.tick -->3<!-- /v --> × `line.base` (axis ticks under a chart baseline, from the row below it) |
-| `line.dot` | <!-- v:strokes.dot -->1 on / 1 off<!-- /v --> × `line.base` ("now" lines) |
+| `line.dot` | <!-- v:strokes.dot -->1 on / 1 off<!-- /v --> × `line.base` ("now" lines; no layout draws one yet) |
 | `line.barGap` | <!-- v:strokes.barGap -->2<!-- /v --> × `line.base` (paper between chart bars) |
 | `line.series` | `line.base` + <!-- v:dt:SERIES_UP -->1<!-- /v -->, one more on a large screen (*Step up (large screens)*), drawn as 1 px lines (below) |
 | `line.forecastDash` | <!-- v:strokes.forecastDash -->6 on / 3 off<!-- /v --> × `line.base` |
@@ -423,6 +419,7 @@ Values per panel type are in *Values per panel* below. Layouts only ever name th
 | `color.onWarning` | Text and icons on a warning fill |
 | `color.severe` | Severe fill, error block |
 | `color.onSevere` | Text and icons on a severe fill |
+| `color.severeMark` | A mark in front of a severe chip's text, for a panel whose severe fill can't be told from an ink chip; empty on every panel today |
 | `color.stale` | Stale chip fill: `color.ink`, an outline where warnings are outlines (*Title row*) |
 
 ### Type tokens
@@ -458,7 +455,7 @@ Values per panel type are in *Values per panel* below. Layouts only ever name th
 - `type.unit`: see *Units and numbers*, *Units are drawn one font step down*.
 - On the 4.26" every role that is Regular elsewhere is Bold (units excepted): TRMNL21 Regular's stems are under `stroke.min` there (*Physical size minimums*).
 - The hero sizes: the hero ladder (*Style choices*, Hero ladder). `type.heroAlone` and `type.heroShared` are measured per layout (*Measured*; their values: *Physical size minimums*).
-- The degree sign takes the value's size in the Regular cut.
+- The degree sign: *Units and numbers*, *The degree sign belongs to the number*.
 
 ### Icon tokens
 
@@ -846,6 +843,7 @@ Every gap inside a layout comes from one scale. M and L follow the padding, so t
 1. **Content starts M below the title line**, on every layout: the topmost ink of the first module (an icon, a label, text) sits exactly M below it; a hero numeral sits its hero clearance below it (*Hero group*). Layouts other than the Glance are **top-aligned**: leftover space stays at the bottom (or between the top block and a bottom-anchored strip).
    - **Exception, the hero band:** in a Hero dashboard the hero and its detail rows are centred between two fixed lines (*Hero band*). Everything else on the screen stays top-aligned.
    - **Fill before you float.** Before leaving space empty, use it: first **fill** (show more items, or step the module up one size, e.g. Claude usage with up to 3 bars in TRMNL21), then **spread** by one fixed step (module gap M → L when everything still fits with L), and only then **float**: what remains stays at the bottom. Gaps never take in-between values.
+   - **Lists fill first.** A list shows as many rows as fit down to the content's bottom: its last row's ink must end above it, so the row box may hang its lower margin into the padding (`KVFIT` for key-value rows, the same sum for the event list). The footer, the lowest priority, follows only when it still fits (*Footer*). How many rows that is on each screen: *Panel tiers*.
    - **Centre within a module, never the layout.** Only an element that is the whole message is centred in its own space: the Glance's hero block and the Hero dashboard's hero band (*Hero group*, hero centring) and an empty state's statement (centred in the module it replaces, *Empty states*).
    - **A number on a centre axis is centred as a whole reading**, a trailing ° included (the stacked hero group of a portrait weather screen).
 2. **Dividers are symmetric: S on both sides.** The line itself separates the modules, so the gap on either side only has to keep it off the text. Modules separated by whitespace alone get M.
@@ -1037,7 +1035,7 @@ The date-grouped list (see *Date-grouped list* under *Modules*).
 
 The event list and the footer.
 
-- As many events as fit, the footer only when it still fits (*Footer*; with fewer, the rows spread when that still fits: each row gains L − M, shared equally above and below its line). Per event: start time in a `type.primary` strong column (right-aligned), title in its regular cut, and a `type.label` text line under the title (`TOMORROW · UNTIL 10:30`). A running event's start time sits in an ink chip (*Severity*, *Now is not a severity*); its label reads `NOW · UNTIL …`. A single event is an *Event hero* (the same module on every screen) above the footer. Base lines between events.
+- As many events as fit, the footer only when it still fits (*Footer*; with fewer, the rows spread when that still fits: each row gains L − M, shared equally above and below its line). Per event: start time in a `type.primary` strong column (right-aligned), title in its regular cut, and a `type.label` text line under the title (`TOMORROW · UNTIL 10:30`). A running event's start time sits in an ink chip (*Severity*, *Now is not a severity*); its label reads `NOW · UNTIL …`. Base lines between events. A single event: *Event list with one event as a hero*.
 
 #### Event list with one event as a hero
 
@@ -1681,7 +1679,7 @@ One order everywhere a single place has to choose (the `PICK` macro):
 
 Where it applies:
 
-- **Glance secondary:** Weather at a glance: today's high/low, always; flagged, it is the chip (*Glance with a footer*). Medication: the date becomes the overdue chip (date · status; its redraws are under *Medication*).
+- **Glance secondary:** Weather at a glance: today's high/low, always; flagged, it is the chip (*Glance with a footer*).
 - **2.7" portrait, the text line under the icon:** high/low · today's rain (or wind), always (`13°/6° · 2.6mm`). Flagged high/low is the chip (`MAX/MIN 11°/3°`) and rain follows only if it fits. No other chip takes this line: an alert goes to the footer.
 - **Detail rows (Hero dashboard):** the alert row (official warning, else the current condition) becomes the first row, and the pollen row (pollen above 0) the last. Each takes a row's place so the block keeps its size, and **a row with a chip makes way last**. Each layout names a make-way order for the alert row and one for the pollen row. The alert row chooses first: the first unflagged row still shown in its order makes way, else the first warning-level one, else the first in the order. Then the pollen row chooses the same way. One rule for every layout (`DROWS`):
   - 7.5" (landscape and portrait, and *Weather and calendar*), 4.26": alert row and pollen row: <!-- v:order:_wx -->pressure, wind, high/low<!-- /v -->. Sunrise and sunset never make way.
