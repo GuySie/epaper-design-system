@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_MONTHS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'bsyrvk' -%}
+{%- set EP_SET = 'rjqwzd' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -1143,7 +1143,7 @@
 {%- set gup, gdn = [HUP[hs], g.up] | max, [HDN[hs], g.dn] | max -%}
 {%- set dr = EP_TK.space.detailRow -%}{%- set n = rows | length -%}{%- set ds = EP_TK.type.data[1] -%}
 {#- the rows by ink: the first row's caps to the last row's baseline (a hero gap under the group) -#}
-{%- set tot = gup + gdn + hg + (n - 1) * dr + CAPUP[ds] + CAPDN[ds] + 1 -%}
+{%- set tot = gup + gdn + ((hg + (n - 1) * dr + CAPUP[ds] + CAPDN[ds] + 1) if n else 0) -%}
 {%- set cy = (P + TH + (ym - (P + TH) - tot) / 2 + gup) | round | int -%}
 {#- the group centred by ink across the width -#}
 {%- set hx0 = HERO_LEFT(h.text, hs, 0, HERO_SHARED_EXTRA(h, hs, hic) | int, P, W - P) | int -%}
@@ -1426,7 +1426,7 @@
 {#- METER_ROWS: module 'Meters', inside the box x0 to x1, y0 to y1 (its first and last column and row). bars = [{'label',
      'percent', 'percent_text' (the value as written, a percentage or a number with its unit), 'marker_pct', 'is_severe',
      'is_warning', 'rcap'}], labels already shortened by the page, rcap
-     the reset caption ('' for none). Fill before you float: up to 3 bars in type.primary, more in type.data; order fill →
+     the reset caption ('' for none). Fill before you float: type.primary while the bars fit the height M apart, else type.data; order fill →
      the room to keep → spread (bars L apart when everything still fits, else M). keep: rows to leave free under the bars
      while they still fit (a page's footer); mt.kept says whether they were.
      METERS: pattern 'Meters': the title row, the bars under it, the footer. reserve: the page has a footer to show (its
@@ -1435,7 +1435,9 @@
 {%- set n = bars | length -%}
 {%- set top = y0 -%}
 {%- set avail = y1 + 1 - y0 -%}
-{%- set big = n <= 3 -%}
+{#- the larger type while the bars fit the height M apart (a bar: the label's caps, space.s, the track) -#}
+{%- set bs = EP_PRIMARY[1][1] -%}{%- set bc = CAPH(bs) | int -%}
+{%- set big = n * (bc + (SPACE_S(bs) | int) + bc) + (n - 1) * EP_TK.space.m <= avail -%}
 {%- set tr, tb = (EP_PRIMARY[0], EP_PRIMARY[1]) if big else (EP_TK.type.data, EP_TK.type.data) -%}
 {%- set ts = tb[1] -%}
 {%- set cap = CAPH(ts) | int -%}
