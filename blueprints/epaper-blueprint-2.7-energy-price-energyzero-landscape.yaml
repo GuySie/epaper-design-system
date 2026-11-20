@@ -210,7 +210,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'rjqwzd'
+  ds_set: 'uwydvo'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'

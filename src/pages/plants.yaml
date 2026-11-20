@@ -33,7 +33,7 @@ inputs:
 - name: plant_1
   section: content
   label: Plant 1 - sensor
-  help: Soil moisture sensor for plant 1. Leave blank to disable this row.
+  help: Soil moisture sensor for plant 1.
   selector:
     entity:
       filter:
@@ -79,8 +79,8 @@ inputs:
   default: true
 - name: warning_moisture_low
   section: thresholds
-  label: Warning moisture threshold
-  help: If a plant's moisture is at or below this percentage, its value is shown as a warning chip
+  label: 'Soil moisture: warning at or below'
+  help: If a plant's moisture is at or below this percentage, its row is a warning chip.
   selector:
     number:
       min: 0
@@ -90,8 +90,8 @@ inputs:
   default: 25
 - name: severe_moisture_low
   section: thresholds
-  label: Severe moisture threshold
-  help: If a plant's moisture is at or below this percentage, its value is shown as severe
+  label: 'Soil moisture: severe at or below'
+  help: If a plant's moisture is at or below this percentage, its row is a severe chip.
   selector:
     number:
       min: 0

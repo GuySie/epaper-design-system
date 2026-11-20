@@ -22,7 +22,7 @@ inputs:
 - name: entity_1
   section: content
   label: Entity 1
-  help: Entity for row 1. Leave blank to disable this row.
+  help: Entity for row 1.
   selector:
     entity: {}
   required: true

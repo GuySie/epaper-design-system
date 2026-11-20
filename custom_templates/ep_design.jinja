@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_MONTHS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'rjqwzd' -%}
+{%- set EP_SET = 'uwydvo' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -291,7 +291,7 @@
 {%- set EP_TT, EP_LT = EP_TIER[EP_L.tier], (EP_LAYOUT[layout] | default({})) -%}
 {#- the layout's measured tokens (its hero, its strip icons) laid over its tier's -#}
 {%- set EP_TK = dict(EP_TT, type=dict(EP_TT.type, **(EP_LT.type | default({}))), icon=dict(EP_TT.icon, **(EP_LT.icon | default({})))) -%}
-{#- an item's main text line: type.primary, or type.data where a screen has none (*Size classes*); [Regular, Bold] -#}
+{#- an item's main text line: type.primary, or type.data where a screen has none (*Deriving tokens for any screen*, the size classes); [Regular, Bold] -#}
 {%- set EP_PRIMARY = EP_TK.type.primary if EP_TK.type.primary else [EP_TK.type.data, EP_TK.type.data] -%}
 {#- the kit's short names for the font roles (TRMNL12/16 text is always the bold cut) -#}
 {%- set f12 = font_dir ~ EP_FONT.label12 -%}
@@ -567,12 +567,6 @@
 {%- macro LEVEL_FILL(k) -%}{{ color.severe if k == 'sev' else color.warningChip }}{%- endmacro -%}
 {%- macro LEVEL_TEXT(k) -%}{{ (color.onSevere if k == 'sev' else color.onWarning) if k else 'black' }}{%- endmacro -%}
 {%- macro LEVEL_MARK(k) -%}{{ color.severeMark if k == 'sev' else '' }}{%- endmacro -%}
-{#- the longest run of whole words of v that fits mw at size s / font f (a lone first word that is too long is kept, and cut by the layout) -#}
-{%- macro FITW(v, mw, s, f) -%}
-{%- set fw = namespace(t='', stop=false) -%}
-{%- for w in (v | string).split(' ') -%}{%- if not fw.stop -%}{%- if loop.first or (VALUE_W(fw.t ~ ' ' ~ w, s, f) | int) <= mw -%}{%- set fw.t = (fw.t ~ ' ' ~ w) | trim -%}{%- else -%}{%- set fw.stop = true -%}{%- endif -%}{%- endif -%}{%- endfor -%}
-{{- fw.t -}}
-{%- endmacro -%}
 {#- a flagged label/value detail row: one chip spans the label and the value (they change together) -#}
 {%- macro DCHIP(ns, lab, lf, ls, v, x0, xr, cy, f, s, bg, fg, vopt=false, h=0) -%}
 {#- a label/value row as one chip. The label is cut short so it keeps space.l from the value; the value is never cut.
@@ -1080,9 +1074,8 @@
 {%- for o in [0, 1, -1, 2, -2][:EP_TK.line.series] -%}{{- L(ns, x0 + (o if st else 0), y0 - (0 if st else o), x1 + (o if st else 0), y1 - (0 if st else o), 1) -}}{%- endfor -%}
 {%- endmacro -%}
 
-{#- HERO_ADVANCE: a Space Grotesk Bold string's advance width at size hs (HWR: measured advance per character as a share of the size).
-     HERO_INK_W: its ink width: the advance less the first character's left and the last one's right side bearing (SGB, SGR) -#}
-{%- macro HERO_ADVANCE(t, hs) -%}{%- set w = namespace(v=0) -%}{%- for c in (t | string) -%}{%- set w.v = w.v + (HWR[c] if c in HWR else 0.6) * hs -%}{%- endfor -%}{{ w.v | round | int }}{%- endmacro -%}
+{#- HERO_INK_W: a Space Grotesk Bold string's ink width at size hs: its advance (HWR: measured advance per character as a share of the size)
+     less the first character's left and the last one's right side bearing (SGB, SGR) -#}
 {%- macro HERO_INK_W(t, hs) -%}{%- set t = t | string -%}{%- set w = namespace(v=0) -%}{%- for c in t -%}{%- set w.v = w.v + (HWR[c] if c in HWR else 0.6) * hs -%}{%- endfor -%}
 {%- set l = (SGB[hs][t[:1]] if hs in SGB and t[:1] in SGB[hs] else 0) -%}{%- set r = (SGR[hs][t[-1:]] if hs in SGR and t[-1:] in SGR[hs] else 0) -%}{{ (w.v - l - r) | round | int }}{%- endmacro -%}
 {#- HERO_LEFT: left x of a hero group beside other content (number + gap + icon) centred by ink in the hero column [P, xr] -#}

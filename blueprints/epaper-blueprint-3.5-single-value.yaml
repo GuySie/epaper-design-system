@@ -236,7 +236,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'rjqwzd'
+  ds_set: 'uwydvo'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'
@@ -261,9 +261,10 @@ variables:
       {% if (flag_high and n >= (severe_high | float(0))) or (flag_low and n <= (severe_low | float(0))) %}{% set lvl = 'sev' %}
       {% elif (flag_high and n >= (warning_high | float(0))) or (flag_low and n <= (warning_low | float(0))) %}{% set lvl = 'warn' %}{% endif %}
     {% endif %}
-    {% set s2 = states(secondary_entity) if secondary_entity else '' %}
+    {% set se = secondary_entity | default('') %}
+    {% set s2 = states(se) if se else '' %}
     {{ {'raw': raw if ok else '', 'unit': (state_attr(entity, 'unit_of_measurement') or '') if ok else '', 'level': lvl,
-        'second': s2 if s2 not in ['unknown', 'unavailable', 'none', ''] else '', 'second_unit': (state_attr(secondary_entity, 'unit_of_measurement') or '') if secondary_entity else ''} }}
+        'second': s2 if s2 not in ['unknown', 'unavailable', 'none', ''] else '', 'second_unit': (state_attr(se, 'unit_of_measurement') or '') if se else ''} }}
   ds_last_ts: |-
     {% set ns = namespace(t=0) %} {% for e in [entity] %}
       {% if e %}{% for s in expand(e) %}{% set ns.t = [ns.t, as_timestamp(s.last_reported | default(s.last_updated), 0)] | max %}{% endfor %}{% endif %}

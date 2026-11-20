@@ -184,12 +184,6 @@
 {%- macro LEVEL_FILL(k) -%}{{ color.severe if k == 'sev' else color.warningChip }}{%- endmacro -%}
 {%- macro LEVEL_TEXT(k) -%}{{ (color.onSevere if k == 'sev' else color.onWarning) if k else 'black' }}{%- endmacro -%}
 {%- macro LEVEL_MARK(k) -%}{{ color.severeMark if k == 'sev' else '' }}{%- endmacro -%}
-{#- the longest run of whole words of v that fits mw at size s / font f (a lone first word that is too long is kept, and cut by the layout) -#}
-{%- macro FITW(v, mw, s, f) -%}
-{%- set fw = namespace(t='', stop=false) -%}
-{%- for w in (v | string).split(' ') -%}{%- if not fw.stop -%}{%- if loop.first or (VALUE_W(fw.t ~ ' ' ~ w, s, f) | int) <= mw -%}{%- set fw.t = (fw.t ~ ' ' ~ w) | trim -%}{%- else -%}{%- set fw.stop = true -%}{%- endif -%}{%- endif -%}{%- endfor -%}
-{{- fw.t -}}
-{%- endmacro -%}
 {#- a flagged label/value detail row: one chip spans the label and the value (they change together) -#}
 {%- macro DCHIP(ns, lab, lf, ls, v, x0, xr, cy, f, s, bg, fg, vopt=false, h=0) -%}
 {#- a label/value row as one chip. The label is cut short so it keeps space.l from the value; the value is never cut.
@@ -697,9 +691,8 @@
 {%- for o in [0, 1, -1, 2, -2][:EP_TK.line.series] -%}{{- L(ns, x0 + (o if st else 0), y0 - (0 if st else o), x1 + (o if st else 0), y1 - (0 if st else o), 1) -}}{%- endfor -%}
 {%- endmacro -%}
 
-{#- HERO_ADVANCE: a Space Grotesk Bold string's advance width at size hs (HWR: measured advance per character as a share of the size).
-     HERO_INK_W: its ink width: the advance less the first character's left and the last one's right side bearing (SGB, SGR) -#}
-{%- macro HERO_ADVANCE(t, hs) -%}{%- set w = namespace(v=0) -%}{%- for c in (t | string) -%}{%- set w.v = w.v + (HWR[c] if c in HWR else 0.6) * hs -%}{%- endfor -%}{{ w.v | round | int }}{%- endmacro -%}
+{#- HERO_INK_W: a Space Grotesk Bold string's ink width at size hs: its advance (HWR: measured advance per character as a share of the size)
+     less the first character's left and the last one's right side bearing (SGB, SGR) -#}
 {%- macro HERO_INK_W(t, hs) -%}{%- set t = t | string -%}{%- set w = namespace(v=0) -%}{%- for c in t -%}{%- set w.v = w.v + (HWR[c] if c in HWR else 0.6) * hs -%}{%- endfor -%}
 {%- set l = (SGB[hs][t[:1]] if hs in SGB and t[:1] in SGB[hs] else 0) -%}{%- set r = (SGR[hs][t[-1:]] if hs in SGR and t[-1:] in SGR[hs] else 0) -%}{{ (w.v - l - r) | round | int }}{%- endmacro -%}
 {#- HERO_LEFT: left x of a hero group beside other content (number + gap + icon) centred by ink in the hero column [P, xr] -#}

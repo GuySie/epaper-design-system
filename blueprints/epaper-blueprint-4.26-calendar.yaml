@@ -74,8 +74,8 @@ blueprint:
                 domain: calendar
         days_shown:
           name: Days shown
-          description: How many days ahead to display, starting today. With many days and/or busy calendars, content may overflow
-            the display's 300px height.
+          description: How many days ahead to display, starting today. Days that don't fit are left out; a day that doesn't
+            fit whole ends with "+N more".
           default: 6
           selector:
             number:
@@ -177,7 +177,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'rjqwzd'
+  ds_set: 'uwydvo'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'

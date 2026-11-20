@@ -54,7 +54,7 @@ A page can reuse another page's modules without becoming a version of it: a Hero
 
 ## Principles
 
-1. **Pixel-first.** Panels are 1-bit per colour plane. Design at the panel's real resolution, with bitmap type at its native size (or an exact 2× cut) and solid primitives. Nothing is designed smooth and then downscaled.
+1. **Pixel-first.** Panels have a few flat colours: one bit per colour plane, or a few grey levels. Design at the panel's real resolution, with bitmap type at its native size (or an exact 2× cut) and solid primitives. Nothing is designed smooth and then downscaled.
 2. **Colour is earned.** The warning and severe colours signal something that needs attention. They are never decoration, and never the only cue.
 3. **Fixed sizes, not ranges.** Every size (type, icon, padding, row, gap) is a token: a tier value, a step on a scale (spacing, icon ladder, hero sizes), a rule over other tokens or a measured metric (see *Token register*). Blueprints pick from them; they don't invent sizes.
 4. **Content has a budget.** Dynamic data is unbounded. Every module has a row and character budget per tier, and a rule for what happens when content overflows. Nothing runs past the panel edge, and text never shrinks to fit.
@@ -180,11 +180,17 @@ What each font measures on each tier (x-height / cap height):
 <!-- registry:tier-hero -->
 | Page | Screen | Hero group | Hero | Hero icon | Strip icons (hour / day) | Digit height | mm |
 |---|---|---|---|---|---|---|---|
-| Weather at a glance | 1.4" | on its own | 80 px | 80 → 48 | — | 58 px | 7.5 |
-| Weather at a glance | 3.5" | on its own | 88 px | 88 → 56 | — | 64 px | 13.2 |
+| Doors & windows | 1.4" | on its own | 112 px | 112 → 72 | — | 81 px | 10.5 |
+| Medication | 2.7" L | on its own | 88 px | 88 → 56 | — | 64 px | 10.7 |
+| Next appointment | 3.5" | beside other content | 104 px | 88 | — | 75 px | 15.5 |
+| Next appointment | 4.1" | beside other content | 128 px | 112 | — | 93 px | 19.5 |
+| Next appointment | 4.26" | beside other content | 256 px | 224 | — | 187 px | 21.7 |
 | Single value | 1.4" | on its own | 72 px | 72 → 48 | — | 53 px | 6.9 |
 | Single value | 2.7" L | on its own | 88 px | 88 → 56 | — | 64 px | 10.7 |
 | Single value | 3.5" | on its own | 104 px | 104 → 64 | — | 75 px | 15.5 |
+| Value with details | 4.1" | beside other content | 56 px | 48 | — | 41 px | 8.6 |
+| Value with details | 7.5" L | beside other content | 104 px | 88 | — | 75 px | 15.3 |
+| Value with details | 7.5" P | beside other content | 104 px | 88 | — | 75 px | 15.3 |
 | Weather | 2.7" L | beside other content | 72 px | 64 | — | 53 px | 8.9 |
 | Weather | 2.7" P | beside other content | 72 px | 64 | — | 53 px | 8.9 |
 | Weather | 3.5" | beside other content | 64 px | 56 | — | 47 px | 9.7 |
@@ -192,15 +198,9 @@ What each font measures on each tier (x-height / cap height):
 | Weather | 4.26" | beside other content | 160 px | 136 | 32 / 40 | 117 px | 13.6 |
 | Weather | 7.5" L | beside other content | 160 px | 136 | 32 / 40 | 117 px | 23.9 |
 | Weather | 7.5" P | beside other content | 160 px | 136 | 24 / 32 | 117 px | 23.9 |
-| Medication | 2.7" L | on its own | 88 px | 88 → 56 | — | 64 px | 10.7 |
-| Doors & windows | 1.4" | on its own | 112 px | 112 → 72 | — | 81 px | 10.5 |
 | Weather and calendar | 7.5" P | beside other content | 152 px | 128 | — | 111 px | 22.6 |
-| Next appointment | 3.5" | beside other content | 104 px | 88 | — | 75 px | 15.5 |
-| Next appointment | 4.1" | beside other content | 128 px | 112 | — | 93 px | 19.5 |
-| Next appointment | 4.26" | beside other content | 256 px | 224 | — | 187 px | 21.7 |
-| Value with details | 4.1" | beside other content | 56 px | 48 | — | 41 px | 8.6 |
-| Value with details | 7.5" L | beside other content | 104 px | 88 | — | 75 px | 15.3 |
-| Value with details | 7.5" P | beside other content | 104 px | 88 | — | 75 px | 15.3 |
+| Weather at a glance | 1.4" | on its own | 80 px | 80 → 48 | — | 58 px | 7.5 |
+| Weather at a glance | 3.5" | on its own | 88 px | 88 → 56 | — | 64 px | 13.2 |
 <!-- /registry:tier-hero -->
 
 - **TRMNL12 on 1.4" and 2.7".** Never on 1.4". On 2.7" only for **all-caps field labels** beside a value (RAIN, WIND, MAX/MIN) and the **update stamp** (capitals and digits only, `SA 14:10`): capitals are what you read there, and their cap height (<!-- v:mm:384x168-0.17:12:cap -->1.3<!-- /v --> mm) clears the label minimum, while TRMNL12's lowercase (<!-- v:mm:384x168-0.17:12:x -->1.0<!-- /v --> mm) only just meets it. Everything else on 2.7" (data, units, captions, footers) stays TRMNL16 or larger.
@@ -641,27 +641,27 @@ Three levels, the same on every module:
 <!-- registry:thresholds -->
 | Page | Data | Warning | Severe |
 |---|---|---|---|
-| Weather at a glance, Weather, Weather and calendar | Cold (`*_temp_low`) | ≤ 3° | ≤ 0° |
+| Claude usage | Usage | ≥ 90 % | ≥ 100 % |
+| CO2 graph | Concentration | ≥ 1000 ppm | ≥ 1400 ppm |
+| Doors & windows | An opening is open | any opening | the openings in `severe_openings` |
+| Energy price (EnergyZero) | Price per kWh | ≥ 15 ct/kWh | ≥ 25 ct/kWh |
+| History graph, Single value | The value, high (`*_high`, at or above) and low (`*_low`, at or below) | the user's value | the user's value |
+| Levels | Each row's share of its maximum, high and low | the user's value | the user's value |
+| Medication | Hours since the last press | ≥ 24 h | ≥ 36 h |
+| Plant moisture | Soil moisture | ≤ 25 % | ≤ 14 % |
+| Rain forecast, Rain forecast (Netherlands) | Rain per hour | ≥ 2.5 mm/h | ≥ 10 mm/h |
+| To-do list | An item's due day | due today | overdue |
+| Value with details | The value, high and low, as on Single value | the user's value | the user's value |
+| Weather, Weather and calendar, Weather at a glance | Cold (`*_temp_low`) | ≤ 3° | ≤ 0° |
 |  | Heat (`*_temp_high`) | ≥ 27° | ≥ 35° |
 |  | Wind, in the weather entity's own wind unit; the defaults suit km/h (`*_wind_high`) | ≥ 50 | ≥ 75 |
 |  | Rain per hour (`*_rain_hour`) | ≥ 2.5 mm/h | ≥ 10 mm/h |
 |  | Rain per day, today's total included (`*_rain_day`) | ≥ 10 mm | ≥ 25 mm |
 |  | Pollen (`*_pollen_high`, where a pollen sensor is an input) | sensor level *high* | sensor level *very high* |
 |  | Condition (`*_conditions`, a list) | `hail`, `lightning`, `lightning-rainy`, `exceptional` | none (empty list) |
-| Single value, History graph | The value, high (`*_high`, at or above) and low (`*_low`, at or below) | the user's value | the user's value |
-| Medication | Hours since the last press | ≥ 24 h | ≥ 36 h |
-| Doors & windows | An opening is open | any opening | the openings in `severe_openings` |
-| Rain forecast (Netherlands), Rain forecast | Rain per hour | ≥ 2.5 mm/h | ≥ 10 mm/h |
-| CO2 graph | Concentration | ≥ 1000 ppm | ≥ 1400 ppm |
-| Claude usage | Usage | ≥ 90 % | ≥ 100 % |
-| Levels | Each row's share of its maximum, high and low | the user's value | the user's value |
-| Plant moisture | Soil moisture | ≤ 25 % | ≤ 14 % |
-| Energy price (EnergyZero) | Price per kWh | ≥ 15 ct/kWh | ≥ 25 ct/kWh |
-| To-do list | An item's due day | due today | overdue |
-| Value with details | The value, high and low, as on Single value | the user's value | the user's value |
 <!-- /registry:thresholds -->
 
-- **No thresholds** on <!-- v:noThresholdPages -->Sun & moon, Entities, Calendar, Next appointment, Tiles<!-- /v -->: nothing can be bad there, or (Entities, Tiles) one pair can't fit up to 12 arbitrary sensors, which show "—" and the error state instead.
+- **No thresholds** on <!-- v:noThresholdPages -->Calendar, Entities, Next appointment, Sun & moon, Tiles<!-- /v -->: nothing can be bad there, or (Entities, Tiles) one pair can't fit up to 12 arbitrary sensors, which show "—" and the error state instead.
 - **Page-specific threshold rules** are with their page: weather (pollen levels, conditions, official warnings, high/low, the *Override order*) in *Weather at a glance and Weather*, the redraw at a deadline in *Medication*.
 
 ### Unavailable, stale, empty and error
@@ -693,7 +693,7 @@ A component is one drawn building block with a fixed job; it can contain other c
 | **QR code** | A QR code with its quiet zone, QR modules on whole pixels | data | `tier.pitch`, `space.l` | — (mock-up; drawcustom's `qrcode` element) |
 | **Empty statement** | One centred text line where a module has nothing to say | message | `type.primary` (strong), one step down to `type.data` when it doesn't fit | `EMPTY` (reads its tokens) |
 | **Moon badge** | The moon phase on a weather hero icon | icon box | `icon.moonBadge` | `MOON_BADGE` |
-| **Hero group** | Number then icon, centred by ink in the space it owns. Two versions: *on its own* (in the hero block) and *beside other content* (in the hero band, the event hero); see *Hero group* | number, icon, area, level | `type.hero*`, `icon.hero*`, `space.heroGap` | `HERO_ALONE` on its own, `HERO_SHARED` beside other content; `HERO_LEFT`, `HERO_INK_X`, `HERO_ADVANCE` |
+| **Hero group** | Number then icon, centred by ink in the space it owns. Two versions: *on its own* (in the hero block) and *beside other content* (in the hero band, the event hero); see *Hero group* | number, icon, area, level | `type.hero*`, `icon.hero*`, `space.heroGap` | `HERO_ALONE` on its own, `HERO_SHARED` beside other content; `HERO_LEFT`, `HERO_INK_X` |
 | **Glance secondary** | The one text line under the hero on a Glance: a value as plain text, or a chip at a level; its box is a chip's height. What goes there is the page's rule (the weather's: today's high/low, *Glance with a footer*) | text, level | `type.secondary`, `chip.*` | drawn in `HBLOCK`; the weather's is `SECOND` |
 | **Hour cell / Day cell** | One column of a strip: label, optional icon, values. Rules: *Hour cell / Day cell*, below the table | hour or day | `type.data`, `space.xs`, `icon.strip*`, `chip.*` | `HCELL`, `DCELL`, `DATA_REGULAR` |
 | **Forecast row** | One row of the 2.7" portrait's forecast table: label, mm, temperature. Rules: *Forecast row*, below the table | hour or day | `type.data`, `space.row`, `space.l`, `chip.*` | `RROW`, `RCHIP` |
@@ -757,12 +757,12 @@ A module is one block of content on a screen, built from components (and other m
 | **Date-grouped list** | Day headers and event rows, with an overflow text line. Rules: *Date-grouped list*, below the table. | events | `type.label`, `type.data`, `space.rowDense`, `space.s`, `space.l`, `color.ink`, `color.paper` | `DLIST` (reads its tokens); `DAY_HEAD_H` is the day header height to budget with |
 | **Event list** | Next appointment: start time column, title, label text line. Rules: *Event list* under *Patterns*. | events | `type.primary`, `type.label` | `ELIST` (reads its tokens), with `EFREE` for the free-time footer |
 | **Event hero** | Next appointment with one event: label text line (day, or the NOW chip) with the time range, the start (the end while it runs) as a hero beside other content, the title. | event | `type.data`, `type.heroShared`, `type.primary` (regular cut), `space.l`, `color.ink`, `color.paper` | `EHERO` (reads its tokens; the 3.5", 4.1" and 4.26" share it) |
-| **Meters** | Progress bars stacked. Rules: *Meters* under *Patterns*. | — | — | — |
+| **Meters** | Progress bars stacked. Rules: *Meters* under *Patterns*. | bars | `type.primary`, `type.data`, `type.label`, `space.m`, `space.l` | `METER_ROWS` (each bar by `PBAR`) |
 | **Chart** | Plot, label margin, clock-time axis, thresholds, severe fills. | series, thresholds | `type.label`, `line.*`, `space.s` | `CFRAME`, `CTHRESH`, `CBASE`, `CAXIS` (read their tokens); bars, series and notches stay in each chart |
 | **Timeline** | Sun and moon track with markers and the sun path. Rules: *Timeline* under *Patterns*. | sun, moon | `icon.inline`, `icon.markerDisc`, `line.tick`, `type.label` | `TMARK` for markers, `SERIES` for the path, `CAXIS` for the compass row; the heights follow the vertical rhythm in *Sun & moon* |
 | **Checkbox rows** | Checkbox rows in one or two columns, open items first. Rules: *Checklist* under *Patterns*. | items, done, due, level | `type.data`, `type.label`, `space.row`, `space.s`, `space.l`, `line.base` | `CHECKROWS` |
 | **Tiles** | Repeated icon–state–label unit in a grid. Rules: *Tiles* under *Patterns*. | icon, state, label | `type.data`, `type.label`, `space.m`, `line.base` | `TILEGRID` |
-| **Level meter** | *Reserved: no blueprint uses it.* A level in four segments. Rules: *Level meter*, below the table. | — | — | — |
+| **Level meter** | *Reserved: no blueprint uses it.* A level in four segments. Rules: *Level meter*, below the table. | level | — | `METER` |
 | **Hero block** | The hero group *on its own* and the Glance secondary under it, centred as one block (*Hero group*, hero centring; the secondary's chip box is reserved, so nothing moves when a chip appears). The Glance's one module under the title row; see *Glance*. | hero, icon, levels, Glance secondary | `type.heroAlone`, `icon.heroAloneSteps`, `type.secondary`, `space.heroGap` | `HBLOCK`, `HERO_BLOCK_Y` |
 | **Hero band** | The hero group *beside other content* and the detail rows, **centred by ink between the title line and the next line** (the strip's, or the module's). Rules: *Hero dashboard* under *Patterns*. | hero, icon, rows | `type.heroShared`, `icon.heroShared`, `space.l` | `HBAND` |
 | **Forecast table** | The 2.7" portrait's strips: forecast rows for the hours, the days and the pollen, stacked bottom up as one block of fixed rows; see *Forecast row*. | hours, days, pollen | `type.data`, `space.row`, `space.l` | `RROW` |
@@ -794,7 +794,7 @@ The label left in `type.fieldLabel`, the value right on the padding in the data 
   - **Every blueprint has a *Header title* input.** Left blank, the title is a translated default that names what the screen shows (`WEATHER`, `CALENDAR`, `PLANTS`). One qualifier may follow after ` · ` when it tells devices of the same kind apart (`CO2 · BEDROOM` from the sensor's area, `WEATHER · AMSTERDAM` on the 7.5", `MEDICATION · LAST TAKEN` so the hero time reads as the last dose); a typed title replaces the whole default.
   - **Width:** the title gets what is left after the stamp: the canvas minus both paddings, the stamp's measured width (its chip included when stale) and a gap of L. A longer title is cut with "..." (*A label never overlaps its value*).
 - **Update stamp:** quieter than the title, because it is a check, not data: `type.stamp` (*Derived*). Never TRMNL16 Regular: its 1 px strokes are under `stroke.min`, and unlike a unit the stamp has to be read exactly. Right-aligned, ink ending at W − P − 1, on the title's baseline (a TRMNL12 stamp sits 2 px below a TRMNL16 title's middle anchor). The title's width is measured against this smaller stamp. It is **weekday + time** (`SU 17:58`, `FR 6:05 PM`), a 2-letter weekday in capitals (the `STAMP` macro), on every layout except Medication (see *Medication*). A device that stops updating keeps its last image, so a date-less time can't tell you the image is from yesterday; the weekday can.
-- **Stale chip:** when the data source stops reporting while the automation still runs, the stamp shows the source's last report (weekday + time) in an ink chip with "!" (`chip.stale`: fill `color.ink`, text `color.paper`, prefix `! `; an outline with ink text and "!" where warnings are outlines). It is not a warning chip: old data is not an alarm about the world, and the mark and its place in the title row tell it apart. The chip goes back to the title's font and size (`type.title`), so a stale screen is louder than a healthy one (the *Mark data as stale after* input, default <!-- v:shared:stale_after -->60 min<!-- /v -->, 0 turns it off). It reads `last_reported`, not `last_updated`: a value that stays the same for hours is not stale as long as the source keeps reporting it. With several sources (entity list, plants, pollen next to weather) the newest report counts: one quiet door sensor doesn't mark the whole screen stale. Every blueprint whose data comes from reporting entities has the input. Exempt are the blueprints whose data Home Assistant computes or fetches at the moment it redraws, so there is nothing to go stale, and the two that redraw only on a change of their own (Medication, which has no stamp; Doors & windows, where there is no redraw at which old data could be marked): <!-- v:noStalePages -->Medication, Doors & windows, Sun & moon, Calendar, Next appointment, Energy price (EnergyZero), To-do list<!-- /v -->.
+- **Stale chip:** when the data source stops reporting while the automation still runs, the stamp shows the source's last report (weekday + time) in an ink chip with "!" (`chip.stale`: fill `color.ink`, text `color.paper`, prefix `! `; an outline with ink text and "!" where warnings are outlines). It is not a warning chip: old data is not an alarm about the world, and the mark and its place in the title row tell it apart. The chip goes back to the title's font and size (`type.title`), so a stale screen is louder than a healthy one (the *Mark data as stale after* input, default <!-- v:shared:stale_after -->60 min<!-- /v -->, 0 turns it off). It reads `last_reported`, not `last_updated`: a value that stays the same for hours is not stale as long as the source keeps reporting it. With several sources (entity list, plants, pollen next to weather) the newest report counts: one quiet door sensor doesn't mark the whole screen stale. Every blueprint whose data comes from reporting entities has the input. Exempt are the blueprints whose data Home Assistant computes or fetches at the moment it redraws, so there is nothing to go stale, and the two that redraw only on a change of their own (Medication, which has no stamp; Doors & windows, where there is no redraw at which old data could be marked): <!-- v:noStalePages -->Calendar, Doors & windows, Energy price (EnergyZero), Medication, Next appointment, Sun & moon, To-do list<!-- /v -->.
 - The title row has no icons.
 - **Line:** the row ends in the screen's standard line.
 - **Height (`space.titleRow`, *Derived*):** the title caps start at P (accents above them hang, *Text rules*, *Accents hang*), and the line sits S under the caps, as the footer's line sits S above its caps.
@@ -818,21 +818,21 @@ The footer is an **optional single text line at the bottom of a screen**. It say
 <!-- registry:footers -->
 | Page and screens | Footer |
 |---|---|
-| Weather at a glance 1.4", 3.5" | the alert, else (a) forecast conclusion with pollen at the right (*Glance with a footer*) |
-| Single value 1.4", 2.7" L, 3.5"; Medication 2.7" L; Doors & windows 1.4" | none (Glance) |
+| Calendar 4.1", 4.26"; Entities 3.5"; Levels 2.7" L, 3.5", 4.1"; Tiles 1.4", 2.7" P, 2.7" L, 3.5", 4.1", 7.5" L, 7.5" P; Value with details 4.1", 7.5" L, 7.5" P; Weather and calendar 7.5" P | none |
+| Claude usage 3.5" | (a) on schedule / furthest ahead, when it fits |
+| CO2 graph 3.5"; Rain forecast 3.5", 2.7" L; Rain forecast (Netherlands) 3.5", 2.7" L | (a) chart summary; none when there's nothing to show |
+| Doors & windows 1.4"; Medication 2.7" L; Single value 1.4", 2.7" L, 3.5" | none (Glance) |
+| Energy price (EnergyZero) 3.5", 2.7" L | (a) the current price and the cheapest run (*Bar chart for prices*, Footer) |
+| History graph 2.7" L, 3.5", 4.1" | (a) the current value, and the period's lowest and highest |
+| Next appointment 3.5", 4.1", 4.26" | (a) free until / free from, when it fits |
+| Plant moisture 4.1" | (a) number to water, when any and when it fits |
+| Sun & moon 3.5" | (a) day length (the moon and its phase are on the timeline) |
+| To-do list 2.7" L, 2.7" P, 3.5", 4.1", 7.5" L, 7.5" P | (a) the count of open and done items |
 | Weather 2.7" L, 3.5" | none (no room; the strip is the last module) |
 | Weather 2.7" P | the alert, else (a) forecast conclusion (*Override order*, Footer) |
 | Weather 4.1", 7.5" P | (a) forecast conclusion |
 | Weather 4.26", 7.5" L | none (strips fill the panel; sunrise/sunset in the detail rows) |
-| Rain forecast (Netherlands) 3.5", 2.7" L; Rain forecast 3.5", 2.7" L; CO2 graph 3.5" | (a) chart summary; none when there's nothing to show |
-| History graph 2.7" L, 3.5", 4.1" | (a) the current value, and the period's lowest and highest |
-| Sun & moon 3.5" | (a) day length (the moon and its phase are on the timeline) |
-| Claude usage 3.5" | (a) on schedule / furthest ahead, when it fits |
-| Levels 2.7" L, 3.5", 4.1"; Entities 3.5"; Weather and calendar 7.5" P; Calendar 4.1", 4.26"; Tiles 1.4", 2.7" P, 2.7" L, 3.5", 4.1", 7.5" L, 7.5" P; Value with details 4.1", 7.5" L, 7.5" P | none |
-| Plant moisture 4.1" | (a) number to water, when any and when it fits |
-| Next appointment 3.5", 4.1", 4.26" | (a) free until / free from, when it fits |
-| Energy price (EnergyZero) 3.5", 2.7" L | (a) the current price and the cheapest run (*Bar chart for prices*, Footer) |
-| To-do list 2.7" L, 2.7" P, 3.5", 4.1", 7.5" L, 7.5" P | (a) the count of open and done items |
+| Weather at a glance 1.4", 3.5" | the alert, else (a) forecast conclusion with pollen at the right (*Glance with a footer*) |
 <!-- /registry:footers -->
 
 ## Composition
@@ -898,7 +898,7 @@ Bar chart and Line chart share the chart frame; the Timeline shares its clock-ti
 
 Every Glance page draws with one macro, `GLANCE`: the title row and the hero block (the hero group on its own and the Glance secondary under it, centred as one block; `HBLOCK`). The page passes the title, the stamp, the hero and its icon, and the Glance secondary: plain text, a chip at a level, or one it draws itself (the weather's high/low, *Glance with a footer*).
 
-- A readout for across the room (<!-- v:uses:glance,glance/footer -->Weather at a glance, Single value, Medication, Doors & windows<!-- /v -->).
+- A readout for across the room (<!-- v:uses:glance,glance/footer -->Doors & windows, Medication, Single value, Weather at a glance<!-- /v -->).
   1. **Everything with data is large:** the hero (`type.heroAlone`, the hero group *on its own*) and **at most one secondary value**, in `type.secondary` (TRMNL21 Bold). If a value isn't worth that size, it belongs on another pattern.
   2. **Severity takes the Glance secondary:** the flagged item replaces the secondary value as a chip, at the same large size. Temperature chips the hero itself. (*Glance with a footer* puts it in the footer instead.)
   3. **The only small text is the title and the update stamp**, in the title row. They are metadata, so they only need the label minimum.
@@ -983,7 +983,7 @@ Bar and line charts share one frame. The Rain forecast is the reference Bar char
 
 #### Bar chart with thresholds, Line chart with thresholds
 
-The chart frame with a warning and a severe input (*Thresholds*); its scale is the one the page names: built from the severe value, the rain intensity's logarithmic scale, or the automatic scale (*Chart frame (all charts)*, *Fixed y-scale*). Used by <!-- v:uses:bar-chart/thresholds,line-chart/thresholds -->Rain forecast (Netherlands), Rain forecast, CO2 graph, History graph<!-- /v -->; Value with details draws the History graph's chart in its bottom half.
+The chart frame with a warning and a severe input (*Thresholds*); its scale is the one the page names: built from the severe value, the rain intensity's logarithmic scale, or the automatic scale (*Chart frame (all charts)*, *Fixed y-scale*). Used by <!-- v:uses:bar-chart/thresholds,line-chart/thresholds -->CO2 graph, History graph, Rain forecast, Rain forecast (Netherlands)<!-- /v -->; Value with details draws the History graph's chart in its bottom half.
 
 - **Thresholds.** At most two (warning, severe), and a second pair where the page has low thresholds (History graph); left out when the chart has nothing to show (*Chart frame (all charts)*, *Exception, nothing to show*). Each is a dashed line at `line.base` (`line.dash`) across the full plot width. A bar or a span at the warning level takes the warning colour, as *Severity* says (Charts on BWRY).
 - **Switched off** (`flag_<what>` off, *Thresholds*): the chart is drawn without its thresholds. No threshold lines and no values beside them, no severe fill, no warning colour, and the footer states its facts without a chip. The scale and the plot stay as they are: the scale is still built from the severe value (*Chart frame (all charts)*, *Fixed y-scale*) and keeps its top value where it shows one, and the label margin keeps the width it has with the switch on, so switching off never rescales or moves the chart.
@@ -1007,10 +1007,10 @@ The chart frame with a warning and a severe input, as *Bar chart with thresholds
 
 #### Line charts
 
-1. **Stroke.** `line.series` ink, drawn as 1 px lines (*Lines and strokes*), straight segments, square joins, snapped to whole pixels. Dashes on a curve are measured along its length, never per segment. Use a step line for states and setpoints.
+1. **Stroke.** `line.series` ink, drawn as 1 px lines (*Lines and strokes*), straight segments, square joins, snapped to whole pixels. Dashes on a curve are measured along its length, never per segment. A step line for states and setpoints is a proposal: no page draws one yet.
 2. **No area fill**, except flagged spans (from baseline to line, in the level's colour): above a high threshold, and under a low one where the page has low thresholds (History graph).
 3. **Current value.** A filled square (3 × `line.series` wide) on the latest point, or on the render-time point of a forecast chart. Its value and time go in the title row or footer.
-4. **Measured vs forecast.** Measured is solid and forecast is dashed (`line.forecastDash`). A dotted vertical line (`line.dot`) at the render time splits them, labelled with that clock time above the plot.
+4. **Measured vs forecast.** *A proposal for charts: no chart page draws a forecast yet (the Sun & moon path does, *Timeline*).* Measured is solid and forecast is dashed (`line.forecastDash`). A dotted vertical line (`line.dot`) at the render time splits them, labelled with that clock time above the plot.
 5. **Two series at most.** The primary is the thick solid line; the secondary is thinner and dashed. Name them in a legend of line samples above the plot, never by colour. No page draws a second series yet: the second series and the legend are a proposal until one does.
 6. **Gaps.** More than two missing samples breaks the line. Never draw across missing data.
 7. **Scale labels.** Without thresholds, the margin shows the scale's top and bottom values. With thresholds, it shows the threshold values (plus the top when there's room).
@@ -1070,7 +1070,7 @@ A list of to-do items: checkbox rows, filled first, and the footer.
 - **Footer:** the count (`14 OPEN · 4 DONE`, `14 OPEN` where narrow or where the done items are left out by the switch). It is always shown and never gives way to one more item: when the list overflows, the count says how much is hidden.
 - **Flagged:** an overdue item is a severe row chip, one due today a warning chip; the chip spans box, item and due day like a key-value row chip, and a row keeps its place when it is flagged. A switch turns the flagging off.
 - **Nothing to show:** no open items and no done ones to show is one empty statement.
-- Widest readings: an item of 40 characters (cut with an ellipsis before its due day), the due day `VANDAAG`, the footer `99 OPEN · 99 DONE`.
+- Widest readings: an item of 40 characters (cut with an ellipsis before its due day), the due day in its longest translation (Dutch, seven letters), the footer `99 OPEN · 99 DONE`.
 
 ### Mocked-up patterns
 
@@ -1135,36 +1135,36 @@ A page is a pattern filled with real content for one use. Each page names the pa
 <!-- registry:pages -->
 | Page | Uses | Status | Widest reading | 1.4" | 2.7" L | 2.7" P | 3.5" | 4.1" | 4.26" | 7.5" L | 7.5" P | 7.09" (no tier yet) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Weather at a glance** | Glance with a footer | live | -12° | ● | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
-| **Single value** | Glance | live | -12.5 | ● | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
-| **Weather** | Hero dashboard with forecast strips | live | -12° | — | ● | ● | ● | ● | ● | ● | ● | ○ |
-| **Medication** | Glance | live | 20:00 | — | ● | — | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Doors & windows** | Glance | live | — | ● | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Rain forecast (Netherlands)** | Bar chart with thresholds | live | 50 mm/h | — | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
-| **Rain forecast** | Bar chart with thresholds | live | 50 mm/h | — | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
-| **CO2 graph** | Line chart with thresholds | live | 4000 | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
-| **History graph** | Line chart with thresholds | live | -12.5 | — | ● | ○ | ● | ● | ○ | ○ | ○ | ○ |
-| **Sun & moon** | Timeline | live | 10:44am | — | ○ | — | ● | ○ | ○ | ○ | ○ | ○ |
-| **Claude usage** | Meters | live | — | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
-| **Levels** | Meters | live | 1240 ppm | — | ● | ○ | ● | ● | ○ | ○ | ○ | ○ |
-| **Entities** | Key-value list | live | — | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
-| **Plant moisture** | Key-value list | live | — | — | ○ | ○ | ○ | ● | ○ | ○ | ○ | ○ |
-| **Weather and calendar** | Hero dashboard with a chart or list | live | -12° | — | — | — | — | — | — | — | ● | — |
-| **Calendar** | Grouped list | live | — | — | ○ | ○ | ○ | ● | ● | ○ | ○ | ○ |
-| **Next appointment** | Event list | live | 20:00 | — | ○ | ○ | ● | ● | ● | ○ | ○ | ○ |
-| **Bin day** | Glance with a word | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Room sign** | Glance with a word | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Appliance run** | Glance with a progress bar | mock | 20:00 | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Energy price (EnergyZero)** | Bar chart for prices | live | -10 ct | — | ● | — | ● | ○ | ○ | ○ | ○ | ○ |
+| **Bin day** | Glance with a word | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Calendar** | Grouped list | live | — | — | ○ | ○ | ○ | ● | ● | ○ | ○ | ○ |
+| **Claude usage** | Meters | live | — | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
+| **CO2 graph** | Line chart with thresholds | live | 4000 | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Departures** | Event list with line numbers | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Solar & battery** | Meters both ways | mock | 100% | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **To-do list** | Checklist | live | — | — | ● | ● | ● | ● | ○ | ● | ● | ○ |
-| **Tiles** | Tiles | live | Triggered | ● | ● | ● | ● | ● | ○ | ● | ● | ○ |
-| **Month overview** | Month | mock | — | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Message board** | Note | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Now playing** | Note with a progress bar | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Doors & windows** | Glance | live | — | ● | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Energy price (EnergyZero)** | Bar chart for prices | live | -10 ct | — | ● | — | ● | ○ | ○ | ○ | ○ | ○ |
+| **Entities** | Key-value list | live | — | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Guest Wi-Fi** | Code | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **History graph** | Line chart with thresholds | live | -12.5 | — | ● | ○ | ● | ● | ○ | ○ | ○ | ○ |
+| **Levels** | Meters | live | 1240 ppm | — | ● | ○ | ● | ● | ○ | ○ | ○ | ○ |
+| **Medication** | Glance | live | 20:00 | — | ● | — | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Message board** | Note | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Month overview** | Month | mock | — | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Next appointment** | Event list | live | 20:00 | — | ○ | ○ | ● | ● | ● | ○ | ○ | ○ |
+| **Now playing** | Note with a progress bar | mock | — | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Plant moisture** | Key-value list | live | — | — | ○ | ○ | ○ | ● | ○ | ○ | ○ | ○ |
+| **Rain forecast** | Bar chart with thresholds | live | 50 mm/h | — | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
+| **Rain forecast (Netherlands)** | Bar chart with thresholds | live | 50 mm/h | — | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
+| **Room sign** | Glance with a word | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Single value** | Glance | live | -12.5 | ● | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
+| **Solar & battery** | Meters both ways | mock | 100% | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Sun & moon** | Timeline | live | 10:44am | — | ○ | — | ● | ○ | ○ | ○ | ○ | ○ |
+| **Tiles** | Tiles | live | Triggered | ● | ● | ● | ● | ● | ○ | ● | ● | ○ |
+| **To-do list** | Checklist | live | — | — | ● | ● | ● | ● | ○ | ● | ● | ○ |
 | **Value with details** | Hero dashboard with a chart or list | live | -12.5 | — | — | — | — | ● | — | ● | ● | — |
+| **Weather** | Hero dashboard with forecast strips | live | -12° | — | ● | ● | ● | ● | ● | ● | ● | ○ |
+| **Weather and calendar** | Hero dashboard with a chart or list | live | -12° | — | — | — | — | — | — | — | ● | — |
+| **Weather at a glance** | Glance with a footer | live | -12° | ● | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 <!-- /registry:pages -->
 
 **Rules for every page:**
@@ -1173,6 +1173,480 @@ A page is a pattern filled with real content for one use. Each page names the pa
 - **Clock times, never countdowns of minutes** (*Text rules*, *Clock times, never relative times*).
 - **The widest reading decides the layout.** Every size and every layout is chosen for the widest reading the page's entity can show (`100%`, `4000`, `-12°`, day `28`), so a screen keeps its layout from one reading, and one state, to the next. The one exception is the hero on its own, fitted on its ordinary reading: at a wider one its icon gives way (*Hero group*, *Wide readings*).
 - **Labels don't change with the state** (`NET`, not `NET IMPORT` / `NET EXPORT`): a direction goes in the value (`-0.4 kW`).
+
+### Calendar
+
+A Grouped list: the coming days with their events.
+
+- **Shows:** the coming days (`days_shown`), each under its day header, with its events; overflow as "+N more".
+- **Tested with:** a full week that overflows, and an empty day.
+- **In progress:** an event in progress (`NOW`) is an ink row chip (*Severity*, *Now is not a severity*).
+- **Today** is not an alert. Mark it by name (the date header reads "TODAY" from `language_map`), never with colour or weight.
+
+<!-- registry:inputs-calendar -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `calendar_entities`, `days_shown` |
+<!-- /registry:inputs-calendar -->
+
+<!-- registry:layouts-calendar -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 4.1" | normal, widest, title, error, empty | warning, severe, gray, colour, stale, unavailable | 7 |
+| 4.26" | normal, widest, title, error, empty | warning, severe, gray, colour, stale, unavailable | 7 |
+<!-- /registry:layouts-calendar -->
+
+### Claude usage
+
+Meters: up to four usage bars with their reset times.
+
+- **Shows:** per bar the label, the percentage, the reset time and the now-marker for the period.
+- **Tested with:** warning on yellow, severe (100 %) on a colour and a grey panel, the switch off, an entity that stopped reporting.
+- **Bars:** up to 3 bars on 3.5" in `type.primary`, 4 in `type.data`, drawn as in *Meters*.
+- **Pace:** the footer states the pace against the period (`ON PACE`, `WEEK 7% AHEAD`). Ahead of the period it is a warning chip; with `flag_usage` off it is plain text.
+
+<!-- registry:inputs-claude -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `bar_1`, `bar_1_reset`, `bar_2`, `bar_2_reset`, `bar_3`, `bar_3_reset`, `bar_4`, `bar_4_reset`, `bar_1_label`, `bar_1_period_hours`, `bar_2_label`, `bar_2_period_hours`, `bar_3_label`, `bar_3_period_hours`, `bar_4_label`, `bar_4_period_hours`, `flag_usage`, `warning_usage`, `severe_usage` |
+<!-- /registry:inputs-claude -->
+
+<!-- registry:layouts-claude -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 11 |
+<!-- /registry:layouts-claude -->
+
+### CO2 graph
+
+A Line chart *with thresholds*: the last hours of CO2 with the current value at the end.
+
+- **Shows:** the series over the chosen hours, the warning and severe lines, the current value as a square at the end, the footer's conclusion.
+- **Tested with:** a severe reading, the same reading with the switch off, a warning on a yellow panel and on a grey panel, 12-hour time, no data; widest reading `4000`.
+- **Current value:** the square of *Line charts*, *Current value*, centred on the line's last point.
+- **Points:** at most <!-- v:spec:co2_35:POINTS -->165<!-- /v --> on the 3.5" (*Chart frame (all charts)*, *Density*): the readings are grouped so the chosen hours stay under it.
+
+<!-- registry:inputs-co2 -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `co2_entity`, `hours`, `flag_co2`, `warning_co2`, `severe_co2` |
+<!-- /registry:inputs-co2 -->
+
+<!-- registry:layouts-co2 -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 12 |
+<!-- /registry:layouts-co2 -->
+
+### Doors & windows
+
+A Glance, redrawn only when the count changes.
+
+- **Shows:** the number of open doors and windows as the hero, the first open one as the chip.
+- **Tested with:** nothing open, one (warning), three with a severe one, and English texts.
+- **Flagged:** an open door or window is a warning; one of `severe_openings` is severe. The chip names the first open one, the severe ones first, at the highest level open.
+- **Unavailable:** an unavailable sensor is left out of the count. When more than half of the sensors are unavailable, or the only one is, the page is the error state (*Unavailable, stale, empty and error*, Mostly unavailable). The page redraws on a change of the count, so the error shows at the next redraw.
+
+<!-- registry:inputs-doors-windows -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `openings`, `severe_openings` |
+<!-- /registry:inputs-doors-windows -->
+
+<!-- registry:layouts-doors-windows -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 1.4" | 112 px | 112 → 72 px | normal, widest, warning, severe, gray, colour, title, error, unavailable, empty | stale | 10 |
+<!-- /registry:layouts-doors-windows -->
+
+### Energy price (EnergyZero)
+
+A Bar chart *for prices*: today's electricity price per hour, from the EnergyZero integration's own action.
+
+- **Shows:** the bars of the day against the warning and severe lines, the clock-time axis, and in the footer the current price and the cheapest run of hours still to come.
+- **Tested with:** an ordinary afternoon, the current hour at warning and at severe, the worst case of the footer (12-hour time), negative prices at midday, a price above the scale, the last hours without a price, an hour without a price in the middle of the day, the first and the last hour of the day, the switch off, 12-hour time, no prices, a grey panel.
+- **Price:** EnergyZero's market price with VAT, without energy tax and purchase costs, in whole cents per kWh. An hour's level is decided on the price as shown.
+- **Thresholds:** price per kWh (*Thresholds*).
+- **No stale state:** the prices come from an action, not from a reporting entity.
+- **No prices:** the error view.
+
+<!-- registry:inputs-energy-price -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `energyzero_entry`, `cheapest_hours`, `flag_price`, `warning_price`, `severe_price` |
+<!-- /registry:inputs-energy-price -->
+
+<!-- registry:layouts-energy-price -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, warning, severe, gray, colour, title, error, unavailable | stale, empty | 18 |
+| 2.7" L | normal, widest, warning, severe, gray, colour, title, error, unavailable | stale, empty | 18 |
+<!-- /registry:layouts-energy-price -->
+
+### Entities
+
+A Key-value list of up to 12 entities.
+
+- **Shows:** name and state with its unit, one or two columns.
+- **Tested with:** 12 entities (two columns), unavailable values, more than half unavailable (the error state), stale data, Home Assistant's own unit glyphs (µg/m³, ℃).
+<!-- registry:examples-entities -->
+- **Examples:** packages on their way; a home server. Each is drawn in the README.
+<!-- /registry:examples-entities -->
+
+<!-- registry:inputs-entities -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `entity_1`, `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_7`, `entity_8`, `entity_9`, `entity_10`, `entity_11`, `entity_12`, `entity_1_label`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_7_label`, `entity_8_label`, `entity_9_label`, `entity_10_label`, `entity_11_label`, `entity_12_label` |
+<!-- /registry:inputs-entities -->
+
+<!-- registry:layouts-entities -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, title, stale, error, unavailable | warning, severe, gray, colour, empty | 10 |
+<!-- /registry:layouts-entities -->
+
+### History graph
+
+A Line chart for any sensor: its last hours on the automatic scale.
+
+- **Shows:** one sensor's last 3, 6, 12 or 24 hours as a line, the current value as the square at its end, the scale's two ends beside the plot, and the footer's conclusion. The title is the sensor's name unless a header title is given.
+- **Tested with:** a room's temperature over 12 hours; the widest labels (`-12.5`); a nearly flat line; a CO2 sensor over 24 hours (whole numbers); the period at warning and at severe (the severe line close to the scale's top, whose label gives way); a low dip; high and low together, on a colour, a yellow and a grey panel; a long title; stale data; the sensor unavailable now; no history (the error view); both switches off; 12-hour time.
+<!-- registry:examples-history -->
+- **Examples:** the house's power use over a day; a freezer's temperature, flagged when it warms up. Each is drawn in the README.
+<!-- /registry:examples-history -->
+- **Scale:** the automatic scale (*Chart frame (all charts)*, *Fixed y-scale*). With a threshold on, its lines are inside the scale; this page doesn't use the scale built from the severe value.
+- **Footer:** left the current value (`NOW 20.6 °C`), right the period's lowest and highest (`LOW 18.3 · HIGH 22.8 °C`); a chip at the highest level the period reached.
+- **Widest reading:** four characters and a three-letter unit (`1240 ppm`, `-12.5 °C`): the label margin is as wide as `-12.5`, whatever the scale shows.
+- **Thresholds:** high (`*_high`, at or above) and low (`*_low`, at or below), each with its two dashed lines and the spans past them filled (*Line charts*). Both switches are off by default (*Thresholds*).
+- **Points:** at most <!-- v:spec:history_35:POINTS -->166<!-- /v --> on the 3.5" (*Chart frame (all charts)*, *Density*), as on the CO2 graph.
+
+<!-- registry:inputs-history -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `entity`, `hours`, `flag_high`, `warning_high`, `severe_high`, `flag_low`, `warning_low`, `severe_low` |
+<!-- /registry:inputs-history -->
+
+<!-- registry:layouts-history -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 17 |
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 20 |
+| 4.1" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 17 |
+<!-- /registry:layouts-history -->
+
+### Levels
+
+Meters for any sensors: each a row with its value and a bar that shows how full it is.
+
+- **Shows:** up to six sensors, one row each: its label, its value with its unit, and a bar filled to the value's share of that row's maximum. No footer, no reset time and no now-marker: those are Claude usage's.
+- **Tested with:** a battery, solar power of 4 kW, a tank of 1000 L and humidity; the widest reading (`1240 ppm`) beside a long label; a high row at warning; low rows at severe and at warning, on a colour, a yellow and a grey panel; a long title; stale data; one row unavailable; most rows unavailable (the error state); both switches off; three rows (the larger type); six rows (the 4.1").
+<!-- registry:examples-levels -->
+- **Examples:** the batteries of the devices in the house; a printer's ink. Each is drawn in the README.
+<!-- /registry:examples-levels -->
+- **Label:** the sensor's name, or the row's label input.
+- **Value and bar:** the number as *Single value* writes it, with its unit. The bar is the value divided by the row's maximum (`bar_<n>_max`, 100 by default), kept between empty and full.
+- **Rows:** four on the 3.5" and the 2.7" landscape, six on the 4.1"; each blueprint offers only the rows its screen has. Type and spacing as *Meters* says.
+- **Widest reading:** a value of four characters with a three-letter unit (`1240 ppm`).
+- **Flagged:** as *Meters* says, by two readings for all rows, each a share of the row's maximum: high (`*_high`, at or above) and low (`*_low`, at or below). Both switches are off by default (*Thresholds*).
+- **Unavailable:** the value is `—` and the track is empty; most rows unavailable is the error state (*States*).
+
+<!-- registry:inputs-levels -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `bar_1`, `bar_2`, `bar_3`, `bar_4`, `bar_1_label`, `bar_2_label`, `bar_3_label`, `bar_4_label`, `bar_1_max`, `bar_2_max`, `bar_3_max`, `bar_4_max`, `flag_high`, `warning_high`, `severe_high`, `flag_low`, `warning_low`, `severe_low` |
+| 4.1" | also `bar_5`, `bar_6`, `bar_5_label`, `bar_6_label`, `bar_5_max`, `bar_6_max` |
+<!-- /registry:inputs-levels -->
+
+<!-- registry:layouts-levels -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 13 |
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 15 |
+| 4.1" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 14 |
+<!-- /registry:layouts-levels -->
+
+### Medication
+
+A Glance: the time of the last press of the device's button is the hero.
+
+- **Shows:** the time of the last press as the hero, the pill icon, the date as the Glance secondary.
+- **Tested with:** on time, late (warning) and missed (severe); widest reading `20:00`; in 12-hour form the widest chip (Croatian: weekday, date, AM, missed).
+- **12-hour time:** the hero shows the time without AM/PM; the date line, or the overdue chip, carries it after the date (`MO 13 APR · PM`, `MO 13 APR · PM · MISSED`). When the chip doesn't fit between the paddings, the weekday gives way first (`24 FEB · AM · MISSED`; a chip may hang S past the padding, *Spacing (internal)*, *Chips hang outward*).
+- **No update stamp** in its title row: the hero time already is the last update.
+- **Medication redraws by itself** when the warning and the severe time are reached (the button's last press is read from its event entity), and the press date in the Glance secondary becomes the chip. Redraw triggers: a press (the only one that flashes the LED); a template trigger per threshold (fires once when it is crossed, re-checked each minute); Home Assistant start (so a missed deadline shows at once); and a manual run (**Run actions**), which redraws the current state, for example after a changed setting.
+
+<!-- registry:inputs-medication -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `button_entity`, `flag_late`, `warning_late`, `severe_late` |
+<!-- /registry:inputs-medication -->
+
+<!-- registry:layouts-medication -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 2.7" L | 88 px | 88 → 56 px | normal, widest, warning, severe, gray, colour, title, unavailable | stale, error, empty | 10 |
+<!-- /registry:layouts-medication -->
+
+### Next appointment
+
+An Event list, or the event hero when there is one event.
+
+- **Shows:** the next events (start time, title, the label text line), or the event hero for one event, and the free time in the footer.
+- **Tested with:** 9, 6, 3, 1 and no events, an event in progress (`NOW`), a grey panel.
+- **In progress:** an event in progress (`NOW`) has its start time in an ink chip, and on the event hero its `NOW` label (*Severity*, *Now is not a severity*).
+- **All-day events** are left out.
+
+<!-- registry:inputs-appointment -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `calendar_entities`, `days_ahead` |
+<!-- /registry:inputs-appointment -->
+
+<!-- registry:layouts-appointment -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 3.5" | 104 px | 88 px | normal, widest, title, error, empty | warning, severe, gray, colour, stale, unavailable | 11 |
+| 4.1" | 128 px | 112 px | normal, widest, gray, title, error, empty | warning, severe, colour, stale, unavailable | 11 |
+| 4.26" | 256 px | 224 px | normal, widest, gray, title, error, empty | warning, severe, colour, stale, unavailable | 12 |
+<!-- /registry:layouts-appointment -->
+
+### Plant moisture
+
+A Key-value list of up to 22 plants, driest first if chosen.
+
+- **Shows:** each plant's soil moisture.
+- **Tested with:** 20 plants, warnings on a yellow panel and on a grey panel, most sensors unavailable (the error state).
+
+<!-- registry:inputs-plants -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `plant_1`, `plant_2`, `plant_3`, `plant_4`, `plant_5`, `plant_6`, `plant_7`, `plant_8`, `plant_9`, `plant_10`, `plant_11`, `plant_12`, `plant_13`, `plant_14`, `plant_15`, `plant_16`, `plant_17`, `plant_18`, `plant_19`, `plant_20`, `plant_21`, `plant_22`, `plant_1_label`, `plant_2_label`, `plant_3_label`, `plant_4_label`, `plant_5_label`, `plant_6_label`, `plant_7_label`, `plant_8_label`, `plant_9_label`, `plant_10_label`, `plant_11_label`, `plant_12_label`, `plant_13_label`, `plant_14_label`, `plant_15_label`, `plant_16_label`, `plant_17_label`, `plant_18_label`, `plant_19_label`, `plant_20_label`, `plant_21_label`, `plant_22_label`, `sort_driest_first`, `flag_moisture_low`, `warning_moisture_low`, `severe_moisture_low` |
+<!-- /registry:inputs-plants -->
+
+<!-- registry:layouts-plants -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 4.1" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 9 |
+<!-- /registry:layouts-plants -->
+
+### Rain forecast
+
+A Bar chart *with thresholds*: the next 24 hours in hourly bars on a log scale, from the hourly forecast of any weather entity; the dry state is one statement (*Chart frame (all charts)*, *Exception, nothing to show*).
+
+- **Shows:** the bars against the warning and severe lines, the clock-time axis, and the footer's conclusion (the heaviest rain and its peak).
+- **Tested with:** light rain, a heavy shower (severe), rain past the warning line, the top of the scale all day (Spanish), the same with the switch off, dry, 12-hour time (a shower, a span of more than half a day, dry), stale data, a weather entity without an hourly forecast, an unavailable weather entity with another one working, a grey panel.
+- **Bars:** one per hour, starting with the current hour; a bar's value is the rain the forecast gives for that hour, read as mm/h. An hour the forecast doesn't have is dry. A wet bar's least height, the scale and the ticks are those of *Rain forecast (Netherlands)*.
+- **Dry statement:** it names the end of the last bar, the current hour a day on, so it carries its weekday as a time a day away does (*Text rules*, *Dates in captions*): `DRY UNTIL SU 14:00`.
+- **Thresholds:** rain per hour (*Thresholds*).
+- **No hourly forecast:** the error view.
+
+<!-- registry:inputs-rain-hourly -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `weather_entity`, `flag_rain_hour`, `warning_rain_hour`, `severe_rain_hour` |
+<!-- /registry:inputs-rain-hourly -->
+
+<!-- registry:layouts-rain-hourly -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 16 |
+| 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 16 |
+<!-- /registry:layouts-rain-hourly -->
+
+### Rain forecast (Netherlands)
+
+A Bar chart *with thresholds*: the next two hours in 5-minute bars on a log scale, from the Neerslag app's Buienalarm and Buienradar sensors; the dry state is one statement (*Chart frame (all charts)*, *Exception, nothing to show*).
+
+- **Shows:** the bars against the warning and severe lines, the clock-time axis, and the footer's conclusion (the heaviest shower and its peak).
+- **Tested with:** light rain, a heavy shower (severe), the same shower with the switch off, dry, 12-hour time (afternoon, across noon, dry), stale data, no data, the 2.7" canvas (384 × 168), a grey panel.
+- **Bars:** a wet 5-minute bar is at least 3 × `line.base` high, so it reads as a bar, not a line.
+
+<!-- registry:inputs-rain -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `buienalarm_entity`, `buienradar_entity`, `flag_rain_hour`, `warning_rain_hour`, `severe_rain_hour` |
+<!-- /registry:inputs-rain -->
+
+<!-- registry:layouts-rain -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 15 |
+| 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 14 |
+<!-- /registry:layouts-rain -->
+
+### Single value
+
+A Glance for any sensor: its number, large, with its unit.
+
+- **Shows:** one entity's number as the hero, with its unit. The title is the entity's name unless a header title is given.
+- **Tested with:** `1240 ppm`; the widest reading (`-12.5 °C`); a high reading at warning and at severe, a low one at severe; a yellow and a grey panel; a long title; stale data; an unavailable sensor (`—`); both switches off. As other configurations: an icon with a second value (`21.4 °C`, `48 %`), a short reading with an icon (`48 %`), and a reading longer than the widest (`123456 kWh`: a smaller number on the 2.7" and 3.5", the error state on the 1.4").
+<!-- registry:examples-single-value -->
+- **Examples:** a countdown: the days until a date; today's date. Each is drawn in the README.
+<!-- /registry:examples-single-value -->
+- **Unit:** after the number, on its baseline, as *Hero group*, *A unit beside the number* says. On the 1.4" the unit is the Glance secondary instead: a four-digit number needs the screen's width.
+- **Widest reading:** four characters and a three-letter unit (`1240 ppm`, `-12.5 °C`). A longer reading steps down the hero ladder one rung at a time until it fits, as a word-hero does (*Glance with a word*); it is never cut.
+- **The 1.4" has one size.** Its hero is fitted on the widest four digits (`4000`) and never steps, so the number keeps its size whatever the value; that size is under the Glance floor, the one exception to it (*Physical size minimums*). A reading too wide for it is the error state: "Value too long for this screen."
+- **Icon:** optional, from the `icon` input, beside the number as in every hero group (*Glance*, *Too wide*). An icon the kit has no glyph for is drawn by the renderer's own icon element, a little smaller.
+- **Second value:** optional, from the `secondary_entity` input: its number and unit as the Glance secondary. Not on the 1.4", where the unit has that line.
+- **Flagged:** the number sits in a hero chip at its level, its unit with it, as a flagged temperature does. Two readings can be flagged: high (`*_high`, at or above) and low (`*_low`, at or below). Both switches are off by default (*Thresholds*).
+- **Unavailable:** the number is `—`, with no unit.
+
+<!-- registry:inputs-single-value -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `entity`, `icon`, `flag_high`, `warning_high`, `severe_high`, `flag_low`, `warning_low`, `severe_low` |
+| 2.7" L | also `secondary_entity` |
+| 3.5" | also `secondary_entity` |
+<!-- /registry:inputs-single-value -->
+
+<!-- registry:layouts-single-value -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 1.4" | 72 px | 72 → 48 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 16 |
+| 2.7" L | 88 px | 88 → 56 px | normal, widest, warning, severe, gray, colour, title, stale, unavailable | error, empty | 15 |
+| 3.5" | 104 px | 104 → 64 px | normal, widest, warning, severe, gray, colour, title, stale, unavailable | error, empty | 17 |
+<!-- /registry:layouts-single-value -->
+
+### Sun & moon
+
+A Timeline: sun and moon on the compass axis (*Timeline*), the five times of the day under it.
+
+- **Shows:** the sun and the moon on the timeline (the moon with its phase; no moon marker while its position sensors are not chosen or unavailable), today's sun path, the five times of the day under it, and the day length in the footer.
+- **Tested with:** night, noon, midsummer, the southern hemisphere, a new moon, a compass letter left out for a marker, the moon beside the sun below the horizon (on its left, and at the end of the track), and the widest reading: `10:44am` with the longest footer (Spanish, `DURACIÓN DEL DÍA 18h34min`).
+- **Times follow `time_format`:** `07:12`, or in 12-hour form `7:12am`, with `am`/`pm` attached as a unit (*Text rules*, *Short hour labels*), because each time has a fifth of the width between the paddings: the widest, `10:44am`, fits that fifth less S on the 3.5"; `10:44 AM` does not.
+- **Vertical rhythm** (no hand-set heights): from the bottom up, the footer, M, the five times in `type.data`, `space.s`, their labels in `type.label`, M, the compass row (`space.axis`), the horizon. The sky above the horizon takes everything that is left (fill before you float), from M under the title line; the highest marker keeps its disc and half its icon clear of the sky's top.
+
+<!-- registry:inputs-sun-moon -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `moon_azimuth_sensor`, `moon_altitude_sensor`, `moon_phase_sensor`, `hemisphere` |
+<!-- /registry:inputs-sun-moon -->
+
+<!-- registry:layouts-sun-moon -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 3.5" | normal, widest, title, error, unavailable | warning, severe, gray, colour, stale, empty | 14 |
+<!-- /registry:layouts-sun-moon -->
+
+### Tiles (the page)
+
+The Tiles pattern for any entities: up to 12, one tile each.
+
+- **Shows:** per entity its icon, its state and its label. As many tiles as the screen holds (*Tiles*); each blueprint offers only the entities its screen has.
+- **Tested with:** every tile filled, with icons from the input, from the entity and one tile without; a state and labels too long for a tile, and `-12,5°C`; five entities and two entities (the grid shrinks); a long title; stale data; one entity unavailable; every entity unavailable (the error state; on the 1.4" a dash); a grey and a yellow panel.
+<!-- registry:examples-tiles -->
+- **Examples:** what is still open or on before you leave; the appliances and what they are doing. Each is drawn in the README.
+<!-- /registry:examples-tiles -->
+- **State:** a number as *Entities* writes it, with its unit; any other state in Home Assistant's own wording for it (`Closed` for a door that is `off`), which follows the language Home Assistant is set to, not the blueprint's.
+- **Label:** the entity's name, or the tile's label input.
+- **Icon:** the tile's icon input, else the entity's own icon; an entity with neither gets no icon. An icon the kit has no glyph for is drawn by the renderer's own icon element (*Blueprint mechanics*).
+- **Flagged:** never: the page has no thresholds, as *Entities* has none.
+- **Unavailable:** the state is `—`; most entities unavailable is the error state (*States*).
+
+<!-- registry:inputs-tiles -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `entity_1`, `entity_1_label`, `entity_1_icon` |
+| 2.7" P | also `entity_2`, `entity_3`, `entity_2_label`, `entity_3_label`, `entity_2_icon`, `entity_3_icon` |
+| 2.7" L | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon` |
+| 3.5" | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon` |
+| 4.1" | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon` |
+| 7.5" L | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_7`, `entity_8`, `entity_9`, `entity_10`, `entity_11`, `entity_12`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_7_label`, `entity_8_label`, `entity_9_label`, `entity_10_label`, `entity_11_label`, `entity_12_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon`, `entity_7_icon`, `entity_8_icon`, `entity_9_icon`, `entity_10_icon`, `entity_11_icon`, `entity_12_icon` |
+| 7.5" P | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_7`, `entity_8`, `entity_9`, `entity_10`, `entity_11`, `entity_12`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_7_label`, `entity_8_label`, `entity_9_label`, `entity_10_label`, `entity_11_label`, `entity_12_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon`, `entity_7_icon`, `entity_8_icon`, `entity_9_icon`, `entity_10_icon`, `entity_11_icon`, `entity_12_icon` |
+<!-- /registry:inputs-tiles -->
+
+<!-- registry:layouts-tiles -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 1.4" | normal, widest, gray, colour, title, stale, unavailable | warning, severe, error, empty | 8 |
+| 2.7" P | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 10 |
+| 2.7" L | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
+| 3.5" | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 13 |
+| 4.1" | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
+| 7.5" L | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
+| 7.5" P | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
+<!-- /registry:layouts-tiles -->
+
+### To-do list
+
+A Checklist of the items of one `todo` entity in Home Assistant.
+
+- **Shows:** the list's open items, each with its box and its due day, then the done ones while there is room; the count in the footer. The title is the list's name unless a header title is given.
+- **Tested with:** a shopping list with an overdue item, one due today, one due on Monday and three done, on a colour, a yellow and a grey panel; 14 open items (one of 40 characters, a due day twelve days off) and 4 done; a long title; an unavailable list (the error state); a list without items; every item done; flagging off; the done items left out; due days first.
+<!-- registry:examples-todo -->
+- **Examples:** the week's chores; a packing list. Each is drawn in the README.
+<!-- /registry:examples-todo -->
+- **Items:** as Home Assistant's `todo.get_items` gives them, open and done; an item's text as written.
+- **Order, done items, flagging:** as *Checklist* says, by the switches `due_first` (off), `show_done` (on) and `flag_due` (on).
+- **Unavailable:** an unavailable list is the error state (*States*); the page has no stale state.
+
+<!-- registry:inputs-todo -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `todo_entity`, `show_done`, `due_first`, `flag_due` |
+<!-- /registry:inputs-todo -->
+
+<!-- registry:layouts-todo -->
+| Screen | Checked in | Not applicable | Cases |
+|---|---|---|---|
+| 2.7" L | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 13 |
+| 2.7" P | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |
+| 3.5" | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 14 |
+| 4.1" | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 13 |
+| 7.5" L | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |
+| 7.5" P | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |
+<!-- /registry:layouts-todo -->
+
+### Value with details
+
+A Hero dashboard *with a chart or list* for any sensor: its number large, other values beside it, its last hours under it.
+
+- **Shows:** one sensor's number as the hero with its unit and an optional icon; up to four detail rows, each another entity's label and value; a chart of the sensor's last hours as one line on the automatic scale (*Bar chart and Line chart*), without a footer.
+- **Tested with:** a room's CO2 with its climate beside it; the number at warning and at severe, on a colour, a yellow and a grey panel; the widest readings (`-12.5 °C`, flagged low, with a label too long for its row); a long title; stale data; the sensor and a detail unavailable; no history (the error block in the chart's half); thresholds set with both switches off; one detail row; no detail rows and no icon.
+<!-- registry:examples-value-details -->
+- **Examples:** the house's power use with solar, battery and grid; the temperature outside with humidity, wind and rain. Each is drawn in the README.
+<!-- /registry:examples-value-details -->
+- **Number and unit:** as *Single value* writes them. An unavailable sensor is a dash without unit or icon.
+- **Detail rows:** three on the 4.1", four on the 7.5"; the 4.1" has no icon, the number, its unit and the rows fill the width. A row's value as *Entities* writes it, or Home Assistant's own wording of a state; the detail column is as wide as a label of 11 characters (`TEMPERATURE`) and the widest value (`1240 ppm`), and a longer label is cut.
+- **Chart:** as *History graph* draws it: the hours input, the automatic scale, the threshold lines and fills.
+- **Flagged:** the high and low thresholds flag the number (the hero chip) and the chart alike (`*_high`, `*_low`; both switches off by default, *Thresholds*). Detail rows are never flagged.
+- **Screens:** the 4.1", the 7.5" and the 7.5" portrait. On smaller screens the number and the chart don't fit together: *Single value* and *History graph* each show one of them.
+
+<!-- registry:inputs-value-details -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `entity`, `detail_1`, `detail_2`, `detail_3`, `hours`, `detail_1_label`, `detail_2_label`, `detail_3_label`, `flag_high`, `warning_high`, `severe_high`, `flag_low`, `warning_low`, `severe_low` |
+| 7.5" L | also `detail_4`, `icon`, `detail_4_label` |
+| 7.5" P | also `detail_4`, `icon`, `detail_4_label` |
+<!-- /registry:inputs-value-details -->
+
+<!-- registry:layouts-value-details -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 4.1" | 56 px | 48 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 15 |
+| 7.5" L | 104 px | 88 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 15 |
+| 7.5" P | 104 px | 88 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 14 |
+<!-- /registry:layouts-value-details -->
+
+### Weather and calendar
+
+A *Hero dashboard with a chart or list*: the weather's hero band over the calendar's date-grouped list, in two equal halves, on the 7.5" portrait.
+
+- **Shows:** the current temperature as the hero with its condition icon (and the moon badge) and the 7.5" detail rows in the top half; the coming days with their events in the bottom half.
+- **Tested with:** −12° with the moon badge, an official warning with pollen at severe (both take a detail row), an event in progress, a full calendar that overflows, an empty day, no calendar chosen, weather unavailable, stale weather, a grayscale panel, a long title.
+- **Rules:** the weather's (*Weather at a glance and Weather*: thresholds, *Pollen*, *Override order*, with the 7.5" detail rows and their make-way order) and the calendar's (*Calendar*: an event in progress is an ink row chip, today by name).
+
+<!-- registry:inputs-weather-calendar -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `weather_entity`, `current_temp_sensor`, `pollen_sensor`, `moon_phase_sensor`, `weather_warning_sensor`, `weather_warning_text_sensor`, `calendar_entities`, `pollen_type`, `days_shown`, `flag_temp_low`, `warning_temp_low`, `severe_temp_low`, `flag_temp_high`, `warning_temp_high`, `severe_temp_high`, `flag_wind_high`, `warning_wind_high`, `severe_wind_high`, `flag_rain_hour`, `warning_rain_hour`, `severe_rain_hour`, `flag_rain_day`, `warning_rain_day`, `severe_rain_day`, `flag_pollen_high`, `warning_pollen_high`, `severe_pollen_high`, `warning_conditions`, `severe_conditions`, `location_string` |
+<!-- /registry:inputs-weather-calendar -->
+
+<!-- registry:layouts-weather-calendar -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 7.5" P | 152 px | 128 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty, alert, pollen 0, pollen widest | — | 35 |
+<!-- /registry:layouts-weather-calendar -->
 
 ### Weather at a glance and Weather
 
@@ -1255,478 +1729,6 @@ Where it applies:
 | 7.5" P | 160 px | 136 px | 5 / 5 | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, alert, pollen 0, pollen widest | empty | 32 |
 <!-- /registry:layouts-weather -->
 
-### Medication
-
-A Glance: the time of the last press of the device's button is the hero.
-
-- **Shows:** the time of the last press as the hero, the pill icon, the date as the Glance secondary.
-- **Tested with:** on time, late (warning) and missed (severe); widest reading `20:00`; in 12-hour form the widest chip, Croatian and missed (`PO 24 VEL · AM · PROPUŠTENO`).
-- **12-hour time:** the hero shows the time without AM/PM; the date line, or the overdue chip, carries it after the date (`MO 13 APR · PM`, `MO 13 APR · PM · MISSED`). When the chip doesn't fit between the paddings, the weekday gives way first (`24 VEL · AM · PROPUŠTENO`; a chip may hang S past the padding, *Spacing (internal)*, *Chips hang outward*).
-- **No update stamp** in its title row: the hero time already is the last update.
-- **Medication redraws by itself** when the warning and the severe time are reached (the button's last press is read from its event entity), and the press date in the Glance secondary becomes the chip. Redraw triggers: a press (the only one that flashes the LED); a template trigger per threshold (fires once when it is crossed, re-checked each minute); Home Assistant start (so a missed deadline shows at once); and a manual run (**Run actions**), which redraws the current state, for example after a changed setting.
-
-<!-- registry:inputs-medication -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `button_entity`, `flag_late`, `warning_late`, `severe_late` |
-<!-- /registry:inputs-medication -->
-
-<!-- registry:layouts-medication -->
-| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
-|---|---|---|---|---|---|
-| 2.7" L | 88 px | 88 → 56 px | normal, widest, warning, severe, gray, colour, title, unavailable | stale, error, empty | 10 |
-<!-- /registry:layouts-medication -->
-
-### Doors & windows
-
-A Glance, redrawn only when the count changes.
-
-- **Shows:** the number of open doors and windows as the hero, the first open one as the chip.
-- **Tested with:** nothing open, one (warning), three with a severe one, and English texts.
-- **Flagged:** an open door or window is a warning; one of `severe_openings` is severe. The chip names the first open one, the severe ones first, at the highest level open.
-- **Unavailable:** an unavailable sensor is left out of the count. When more than half of the sensors are unavailable, or the only one is, the page is the error state (*Unavailable, stale, empty and error*, Mostly unavailable). The page redraws on a change of the count, so the error shows at the next redraw.
-
-<!-- registry:inputs-doors-windows -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `openings`, `severe_openings` |
-<!-- /registry:inputs-doors-windows -->
-
-<!-- registry:layouts-doors-windows -->
-| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
-|---|---|---|---|---|---|
-| 1.4" | 112 px | 112 → 72 px | normal, widest, warning, severe, gray, colour, title, error, unavailable, empty | stale | 10 |
-<!-- /registry:layouts-doors-windows -->
-
-### Single value
-
-A Glance for any sensor: its number, large, with its unit.
-
-- **Shows:** one entity's number as the hero, with its unit. The title is the entity's name unless a header title is given.
-- **Tested with:** `1240 ppm`; the widest reading (`-12.5 °C`); a high reading at warning and at severe, a low one at severe; a yellow and a grey panel; a long title; stale data; an unavailable sensor (`—`); both switches off. As other configurations: an icon with a second value (`21.4 °C`, `48 %`), a short reading with an icon (`48 %`), and a reading longer than the widest (`123456 kWh`: a smaller number on the 2.7" and 3.5", the error state on the 1.4").
-<!-- registry:examples-single-value -->
-- **Examples:** a countdown: the days until a date; today's date. Each is drawn in the README.
-<!-- /registry:examples-single-value -->
-- **Unit:** after the number, on its baseline, as *Hero group*, *A unit beside the number* says. On the 1.4" the unit is the Glance secondary instead: a four-digit number needs the screen's width.
-- **Widest reading:** four characters and a three-letter unit (`1240 ppm`, `-12.5 °C`). A longer reading steps down the hero ladder one rung at a time until it fits, as a word-hero does (*Glance with a word*); it is never cut.
-- **The 1.4" has one size.** Its hero is fitted on the widest four digits (`4000`) and never steps, so the number keeps its size whatever the value; that size is under the Glance floor, the one exception to it (*Physical size minimums*). A reading too wide for it is the error state: "Value too long for this screen."
-- **Icon:** optional, from the `icon` input, beside the number as in every hero group (*Glance*, *Too wide*). An icon the kit has no glyph for is drawn by the renderer's own icon element, a little smaller.
-- **Second value:** optional, from the `secondary_entity` input: its number and unit as the Glance secondary. Not on the 1.4", where the unit has that line.
-- **Flagged:** the number sits in a hero chip at its level, its unit with it, as a flagged temperature does. Two readings can be flagged: high (`*_high`, at or above) and low (`*_low`, at or below). Both switches are off by default (*Thresholds*).
-- **Unavailable:** the number is `—`, with no unit.
-
-<!-- registry:inputs-single-value -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `entity`, `secondary_entity`, `icon`, `flag_high`, `warning_high`, `severe_high`, `flag_low`, `warning_low`, `severe_low` |
-<!-- /registry:inputs-single-value -->
-
-<!-- registry:layouts-single-value -->
-| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
-|---|---|---|---|---|---|
-| 1.4" | 72 px | 72 → 48 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 16 |
-| 2.7" L | 88 px | 88 → 56 px | normal, widest, warning, severe, gray, colour, title, stale, unavailable | error, empty | 15 |
-| 3.5" | 104 px | 104 → 64 px | normal, widest, warning, severe, gray, colour, title, stale, unavailable | error, empty | 17 |
-<!-- /registry:layouts-single-value -->
-
-### Value with details
-
-A Hero dashboard *with a chart or list* for any sensor: its number large, other values beside it, its last hours under it.
-
-- **Shows:** one sensor's number as the hero with its unit and an optional icon; up to four detail rows, each another entity's label and value; a chart of the sensor's last hours as one line on the automatic scale (*Bar chart and Line chart*), without a footer.
-- **Tested with:** a room's CO2 with its climate beside it; the number at warning and at severe, on a colour, a yellow and a grey panel; the widest readings (`-12.5 °C`, flagged low, with a label too long for its row); a long title; stale data; the sensor and a detail unavailable; no history (the error block in the chart's half); thresholds set with both switches off; one detail row; no detail rows and no icon.
-<!-- registry:examples-value-details -->
-- **Examples:** the house's power use with solar, battery and grid; the temperature outside with humidity, wind and rain. Each is drawn in the README.
-<!-- /registry:examples-value-details -->
-- **Number and unit:** as *Single value* writes them. An unavailable sensor is a dash without unit or icon.
-- **Detail rows:** three on the 4.1", four on the 7.5"; the 4.1" has no icon, the number, its unit and the rows fill the width. A row's value as *Entities* writes it, or Home Assistant's own wording of a state; the detail column is as wide as a label of 11 characters (`TEMPERATURE`) and the widest value (`1240 ppm`), and a longer label is cut.
-- **Chart:** as *History graph* draws it: the hours input, the automatic scale, the threshold lines and fills.
-- **Flagged:** the high and low thresholds flag the number (the hero chip) and the chart alike (`*_high`, `*_low`; both switches off by default, *Thresholds*). Detail rows are never flagged.
-- **Screens:** the 4.1", the 7.5" and the 7.5" portrait. On smaller screens the number and the chart don't fit together: *Single value* and *History graph* each show one of them.
-
-<!-- registry:inputs-value-details -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `entity`, `detail_1`, `detail_2`, `detail_3`, `hours`, `detail_1_label`, `detail_2_label`, `detail_3_label`, `flag_high`, `warning_high`, `severe_high`, `flag_low`, `warning_low`, `severe_low` |
-| 7.5" L | also `detail_4`, `icon`, `detail_4_label` |
-| 7.5" P | also `detail_4`, `icon`, `detail_4_label` |
-<!-- /registry:inputs-value-details -->
-
-<!-- registry:layouts-value-details -->
-| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
-|---|---|---|---|---|---|
-| 4.1" | 56 px | 48 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 15 |
-| 7.5" L | 104 px | 88 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 15 |
-| 7.5" P | 104 px | 88 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 14 |
-<!-- /registry:layouts-value-details -->
-
-### Rain forecast
-
-A Bar chart *with thresholds*: the next 24 hours in hourly bars on a log scale, from the hourly forecast of any weather entity; the dry state is one statement (*Chart frame (all charts)*, *Exception, nothing to show*).
-
-- **Shows:** the bars against the warning and severe lines, the clock-time axis, and the footer's conclusion (the heaviest rain and its peak).
-- **Tested with:** light rain, a heavy shower (severe), rain past the warning line, the top of the scale all day (Spanish), the same with the switch off, dry, 12-hour time (a shower, a span of more than half a day, dry), stale data, a weather entity without an hourly forecast, an unavailable weather entity with another one working, a grey panel.
-- **Bars:** one per hour, starting with the current hour; a bar's value is the rain the forecast gives for that hour, read as mm/h. An hour the forecast doesn't have is dry. A wet bar's least height, the scale and the ticks are those of *Rain forecast (Netherlands)*.
-- **Dry statement:** it names the end of the last bar, the current hour a day on, so it carries its weekday as a time a day away does (*Text rules*, *Dates in captions*): `DRY UNTIL SU 14:00`.
-- **Thresholds:** rain per hour (*Thresholds*).
-- **No hourly forecast:** the error view.
-
-<!-- registry:inputs-rain-hourly -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `weather_entity`, `flag_rain_hour`, `warning_rain_hour`, `severe_rain_hour` |
-<!-- /registry:inputs-rain-hourly -->
-
-<!-- registry:layouts-rain-hourly -->
-| Screen | Checked in | Not applicable | Cases |
-|---|---|---|---|
-| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 16 |
-| 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 16 |
-<!-- /registry:layouts-rain-hourly -->
-
-### Energy price (EnergyZero)
-
-A Bar chart *for prices*: today's electricity price per hour, from the EnergyZero integration's own action.
-
-- **Shows:** the bars of the day against the warning and severe lines, the clock-time axis, and in the footer the current price and the cheapest run of hours still to come.
-- **Tested with:** an ordinary afternoon, the current hour at warning and at severe, the worst case of the footer (12-hour time), negative prices at midday, a price above the scale, the last hours without a price, an hour without a price in the middle of the day, the first and the last hour of the day, the switch off, 12-hour time, no prices, a grey panel.
-- **Price:** EnergyZero's market price with VAT, without energy tax and purchase costs, in whole cents per kWh. An hour's level is decided on the price as shown.
-- **Thresholds:** price per kWh (*Thresholds*).
-- **No stale state:** the prices come from an action, not from a reporting entity.
-- **No prices:** the error view.
-
-<!-- registry:inputs-energy-price -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `energyzero_entry`, `cheapest_hours`, `flag_price`, `warning_price`, `severe_price` |
-<!-- /registry:inputs-energy-price -->
-
-<!-- registry:layouts-energy-price -->
-| Screen | Checked in | Not applicable | Cases |
-|---|---|---|---|
-| 3.5" | normal, widest, warning, severe, gray, colour, title, error, unavailable | stale, empty | 18 |
-| 2.7" L | normal, widest, warning, severe, gray, colour, title, error, unavailable | stale, empty | 18 |
-<!-- /registry:layouts-energy-price -->
-
-### Rain forecast (Netherlands)
-
-A Bar chart *with thresholds*: the next two hours in 5-minute bars on a log scale, from the Neerslag app's Buienalarm and Buienradar sensors; the dry state is one statement (*Chart frame (all charts)*, *Exception, nothing to show*).
-
-- **Shows:** the bars against the warning and severe lines, the clock-time axis, and the footer's conclusion (the heaviest shower and its peak).
-- **Tested with:** light rain, a heavy shower (severe), the same shower with the switch off, dry, 12-hour time (afternoon, across noon, dry), stale data, no data, the 2.7" canvas (384 × 168), a grey panel.
-- **Bars:** a wet 5-minute bar is at least 3 × `line.base` high, so it reads as a bar, not a line.
-
-<!-- registry:inputs-rain -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `buienalarm_entity`, `buienradar_entity`, `flag_rain_hour`, `warning_rain_hour`, `severe_rain_hour` |
-<!-- /registry:inputs-rain -->
-
-<!-- registry:layouts-rain -->
-| Screen | Checked in | Not applicable | Cases |
-|---|---|---|---|
-| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 15 |
-| 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 14 |
-<!-- /registry:layouts-rain -->
-
-### CO2 graph
-
-A Line chart *with thresholds*: the last hours of CO2 with the current value at the end.
-
-- **Shows:** the series over the chosen hours, the warning and severe lines, the current value as a square at the end, the footer's conclusion.
-- **Tested with:** a severe reading, the same reading with the switch off, a warning on a yellow panel and on a grey panel, 12-hour time, no data; widest reading `4000`.
-- **Current value:** the square of *Line charts*, *Current value*, centred on the line's last point.
-- **Points:** at most <!-- v:spec:co2_35:POINTS -->165<!-- /v --> on the 3.5" (*Chart frame (all charts)*, *Density*): the readings are grouped so the chosen hours stay under it.
-
-<!-- registry:inputs-co2 -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `co2_entity`, `hours`, `flag_co2`, `warning_co2`, `severe_co2` |
-<!-- /registry:inputs-co2 -->
-
-<!-- registry:layouts-co2 -->
-| Screen | Checked in | Not applicable | Cases |
-|---|---|---|---|
-| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 12 |
-<!-- /registry:layouts-co2 -->
-
-### History graph
-
-A Line chart for any sensor: its last hours on the automatic scale.
-
-- **Shows:** one sensor's last 3, 6, 12 or 24 hours as a line, the current value as the square at its end, the scale's two ends beside the plot, and the footer's conclusion. The title is the sensor's name unless a header title is given.
-- **Tested with:** a room's temperature over 12 hours; the widest labels (`-12.5`); a nearly flat line; a CO2 sensor over 24 hours (whole numbers); the period at warning and at severe (the severe line close to the scale's top, whose label gives way); a low dip; high and low together, on a colour, a yellow and a grey panel; a long title; stale data; the sensor unavailable now; no history (the error view); both switches off; 12-hour time.
-<!-- registry:examples-history -->
-- **Examples:** the house's power use over a day; a freezer's temperature, flagged when it warms up. Each is drawn in the README.
-<!-- /registry:examples-history -->
-- **Scale:** the automatic scale (*Chart frame (all charts)*, *Fixed y-scale*). With a threshold on, its lines are inside the scale; this page doesn't use the scale built from the severe value.
-- **Footer:** left the current value (`NOW 20.6 °C`), right the period's lowest and highest (`LOW 18.3 · HIGH 22.8 °C`); a chip at the highest level the period reached.
-- **Widest reading:** four characters and a three-letter unit (`1240 ppm`, `-12.5 °C`): the label margin is as wide as `-12.5`, whatever the scale shows.
-- **Thresholds:** high (`*_high`, at or above) and low (`*_low`, at or below), each with its two dashed lines and the spans past them filled (*Line charts*). Both switches are off by default (*Thresholds*).
-- **Points:** at most <!-- v:spec:history_35:POINTS -->166<!-- /v --> on the 3.5" (*Chart frame (all charts)*, *Density*), as on the CO2 graph.
-
-<!-- registry:inputs-history -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `entity`, `hours`, `flag_high`, `warning_high`, `severe_high`, `flag_low`, `warning_low`, `severe_low` |
-<!-- /registry:inputs-history -->
-
-<!-- registry:layouts-history -->
-| Screen | Checked in | Not applicable | Cases |
-|---|---|---|---|
-| 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 17 |
-| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 20 |
-| 4.1" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 17 |
-<!-- /registry:layouts-history -->
-
-### Sun & moon
-
-A Timeline: sun and moon on the compass axis (*Timeline*), the five times of the day under it.
-
-- **Shows:** the sun and the moon on the timeline (the moon with its phase; no moon marker while its position sensors are not chosen or unavailable), today's sun path, the five times of the day under it, and the day length in the footer.
-- **Tested with:** night, noon, midsummer, the southern hemisphere, a new moon, a compass letter left out for a marker, the moon beside the sun below the horizon (on its left, and at the end of the track), and the widest reading: `10:44am` with the longest footer (Spanish, `DURACIÓN DEL DÍA 18h34min`).
-- **Times follow `time_format`:** `07:12`, or in 12-hour form `7:12am`, with `am`/`pm` attached as a unit (*Text rules*, *Short hour labels*), because each time has a fifth of the width between the paddings: the widest, `10:44am`, fits that fifth less S on the 3.5"; `10:44 AM` does not.
-- **Vertical rhythm** (no hand-set heights): from the bottom up, the footer, M, the five times in `type.data`, `space.s`, their labels in `type.label`, M, the compass row (`space.axis`), the horizon. The sky above the horizon takes everything that is left (fill before you float), from M under the title line; the highest marker keeps its disc and half its icon clear of the sky's top.
-
-<!-- registry:inputs-sun-moon -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `moon_azimuth_sensor`, `moon_altitude_sensor`, `moon_phase_sensor`, `hemisphere` |
-<!-- /registry:inputs-sun-moon -->
-
-<!-- registry:layouts-sun-moon -->
-| Screen | Checked in | Not applicable | Cases |
-|---|---|---|---|
-| 3.5" | normal, widest, title, error, unavailable | warning, severe, gray, colour, stale, empty | 14 |
-<!-- /registry:layouts-sun-moon -->
-
-### Claude usage
-
-Meters: up to four usage bars with their reset times.
-
-- **Shows:** per bar the label, the percentage, the reset time and the now-marker for the period.
-- **Tested with:** warning on yellow, severe (100 %) on a colour and a grey panel, the switch off, an entity that stopped reporting.
-- **Bars:** up to 3 bars on 3.5" in `type.primary`, 4 in `type.data`, drawn as in *Meters*.
-- **Pace:** the footer states the pace against the period (`ON PACE`, `WEEK 7% AHEAD`). Ahead of the period it is a warning chip; with `flag_usage` off it is plain text.
-
-<!-- registry:inputs-claude -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `bar_1`, `bar_1_reset`, `bar_2`, `bar_2_reset`, `bar_3`, `bar_3_reset`, `bar_4`, `bar_4_reset`, `bar_1_label`, `bar_1_period_hours`, `bar_2_label`, `bar_2_period_hours`, `bar_3_label`, `bar_3_period_hours`, `bar_4_label`, `bar_4_period_hours`, `flag_usage`, `warning_usage`, `severe_usage` |
-<!-- /registry:inputs-claude -->
-
-<!-- registry:layouts-claude -->
-| Screen | Checked in | Not applicable | Cases |
-|---|---|---|---|
-| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 11 |
-<!-- /registry:layouts-claude -->
-
-### Levels
-
-Meters for any sensors: each a row with its value and a bar that shows how full it is.
-
-- **Shows:** up to six sensors, one row each: its label, its value with its unit, and a bar filled to the value's share of that row's maximum. No footer, no reset time and no now-marker: those are Claude usage's.
-- **Tested with:** a battery, solar power of 4 kW, a tank of 1000 L and humidity; the widest reading (`1240 ppm`) beside a long label; a high row at warning; low rows at severe and at warning, on a colour, a yellow and a grey panel; a long title; stale data; one row unavailable; most rows unavailable (the error state); both switches off; three rows (the larger type); six rows (the 4.1").
-<!-- registry:examples-levels -->
-- **Examples:** the batteries of the devices in the house; a printer's ink. Each is drawn in the README.
-<!-- /registry:examples-levels -->
-- **Label:** the sensor's name, or the row's label input.
-- **Value and bar:** the number as *Single value* writes it, with its unit. The bar is the value divided by the row's maximum (`bar_<n>_max`, 100 by default), kept between empty and full.
-- **Rows:** four on the 3.5" and the 2.7" landscape, six on the 4.1"; each blueprint offers only the rows its screen has. Type and spacing as *Meters* says.
-- **Widest reading:** a value of four characters with a three-letter unit (`1240 ppm`).
-- **Flagged:** as *Meters* says, by two readings for all rows, each a share of the row's maximum: high (`*_high`, at or above) and low (`*_low`, at or below). Both switches are off by default (*Thresholds*).
-- **Unavailable:** the value is `—` and the track is empty; most rows unavailable is the error state (*States*).
-
-<!-- registry:inputs-levels -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `bar_1`, `bar_2`, `bar_3`, `bar_4`, `bar_1_label`, `bar_2_label`, `bar_3_label`, `bar_4_label`, `bar_1_max`, `bar_2_max`, `bar_3_max`, `bar_4_max`, `flag_high`, `warning_high`, `severe_high`, `flag_low`, `warning_low`, `severe_low` |
-| 4.1" | also `bar_5`, `bar_6`, `bar_5_label`, `bar_6_label`, `bar_5_max`, `bar_6_max` |
-<!-- /registry:inputs-levels -->
-
-<!-- registry:layouts-levels -->
-| Screen | Checked in | Not applicable | Cases |
-|---|---|---|---|
-| 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 13 |
-| 3.5" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 15 |
-| 4.1" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 14 |
-<!-- /registry:layouts-levels -->
-
-### Entities
-
-A Key-value list of up to 12 entities.
-
-- **Shows:** name and state with its unit, one or two columns.
-- **Tested with:** 12 entities (two columns), unavailable values, more than half unavailable (the error state), stale data, Home Assistant's own unit glyphs (µg/m³, ℃).
-<!-- registry:examples-entities -->
-- **Examples:** packages on their way; a home server. Each is drawn in the README.
-<!-- /registry:examples-entities -->
-
-<!-- registry:inputs-entities -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `entity_1`, `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_7`, `entity_8`, `entity_9`, `entity_10`, `entity_11`, `entity_12`, `entity_1_label`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_7_label`, `entity_8_label`, `entity_9_label`, `entity_10_label`, `entity_11_label`, `entity_12_label` |
-<!-- /registry:inputs-entities -->
-
-<!-- registry:layouts-entities -->
-| Screen | Checked in | Not applicable | Cases |
-|---|---|---|---|
-| 3.5" | normal, widest, title, stale, error, unavailable | warning, severe, gray, colour, empty | 10 |
-<!-- /registry:layouts-entities -->
-
-### Tiles (the page)
-
-The Tiles pattern for any entities: up to 12, one tile each.
-
-- **Shows:** per entity its icon, its state and its label. As many tiles as the screen holds (*Tiles*); each blueprint offers only the entities its screen has.
-- **Tested with:** every tile filled, with icons from the input, from the entity and one tile without; a state and labels too long for a tile, and `-12,5°C`; five entities and two entities (the grid shrinks); a long title; stale data; one entity unavailable; every entity unavailable (the error state; on the 1.4" a dash); a grey and a yellow panel.
-<!-- registry:examples-tiles -->
-- **Examples:** what is still open or on before you leave; the appliances and what they are doing. Each is drawn in the README.
-<!-- /registry:examples-tiles -->
-- **State:** a number as *Entities* writes it, with its unit; any other state in Home Assistant's own wording for it (`Closed` for a door that is `off`), which follows the language Home Assistant is set to, not the blueprint's.
-- **Label:** the entity's name, or the tile's label input.
-- **Icon:** the tile's icon input, else the entity's own icon; an entity with neither gets no icon. An icon the kit has no glyph for is drawn by the renderer's own icon element (*Blueprint mechanics*).
-- **Flagged:** never: the page has no thresholds, as *Entities* has none.
-- **Unavailable:** the state is `—`; most entities unavailable is the error state (*States*).
-
-<!-- registry:inputs-tiles -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `entity_1`, `entity_1_label`, `entity_1_icon` |
-| 2.7" P | also `entity_2`, `entity_3`, `entity_2_label`, `entity_3_label`, `entity_2_icon`, `entity_3_icon` |
-| 2.7" L | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon` |
-| 3.5" | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon` |
-| 4.1" | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon` |
-| 7.5" L | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_7`, `entity_8`, `entity_9`, `entity_10`, `entity_11`, `entity_12`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_7_label`, `entity_8_label`, `entity_9_label`, `entity_10_label`, `entity_11_label`, `entity_12_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon`, `entity_7_icon`, `entity_8_icon`, `entity_9_icon`, `entity_10_icon`, `entity_11_icon`, `entity_12_icon` |
-| 7.5" P | also `entity_2`, `entity_3`, `entity_4`, `entity_5`, `entity_6`, `entity_7`, `entity_8`, `entity_9`, `entity_10`, `entity_11`, `entity_12`, `entity_2_label`, `entity_3_label`, `entity_4_label`, `entity_5_label`, `entity_6_label`, `entity_7_label`, `entity_8_label`, `entity_9_label`, `entity_10_label`, `entity_11_label`, `entity_12_label`, `entity_2_icon`, `entity_3_icon`, `entity_4_icon`, `entity_5_icon`, `entity_6_icon`, `entity_7_icon`, `entity_8_icon`, `entity_9_icon`, `entity_10_icon`, `entity_11_icon`, `entity_12_icon` |
-<!-- /registry:inputs-tiles -->
-
-<!-- registry:layouts-tiles -->
-| Screen | Checked in | Not applicable | Cases |
-|---|---|---|---|
-| 1.4" | normal, widest, gray, colour, title, stale, unavailable | warning, severe, error, empty | 8 |
-| 2.7" P | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 10 |
-| 2.7" L | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
-| 3.5" | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 13 |
-| 4.1" | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
-| 7.5" L | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
-| 7.5" P | normal, widest, gray, colour, title, stale, error, unavailable | warning, severe, empty | 11 |
-<!-- /registry:layouts-tiles -->
-
-### To-do list
-
-A Checklist of the items of one `todo` entity in Home Assistant.
-
-- **Shows:** the list's open items, each with its box and its due day, then the done ones while there is room; the count in the footer. The title is the list's name unless a header title is given.
-- **Tested with:** a shopping list with an overdue item, one due today, one due on Monday and three done, on a colour, a yellow and a grey panel; 14 open items (one of 40 characters, a due day twelve days off) and 4 done; a long title; an unavailable list (the error state); a list without items; every item done; flagging off; the done items left out; due days first.
-<!-- registry:examples-todo -->
-- **Examples:** the week's chores; a packing list. Each is drawn in the README.
-<!-- /registry:examples-todo -->
-- **Items:** as Home Assistant's `todo.get_items` gives them, open and done; an item's text as written.
-- **Order, done items, flagging:** as *Checklist* says, by the switches `due_first` (off), `show_done` (on) and `flag_due` (on).
-- **Unavailable:** an unavailable list is the error state (*States*); the page has no stale state.
-
-<!-- registry:inputs-todo -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `todo_entity`, `show_done`, `due_first`, `flag_due` |
-<!-- /registry:inputs-todo -->
-
-<!-- registry:layouts-todo -->
-| Screen | Checked in | Not applicable | Cases |
-|---|---|---|---|
-| 2.7" L | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 13 |
-| 2.7" P | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |
-| 3.5" | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 14 |
-| 4.1" | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 13 |
-| 7.5" L | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |
-| 7.5" P | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |
-<!-- /registry:layouts-todo -->
-
-### Plant moisture
-
-A Key-value list of up to 22 plants, driest first if chosen.
-
-- **Shows:** each plant's soil moisture.
-- **Tested with:** 20 plants, warnings on a yellow panel and on a grey panel, most sensors unavailable (the error state).
-
-<!-- registry:inputs-plants -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `plant_1`, `plant_2`, `plant_3`, `plant_4`, `plant_5`, `plant_6`, `plant_7`, `plant_8`, `plant_9`, `plant_10`, `plant_11`, `plant_12`, `plant_13`, `plant_14`, `plant_15`, `plant_16`, `plant_17`, `plant_18`, `plant_19`, `plant_20`, `plant_21`, `plant_22`, `plant_1_label`, `plant_2_label`, `plant_3_label`, `plant_4_label`, `plant_5_label`, `plant_6_label`, `plant_7_label`, `plant_8_label`, `plant_9_label`, `plant_10_label`, `plant_11_label`, `plant_12_label`, `plant_13_label`, `plant_14_label`, `plant_15_label`, `plant_16_label`, `plant_17_label`, `plant_18_label`, `plant_19_label`, `plant_20_label`, `plant_21_label`, `plant_22_label`, `sort_driest_first`, `flag_moisture_low`, `warning_moisture_low`, `severe_moisture_low` |
-<!-- /registry:inputs-plants -->
-
-<!-- registry:layouts-plants -->
-| Screen | Checked in | Not applicable | Cases |
-|---|---|---|---|
-| 4.1" | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 9 |
-<!-- /registry:layouts-plants -->
-
-### Calendar
-
-A Grouped list: the coming days with their events.
-
-- **Shows:** the coming days (`days_shown`), each under its day header, with its events; overflow as "+N more".
-- **Tested with:** a full week that overflows, and an empty day.
-- **In progress:** an event in progress (`NOW`) is an ink row chip (*Severity*, *Now is not a severity*).
-- **Today** is not an alert. Mark it by name (the date header reads "TODAY" from `language_map`), never with colour or weight.
-
-<!-- registry:inputs-calendar -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `calendar_entities`, `days_shown` |
-<!-- /registry:inputs-calendar -->
-
-<!-- registry:layouts-calendar -->
-| Screen | Checked in | Not applicable | Cases |
-|---|---|---|---|
-| 4.1" | normal, widest, title, error, empty | warning, severe, gray, colour, stale, unavailable | 7 |
-| 4.26" | normal, widest, title, error, empty | warning, severe, gray, colour, stale, unavailable | 7 |
-<!-- /registry:layouts-calendar -->
-
-### Next appointment
-
-An Event list, or the event hero when there is one event.
-
-- **Shows:** the next events (start time, title, the label text line), or the event hero for one event, and the free time in the footer.
-- **Tested with:** 9, 6, 3, 1 and no events, an event in progress (`NOW`), a grey panel.
-- **In progress:** an event in progress (`NOW`) has its start time in an ink chip, and on the event hero its `NOW` label (*Severity*, *Now is not a severity*).
-- **All-day events** are left out.
-
-<!-- registry:inputs-appointment -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `calendar_entities`, `days_ahead` |
-<!-- /registry:inputs-appointment -->
-
-<!-- registry:layouts-appointment -->
-| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
-|---|---|---|---|---|---|
-| 3.5" | 104 px | 88 px | normal, widest, title, error, empty | warning, severe, gray, colour, stale, unavailable | 11 |
-| 4.1" | 128 px | 112 px | normal, widest, gray, title, error, empty | warning, severe, colour, stale, unavailable | 11 |
-| 4.26" | 256 px | 224 px | normal, widest, gray, title, error, empty | warning, severe, colour, stale, unavailable | 12 |
-<!-- /registry:layouts-appointment -->
-
-### Weather and calendar
-
-A *Hero dashboard with a chart or list*: the weather's hero band over the calendar's date-grouped list, in two equal halves, on the 7.5" portrait.
-
-- **Shows:** the current temperature as the hero with its condition icon (and the moon badge) and the 7.5" detail rows in the top half; the coming days with their events in the bottom half.
-- **Tested with:** −12° with the moon badge, an official warning with pollen at severe (both take a detail row), an event in progress, a full calendar that overflows, an empty day, no calendar chosen, weather unavailable, stale weather, a grayscale panel, a long title.
-- **Rules:** the weather's (*Weather at a glance and Weather*: thresholds, *Pollen*, *Override order*, with the 7.5" detail rows and their make-way order) and the calendar's (*Calendar*: an event in progress is an ink row chip, today by name).
-
-<!-- registry:inputs-weather-calendar -->
-| Screen | Inputs of this page |
-|---|---|
-| every screen | `weather_entity`, `current_temp_sensor`, `pollen_sensor`, `moon_phase_sensor`, `weather_warning_sensor`, `weather_warning_text_sensor`, `calendar_entities`, `pollen_type`, `days_shown`, `flag_temp_low`, `warning_temp_low`, `severe_temp_low`, `flag_temp_high`, `warning_temp_high`, `severe_temp_high`, `flag_wind_high`, `warning_wind_high`, `severe_wind_high`, `flag_rain_hour`, `warning_rain_hour`, `severe_rain_hour`, `flag_rain_day`, `warning_rain_day`, `severe_rain_day`, `flag_pollen_high`, `warning_pollen_high`, `severe_pollen_high`, `warning_conditions`, `severe_conditions`, `location_string` |
-<!-- /registry:inputs-weather-calendar -->
-
-<!-- registry:layouts-weather-calendar -->
-| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
-|---|---|---|---|---|---|
-| 7.5" P | 152 px | 128 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty, alert, pollen 0, pollen widest | — | 35 |
-<!-- /registry:layouts-weather-calendar -->
-
 ### Mocked-up pages
 
 Bin day, Room sign, Appliance run, Departures, Solar & battery, Month overview, Message board, Now playing and Guest Wi-Fi: their patterns and layouts are in the table above, their rules with the pattern versions they use.
@@ -1743,11 +1745,11 @@ What every blueprint does the same way; where it can, through a shared part that
   5. **Advanced** (collapsed): `stale_after`, `led_color`, `led_flash_delay` and `font_dir`. The LED inputs are there wherever a button can start the redraw: the LED confirms the press. A blueprint that redraws on a change (Doors & windows) has none.
 - **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button, the EnergyZero integration). Every other input has a default, and an optional entity left empty removes its part of the page. Rain forecast (Netherlands) has no main entity: it needs one of its two sources. Sun & moon has none either: it reads Home Assistant's own sun.
 - **Input names:** the device input is always `displays`, also where it takes one device (Medication). Numbered entries are `<name>_<n>` with `<name>_<n>_label` (`entity_1`, `plant_1`, `bar_1`). Thresholds are `warning_<what>` and `severe_<what>`, their switch `flag_<what>`. A blueprint's variables keep the names its drawing reads, so renaming an input never changes the drawing.
-  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather at a glance, Single value, Weather, Rain forecast (Netherlands), Rain forecast, CO2 graph, History graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar, Tiles, Value with details<!-- /v -->); see *Title row* for the exempt blueprints.
+  - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Claude usage, CO2 graph, Entities, History graph, Levels, Plant moisture, Rain forecast, Rain forecast (Netherlands), Single value, Tiles, Value with details, Weather, Weather and calendar, Weather at a glance<!-- /v -->); see *Title row* for the exempt blueprints.
   - The panel is never an input: a page drawn on two screens is two blueprints (Rain forecast on the 3.5" and on the 2.7" landscape).
 - **Texts:** every blueprint's strings live in `ep_i18n.jinja`, written from the page definitions (per page, `EP_TXT['<page>']`, which the blueprint's `language_map` reads; the weekday and month lists once, in `pages/_shared.yaml`) and `wx_txt.yaml` (the weather words, `ds_wtxt`), keyed by the 8 language codes, holding weekday/month names and every user-facing string (including the empty, error and stale strings). Paired with separate `weekday_short_map` / `months_short_map` dicts, which read `EP_DAYS_SHORT` / `EP_MONTHS_SHORT`. The update stamp uses weekday + time (`SU 17:58`); dates in content use `SU 8 NOV`. Don't fold them into `language_map`.
 - **One set.** A release gives its templates and its blueprints the same set id: a short hash of the four templates as built, so it changes when the templates change and only then (`lib/set_id.py`). Every blueprint hands its id to the drawing, and the templates compare it with theirs. When they differ, or the blueprint has none, the templates draw the title row and the error block and nothing else: the message (`UPDATE TEMPLATES AND BLUEPRINT`, translated) and, on new lines under it, the two ids (`BLUEPRINT hjnenx · TEMPLATES udrrap` on one line where that fits, else one each; a blueprint without an id shows `—`), the lines centred as one block in the title's type. Templates from before this rule can't tell a newer blueprint apart, and missing templates still fail with `TemplateNotFound`: nothing can draw then.
-- **Shared parts:** the texts, the stale test (`ds_stale`), the drawing step, the button flash and the description's template note are one copy each, in `lib/shared.py`, which writes them into every blueprint; its `--lint` fails a blueprint whose copy differs.
+- **Shared parts:** the texts, the stale test (`ds_stale`), the drawing step, the button flash and the description's template note are written once and put into every blueprint by the build (the text maps by `lib/shared.py`, the others by the generator from `pages/_shared.yaml`); `lib/shared.py --lint` fails a blueprint whose copy differs.
 - **Button feedback (LED flash):** every blueprint with a trigger input confirms a press of the device's own `event.*` button; flash before the ~30 s redraw, using `opendisplay.activate_led` with `continue_on_error: true`, inputs `led_color` (default green) and `led_flash_delay` (default <!-- v:shared:led_flash_delay -->500 ms<!-- /v -->), `flash_count1: 2`, `brightness: 16`.
   - In generic-trigger blueprints, flash only when `trigger.entity_id` is an `event.*` entity belonging to a device.
   - Accept both `button_down` and `button_up`: a sleeping device can deliver either half.

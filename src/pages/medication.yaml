@@ -21,8 +21,8 @@ inputs:
   default: true
 - name: warning_late
   section: thresholds
-  label: 'Overdue: warning after'
-  help: Hours since the last press after which the date turns into a warning chip. The device redraws by itself at that moment.
+  label: 'Overdue: warning at'
+  help: Hours since the last press at which the date turns into a warning chip. The device redraws by itself at that moment.
   selector:
     number:
       min: 0
@@ -32,8 +32,8 @@ inputs:
   default: 24
 - name: severe_late
   section: thresholds
-  label: 'Overdue: severe after'
-  help: Hours since the last press after which the date turns into a severe chip. The device redraws by itself at that moment.
+  label: 'Overdue: severe at'
+  help: Hours since the last press at which the date turns into a severe chip. The device redraws by itself at that moment.
   selector:
     number:
       min: 0

@@ -69,15 +69,159 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 Each blueprint on a black, white, red and yellow panel (the 4.26" is black and white), at the panel's own pixels. Where a page has thresholds the picture shows them at work: a warning in yellow and a severe state in red. The pictures are the release's check renders, so they show what the devices get.
 
 <!-- registry:pictures -->
-**Weather at a glance**
+**Calendar**
 
-Weather at a glance 1.4"
+Calendar 4.1"
 
-![Weather at a glance 1.4"](docs/images/epaper-blueprint-1.4-weather-at-a-glance.png)
+![Calendar 4.1"](docs/images/epaper-blueprint-4.1-calendar.png)
 
-Weather at a glance 3.5"
+Calendar 4.26"
 
-![Weather at a glance 3.5"](docs/images/epaper-blueprint-3.5-weather-at-a-glance.png)
+![Calendar 4.26"](docs/images/epaper-blueprint-4.26-calendar.png)
+
+
+**Claude usage**
+
+Claude usage 3.5"
+
+![Claude usage 3.5"](docs/images/epaper-blueprint-3.5-claude-usage.png)
+
+
+**CO2 graph**
+
+CO2 graph 3.5"
+
+![CO2 graph 3.5"](docs/images/epaper-blueprint-3.5-co2-graph.png)
+
+
+**Doors & windows**
+
+Doors & windows 1.4"
+
+![Doors & windows 1.4"](docs/images/epaper-blueprint-1.4-doors-windows.png)
+
+
+**Energy price (EnergyZero)**
+
+Energy price (EnergyZero) 2.7" landscape
+
+![Energy price (EnergyZero) 2.7" landscape](docs/images/epaper-blueprint-2.7-energy-price-energyzero-landscape.png)
+
+Energy price (EnergyZero) 3.5"
+
+![Energy price (EnergyZero) 3.5"](docs/images/epaper-blueprint-3.5-energy-price-energyzero.png)
+
+
+**Entities**
+
+Entities 3.5"
+
+![Entities 3.5"](docs/images/epaper-blueprint-3.5-entities.png)
+
+
+Example: packages on their way
+
+![Example: packages on their way](docs/images/example-entities-packages.png)
+
+Example: a home server
+
+![Example: a home server](docs/images/example-entities-server.png)
+
+**History graph**
+
+History graph 2.7" landscape
+
+![History graph 2.7" landscape](docs/images/epaper-blueprint-2.7-history-graph-landscape.png)
+
+History graph 3.5"
+
+![History graph 3.5"](docs/images/epaper-blueprint-3.5-history-graph.png)
+
+History graph 4.1"
+
+![History graph 4.1"](docs/images/epaper-blueprint-4.1-history-graph.png)
+
+
+Example: the house's power use over a day
+
+![Example: the house's power use over a day](docs/images/example-history-power.png)
+
+Example: a freezer's temperature, flagged when it warms up
+
+![Example: a freezer's temperature, flagged when it warms up](docs/images/example-history-freezer.png)
+
+**Levels**
+
+Levels 2.7" landscape
+
+![Levels 2.7" landscape](docs/images/epaper-blueprint-2.7-levels-landscape.png)
+
+Levels 3.5"
+
+![Levels 3.5"](docs/images/epaper-blueprint-3.5-levels.png)
+
+Levels 4.1"
+
+![Levels 4.1"](docs/images/epaper-blueprint-4.1-levels.png)
+
+
+Example: the batteries of the devices in the house
+
+![Example: the batteries of the devices in the house](docs/images/example-levels-batteries.png)
+
+Example: a printer's ink
+
+![Example: a printer's ink](docs/images/example-levels-ink.png)
+
+**Medication**
+
+Medication 2.7" landscape
+
+![Medication 2.7" landscape](docs/images/epaper-blueprint-2.7-medication-landscape.png)
+
+
+**Next appointment**
+
+Next appointment 3.5"
+
+![Next appointment 3.5"](docs/images/epaper-blueprint-3.5-next-appointment.png)
+
+Next appointment 4.1"
+
+![Next appointment 4.1"](docs/images/epaper-blueprint-4.1-next-appointment.png)
+
+Next appointment 4.26"
+
+![Next appointment 4.26"](docs/images/epaper-blueprint-4.26-next-appointment.png)
+
+
+**Plant moisture**
+
+Plant moisture 4.1"
+
+![Plant moisture 4.1"](docs/images/epaper-blueprint-4.1-plant-moisture.png)
+
+
+**Rain forecast**
+
+Rain forecast 2.7" landscape
+
+![Rain forecast 2.7" landscape](docs/images/epaper-blueprint-2.7-rain-forecast-landscape.png)
+
+Rain forecast 3.5"
+
+![Rain forecast 3.5"](docs/images/epaper-blueprint-3.5-rain-forecast.png)
+
+
+**Rain forecast (Netherlands)**
+
+Rain forecast (Netherlands) 2.7" landscape
+
+![Rain forecast (Netherlands) 2.7" landscape](docs/images/epaper-blueprint-2.7-rain-forecast-netherlands-landscape.png)
+
+Rain forecast (Netherlands) 3.5"
+
+![Rain forecast (Netherlands) 3.5"](docs/images/epaper-blueprint-3.5-rain-forecast-netherlands.png)
 
 
 **Single value**
@@ -103,240 +247,12 @@ Example: today's date
 
 ![Example: today's date](docs/images/example-single-value-date.png)
 
-**Weather**
-
-Weather 2.7" landscape
-
-![Weather 2.7" landscape](docs/images/epaper-blueprint-2.7-weather-landscape.png)
-
-Weather 2.7" portrait
-
-![Weather 2.7" portrait](docs/images/epaper-blueprint-2.7-weather-portrait.png)
-
-Weather 3.5"
-
-![Weather 3.5"](docs/images/epaper-blueprint-3.5-weather.png)
-
-Weather 4.1"
-
-![Weather 4.1"](docs/images/epaper-blueprint-4.1-weather.png)
-
-Weather 4.26"
-
-![Weather 4.26"](docs/images/epaper-blueprint-4.26-weather.png)
-
-Weather 7.5" landscape
-
-![Weather 7.5" landscape](docs/images/epaper-blueprint-7.5-weather-landscape.png)
-
-Weather 7.5" portrait
-
-![Weather 7.5" portrait](docs/images/epaper-blueprint-7.5-weather-portrait.png)
-
-
-**Medication**
-
-Medication 2.7" landscape
-
-![Medication 2.7" landscape](docs/images/epaper-blueprint-2.7-medication-landscape.png)
-
-
-**Doors & windows**
-
-Doors & windows 1.4"
-
-![Doors & windows 1.4"](docs/images/epaper-blueprint-1.4-doors-windows.png)
-
-
-**Rain forecast (Netherlands)**
-
-Rain forecast (Netherlands) 2.7" landscape
-
-![Rain forecast (Netherlands) 2.7" landscape](docs/images/epaper-blueprint-2.7-rain-forecast-netherlands-landscape.png)
-
-Rain forecast (Netherlands) 3.5"
-
-![Rain forecast (Netherlands) 3.5"](docs/images/epaper-blueprint-3.5-rain-forecast-netherlands.png)
-
-
-**Rain forecast**
-
-Rain forecast 2.7" landscape
-
-![Rain forecast 2.7" landscape](docs/images/epaper-blueprint-2.7-rain-forecast-landscape.png)
-
-Rain forecast 3.5"
-
-![Rain forecast 3.5"](docs/images/epaper-blueprint-3.5-rain-forecast.png)
-
-
-**CO2 graph**
-
-CO2 graph 3.5"
-
-![CO2 graph 3.5"](docs/images/epaper-blueprint-3.5-co2-graph.png)
-
-
-**History graph**
-
-History graph 2.7" landscape
-
-![History graph 2.7" landscape](docs/images/epaper-blueprint-2.7-history-graph-landscape.png)
-
-History graph 3.5"
-
-![History graph 3.5"](docs/images/epaper-blueprint-3.5-history-graph.png)
-
-History graph 4.1"
-
-![History graph 4.1"](docs/images/epaper-blueprint-4.1-history-graph.png)
-
-
-Example: the house's power use over a day
-
-![Example: the house's power use over a day](docs/images/example-history-power.png)
-
-Example: a freezer's temperature, flagged when it warms up
-
-![Example: a freezer's temperature, flagged when it warms up](docs/images/example-history-freezer.png)
-
 **Sun & moon**
 
 Sun & moon 3.5"
 
 ![Sun & moon 3.5"](docs/images/epaper-blueprint-3.5-sun-moon.png)
 
-
-**Claude usage**
-
-Claude usage 3.5"
-
-![Claude usage 3.5"](docs/images/epaper-blueprint-3.5-claude-usage.png)
-
-
-**Levels**
-
-Levels 2.7" landscape
-
-![Levels 2.7" landscape](docs/images/epaper-blueprint-2.7-levels-landscape.png)
-
-Levels 3.5"
-
-![Levels 3.5"](docs/images/epaper-blueprint-3.5-levels.png)
-
-Levels 4.1"
-
-![Levels 4.1"](docs/images/epaper-blueprint-4.1-levels.png)
-
-
-Example: the batteries of the devices in the house
-
-![Example: the batteries of the devices in the house](docs/images/example-levels-batteries.png)
-
-Example: a printer's ink
-
-![Example: a printer's ink](docs/images/example-levels-ink.png)
-
-**Entities**
-
-Entities 3.5"
-
-![Entities 3.5"](docs/images/epaper-blueprint-3.5-entities.png)
-
-
-Example: packages on their way
-
-![Example: packages on their way](docs/images/example-entities-packages.png)
-
-Example: a home server
-
-![Example: a home server](docs/images/example-entities-server.png)
-
-**Plant moisture**
-
-Plant moisture 4.1"
-
-![Plant moisture 4.1"](docs/images/epaper-blueprint-4.1-plant-moisture.png)
-
-
-**Weather and calendar**
-
-Weather and calendar 7.5" portrait
-
-![Weather and calendar 7.5" portrait](docs/images/epaper-blueprint-7.5-weather-and-calendar-portrait.png)
-
-
-**Calendar**
-
-Calendar 4.1"
-
-![Calendar 4.1"](docs/images/epaper-blueprint-4.1-calendar.png)
-
-Calendar 4.26"
-
-![Calendar 4.26"](docs/images/epaper-blueprint-4.26-calendar.png)
-
-
-**Next appointment**
-
-Next appointment 3.5"
-
-![Next appointment 3.5"](docs/images/epaper-blueprint-3.5-next-appointment.png)
-
-Next appointment 4.1"
-
-![Next appointment 4.1"](docs/images/epaper-blueprint-4.1-next-appointment.png)
-
-Next appointment 4.26"
-
-![Next appointment 4.26"](docs/images/epaper-blueprint-4.26-next-appointment.png)
-
-
-**Energy price (EnergyZero)**
-
-Energy price (EnergyZero) 2.7" landscape
-
-![Energy price (EnergyZero) 2.7" landscape](docs/images/epaper-blueprint-2.7-energy-price-energyzero-landscape.png)
-
-Energy price (EnergyZero) 3.5"
-
-![Energy price (EnergyZero) 3.5"](docs/images/epaper-blueprint-3.5-energy-price-energyzero.png)
-
-
-**To-do list**
-
-To-do list 2.7" landscape
-
-![To-do list 2.7" landscape](docs/images/epaper-blueprint-2.7-to-do-list-landscape.png)
-
-To-do list 2.7" portrait
-
-![To-do list 2.7" portrait](docs/images/epaper-blueprint-2.7-to-do-list-portrait.png)
-
-To-do list 3.5"
-
-![To-do list 3.5"](docs/images/epaper-blueprint-3.5-to-do-list.png)
-
-To-do list 4.1"
-
-![To-do list 4.1"](docs/images/epaper-blueprint-4.1-to-do-list.png)
-
-To-do list 7.5" landscape
-
-![To-do list 7.5" landscape](docs/images/epaper-blueprint-7.5-to-do-list-landscape.png)
-
-To-do list 7.5" portrait
-
-![To-do list 7.5" portrait](docs/images/epaper-blueprint-7.5-to-do-list-portrait.png)
-
-
-Example: the week's chores
-
-![Example: the week's chores](docs/images/example-todo-chores.png)
-
-Example: a packing list
-
-![Example: a packing list](docs/images/example-todo-packing.png)
 
 **Tiles**
 
@@ -377,6 +293,41 @@ Example: the appliances and what they are doing
 
 ![Example: the appliances and what they are doing](docs/images/example-tiles-appliances.png)
 
+**To-do list**
+
+To-do list 2.7" landscape
+
+![To-do list 2.7" landscape](docs/images/epaper-blueprint-2.7-to-do-list-landscape.png)
+
+To-do list 2.7" portrait
+
+![To-do list 2.7" portrait](docs/images/epaper-blueprint-2.7-to-do-list-portrait.png)
+
+To-do list 3.5"
+
+![To-do list 3.5"](docs/images/epaper-blueprint-3.5-to-do-list.png)
+
+To-do list 4.1"
+
+![To-do list 4.1"](docs/images/epaper-blueprint-4.1-to-do-list.png)
+
+To-do list 7.5" landscape
+
+![To-do list 7.5" landscape](docs/images/epaper-blueprint-7.5-to-do-list-landscape.png)
+
+To-do list 7.5" portrait
+
+![To-do list 7.5" portrait](docs/images/epaper-blueprint-7.5-to-do-list-portrait.png)
+
+
+Example: the week's chores
+
+![Example: the week's chores](docs/images/example-todo-chores.png)
+
+Example: a packing list
+
+![Example: a packing list](docs/images/example-todo-packing.png)
+
 **Value with details**
 
 Value with details 4.1"
@@ -391,6 +342,7 @@ Value with details 7.5" portrait
 
 ![Value with details 7.5" portrait](docs/images/epaper-blueprint-7.5-value-with-details-portrait.png)
 
+
 Example: the house's power use with solar, battery and grid
 
 ![Example: the house's power use with solar, battery and grid](docs/images/example-value-details-power.png)
@@ -398,6 +350,54 @@ Example: the house's power use with solar, battery and grid
 Example: the temperature outside with humidity, wind and rain
 
 ![Example: the temperature outside with humidity, wind and rain](docs/images/example-value-details-outside.png)
+
+**Weather**
+
+Weather 2.7" landscape
+
+![Weather 2.7" landscape](docs/images/epaper-blueprint-2.7-weather-landscape.png)
+
+Weather 2.7" portrait
+
+![Weather 2.7" portrait](docs/images/epaper-blueprint-2.7-weather-portrait.png)
+
+Weather 3.5"
+
+![Weather 3.5"](docs/images/epaper-blueprint-3.5-weather.png)
+
+Weather 4.1"
+
+![Weather 4.1"](docs/images/epaper-blueprint-4.1-weather.png)
+
+Weather 4.26"
+
+![Weather 4.26"](docs/images/epaper-blueprint-4.26-weather.png)
+
+Weather 7.5" landscape
+
+![Weather 7.5" landscape](docs/images/epaper-blueprint-7.5-weather-landscape.png)
+
+Weather 7.5" portrait
+
+![Weather 7.5" portrait](docs/images/epaper-blueprint-7.5-weather-portrait.png)
+
+
+**Weather and calendar**
+
+Weather and calendar 7.5" portrait
+
+![Weather and calendar 7.5" portrait](docs/images/epaper-blueprint-7.5-weather-and-calendar-portrait.png)
+
+
+**Weather at a glance**
+
+Weather at a glance 1.4"
+
+![Weather at a glance 1.4"](docs/images/epaper-blueprint-1.4-weather-at-a-glance.png)
+
+Weather at a glance 3.5"
+
+![Weather at a glance 3.5"](docs/images/epaper-blueprint-3.5-weather-at-a-glance.png)
 <!-- /registry:pictures -->
 
 The design itself is written down in [docs/design-system.md](docs/design-system.md): screens and their tokens, colour, type, icons, states, components, modules, patterns and pages.

@@ -100,7 +100,7 @@ layouts:
     - name: pollen_sensor
       section: content
       label: Pollen forecast sensor
-      help: Optional Kleenex pollen sensor to use - if not specified all pollen rows are omitted
+      help: Optional Kleenex pollen sensor. Left empty, the screen shows no pollen.
       selector:
         entity:
           filter:

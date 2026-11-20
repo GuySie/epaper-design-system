@@ -214,7 +214,7 @@ blueprint:
           selector:
             boolean: {}
         warning_usage:
-          name: Warning threshold
+          name: 'Usage: warning at or above'
           description: If a bar's usage is at or above this percentage, its fill and percentage chip switch to the warning
             level.
           default: 90
@@ -225,9 +225,9 @@ blueprint:
               unit_of_measurement: '%'
               mode: box
         severe_usage:
-          name: Severe threshold
+          name: 'Usage: severe at or above'
           description: If a bar's usage is at or above this percentage, its fill and percentage chip switch to the severe
-            colour.
+            level.
           default: 100
           selector:
             number:
@@ -341,7 +341,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'rjqwzd'
+  ds_set: 'uwydvo'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'

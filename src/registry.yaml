@@ -106,36 +106,36 @@ patterns:
 # pages: what a blueprint offers (its blueprints are its layouts in pages/<page>.yaml, never listed here). uses = pattern[/version]; layouts per screen: the page's own pattern (default for the
 # rest) or '-' = not offered; the lint fails on another pattern's name
 pages:
-  weather-glance: {name: Weather at a glance, uses: glance/footer, status: live, default: [glance/footer], widest: '-12°'}
-  single-value:   {name: Single value, uses: glance, status: live, default: [glance], widest: '-12.5'}
-  weather:        {name: Weather, uses: hero-dashboard/strips, status: live, default: [hero-dashboard/strips], '14': ['-'], widest: '-12°'}
-  medication:     {name: Medication, uses: glance, status: live, default: [glance], '14': ['-'], '27p': ['-'], widest: '20:00'}
-  doors-windows:  {name: Doors & windows, uses: glance, status: live, default: [glance]}
-  rain:           {name: 'Rain forecast (Netherlands)', uses: bar-chart/thresholds, status: live, default: [bar-chart/thresholds], '14': ['-'], widest: '50 mm/h'}
-  rain-hourly:    {name: Rain forecast, uses: bar-chart/thresholds, status: live, default: [bar-chart/thresholds], '14': ['-'], widest: '50 mm/h'}
-  co2:            {name: CO2 graph, uses: line-chart/thresholds, status: live, default: [line-chart/thresholds], '14': ['-'], widest: '4000'}
-  history:        {name: History graph, uses: line-chart/thresholds, status: live, default: [line-chart/thresholds], '14': ['-'], widest: '-12.5'}
-  sun-moon:       {name: Sun & moon, uses: timeline, status: live, default: [timeline], '14': ['-'], '27p': ['-'], widest: '10:44am'}
-  claude:         {name: Claude usage, uses: meters, status: live, default: [meters], '14': ['-']}
-  levels:         {name: Levels, uses: meters, status: live, default: [meters], '14': ['-'], widest: '1240 ppm'}
-  entities:       {name: Entities, uses: key-value-list, status: live, default: [key-value-list], '14': ['-']}
-  plants:         {name: Plant moisture, uses: key-value-list, status: live, default: [key-value-list], '14': ['-']}
-  weather-calendar: {name: Weather and calendar, uses: hero-dashboard/module, status: live, default: ['-'], '75p': [hero-dashboard/module], widest: '-12°'}
-  calendar:       {name: Calendar, uses: grouped-list, status: live, default: [grouped-list], '14': ['-']}
-  appointment:    {name: Next appointment, uses: event-list, status: live, default: [event-list], '14': ['-'], widest: '20:00'}
-  bin-day:        {name: Bin day, uses: glance/word, status: mock, default: [glance/word]}
-  room-sign:      {name: Room sign, uses: glance/word, status: mock, default: [glance/word]}
   appliance:      {name: Appliance run, uses: glance/progress, status: mock, default: [glance/progress], '14': ['-'], '27p': ['-'], widest: '20:00'}
-  energy-price:   {name: 'Energy price (EnergyZero)', uses: bar-chart/prices, status: live, default: [bar-chart/prices], '14': ['-'], '27p': ['-'], widest: '-10 ct'}
+  bin-day:        {name: Bin day, uses: glance/word, status: mock, default: [glance/word]}
+  calendar:       {name: Calendar, uses: grouped-list, status: live, default: [grouped-list], '14': ['-']}
+  claude:         {name: Claude usage, uses: meters, status: live, default: [meters], '14': ['-']}
+  co2:            {name: CO2 graph, uses: line-chart/thresholds, status: live, default: [line-chart/thresholds], '14': ['-'], widest: '4000'}
   departures:     {name: Departures, uses: event-list/line-numbers, status: mock, default: [event-list/line-numbers], '14': ['-']}
-  energy-flows:   {name: Solar & battery, uses: meters/both-ways, status: mock, default: [meters/both-ways], '14': ['-'], widest: '100%'}
-  todo:           {name: To-do list, uses: checklist, status: live, default: [checklist], '14': ['-']}
-  tiles:          {name: Tiles, uses: tiles, status: live, default: [tiles], widest: 'Triggered'}
-  month:          {name: Month overview, uses: month, status: mock, default: [month], '14': ['-'], '27p': ['-']}
-  message:        {name: Message board, uses: note, status: mock, default: [note], '14': ['-']}
-  now-playing:    {name: Now playing, uses: note/progress, status: mock, default: [note/progress], '14': ['-']}
+  doors-windows:  {name: Doors & windows, uses: glance, status: live, default: [glance]}
+  energy-price:   {name: 'Energy price (EnergyZero)', uses: bar-chart/prices, status: live, default: [bar-chart/prices], '14': ['-'], '27p': ['-'], widest: '-10 ct'}
+  entities:       {name: Entities, uses: key-value-list, status: live, default: [key-value-list], '14': ['-']}
   guest-wifi:     {name: Guest Wi-Fi, uses: code, status: mock, default: [code]}
+  history:        {name: History graph, uses: line-chart/thresholds, status: live, default: [line-chart/thresholds], '14': ['-'], widest: '-12.5'}
+  levels:         {name: Levels, uses: meters, status: live, default: [meters], '14': ['-'], widest: '1240 ppm'}
+  medication:     {name: Medication, uses: glance, status: live, default: [glance], '14': ['-'], '27p': ['-'], widest: '20:00'}
+  message:        {name: Message board, uses: note, status: mock, default: [note], '14': ['-']}
+  month:          {name: Month overview, uses: month, status: mock, default: [month], '14': ['-'], '27p': ['-']}
+  appointment:    {name: Next appointment, uses: event-list, status: live, default: [event-list], '14': ['-'], widest: '20:00'}
+  now-playing:    {name: Now playing, uses: note/progress, status: mock, default: [note/progress], '14': ['-']}
+  plants:         {name: Plant moisture, uses: key-value-list, status: live, default: [key-value-list], '14': ['-']}
+  rain-hourly:    {name: Rain forecast, uses: bar-chart/thresholds, status: live, default: [bar-chart/thresholds], '14': ['-'], widest: '50 mm/h'}
+  rain:           {name: 'Rain forecast (Netherlands)', uses: bar-chart/thresholds, status: live, default: [bar-chart/thresholds], '14': ['-'], widest: '50 mm/h'}
+  room-sign:      {name: Room sign, uses: glance/word, status: mock, default: [glance/word]}
+  single-value:   {name: Single value, uses: glance, status: live, default: [glance], widest: '-12.5'}
+  energy-flows:   {name: Solar & battery, uses: meters/both-ways, status: mock, default: [meters/both-ways], '14': ['-'], widest: '100%'}
+  sun-moon:       {name: Sun & moon, uses: timeline, status: live, default: [timeline], '14': ['-'], '27p': ['-'], widest: '10:44am'}
+  tiles:          {name: Tiles, uses: tiles, status: live, default: [tiles], widest: 'Triggered'}
+  todo:           {name: To-do list, uses: checklist, status: live, default: [checklist], '14': ['-']}
   value-details:  {name: Value with details, uses: hero-dashboard/module, status: live, default: ['-'], '41': [hero-dashboard/module], '75': [hero-dashboard/module], '75p': [hero-dashboard/module], widest: '-12.5'}
+  weather:        {name: Weather, uses: hero-dashboard/strips, status: live, default: [hero-dashboard/strips], '14': ['-'], widest: '-12°'}
+  weather-calendar: {name: Weather and calendar, uses: hero-dashboard/module, status: live, default: ['-'], '75p': [hero-dashboard/module], widest: '-12°'}
+  weather-glance: {name: Weather at a glance, uses: glance/footer, status: live, default: [glance/footer], widest: '-12°'}
 
 # words that are not terms of the design system; the lint fails the design system when one is used as a term
 withdrawn: [preset, presets, row kind, row kinds, fallback chain, page frame, Matrix, body module, compact form, short form, family, families]
@@ -150,7 +150,7 @@ components:
   QR code:              {macros: []}
   Empty statement:      {macros: [EMPTY]}
   Moon badge:           {macros: [MOON_BADGE]}
-  Hero group:           {macros: [HERO_ALONE, HERO_SHARED, HERO_LEFT, HERO_INK_X, HERO_ADVANCE]}
+  Hero group:           {macros: [HERO_ALONE, HERO_SHARED, HERO_LEFT, HERO_INK_X]}
   Glance secondary:     {macros: [SECOND]}
   Hour cell / Day cell: {macros: [HCELL, DCELL, DATA_REGULAR]}
   Forecast row:         {macros: [RROW]}

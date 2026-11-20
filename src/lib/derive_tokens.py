@@ -174,10 +174,6 @@ def derive(W, H, Wmm, Hmm):
     return out, notes
 
 
-def step_icon(i):
-    return ICON_LADDER[min(ICON_LADDER.index(i) + 1, len(ICON_LADDER) - 1)]
-
-
 def tier_key(W, H, Wmm, Hmm):
     """The tier's name: canvas pixels and pixel pitch (mm, 0.01)."""
     return f'{W}x{H}-{((Wmm / W) + (Hmm / H)) / 2:.2f}'

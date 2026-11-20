@@ -63,7 +63,7 @@ blueprint:
       input:
         plant_1:
           name: Plant 1 - sensor
-          description: Soil moisture sensor for plant 1. Leave blank to disable this row.
+          description: Soil moisture sensor for plant 1.
           selector:
             entity:
               filter:
@@ -386,8 +386,8 @@ blueprint:
           selector:
             boolean: {}
         warning_moisture_low:
-          name: Warning moisture threshold
-          description: If a plant's moisture is at or below this percentage, its value is shown as a warning chip
+          name: 'Soil moisture: warning at or below'
+          description: If a plant's moisture is at or below this percentage, its row is a warning chip.
           default: 25
           selector:
             number:
@@ -396,8 +396,8 @@ blueprint:
               unit_of_measurement: '%'
               mode: box
         severe_moisture_low:
-          name: Severe moisture threshold
-          description: If a plant's moisture is at or below this percentage, its value is shown as severe
+          name: 'Soil moisture: severe at or below'
+          description: If a plant's moisture is at or below this percentage, its row is a severe chip.
           default: 14
           selector:
             number:
@@ -511,7 +511,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'rjqwzd'
+  ds_set: 'uwydvo'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'

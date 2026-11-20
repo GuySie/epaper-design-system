@@ -67,14 +67,6 @@ blueprint:
             entity:
               filter:
                 domain: sensor
-        secondary_entity:
-          name: Second sensor (optional)
-          description: Its value is shown on one line under the number. Leave blank for none.
-          default: ''
-          selector:
-            entity:
-              filter:
-                domain: sensor
         icon:
           name: Icon (optional)
           description: Shown beside the number. Leave blank for none.
@@ -235,7 +227,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'rjqwzd'
+  ds_set: 'uwydvo'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'
@@ -243,7 +235,6 @@ variables:
   time_format: !input 'time_format'
   header_title: !input 'header_title'
   entity: !input 'entity'
-  secondary_entity: !input 'secondary_entity'
   ds_icon: !input 'icon'
   flag_high: !input 'flag_high'
   warning_high: !input 'warning_high'
@@ -260,9 +251,10 @@ variables:
       {% if (flag_high and n >= (severe_high | float(0))) or (flag_low and n <= (severe_low | float(0))) %}{% set lvl = 'sev' %}
       {% elif (flag_high and n >= (warning_high | float(0))) or (flag_low and n <= (warning_low | float(0))) %}{% set lvl = 'warn' %}{% endif %}
     {% endif %}
-    {% set s2 = states(secondary_entity) if secondary_entity else '' %}
+    {% set se = secondary_entity | default('') %}
+    {% set s2 = states(se) if se else '' %}
     {{ {'raw': raw if ok else '', 'unit': (state_attr(entity, 'unit_of_measurement') or '') if ok else '', 'level': lvl,
-        'second': s2 if s2 not in ['unknown', 'unavailable', 'none', ''] else '', 'second_unit': (state_attr(secondary_entity, 'unit_of_measurement') or '') if secondary_entity else ''} }}
+        'second': s2 if s2 not in ['unknown', 'unavailable', 'none', ''] else '', 'second_unit': (state_attr(se, 'unit_of_measurement') or '') if se else ''} }}
   ds_last_ts: |-
     {% set ns = namespace(t=0) %} {% for e in [entity] %}
       {% if e %}{% for s in expand(e) %}{% set ns.t = [ns.t, as_timestamp(s.last_reported | default(s.last_updated), 0)] | max %}{% endfor %}{% endif %}

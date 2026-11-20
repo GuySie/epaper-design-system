@@ -87,8 +87,7 @@ blueprint:
                 device_class: temperature
         pollen_sensor:
           name: Pollen forecast sensor
-          description: Optional Kleenex pollen sensor to use - if not specified an additional hour weather forecast will be
-            shown
+          description: Optional Kleenex pollen sensor. Left empty, the screen shows no pollen.
           default: ''
           selector:
             entity:
@@ -431,7 +430,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'rjqwzd'
+  ds_set: 'uwydvo'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'

@@ -63,7 +63,7 @@ blueprint:
       input:
         entity_1:
           name: Entity 1
-          description: Entity for row 1. Leave blank to disable this row.
+          description: Entity for row 1.
           selector:
             entity: {}
         entity_2:
@@ -310,7 +310,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'rjqwzd'
+  ds_set: 'uwydvo'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'

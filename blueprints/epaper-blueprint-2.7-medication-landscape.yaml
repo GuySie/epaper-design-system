@@ -74,8 +74,8 @@ blueprint:
           selector:
             boolean: {}
         warning_late:
-          name: 'Overdue: warning after'
-          description: Hours since the last press after which the date turns into a warning chip. The device redraws by itself
+          name: 'Overdue: warning at'
+          description: Hours since the last press at which the date turns into a warning chip. The device redraws by itself
             at that moment.
           default: 24
           selector:
@@ -85,8 +85,8 @@ blueprint:
               unit_of_measurement: h
               mode: box
         severe_late:
-          name: 'Overdue: severe after'
-          description: Hours since the last press after which the date turns into a severe chip. The device redraws by itself
+          name: 'Overdue: severe at'
+          description: Hours since the last press at which the date turns into a severe chip. The device redraws by itself
             at that moment.
           default: 36
           selector:
@@ -217,7 +217,7 @@ trigger:
   - unknown
 conditions: !input 'automation_conditions'
 variables:
-  ds_set: 'rjqwzd'
+  ds_set: 'uwydvo'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'

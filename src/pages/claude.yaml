@@ -178,7 +178,7 @@ inputs:
   default: true
 - name: warning_usage
   section: thresholds
-  label: Warning threshold
+  label: 'Usage: warning at or above'
   help: If a bar's usage is at or above this percentage, its fill and percentage chip switch to the warning level.
   selector:
     number:
@@ -189,8 +189,8 @@ inputs:
   default: 90
 - name: severe_usage
   section: thresholds
-  label: Severe threshold
-  help: If a bar's usage is at or above this percentage, its fill and percentage chip switch to the severe colour.
+  label: 'Usage: severe at or above'
+  help: If a bar's usage is at or above this percentage, its fill and percentage chip switch to the severe level.
   selector:
     number:
       min: 0

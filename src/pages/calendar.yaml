@@ -24,8 +24,7 @@ inputs:
 - name: days_shown
   section: content
   label: Days shown
-  help: How many days ahead to display, starting today. With many days and/or busy calendars, content may overflow the display's
-    300px height.
+  help: How many days ahead to display, starting today. Days that don't fit are left out; a day that doesn't fit whole ends with "+N more".
   selector:
     number:
       min: 1

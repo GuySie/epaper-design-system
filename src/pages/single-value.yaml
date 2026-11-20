@@ -104,9 +104,10 @@ data:
         {% if (flag_high and n >= (severe_high | float(0))) or (flag_low and n <= (severe_low | float(0))) %}{% set lvl = 'sev' %}
         {% elif (flag_high and n >= (warning_high | float(0))) or (flag_low and n <= (warning_low | float(0))) %}{% set lvl = 'warn' %}{% endif %}
       {% endif %}
-      {% set s2 = states(secondary_entity) if secondary_entity else '' %}
+      {% set se = secondary_entity | default('') %}
+      {% set s2 = states(se) if se else '' %}
       {{ {'raw': raw if ok else '', 'unit': (state_attr(entity, 'unit_of_measurement') or '') if ok else '', 'level': lvl,
-          'second': s2 if s2 not in ['unknown', 'unavailable', 'none', ''] else '', 'second_unit': (state_attr(secondary_entity, 'unit_of_measurement') or '') if secondary_entity else ''} }}
+          'second': s2 if s2 not in ['unknown', 'unavailable', 'none', ''] else '', 'second_unit': (state_attr(se, 'unit_of_measurement') or '') if se else ''} }}
   draw:
     kind: single
 texts:
@@ -136,6 +137,8 @@ examples:
 layouts:
   '14':
     spec: single_value_14
+    drop_inputs:
+    - secondary_entity
   27l:
     spec: single_value_27l
   '35':

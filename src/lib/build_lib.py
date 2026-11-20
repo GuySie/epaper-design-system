@@ -216,7 +216,7 @@ def build_design(keys):
 {%- set EP_TT, EP_LT = EP_TIER[EP_L.tier], (EP_LAYOUT[layout] | default({})) -%}
 {#- the layout's measured tokens (its hero, its strip icons) laid over its tier's -#}
 {%- set EP_TK = dict(EP_TT, type=dict(EP_TT.type, **(EP_LT.type | default({}))), icon=dict(EP_TT.icon, **(EP_LT.icon | default({})))) -%}
-{#- an item's main text line: type.primary, or type.data where a screen has none (*Size classes*); [Regular, Bold] -#}
+{#- an item's main text line: type.primary, or type.data where a screen has none (*Deriving tokens for any screen*, the size classes); [Regular, Bold] -#}
 {%- set EP_PRIMARY = EP_TK.type.primary if EP_TK.type.primary else [EP_TK.type.data, EP_TK.type.data] -%}
 {#- the kit's short names for the font roles (TRMNL12/16 text is always the bold cut) -#}
 {%- set f12 = font_dir ~ EP_FONT.label12 -%}
