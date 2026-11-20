@@ -22,6 +22,7 @@ patterns:
     modules: [Title row, Hero block]
     versions:
       hero-chip:    {name: with the hero in a chip, status: live}
+      footer:       {name: with a footer, status: live}
       word:         {name: with a word, status: mock}
       progress:     {name: with a progress bar, status: mock}
   hero-dashboard:
@@ -105,7 +106,7 @@ patterns:
 # pages: what a blueprint offers (its blueprints are its layouts in pages/<page>.yaml, never listed here). uses = pattern[/version]; layouts per screen: the page's own pattern (default for the
 # rest) or '-' = not offered; the lint fails on another pattern's name
 pages:
-  weather-glance: {name: Weather at a glance, uses: glance, status: live, default: [glance], widest: '-12°'}
+  weather-glance: {name: Weather at a glance, uses: glance/footer, status: live, default: [glance/footer], widest: '-12°'}
   single-value:   {name: Single value, uses: glance, status: live, default: [glance], widest: '-12.5'}
   weather:        {name: Weather, uses: hero-dashboard/strips, status: live, default: [hero-dashboard/strips], '14': ['-'], widest: '-12°'}
   medication:     {name: Medication, uses: glance, status: live, default: [glance], '14': ['-'], '27p': ['-'], widest: '20:00'}
@@ -150,7 +151,7 @@ components:
   Empty statement:      {macros: [EMPTY]}
   Moon badge:           {macros: [MOON_BADGE]}
   Hero group:           {macros: [HERO_ALONE, HERO_SHARED, HERO_LEFT, HERO_INK_X, HERO_ADVANCE]}
-  Glance secondary:     {macros: [SECOND, PICK]}
+  Glance secondary:     {macros: [SECOND]}
   Hour cell / Day cell: {macros: [HCELL, DCELL, DATA_REGULAR]}
   Forecast row:         {macros: [RROW]}
   Key-value row:        {macros: [KV, ROW]}
@@ -161,7 +162,7 @@ modules:
   Title row:         {macros: [TITLE]}
   Hero block:        {macros: [HBLOCK, HERO_BLOCK_Y]}
   Hero band:         {macros: [HBAND]}
-  Footer:            {macros: [FOOT]}
+  Footer:            {macros: [FOOT, WXFOOT]}
   Error block:       {macros: [ERRBLOCK, ERRPAGE]}
   Detail rows:       {macros: [DROWS, DCOLW]}
   Strip:             {macros: [HSTRIP, DSTRIP, STRIPY, CELLH]}

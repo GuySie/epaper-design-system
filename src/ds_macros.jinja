@@ -775,9 +775,9 @@
 {%- endmacro -%}
 
 {#- HERO_BLOCK_Y: Glance vertical layout. The hero group and its Glance secondary are ONE block, centred between the title line and the
-     bottom padding. Gap: hero size / 7 from the hero's ink to the secondary's chip box (the box is reserved even without a chip,
+     bottom padding (foot: the footer's room, FNEED). Gap: hero size / 7 from the hero's ink to the secondary's chip box (the box is reserved even without a chip,
      so nothing moves when a chip appears). Returns "hero_cy,second_cy". Mirrors HERO_ALONE's icon fit. -#}
-{%- macro HERO_BLOCK_Y(t, hs, ics, W, P, TH, H, uw=0, icon=true) -%}
+{%- macro HERO_BLOCK_Y(t, hs, ics, W, P, TH, H, uw=0, icon=true, foot=false) -%}
 {%- set tin = (HERO_INK_W(t, hs) | int) + uw -%}
 {%- set gap = hs // EP_SPACE.heroGapDiv -%}
 {%- set fit = namespace(ic=0) -%}
@@ -788,7 +788,7 @@
 {#- the line under the hero (type.secondary) takes a chip's height: its size + 2 x space.xs -#}
 {%- set lb = EP_TK.type.secondary[1] + 2 * (SPACE_XS(EP_TK.type.secondary[1]) | int) -%}
 {%- set block = up + dn + gap + lb -%}
-{%- set z0, z1 = P + TH, H - P -%}
+{%- set z0, z1 = P + TH, H - P - ((FNEED(P) | int) if foot else 0) -%}
 {%- set top = z0 + (z1 - z0 - block) / 2 -%}
 {%- set cy = (top + up) | round | int -%}
 {{ cy }},{{ (cy + dn + gap + lb // 2) | round | int }}
@@ -800,14 +800,15 @@
        sec='chip'   txt as a chip at llevel
        sec='caller' the page draws it: {% call(y) ... %}...{% endcall %}, y = the secondary's centre
      unit: the hero's unit (HERO_ALONE). step: a reading too wide for the layout's hero steps down the hero ladder until
-     the number and its unit fit between the paddings (Single value); without it the number never shrinks. -#}
-{%- macro HBLOCK(ns, hero, icon, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true, unit='', step=false) -%}
+     the number and its unit fit between the paddings (Single value); without it the number never shrinks.
+     foot: the version 'with a footer': the block is centred between the title line and the footer the page draws. -#}
+{%- macro HBLOCK(ns, hero, icon, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true, unit='', step=false, foot=false) -%}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set hs, ics = EP_TK.type.heroAlone, EP_TK.icon.heroAloneSteps -%}
 {%- set uw = HERO_UNIT_W(unit) | int -%}
 {%- if step -%}{%- set pick = namespace(hs=0) -%}{%- for h in (HUP.keys() | list | sort(reverse=true)) -%}{%- if pick.hs == 0 and h <= hs and (HERO_INK_W(hero, h) | int) + uw <= W - 2 * P -%}{%- set pick.hs = h -%}{%- endif -%}{%- endfor -%}
 {%- set hs = pick.hs if pick.hs else (HUP.keys() | list | sort | first) -%}{%- endif -%}
-{%- set gl = HERO_BLOCK_Y(hero, hs, ics, W, P, TH, H, uw, (icon | string | trim) != '').split(',') | map('int') | list -%}
+{%- set gl = HERO_BLOCK_Y(hero, hs, ics, W, P, TH, H, uw, (icon | string | trim) != '', foot).split(',') | map('int') | list -%}
 {{- HERO_ALONE(ns, hero, icon, W, P, gl[0], gl[0], hs, ics, hlevel != '', LEVEL_FILL(hlevel), LEVEL_TEXT(hlevel), moon, unit) -}}
 {%- set sf, ss = FONT[EP_TK.type.secondary[0]], EP_TK.type.secondary[1] -%}
 {%- if sec == 'caller' -%}{{- caller(gl[1]) -}}
@@ -817,14 +818,15 @@
 {%- endmacro -%}
 {#- GLANCE: the Glance pattern (design system: Patterns > Glance), the one macro every Glance page draws with: the title
      row (module 'Title row'; stamp `right`, '' for none; `stale` makes it a chip) and the hero block (module 'Hero block').
-     The other arguments go to HBLOCK; with sec='caller' the page's call block draws the Glance secondary. -#}
-{%- macro GLANCE(ns, title, right, hero, icon, stale=false, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true, unit='', step=false) -%}
+     The other arguments go to HBLOCK; with sec='caller' the page's call block draws the Glance secondary. foot: the
+     version 'with a footer' (the page draws the footer itself). -#}
+{%- macro GLANCE(ns, title, right, hero, icon, stale=false, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true, unit='', step=false, foot=false) -%}
 {{- TITLE(ns, title, right, EP_TK.width, EP_TK.space.pad, EP_TK.space.titleRow, stale) -}}
 {%- if sec == 'caller' -%}
 {%- set outer = caller -%}
-{%- call(y) HBLOCK(ns, hero, icon, hlevel, moon, 'caller') -%}{{- outer(y) -}}{%- endcall -%}
+{%- call(y) HBLOCK(ns, hero, icon, hlevel, moon, 'caller', foot=foot) -%}{{- outer(y) -}}{%- endcall -%}
 {%- else -%}
-{{- HBLOCK(ns, hero, icon, hlevel, moon, sec, txt, llevel, cut, unit, step) -}}
+{{- HBLOCK(ns, hero, icon, hlevel, moon, sec, txt, llevel, cut, unit, step, foot) -}}
 {%- endif -%}
 {%- endmacro -%}
 {#- ===== Pattern macros: a pattern is one macro that puts its modules on the screen; the page passes its content.

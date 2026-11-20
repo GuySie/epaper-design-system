@@ -341,7 +341,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'ebqxmi'
+  ds_set: 'otxyin'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'

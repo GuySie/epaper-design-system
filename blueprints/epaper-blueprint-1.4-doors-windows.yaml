@@ -172,7 +172,7 @@ trigger:
   id: redraw
 conditions: !input 'automation_conditions'
 variables:
-  ds_set: 'ebqxmi'
+  ds_set: 'otxyin'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'

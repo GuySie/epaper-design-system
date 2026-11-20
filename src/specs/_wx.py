@@ -100,18 +100,41 @@ WXM = r'''
 {%- endif -%}
 {%- endmacro -%}
 {#- the one flagged item for a single slot, in the system-wide order: an official warning; else the most severe of
-     the current condition, pollen (if wp), today's rain, wind - on a tie in that order. Returns 'kind§label§value§short' or '' -#}
-{%- macro PICK(wp=true) -%}
+     the current condition, pollen (if wp), today's rain, wind, high/low (if hl) - on a tie in that order. Returns 'kind§label§value§short' or '' -#}
+{%- macro PICK(wp=true, hl=true) -%}
 {%- set p = wx.pollen -%}
 {%- set c = [] -%}
 {%- if wx.flag and not wx.alert -%}{%- set c = c + [[wx.flag.k, '', wx.flag.glance, wx.flag.short]] -%}{%- endif -%}
 {%- if wp and p is not none and p.k -%}{%- set c = c + [[p.k, p.name | upper, p.v | string, p.v | string]] -%}{%- endif -%}
 {%- if wx.mm_today_k -%}{%- set c = c + [[wx.mm_today_k, ds_wtxt['rain'] | upper, MM(wx.mm_today), MM(wx.mm_today)]] -%}{%- endif -%}
 {%- if wx.wind_k -%}{%- set c = c + [[wx.wind_k, ds_wtxt['wind'] | upper, WIND(), WIND()]] -%}{%- endif -%}
-{%- if wx.hilo_k -%}{%- set c = c + [[wx.hilo_k, ds_wtxt['hilo'] | upper, wx.hi ~ '° / ' ~ wx.lo ~ '°', ((ds_wtxt['hilo'] | upper).split('/')[1] ~ ' ' ~ wx.lo ~ '°') if (flag_temp_low | default(true)) and (wx.lo | float(99)) <= (warning_temp_low | default(-100) | float(-100)) else ((ds_wtxt['hilo'] | upper).split('/')[0] ~ ' ' ~ wx.hi ~ '°')]] -%}{%- endif -%}
+{%- if hl and wx.hilo_k -%}{%- set c = c + [[wx.hilo_k, ds_wtxt['hilo'] | upper, wx.hi ~ '° / ' ~ wx.lo ~ '°', ((ds_wtxt['hilo'] | upper).split('/')[1] ~ ' ' ~ wx.lo ~ '°') if (flag_temp_low | default(true)) and (wx.lo | float(99)) <= (warning_temp_low | default(-100) | float(-100)) else ((ds_wtxt['hilo'] | upper).split('/')[0] ~ ' ' ~ wx.hi ~ '°')]] -%}{%- endif -%}
 {%- set pk = ((c | selectattr(0, 'eq', 'sev') | list) + (c | selectattr(0, 'eq', 'warn') | list)) | first | default(none) -%}
 {%- if wx.alert -%}{%- set pk = [wx.flag.k, '', wx.flag.glance, wx.flag.short] -%}{%- endif -%}
 {{ (pk | join('§')) if pk else '' }}
+{%- endmacro -%}
+{#- WXFOOT: the footer of a weather layout without detail rows (Glance with a footer, the portrait Hero dashboard with a
+     forecast table): the alert (PICK without high/low, which has its own line) as the footer chip, an official warning's
+     subject whole or not at all; else the forecast conclusion where it fits whole, chipped at its rain level. pol: pollen
+     above zero stands at the right of the conclusion, alone where both don't fit (and is part of the pick); false where it has a row -#}
+{%- macro WXFOOT(ns, pol, W, H, P) -%}
+{%- set ds, df, maxw = EP_TK.type.data[1], FONT[EP_TK.type.data[0]], W - 2 * P -%}
+{%- set pk = PICK(pol, false) -%}
+{%- if pk -%}
+{%- set kind, lab, val, short = pk.split('§') -%}
+{%- set mark = LEVEL_MARK(kind) -%}
+{%- set full = (lab ~ ' ' ~ val) if lab else val -%}
+{%- if (VALUE_W(mark ~ full, ds, df) | int) <= maxw -%}{%- set v = full -%}
+{%- elif wx.alert and (VALUE_W(mark ~ short, ds, df) | int) > maxw -%}{%- set v = wx.flag.code -%}
+{%- else -%}{%- set v = short -%}{%- endif -%}
+{{- FOOT(ns, v, '', W, H, P, kind) -}}
+{%- else -%}
+{%- set pt = ((wx.pollen.name | upper) ~ ' ' ~ wx.pollen.v) if (pol and wx.pollen is not none and wx.pollen.show) else '' -%}
+{%- set con = FOOT_FORECAST() -%}
+{%- if (VALUE_W(con, ds, df) | int) > maxw -%}{%- set con = '' -%}{%- endif -%}
+{%- if pt and (not con or (VALUE_W(con, ds, df) | int) + EP_TK.space.l + (VALUE_W(pt, ds, df) | int) > maxw) -%}{{- FOOT(ns, pt, '', W, H, P) -}}
+{%- else -%}{{- FOOT(ns, con, pt, W, H, P, FOOT_LEVEL() if con else none) -}}{%- endif -%}
+{%- endif -%}
 {%- endmacro -%}
 {#- WXDASH: pattern 'Hero dashboard', the version with forecast strips (landscape screens). Bottom up: the footer (when
      foot), the day strip (days cells, when days), the hour strip (hours cells), then the hero band between the title line
@@ -213,14 +236,11 @@ WXM = r'''
 {%- for d in dd[:nd] -%}{%- set wl.l = [wl.l, VALUE_W(d.d | upper, ds, df) | int] | max -%}{%- set wl.m = [wl.m, VALUE_W(MM(d.mm), ds, df) | int] | max -%}{%- set wl.r = [wl.r, VALUE_W(d.hi ~ '°/' ~ d.lo ~ '°', ds, df) | int] | max -%}{%- endfor -%}
 {%- set fit = namespace(ok=(wl.l + sl + wl.m + sl + wl.r <= W - 2 * P)) -%}
 {%- macro RANGE(hi, lo) -%}{{ (hi ~ '°/' ~ lo ~ '°') if fit.ok else (hi ~ '/' ~ lo) }}{%- endmacro -%}
-{#- high/low · second item. The second item is the flagged item (PICK, the system-wide order) as a chip, else today's rain
-     (or wind, with the wind_or_precipitation input). High/low stays unless the chip needs the whole text line -#}
-{%- set pk = PICK(false) -%}
-{%- set lft = RANGE(wx.hi, wx.lo) ~ ' · ' -%}
+{#- the text line: high/low · today's rain (or wind, with the wind_or_precipitation input), always; a flagged high/low
+     is a chip, alone where the second item doesn't fit beside it. An alert goes to the footer (WXFOOT) -#}
 {%- set sec = (WIND()) if wind else MM(wx.mm_today) -%}
-{%- set cpad = CHIP_PAD(ds) | int -%}
-{%- if pk and pk.split('§')[2] == wx.hi ~ '° / ' ~ wx.lo ~ '°' -%}
-{%- set kind = pk.split('§')[0] -%}
+{%- if wx.hilo_k -%}
+{%- set kind, cpad = wx.hilo_k, CHIP_PAD(ds) | int -%}
 {%- set ctxt = LEVEL_MARK(kind) ~ (ds_wtxt['hilo'] | upper) ~ ' ' ~ RANGE(wx.hi, wx.lo) -%}
 {%- set cwid = (VALUE_W(ctxt, ds, df) | int) + cpad -%}
 {%- set rt = ' · ' ~ sec -%}
@@ -229,23 +249,7 @@ WXM = r'''
 {%- set x0 = ((W - cwid - rw) / 2) | int -%}
 {{- CCHIP(ns, ctxt, x0 + cwid // 2, ly, df, ds, 0, LEVEL_FILL(kind), LEVEL_TEXT(kind)) -}}
 {{- T(ns, rt, x0 + cwid, ly, df, ds, color.ink, 'lm') -}}
-{%- elif pk -%}
-{%- set kind, lab, val, short = pk.split('§') -%}
-{%- set full = LEVEL_MARK(kind) ~ ((lab ~ ' ' ~ val) if lab else val) -%}
-{%- set lw = VALUE_W(lft, ds, df) | int -%}
-{%- set fw = (VALUE_W(full, ds, df) | int) + cpad -%}
-{%- if lw + fw <= W - 2 * P -%}{%- set ctxt = full -%}
-{%- elif fw <= W - 2 * P -%}{%- set ctxt, lw, lft = full, W, '' -%}
-{%- elif (VALUE_W(LEVEL_MARK(kind) ~ short, ds, df) | int) + cpad <= W - 2 * P -%}{%- set ctxt = LEVEL_MARK(kind) ~ short -%}
-{%- elif wx.alert -%}{%- set ctxt = LEVEL_MARK(kind) ~ wx.flag.code -%}
-{%- else -%}{%- set ctxt = FITW(LEVEL_MARK(kind) ~ short, W - 2 * P - cpad, ds, df) -%}{%- endif -%}
-{%- set cwid = (VALUE_W(ctxt, ds, df) | int) + cpad -%}
-{%- if lw + cwid <= W - 2 * P -%}
-{%- set x0 = ((W - lw - cwid) / 2) | int -%}
-{{- T(ns, lft, x0, ly, df, ds, color.ink, 'lm') -}}
-{{- CCHIP(ns, ctxt, x0 + lw + cwid // 2, ly, df, ds, 0, LEVEL_FILL(kind), LEVEL_TEXT(kind)) -}}
-{%- else -%}{{- CCHIP(ns, ctxt, W // 2, ly, df, ds, 0, LEVEL_FILL(kind), LEVEL_TEXT(kind)) -}}{%- endif -%}
-{%- else -%}{{- T(ns, lft ~ sec, W // 2, ly, df, ds, color.ink, 'mm', W - 2 * P) -}}{%- endif -%}
+{%- else -%}{{- T(ns, RANGE(wx.hi, wx.lo) ~ ' · ' ~ sec, W // 2, ly, df, ds, color.ink, 'mm', W - 2 * P) -}}{%- endif -%}
 {%- set y = yt -%}
 {#- the forecast table: label left, mm right-aligned space.l before the temperature column (as wide as its widest value),
      temperature right; a flagged value is a row chip (row - 1 high) -#}
@@ -279,28 +283,21 @@ WXM = r'''
 {{- T(ns, LEVEL_MARK(p.k) ~ (p.name | upper), P, pcy, df, ds, LEVEL_TEXT(p.k), 'lm', W - 2 * P - (VALUE_W(p.v, ds, df) | int) - sl) -}}
 {{- T(ns, p.v, W - P - 1, pcy, df, ds, LEVEL_TEXT(p.k), 'rm') -}}
 {%- endif -%}
-{{- FOOT(ns, FOOT_FORECAST(), '', W, H, P, FOOT_LEVEL()) -}}
+{{- WXFOOT(ns, false, W, H, P) -}}
 {%- endmacro -%}
 '''
 
-# Glance secondary value (one slot): the flagged item (PICK); else pollen above zero (it has priority); else hi/lo
+# Weather at a glance: the line under the hero is today's high/low, always; flagged, it is a chip (the values alone
+# where the label doesn't fit). Alerts and pollen stand in the footer (WXFOOT)
 GLANCE2 = r"""
 {%- macro SECOND(ns, cx, cy, fb, s, cw, maxw=999) -%}
-{%- set pk = PICK(true) -%}
-{%- if pk -%}
-{%- set kind, lab, val, short = pk.split('§') -%}
-{%- set mark = LEVEL_MARK(kind) -%}
-{%- set full = mark ~ ((lab ~ ' ' ~ val) if lab else val) -%}
-{%- set pad = CHIP_PAD(s) | int -%}
-{%- if (VALUE_W(full, s, fb) | int) + pad <= maxw -%}{%- set v = full -%}
-{%- elif (VALUE_W(mark ~ short, s, fb) | int) + pad <= maxw -%}{%- set v = mark ~ short -%}
-{%- elif wx.alert -%}{%- set v = mark ~ wx.flag.code -%}
-{%- else -%}{%- set v = FITW(mark ~ short, maxw - pad, s, fb) -%}{%- endif -%}
-{{- CCHIP(ns, v, cx, cy, fb, s, cw, LEVEL_FILL(kind), LEVEL_TEXT(kind)) -}}
-{%- elif wx.pollen is not none and wx.pollen.show -%}
-{{- T(ns, (wx.pollen.name | upper) ~ ' ' ~ wx.pollen.v, cx, cy, fb, s, color.ink, 'mm', maxw) -}}
+{%- set hl = wx.hi ~ '° / ' ~ wx.lo ~ '°' -%}
+{%- if wx.hilo_k -%}
+{%- set mark = LEVEL_MARK(wx.hilo_k) -%}
+{%- set full = mark ~ (ds_wtxt['hilo'] | upper) ~ ' ' ~ hl -%}
+{{- CCHIP(ns, full if (VALUE_W(full, s, fb) | int) + (CHIP_PAD(s) | int) <= maxw else (mark ~ hl), cx, cy, fb, s, cw, LEVEL_FILL(wx.hilo_k), LEVEL_TEXT(wx.hilo_k)) -}}
 {%- else -%}
-{{- T(ns, wx.hi ~ '° / ' ~ wx.lo ~ '°', cx, cy, fb, s, color.ink, 'mm') -}}
+{{- T(ns, hl, cx, cy, fb, s, color.ink, 'mm') -}}
 {%- endif -%}
 {%- endmacro -%}
 """

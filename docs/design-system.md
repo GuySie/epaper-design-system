@@ -181,7 +181,7 @@ What each font measures on each tier (x-height / cap height):
 | Page | Screen | Hero group | Hero | Hero icon | Strip icons (hour / day) | Digit height | mm |
 |---|---|---|---|---|---|---|---|
 | Weather at a glance | 1.4" | on its own | 80 px | 80 → 48 | — | 58 px | 7.5 |
-| Weather at a glance | 3.5" | on its own | 104 px | 104 → 64 | — | 75 px | 15.5 |
+| Weather at a glance | 3.5" | on its own | 88 px | 88 → 56 | — | 64 px | 13.2 |
 | Single value | 1.4" | on its own | 72 px | 72 → 48 | — | 53 px | 6.9 |
 | Single value | 2.7" L | on its own | 88 px | 88 → 56 | — | 64 px | 10.7 |
 | Single value | 3.5" | on its own | 104 px | 104 → 64 | — | 75 px | 15.5 |
@@ -691,7 +691,7 @@ A component is one drawn building block with a fixed job; it can contain other c
 | **Empty statement** | One centred text line where a module has nothing to say | message | `type.primary` (strong), one step down to `type.data` when it doesn't fit | `EMPTY` (reads its tokens) |
 | **Moon badge** | The moon phase on a weather hero icon | icon box | `icon.moonBadge` | `MOON_BADGE` |
 | **Hero group** | Number then icon, centred by ink in the space it owns. Two versions: *on its own* (in the hero block) and *beside other content* (in the hero band, the event hero); see *Hero group* | number, icon, area, level | `type.hero*`, `icon.hero*`, `space.heroGap` | `HERO_ALONE` on its own, `HERO_SHARED` beside other content; `HERO_LEFT`, `HERO_INK_X`, `HERO_ADVANCE` |
-| **Glance secondary** | The one text line under the hero on a Glance: a value as plain text, or a chip at a level; its box is a chip's height. What goes there is the page's rule (the weather's: *Override order*) | text, level | `type.secondary`, `chip.*` | drawn in `HBLOCK`; the weather's pick is `SECOND`, `PICK` |
+| **Glance secondary** | The one text line under the hero on a Glance: a value as plain text, or a chip at a level; its box is a chip's height. What goes there is the page's rule (the weather's: today's high/low, *Glance with a footer*) | text, level | `type.secondary`, `chip.*` | drawn in `HBLOCK`; the weather's is `SECOND` |
 | **Hour cell / Day cell** | One column of a strip: label, optional icon, values. Rules: *Hour cell / Day cell*, below the table | hour or day | `type.data`, `space.xs`, `icon.strip*`, `chip.*` | `HCELL`, `DCELL`, `DATA_REGULAR` |
 | **Forecast row** | One row of the 2.7" portrait's forecast table: label, mm, temperature. Rules: *Forecast row*, below the table | hour or day | `type.data`, `space.row`, `space.l`, `chip.*` | `RROW`, `RCHIP` |
 | **Key-value row** | Name and value in a list, one or two columns, row lines | name, value, level | `type.label`, `type.data`, `space.row` (`space.rowDense` on the 4.1" plant list), `space.l`, `line.base`, `chip.*` | `KVLIST` / `KV` (read their tokens; `ROW` draws) |
@@ -805,18 +805,20 @@ The footer is an **optional single text line at the bottom of a screen**. It say
   - **(b) context for the whole screen** that belongs to no module and needs no action (sunrise/sunset).
 
   (a) beats (b). A layout has a footer only when there is such a conclusion or context **that isn't shown anywhere else on the screen**; otherwise it has none.
-- **Never in the footer:** information you act on (pollen, warnings): it is a module of its own; overflow (`+N more` belongs in its list); metadata (update time and stale chip live in the title row); anything already visible.
+- **Never in the footer:** information you act on (pollen, warnings): it is a module of its own, except on a layout without detail rows, where the footer is its place (*Override order*, Footer; *Pollen*); overflow (`+N more` belongs in its list); metadata (update time and stale chip live in the title row); anything already visible.
 - **Room:** a footer takes `space.footer` at the bottom (above the padding), and every module above it keeps **M** clear of its line. A layout checks this with the same sum everywhere (`FNEED` = M + `space.footer`); the footer is drawn only when it fits.
 - **Look:** one text line in `type.data`, ink ending P from the bottom, a base line S above the caps. At most two items, one left-aligned and one right-aligned. Interface words as uppercase labels, values as written. No icons: whatever an icon could show belongs in a module.
 - **Severity:** when the conclusion is a warning or severe fact, the whole text line becomes the chip (`WEEK 7% AHEAD` in a warning chip), which takes the footer line's place.
 - **Priority:** fill → footer → spread (fill before you float, *Spacing (internal)*, *Fill before you float*, with the footer between fill and spread). The footer gives way to content (one more event, one more plant) but takes precedence over extra white space (Claude bars move from L to M apart to make room).
-- **Never on Glance:** a Glance layout's bottom is its Glance secondary.
+- **Never on Glance:** a Glance layout's bottom is its Glance secondary. The one exception is the version *Glance with a footer*.
 
 | Page and screens | Footer |
 |---|---|
-| Weather at a glance 1.4", 3.5"; Medication 2.7"; Doors & windows 1.4" | none (Glance) |
+| Weather at a glance 1.4", 3.5" | the alert, else (a) forecast conclusion with pollen at the right (*Glance with a footer*) |
+| Single value; Medication 2.7"; Doors & windows 1.4" | none (Glance) |
 | Weather 2.7" landscape, 3.5" | none (no room; the strip is the last module) |
-| Weather 2.7" portrait, 4.1", 7.5" portrait | (a) forecast conclusion |
+| Weather 2.7" portrait | the alert, else (a) forecast conclusion (*Override order*, Footer) |
+| Weather 4.1", 7.5" portrait | (a) forecast conclusion |
 | Weather 7.5" landscape, 4.26" | none (strips fill the panel; sunrise/sunset in the detail rows) |
 | Rain forecast and Rain forecast (Netherlands) 3.5", 2.7" landscape; CO2 graph 3.5" | (a) chart summary; none when there's nothing to show |
 | Energy price (EnergyZero) 3.5", 2.7" landscape | (a) the current price and the cheapest run (*Bar chart for prices*, Footer) |
@@ -867,7 +869,7 @@ A pattern is what a kind of screen looks like: which modules, in which order, an
 <!-- registry:patterns -->
 | Pattern | Modules | Versions | Status | Macro |
 |---|---|---|---|---|
-| **Glance** | Title row, Hero block | *with the hero in a chip*<br>*with a word* (mock)<br>*with a progress bar* (mock) | live | `GLANCE` |
+| **Glance** | Title row, Hero block | *with the hero in a chip*<br>*with a footer*<br>*with a word* (mock)<br>*with a progress bar* (mock) | live | `GLANCE` |
 | **Hero dashboard** | Title row, Hero band, Strip, Footer | *with forecast strips*<br>*with a chart or list* | live | `HERODASH`, `WXDASH`, `WXPORT` |
 | **Bar chart** | Title row, Chart, Footer | *with thresholds*<br>*for prices* | live | `BARCHART` |
 | **Line chart** | Title row, Chart, Footer | *with thresholds* | live | `LINECHART` |
@@ -887,13 +889,13 @@ Bar chart and Line chart share the chart frame; the Timeline shares its clock-ti
 
 ### Glance
 
-Every Glance page draws with one macro, `GLANCE`: the title row and the hero block (the hero group on its own and the Glance secondary under it, centred as one block; `HBLOCK`). The page passes the title, the stamp, the hero and its icon, and the Glance secondary: plain text, a chip at a level, or one it draws itself (the weather's pick, *Override order*).
+Every Glance page draws with one macro, `GLANCE`: the title row and the hero block (the hero group on its own and the Glance secondary under it, centred as one block; `HBLOCK`). The page passes the title, the stamp, the hero and its icon, and the Glance secondary: plain text, a chip at a level, or one it draws itself (the weather's high/low, *Glance with a footer*).
 
 - A readout for across the room (Weather at a glance, Single value, Medication, Doors & windows: the number open as the hero, the first open one as the chip, redrawn only when the count changes).
   1. **Everything with data is large:** the hero (`type.heroAlone`, the hero group *on its own*) and **at most one secondary value**, in `type.secondary` (TRMNL21 Bold). If a value isn't worth that size, it belongs on another pattern.
-  2. **Severity takes the Glance secondary**, in the *Override order*: the picked item replaces the secondary value as a chip, at the same large size. Temperature chips the hero itself.
+  2. **Severity takes the Glance secondary:** the flagged item replaces the secondary value as a chip, at the same large size. Temperature chips the hero itself. (*Glance with a footer* puts it in the footer instead.)
   3. **The only small text is the title and the update stamp**, in the title row. They are metadata, so they only need the label minimum.
-  4. No footers with extra data: hi/lo, rain totals and similar either become the secondary value or are left out.
+  4. No footers with extra data: hi/lo, rain totals and similar either become the secondary value or are left out. The version *Glance with a footer* is the stated exception to this and to *at most one secondary value*.
   5. **One structure, three zones**, the same on every tier:
      - **Title row**: title left, update stamp right (as on every pattern).
      - **Hero block**: the hero group (*Hero group*) with its **Glance secondary directly under it**, as one block. The secondary is part of the message, not a footer: it sits a hero gap (`space.heroGap`) below the hero's ink, measured to its chip box (XS around the TRMNL21 caps). The box is reserved even without a chip, so nothing moves when one appears.
@@ -905,6 +907,15 @@ Every Glance page draws with one macro, `GLANCE`: the title row and the hero blo
 #### Glance with the hero in a chip
 
 Temperature chips the hero itself: the chip is the digits' ink plus `space.s` on every side (*Hero chip*).
+
+#### Glance with a footer
+
+For a Glance whose alerts would otherwise take the place of a value you always need. Only Weather at a glance uses it: an alert used to replace today's high/low.
+
+- **The footer is always there** (*Footer*: room and look), so nothing moves when an alert appears. The hero block is centred between the title line and the footer's room (`FNEED`), not the bottom padding.
+- **The Glance secondary is the value that always shows** and never makes way for an alert: on the weather today's high/low (`13° / 6°`). Flagged, it is a chip with its label (`MAX/MIN 13° / 6°`), the values alone where that doesn't fit.
+- **The footer holds the alert:** the item picked in the *Override order*, as the footer chip. The Glance secondary's own value is left out of that pick. With no alert it holds the page's conclusion (the weather's: *Override order*, Footer).
+- **Worst case:** the hero is fitted for the layout's ordinary reading on the smaller block, so `type.heroAlone` is at most what the plain Glance would get on the same screen; the widest reading (−12° with the moon badge) follows rule 6.
 
 ### Hero dashboard
 
@@ -1117,7 +1128,7 @@ A page is a pattern filled with real content for one use. Each page names the pa
 <!-- registry:pages -->
 | Page | Uses | Status | Widest reading | 1.4" | 2.7" L | 2.7" P | 3.5" | 4.1" | 4.26" | 7.5" L | 7.5" P | 7.09" (no tier yet) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Weather at a glance** | Glance | live | -12° | ● | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
+| **Weather at a glance** | Glance with a footer | live | -12° | ● | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Single value** | Glance | live | -12.5 | ● | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Weather** | Hero dashboard with forecast strips | live | -12° | — | ● | ● | ● | ● | ● | ● | ● | ○ |
 | **Medication** | Glance | live | 20:00 | — | ● | — | ○ | ○ | ○ | ○ | ○ | ○ |
@@ -1160,23 +1171,23 @@ A page is a pattern filled with real content for one use. Each page names the pa
 
 Two pages with the same content: Weather at a glance, on the 1.4" and the 3.5", and Weather, the Hero dashboard *with forecast strips*, from the 2.7" to the 7.5", landscape and portrait.
 
-- **Shows:** the current temperature as the hero, with the condition icon (and the moon badge, day and night: *When to use an icon*); on the Hero dashboard the detail rows (today's rain, wind, high/low; humidity, pressure, sunrise and sunset where there is room; the pollen row), the hour strip and the day strip; on the Glance the Glance secondary (*Override order*).
+- **Shows:** the current temperature as the hero, with the condition icon (and the moon badge, day and night: *When to use an icon*); on the Hero dashboard the detail rows (today's rain, wind, high/low; humidity, pressure, sunrise and sunset where there is room; the pollen row), the hour strip and the day strip; on the Glance today's high/low as the Glance secondary and the footer (*Glance with a footer*; *Override order*, Footer).
 - **Tested with:** −12° (the widest reading), a negative temperature with the moon badge, an official warning (KNMI code orange), a current condition alert, pollen at 0 and high, stale data, no data (the error block), a black/white panel, a 4-gray panel, 12-hour English, a long title.
-- **Detail rows:** On 800 × 480 the labels are written out (`PRESSURE`, `HUMIDITY`, `SUNRISE`, `SUNSET`; the `*_l` keys in `ds_wtxt`), and pressure carries its unit (`1012hPa`, from the weather entity's `pressure_unit`). Next to a weather hero, as the *Detail rows* module (flagged: `CODE YELLOW … FOG`, `NOW … THUNDERSTORM`). Order: **today's rain, wind**, then humidity / pressure / sunrise / sunset, **high/low**, then the pollen row last (high/low beats humidity: the 7.5" shows rain, wind, pressure, sunrise, sunset, max/min). Which row makes way for the alert row or the pollen row: *Override order*. The 2.7" portrait has room for one text line under its icon: high/low · today's rain, or wind with the *Rain or wind* input; a flagged item replaces the second part as a chip.
+- **Detail rows:** On 800 × 480 the labels are written out (`PRESSURE`, `HUMIDITY`, `SUNRISE`, `SUNSET`; the `*_l` keys in `ds_wtxt`), and pressure carries its unit (`1012hPa`, from the weather entity's `pressure_unit`). Next to a weather hero, as the *Detail rows* module (flagged: `CODE YELLOW … FOG`, `NOW … THUNDERSTORM`). Order: **today's rain, wind**, then humidity / pressure / sunrise / sunset, **high/low**, then the pollen row last (high/low beats humidity: the 7.5" shows rain, wind, pressure, sunrise, sunset, max/min). Which row makes way for the alert row or the pollen row: *Override order*. The 2.7" portrait has room for one text line under its icon: high/low · today's rain, or wind with the *Rain or wind* input (*Override order*).
 - **Sunrise and sunset** are detail rows, labelled with words (`SUNRISE` / `SUNSET`).
 
 #### Pollen
 
-Pollen is information you act on (taking allergy medication), so it **has priority**: never footer material and never moved by other content: **the pollen row**, the last detail row on every Hero dashboard; a block above the footer (2.7" portrait); and on Glance the secondary value whenever it is above zero and nothing is flagged (flagged pollen joins the *Override order*). **Every weather layout has the pollen inputs.** It shows **the type and the count, nothing else**: no level graphic. The level only decides the fill: plain text below warning, a warning chip at the sensor's *high*, a severe chip at *very high*; with count inputs, a warning chip from the warning count and a severe chip from the severe count (*Weather thresholds*). In the pollen row the type is the label and the count the value (`BIRCH … 96ppm`); flagged, it is one chip spanning both, like any detail row. The detail column is wide enough for a 3-digit count (*Space*); a 4-digit count cuts the type short, as any label gives way to its value (*A label never overlaps its value*). On the 2.7" portrait it is one row (type, count), without an icon. At level 0 the pollen row is left out and the row that made way for it is back; on the 2.7" portrait one more day row takes its place (*fill before you float*).
+Pollen is information you act on (taking allergy medication), so it **has priority** and is never moved by other content: **the pollen row**, the last detail row on every Hero dashboard; a block above the footer (2.7" portrait); and on Glance, which has no rows, the right of the footer whenever it is above zero and nothing is flagged, alone where the conclusion doesn't fit beside it (flagged pollen joins the *Override order*). It is footer material nowhere else. **Every weather layout has the pollen inputs.** It shows **the type and the count, nothing else**: no level graphic. The level only decides the fill: plain text below warning, a warning chip at the sensor's *high*, a severe chip at *very high*; with count inputs, a warning chip from the warning count and a severe chip from the severe count (*Weather thresholds*). In the pollen row the type is the label and the count the value (`BIRCH … 96ppm`); flagged, it is one chip spanning both, like any detail row. The detail column is wide enough for a 3-digit count (*Space*); a 4-digit count cuts the type short, as any label gives way to its value (*A label never overlaps its value*). On the 2.7" portrait it is one row (type, count), without an icon. At level 0 the pollen row is left out and the row that made way for it is back; on the 2.7" portrait one more day row takes its place (*fill before you float*).
 
 #### Weather thresholds
 
 - **Pollen uses the sensor's own level** (Kleenex reports low / moderate / high / very high per type). A count in the pollen inputs overrides it, for sensors without levels.
 - **Conditions never put a chip on the icon** (a fill around an icon outweighs the number and is a chip without text). Instead:
   - **Hours and days:** the cell's label (`15:00`, `MON`) becomes the chip; the icon below it stays plain.
-  - **Current condition:** named in a chip in the **alert row** (`NOW` + `THUNDERSTORM` as the first detail row in the Hero dashboard; the Glance secondary on Glance, where it competes with pollen, rain and wind and wins a tie). Names come from `ds_wtxt.cond` (15 conditions, 8 languages).
+  - **Current condition:** named in a chip in the **alert row** (`NOW` + `THUNDERSTORM` as the first detail row in the Hero dashboard; the footer chip on Glance and the 2.7" portrait, where it competes with pollen, rain and wind and wins a tie). Names come from `ds_wtxt.cond` (15 conditions, 8 languages).
   - **The alert row holds one thing:** an official warning if there is one, else the current condition at warning or severe level.
-- **Official weather warnings** (KNMI, Meteoalarm) come in through two optional inputs on every weather blueprint: a level sensor (yellow / minor / moderate = warning; orange, red / severe / extreme = severe) and a text sensor for the warning's subject (`Thunderstorm`). **The subject** is the alert's weather condition when it sends one (KNMI: `condition: fog` → `FOG`, from `ds_wtxt.cond`), else its title / event / headline. A subject shows **whole or not at all**: no word cutting (it can leave just an adjective, `DENSE`) and no ellipsis. Where the subject doesn't fit, the code alone carries the chip (`CODE ORANGE`); on the 1.4" glance the subject alone comes first when the pair doesn't fit (`FOG`). Every other flagged row (`DCHIP`) follows *A label never overlaps its value*. A warning beats every other alert: the Glance secondary (`CODE ORANGE Thunderstorm`, or only the subject where that doesn't fit), the first detail row in the Hero dashboard (`CODE ORANGE` and the subject as one row chip; *Override order*), and the text line under the icon on the 2.7" portrait. The condition icon never changes.
+- **Official weather warnings** (KNMI, Meteoalarm) come in through two optional inputs on every weather blueprint: a level sensor (yellow / minor / moderate = warning; orange, red / severe / extreme = severe) and a text sensor for the warning's subject (`Thunderstorm`). **The subject** is the alert's weather condition when it sends one (KNMI: `condition: fog` → `FOG`, from `ds_wtxt.cond`), else its title / event / headline. A subject shows **whole or not at all**: no word cutting (it can leave just an adjective, `DENSE`) and no ellipsis. Where the subject doesn't fit, the code alone carries the chip (`CODE ORANGE`); in a footer chip the subject alone comes first when the pair doesn't fit (`FOG`). Every other flagged row (`DCHIP`) follows *A label never overlaps its value*. A warning beats every other alert: the footer chip on Glance and the 2.7" portrait (`CODE ORANGE THUNDERSTORM`, or only the subject where that doesn't fit, else the code) and the first detail row in the Hero dashboard (`CODE ORANGE` and the subject as one row chip; *Override order*). The condition icon never changes.
 - Where a value is shown, its chip follows the threshold: hero temperature, hour and day cells (temperature, rain; the label for the condition), detail rows, the footer. **Today's high/low** (`hilo_k`) takes the same level as today's day forecast, wherever it shows: the MAX/MIN row, the Glance secondary, the 2.7" portrait text line under the icon, the day cell.
 - **Conditions are kinds of weather, not measurements.** Only conditions that are a risk by themselves warn by default. Fog, snow and wind are flagged through the temperature and wind thresholds and official warnings (KNMI issues code yellow for dense fog and slippery roads), so they get no chip of their own.
 
@@ -1185,18 +1196,18 @@ Pollen is information you act on (taking allergy medication), so it **has priori
 One order everywhere a single place has to choose (the `PICK` macro):
 
 1. An **official weather warning**.
-2. Otherwise the **most severe** flagged item; on a tie, in this order: the current **condition**, **pollen**, **today's rain**, **wind**, **today's high/low**.
+2. Otherwise the **most severe** flagged item; on a tie, in this order: the current **condition**, **pollen**, **today's rain**, **wind**, **today's high/low**. An item that has a place of its own on the layout is left out of the pick and flagged there.
 
 Where it applies:
 
-- **Glance secondary** (Weather at a glance, Medication): the picked item as a chip. With nothing flagged: pollen above zero (`BIRCH 40ppm`, *Pollen*), else high/low. Medication: the date becomes the overdue chip (date · status; its redraws are under *Medication*).
-- **2.7" portrait, the text line under the icon:** high/low stays; the second item is the picked item as a chip (pollen excluded: it has its own block), else today's rain (or wind). The chip's full text (`CODE YELLOW FOG`) beats keeping high/low on the text line: the chip takes the whole text line when both don't fit. When high/low itself is picked, it is the chip (`MAX/MIN 11°/3°`) and rain follows only if it fits.
+- **Glance secondary:** Weather at a glance: today's high/low, always; flagged, it is the chip (*Glance with a footer*). Medication: the date becomes the overdue chip (date · status; its redraws are under *Medication*).
+- **2.7" portrait, the text line under the icon:** high/low · today's rain (or wind), always (`13°/6° · 2.6mm`). Flagged high/low is the chip (`MAX/MIN 11°/3°`) and rain follows only if it fits. No other chip takes this line: an alert goes to the footer.
 - **Detail rows (Hero dashboard):** the alert row (official warning, else the current condition) becomes the first row, and the pollen row (pollen above 0) the last. Each takes a row's place so the block keeps its size, and **a row with a chip makes way last**. Each layout names a make-way order for the alert row and one for the pollen row. The alert row chooses first: the first unflagged row still shown in its order makes way, else the first warning-level one, else the first in the order. Then the pollen row chooses the same way. One rule for every layout (`DROWS`):
   - 7.5" (landscape and portrait, and *Weather and calendar*), 4.26": alert row and pollen row: pressure, wind, high/low. Sunrise and sunset never make way.
   - 3.5": both: humidity, wind, high/low, rain.
   - 4.1": both: humidity, wind, rain.
   - 2.7" landscape: both: wind, high/low, rain.
-- **Footer:** keeps its conclusion; it becomes the chip when the rain it is about is flagged (the most severe of today's total and the forecast hours; never when the whole forecast is dry). Alerts never move to the footer: you read a screen from the top, and not every layout has one.
+- **Footer:** keeps its conclusion; it becomes the chip when the rain it is about is flagged (the most severe of today's total and the forecast hours; never when the whole forecast is dry). Alerts never move to the footer: you read a screen from the top, and not every layout has one. **The exception is a layout without detail rows** (Weather at a glance, the 2.7" portrait): there the footer is the alert's place, so the alert never takes a value's. The picked item is the footer chip and goes before the conclusion and its rain chip; high/low is left out of the pick (it is flagged on its own line), and on the 2.7" portrait pollen too (it has its row). An official warning follows *Weather thresholds* (whole or not at all: `CODE ORANGE THUNDERSTORM`, else `THUNDERSTORM`, else `CODE ORANGE`). With no alert: the conclusion where it fits whole (`RAIN UNTIL 17:00`), and on Glance pollen at the right (`BIRCH 96ppm`, *Pollen*).
 - **Title row:** the stale chip replaces the stamp. **Error state:** replaces everything below the title.
 
 #### Weather inputs
@@ -1211,7 +1222,7 @@ Where it applies:
 | Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
 |---|---|---|---|---|---|
 | 1.4" | 80 px | 80 → 48 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, alert, pollen 0, pollen widest | empty | 37 |
-| 3.5" | 104 px | 104 → 64 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, alert, pollen 0, pollen widest | empty | 28 |
+| 3.5" | 88 px | 88 → 56 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, alert, pollen 0, pollen widest | empty | 28 |
 <!-- /registry:layouts-weather-glance -->
 
 <!-- registry:inputs-weather -->
@@ -1771,6 +1782,7 @@ Proven: TRMNL text and Space Grotesk heroes on BWRY ESLs (1.4", 2.7", 3.5", 4.1"
 15. Value with details: the unit after a flagged number (it starts past the chip) and the number at its fitted size on the 4.1" beside three detail rows.
 16. Rain forecast: the hourly forecast of real weather entities (one whose forecast starts at the next hour leaves the first bar dry; one that reports rain in inches is read as mm).
 17. Energy price (EnergyZero): not yet run against a real EnergyZero entry. To prove there: the price arrives in euros per kWh, an hour's start is read as the right hour of the day, and the day the clock changes (23 or 25 hours).
+18. Weather at a glance and Weather on the 2.7" portrait, on a panel without a warning colour: the outlined footer chip under an outlined high/low chip and an outlined hero (three outlines on the 1.4"), and under the outlined pollen row on the 2.7" portrait, where touching outlines join into one box.
 
 ## Open items
 
