@@ -214,6 +214,16 @@ terms:
   spec:                {level: '—',      of: Layout, what: 'the file that draws a layout in pixels (`src/specs/`); a layout may reuse another layout''s spec with its own tokens', aliases: []}
   shared part:         {level: '—',      of: Blueprint, what: 'a piece every blueprint has, written once (texts, stale test, drawing step, button flash, template note)', aliases: []}
   Stale:               {level: '—',      of: States, what: 'the newest data is older than stale_after: the stale chip', aliases: []}
+  floor:               {level: '—',      of: Token, what: 'the smallest value a token may take on a screen: a legibility threshold in millimetres applied to the pixel pitch (*Floors and their thresholds*)', aliases: []}
+  step up:             {level: '—',      of: Token, what: 'one step above a floor or base, taken on a large screen (*Step up (large screens)*)', aliases: []}
+  rung:                {level: '—',      of: hero ladder, what: 'one size of the hero ladder or the icon ladder', aliases: []}
+  cut:                 {level: '—',      of: null, what: 'one drawing of a font at one size and weight: a native cut (12, 16, 21 px) or an exact 2× cut (24, 32, 42 px); Regular or Bold', aliases: []}
+  widest reading:      {level: '—',      of: Page, what: 'the widest value a page''s entity can show; layouts and fitted sizes are chosen for it (*Pages*, the widest reading decides the layout)', aliases: []}
+  ordinary reading:    {level: '—',      of: Page, what: 'the reading a hero on its own is fitted on: a two-digit temperature, a clock time, a one-digit count', aliases: []}
+  hero gap:            {level: token,    of: Hero group, what: 'hero size ÷ 7 (`space.heroGap`): between the number and its icon, and between the hero and what is stacked under it', aliases: []}
+  hero clearance:      {level: '—',      of: Hero group, what: 'the hero gap a hero numeral''s digits keep from any line', aliases: []}
+  footer chip:         {level: component, of: Footer, what: 'the footer''s text line as a chip: its conclusion when flagged, or the alert on a layout without detail rows', aliases: []}
+  make-way order:      {level: '—',      of: Detail rows, what: 'the order in which a layout''s detail rows give their place to the alert row and the pollen row (*Override order*)', aliases: []}
 
 # aliases of registered names (components, modules, patterns, pages) and of hardware words; the key is the name as it
 # is written in running text. An alias with a capital letter matches only with that capital (Track for the Timeline,

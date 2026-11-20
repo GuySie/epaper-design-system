@@ -430,7 +430,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'uwydvo'
+  ds_set: 'thlfyq'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'

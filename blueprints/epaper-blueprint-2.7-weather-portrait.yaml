@@ -135,15 +135,15 @@ blueprint:
             text: null
         wind_or_precipitation:
           name: Rain or wind
-          description: What follows today's high/low under the weather icon. A wind at or above the severe wind threshold
-            always shows, as a severe chip.
+          description: 'What follows today''s high/low under the weather icon: today''s rain, or the wind speed. An alert,
+            a strong wind included, is shown in the footer.'
           default: precipitation
           selector:
             select:
               options:
               - label: Today's rain
                 value: precipitation
-              - label: Windspeed
+              - label: Wind speed
                 value: windspeed
         start_with_today:
           name: Start the daily forecast with today
@@ -455,7 +455,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'uwydvo'
+  ds_set: 'thlfyq'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'

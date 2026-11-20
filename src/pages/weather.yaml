@@ -72,14 +72,13 @@ layouts:
     - name: wind_or_precipitation
       section: content
       label: Rain or wind
-      help: What follows today's high/low under the weather icon. A wind at or above the severe wind threshold always shows,
-        as a severe chip.
+      help: "What follows today's high/low under the weather icon: today's rain, or the wind speed. An alert, a strong wind included, is shown in the footer."
       selector:
         select:
           options:
           - label: Today's rain
             value: precipitation
-          - label: Windspeed
+          - label: Wind speed
             value: windspeed
       default: precipitation
       after: pollen_type

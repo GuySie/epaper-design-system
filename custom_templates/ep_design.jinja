@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_MONTHS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'uwydvo' -%}
+{%- set EP_SET = 'thlfyq' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -378,7 +378,7 @@
   'set': n_set | timestamp_custom(fmt) if n_set else '—',
   'hours': ns.hours,
   'days': ns.days,
-  'pollen': none if pv is none else {'name': (pt if pt else 'Pollen'), 'v': ((pv | round(0) | int | string) ~ (('¦' ~ (state_attr(ps, 'unit_of_measurement') or '')) if state_attr(ps, 'unit_of_measurement') else '')), 'k': pk, 'show': pv > 0 or pk != ''},
+  'pollen': none if pv is none else {'name': (pt if pt else ds_wtxt['pollen']), 'v': ((pv | round(0) | int | string) ~ (('¦' ~ (state_attr(ps, 'unit_of_measurement') or '')) if state_attr(ps, 'unit_of_measurement') else '')), 'k': pk, 'show': pv > 0 or pk != ''},
   'moon': micon,
   'alert': {'k': 'warn' if wkey == 'wy' else 'sev', 'code': wkey, 'subj': wsubj.t} if wkey else none,
   'cond': cond,

@@ -997,7 +997,7 @@ The chart frame with a warning and a severe input, as *Bar chart with thresholds
 - **Scale:** the one with thresholds (*Chart frame (all charts)*, *Fixed y-scale*). On a day with a negative price its bottom is the lowest price, rounded down to a whole 10, and that value is labelled in the margin. The label margin is sized for `-10` on every day, so the plot never moves.
 - **Baseline:** the zero line. Negative bars hang under it; the time axis keeps its ticks and labels at the bottom of the plot, without a second line.
 - **Thresholds:** both lines run across the hours that have a price.
-- **Hours without a price:** nothing is drawn. When they are the last hours of the day the fact is stated once, centred in their part of the plot (`EMPTY`: `NO PRICES`). No price at all is the error view.
+- **Hours without a price:** nothing is drawn. When they are the last hours of the day the fact is stated once, centred in their part of the plot (`EMPTY`: `NO PRICES`). No price at all is the error state.
 - **Footer:** the current price at the left (`NOW 19 ct`), the cheapest run of hours still to come at the right (`CHEAPEST 21:00–00:00`); the length of the run is an input. The footer is a chip at the current hour's level, not at the highest level in the plot: the chart is read for what to do now. With fewer hours left than the run, the right side stays empty.
 - **Worst case:** `NOW -10 ct` beside `CHEAPEST 21:00–00:00`; in 12-hour time `CHEAPEST 9:00pm–12:00am`.
 
@@ -1268,7 +1268,7 @@ A Bar chart *for prices*: today's electricity price per hour, from the EnergyZer
 - **Price:** EnergyZero's market price with VAT, without energy tax and purchase costs, in whole cents per kWh. An hour's level is decided on the price as shown.
 - **Thresholds:** price per kWh (*Thresholds*).
 - **No stale state:** the prices come from an action, not from a reporting entity.
-- **No prices:** the error view.
+- **No prices:** the error state.
 
 <!-- registry:inputs-energy-price -->
 | Screen | Inputs of this page |
@@ -1310,7 +1310,7 @@ A Key-value list of up to 12 entities.
 A Line chart for any sensor: its last hours on the automatic scale.
 
 - **Shows:** one sensor's last 3, 6, 12 or 24 hours as a line, the current value as the square at its end, the scale's two ends beside the plot, and the footer's conclusion. The title is the sensor's name unless a header title is given.
-- **Tested with:** a room's temperature over 12 hours; the widest labels (`-12.5`); a nearly flat line; a CO2 sensor over 24 hours (whole numbers); the period at warning and at severe (the severe line close to the scale's top, whose label gives way); a low dip; high and low together, on a colour, a yellow and a grey panel; a long title; stale data; the sensor unavailable now; no history (the error view); both switches off; 12-hour time.
+- **Tested with:** a room's temperature over 12 hours; the widest labels (`-12.5`); a nearly flat line; a CO2 sensor over 24 hours (whole numbers); the period at warning and at severe (the severe line close to the scale's top, whose label gives way); a low dip; high and low together, on a colour, a yellow and a grey panel; a long title; stale data; the sensor unavailable now; no history (the error state); both switches off; 12-hour time.
 <!-- registry:examples-history -->
 - **Examples:** the house's power use over a day; a freezer's temperature, flagged when it warms up. Each is drawn in the README.
 <!-- /registry:examples-history -->
@@ -1438,7 +1438,7 @@ A Bar chart *with thresholds*: the next 24 hours in hourly bars on a log scale, 
 - **Bars:** one per hour, starting with the current hour; a bar's value is the rain the forecast gives for that hour, read as mm/h. An hour the forecast doesn't have is dry. A wet bar's least height, the scale and the ticks are those of *Rain forecast (Netherlands)*.
 - **Dry statement:** it names the end of the last bar, the current hour a day on, so it carries its weekday as a time a day away does (*Text rules*, *Dates in captions*): `DRY UNTIL SU 14:00`.
 - **Thresholds:** rain per hour (*Thresholds*).
-- **No hourly forecast:** the error view.
+- **No hourly forecast:** the error state.
 
 <!-- registry:inputs-rain-hourly -->
 | Screen | Inputs of this page |
@@ -1826,6 +1826,7 @@ Every named part of the design system, with its kind (`—` when it is a region,
 | **clock-time axis** | — | Chart | the baseline with ticks and clock times under the plot |
 | **Code block** | module | — | see *Modules* |
 | **Component** | vocabulary | — | see *Vocabulary* |
+| **cut** | — | — | one drawing of a font at one size and weight: a native cut (12, 16, 21 px) or an exact 2× cut (24, 32, 42 px); Regular or Bold |
 | **Date-grouped list** | module | — | see *Modules* |
 | **day strip** | module | Strip | the strip of day cells |
 | **detail column** | — | Detail rows | the width the detail rows take: widest label + space.l + widest value (not: details column) |
@@ -1839,14 +1840,18 @@ Every named part of the design system, with its kind (`—` when it is a region,
 | **Event hero** | module | — | see *Modules* |
 | **Event list** | module, pattern | — | see *Modules*, *Patterns* |
 | **Event row** | component | — | see *Components* |
+| **floor** | — | Token | the smallest value a token may take on a screen: a legibility threshold in millimetres applied to the pixel pitch (*Floors and their thresholds*) |
 | **Footer** | module | — | see *Modules* (not: footer band, summary line) |
+| **footer chip** | component | Footer | the footer's text line as a chip: its conclusion when flagged, or the alert on a layout without detail rows |
 | **Forecast row** | component | — | see *Components* |
 | **Forecast table** | module | — | see *Modules* |
 | **Glance secondary** | component | — | see *Components* (not: Glance secondary slot, secondary slot, secondary band, secondary line) |
 | **Hero band** | module | — | see *Modules* |
 | **Hero block** | module | — | see *Modules* |
 | **Hero chip** | component | — | see *Components* |
+| **hero clearance** | — | Hero group | the hero gap a hero numeral's digits keep from any line |
 | **hero column** | — | Hero band | the space the hero group is centred in, left of the detail rows |
+| **hero gap** | token | Hero group | hero size ÷ 7 (`space.heroGap`): between the number and its icon, and between the hero and what is stacked under it |
 | **Hero group** | component | — | see *Components* |
 | **hero ladder** | token | — | the hero sizes (*Style choices*, Hero ladder) |
 | **hero numeral** | component | Hero group | the number of a hero group, in Space Grotesk Bold at the hero size |
@@ -1861,11 +1866,13 @@ Every named part of the design system, with its kind (`—` when it is a region,
 | **label margin** | — | Chart | the space right of the plot for the scale and threshold values |
 | **Layout** | vocabulary | — | see *Vocabulary* |
 | **Level meter** | module | — | see *Modules* |
+| **make-way order** | — | Detail rows | the order in which a layout's detail rows give their place to the alert row and the pollen row (*Override order*) |
 | **Meters** | module, pattern | — | see *Modules*, *Patterns* |
 | **Module** | vocabulary | — | see *Vocabulary* |
 | **Month grid** | module | — | see *Modules* |
 | **Moon badge** | component | — | see *Components* (not: moon-phase badge) |
 | **now-marker** | component | Progress bar | the line across a progress bar for "now in the period" (not: now marker) |
+| **ordinary reading** | — | Page | the reading a hero on its own is fitted on: a two-digit temperature, a clock time, a one-digit count |
 | **Page** | vocabulary | — | see *Vocabulary* |
 | **page definition** | — | Page | everything a page's blueprints are generated from besides its layouts: inputs, data, texts, description (pages/<page>.yaml) |
 | **Panel** | vocabulary | — | see *Vocabulary* |
@@ -1875,12 +1882,14 @@ Every named part of the design system, with its kind (`—` when it is a region,
 | **Progress bar** | component | — | see *Components* (not: usage bar) |
 | **QR code** | component | — | see *Components* |
 | **row chip** | component | Chip | one chip spanning the label and the value of a row |
+| **rung** | — | hero ladder | one size of the hero ladder or the icon ladder |
 | **Screen** | vocabulary | — | see *Vocabulary* |
 | **severe chip** | component | Chip | a chip at the severe level |
 | **shared part** | — | Blueprint | a piece every blueprint has, written once (texts, stale test, drawing step, button flash, template note) |
 | **spec** | — | Layout | the file that draws a layout in pixels (`src/specs/`); a layout may reuse another layout's spec with its own tokens |
 | **Stale** | — | States | the newest data is older than stale_after: the stale chip |
 | **stale chip** | component | Title row | the update stamp in an ink chip with "!" when the data is old (an outline with "!" where warnings are outlines) (not: stale stamp chip, stale stamp) |
+| **step up** | — | Token | one step above a floor or base, taken on a large screen (*Step up (large screens)*) |
 | **Strip** | module | — | see *Modules* (not: forecast strip) |
 | **Text block** | module | — | see *Modules* |
 | **Tier** | vocabulary | — | see *Vocabulary* |
@@ -1894,4 +1903,5 @@ Every named part of the design system, with its kind (`—` when it is a region,
 | **Value** | component | — | see *Components* |
 | **Version** | vocabulary | — | see *Vocabulary* |
 | **warning chip** | component | Chip | a chip at the warning level (an outline where the panel has no warning colour) (not: warn chip) |
+| **widest reading** | — | Page | the widest value a page's entity can show; layouts and fitted sizes are chosen for it (*Pages*, the widest reading decides the layout) |
 <!-- /registry:glossary -->

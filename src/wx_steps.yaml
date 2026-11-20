@@ -136,7 +136,7 @@
                   'set': n_set | timestamp_custom(fmt) if n_set else '—',
                   'hours': ns.hours,
                   'days': ns.days,
-                  'pollen': none if pv is none else {'name': (pt if pt else 'Pollen'), 'v': ((pv | round(0) | int | string) ~ (('¦' ~ (state_attr(ps, 'unit_of_measurement') or '')) if state_attr(ps, 'unit_of_measurement') else '')), 'k': pk, 'show': pv > 0 or pk != ''},
+                  'pollen': none if pv is none else {'name': (pt if pt else ds_wtxt['pollen']), 'v': ((pv | round(0) | int | string) ~ (('¦' ~ (state_attr(ps, 'unit_of_measurement') or '')) if state_attr(ps, 'unit_of_measurement') else '')), 'k': pk, 'show': pv > 0 or pk != ''},
                   'moon': micon,
                   'alert': {'k': 'warn' if wkey == 'wy' else 'sev', 'code': wkey, 'subj': wsubj.t} if wkey else none,
                   'cond': cond,
