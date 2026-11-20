@@ -1721,7 +1721,7 @@ A *Hero dashboard with a chart or list*: the weather's hero band over the calend
 <!-- registry:layouts-weather-calendar -->
 | Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
 |---|---|---|---|---|---|
-| 7.5" P | 152 px | 128 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty, alert, pollen 0, pollen widest | — | 15 |
+| 7.5" P | 152 px | 128 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty, alert, pollen 0, pollen widest | — | 35 |
 <!-- /registry:layouts-weather-calendar -->
 
 ### Mocked-up pages

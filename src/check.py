@@ -314,9 +314,11 @@ def _layouts(test):
 
 # derived from the registry and the page definitions, never listed
 WEATHER = _layouts(lambda d, u: any(i.get('name') == 'pollen_sensor' for i in d.get('inputs') or []))   # layouts with pollen inputs
-SAME = _layouts(lambda d, u: u.split('/')[0] in ('glance', 'hero-dashboard'))   # a hero: nothing moves between states
+SAME = _layouts(lambda d, u: u.split('/')[0] in ('glance', 'hero-dashboard', 'bar-chart', 'line-chart', 'timeline'))   # nothing moves between states: a hero, a chart's frame
 MODULE = _layouts(lambda d, u: u == 'hero-dashboard/module')   # two halves (design system: Hero dashboard with a chart or list)
 DASH = _layouts(lambda d, u: u.split('/')[0] == 'hero-dashboard')
+CHART = _layouts(lambda d, u: u.split('/')[0] in ('bar-chart', 'line-chart', 'timeline'))   # the frame stays put: title line, baseline, footer line
+ZERO = _layouts(lambda d, u: u == 'bar-chart/prices')   # the baseline is the zero line, so it moves on a day with a negative price (*Bar chart for prices*, Baseline)
 
 
 def signature(bp, payload):
@@ -328,6 +330,10 @@ def signature(bp, payload):
     fills = [(e['y_start'], e['x_start'], e['x_end'], e['y_end']) for e in payload if e.get('type') == 'rectangle'
              and (e.get('fill') not in (None, 'white') or ('fill' not in e and e.get('width', 1) >= 2))
              and abs(e['x_end'] - e['x_start']) > 100]
+    if bp in CHART:               # a chart's frame lines run the plot's width; shorter ones are its data (flat runs of a series)
+        lines = [l for l in lines if l[2] - l[1] >= 0.6 * SIZES[bp][0]]
+        if bp in ZERO:            # its baseline is left out: the title line and the footer's line (in the canvas's last fifth) stay
+            lines = [l for i, l in enumerate(lines) if i == 0 or l[0] > 0.8 * SIZES[bp][1]]
     sig = {'hero size': hero, 'lines': lines, '_fills': fills}
     if bp in DASH and hero:
         sig['hero icon'] = sorted({e['size'] for e in payload if e.get('type') == 'text' and 'materialdesign' in str(e.get('font', ''))
@@ -353,6 +359,18 @@ def pollen_off(scen):
     return (det[0] if det else float(st[ps].get('state') or 0)) in (0, '0')
 
 
+def scen_lang(scen):
+    """the language a scenario draws in"""
+    import os
+    os.environ.setdefault('EP_ROOT', str(ROOT))
+    ns = {}
+    try:
+        exec((ROOT / 'scen' / f'{scen}.py').read_text(), ns)
+    except Exception:
+        return ''
+    return (ns.get('INPUTS') or {}).get('weekday_format', 'en')
+
+
 def same_layout():
     errs = []
     for bp in SAME:
@@ -376,6 +394,13 @@ def same_layout():
                         '; '.join(f'y={y} in {", ".join(v[:4])}' for y, v in sorted(ys.items()) if y != most))
         if len(sc) < 2:
             continue
+        if bp in CHART:           # a chart's label margin follows the language (the decimal separator's width), so states are
+            lang = {}             # compared within one language; the first case's language is the one compared
+            for s, sig in sc:
+                lang.setdefault(scen_lang(s.split('@')[0]), []).append((s, sig))
+            sc = max(lang.values(), key=len)
+            if len(sc) < 2:
+                continue
         ref_s, ref = sc[0]
         def replaced(y, x0, x1, fills):
             # a chip that takes a line's place (the footer's, the pollen row's) keeps the layout: a full-width chip just below
