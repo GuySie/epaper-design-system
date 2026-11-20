@@ -1,6 +1,6 @@
 page: levels
 description:
-  shows: 'Up to six sensors as rows, each with its value and a bar that shows how full it is: batteries, tanks, power, humidity.'
+  shows: 'Up to {n:bar} sensors as rows, each with its value and a bar that shows how full it is: batteries, tanks, power, humidity.'
   trigger_advice: 'A time pattern every 15 minutes: every redraw costs battery.'
   title_default: '"Levels"'
 redraw: trigger

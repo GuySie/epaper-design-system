@@ -49,7 +49,7 @@ inputs:
 - name: warning_co2
   section: thresholds
   label: 'CO2: warning at or above'
-  help: CO2 level drawn as the lower dashed line. Spans above it are filled yellow on BWRY panels, and the footer turns
+  help: CO2 level drawn as the lower dashed line. Spans above it are filled in the warning colour, and the footer turns
     into a warning chip.
   selector:
     number:

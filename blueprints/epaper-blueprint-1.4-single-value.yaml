@@ -235,7 +235,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'gpdsms'
+  ds_set: 'bsyrvk'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'

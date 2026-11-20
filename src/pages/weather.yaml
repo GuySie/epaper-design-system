@@ -57,6 +57,7 @@ data:
 layouts:
   27l:
     spec: weather_27l
+    shows_instead: Current weather with the temperature as the hero, its details and the coming hours, with warnings and pollen as chips.
     drop_inputs:
     - start_with_today
     notes:
@@ -84,6 +85,7 @@ layouts:
     - 'Button devices sold as 2.9": configure the firmware for 168 x 384, or the top 16 px are cut off.'
   '35':
     spec: weather_35
+    shows_instead: Current weather with the temperature as the hero, its details and the coming hours, with warnings and pollen as chips.
     drop_inputs:
     - start_with_today
   '41':

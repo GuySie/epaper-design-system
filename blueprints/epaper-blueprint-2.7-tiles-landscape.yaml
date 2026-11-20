@@ -4,7 +4,7 @@ blueprint:
   description: |
     # E-paper Tiles 2.7" landscape
 
-    Up to 12 entities as tiles, each with an icon, its state and its label. How many fit depends on the screen; with fewer entities the tiles grow.
+    Up to six entities as tiles, each with an icon, its state and its label; with fewer entities the tiles grow.
 
     ## Works with
 
@@ -274,7 +274,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'gpdsms'
+  ds_set: 'bsyrvk'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'

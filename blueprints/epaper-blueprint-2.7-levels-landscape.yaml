@@ -4,7 +4,7 @@ blueprint:
   description: |
     # E-paper Levels 2.7" landscape
 
-    Up to six sensors as rows, each with its value and a bar that shows how full it is: batteries, tanks, power, humidity.
+    Up to four sensors as rows, each with its value and a bar that shows how full it is: batteries, tanks, power, humidity.
 
     ## Works with
 
@@ -310,7 +310,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'gpdsms'
+  ds_set: 'bsyrvk'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'

@@ -1,6 +1,6 @@
 page: value-details
 description:
-  shows: "One sensor's value, large, with up to four other values beside it and a graph of its last hours under it."
+  shows: "One sensor's value, large, with up to {n:detail} other values beside it and a graph of its last hours under it."
   trigger_advice: 'A time pattern every 15 minutes: every redraw costs battery.'
   title_default: the sensor's name
 redraw: trigger

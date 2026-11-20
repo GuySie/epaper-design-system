@@ -236,7 +236,7 @@ def layout_rows(r, pg):
     return rows
 
 
-INLINE = re.compile(r'(<!-- v:([A-Za-z0-9_.:-]+) -->)(.*?)(<!-- /v -->)')   # a value inside typed text (lib/doc_values.py)
+INLINE = re.compile(r'(<!-- v:([A-Za-z0-9_.:,/-]+) -->)(.*?)(<!-- /v -->)')   # a value inside typed text (lib/doc_values.py)
 BLOCK = re.compile(r'(<!-- registry:([a-z0-9-]+) -->\n)(.*?)(<!-- /registry:\2 -->)', re.S)
 
 
@@ -478,6 +478,28 @@ def lint_names(r, doc_text):
     return errs
 
 
+def lint_page_tables(s, doc_values):
+    """the typed tables that list pages can't forget one: *Thresholds* names every live page (in its table, or among
+    the pages without thresholds), and the *Footer* table names every live page"""
+    errs = []
+    live = doc_values.live_pages()
+    def section(start, end):
+        i = s.find(start)
+        j = s.find(end, i + len(start)) if i >= 0 else -1
+        return INLINE.sub(lambda m: m.group(3), s[i:j]) if i >= 0 and j >= 0 else None
+    for what, text in (('*Thresholds*', section('\n### Thresholds\n', '\n### ')),
+                       ('the *Footer* table', section('\n| Page and screens | Footer |\n', '\n\n'))):
+        if text is None:
+            errs.append(f'{what}: not found in the design system')
+            continue
+        for _, v, _ in sorted(live, key=lambda x: -len(x[1]['name'])):     # the longest name first: Weather at a glance before Weather
+            if v['name'] in text:
+                text = text.replace(v['name'], '')
+            else:
+                errs.append(f"{what} doesn't name the page {v['name']}")
+    return errs
+
+
 def lint(doc, pkg=PKG):
     r = load(); T = tables(r, pkg); errs = []
     s = open(doc).read()
@@ -496,6 +518,9 @@ def lint(doc, pkg=PKG):
                 if i['name'] in seen and seen[i['name']][1] != i.get('default'):
                     errs.append(f"threshold {i['name']}: default {i.get('default')!r} on {page}, {seen[i['name']][1]!r} on {seen[i['name']][0]}")
                 seen.setdefault(i['name'], (page, i.get('default')))
+    errs += lint_page_tables(s, doc_values)
+    if s.count('<!-- v:') != len(INLINE.findall(s)):      # a marker the pattern doesn't read would never be written or checked
+        errs.append('a v: marker is malformed (its name, or its closing <!-- /v -->)')
     for m in INLINE.finditer(s):
         try:
             if m.group(3) != doc_values.value(m.group(2)):

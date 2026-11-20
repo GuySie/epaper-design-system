@@ -16,7 +16,7 @@ How the blueprints and templates of the E-paper design system are built and chec
   - `stale`: the entities whose last report decides whether the data is stale; none for a page without a stale state.
   - `data`: the actions that fetch data, the computed variables, and when the error view is drawn. What the spec reads comes from the layout, never from a list.
   - `texts`: the page's strings per language and the shared day and month lists it uses.
-  - `layouts`: per screen the spec and what differs on that screen (input defaults, constants, notes, `drop_inputs` for the inputs the screen doesn't offer).
+  - `layouts`: per screen the spec and what differs on that screen (input defaults, constants, notes, `drop_inputs` for the inputs the screen doesn't offer, `shows_instead` where the page's `shows` sentence isn't true on that screen). In `shows`, `{n:<name>}` is the number of numbered inputs `<name>_<n>` the screen offers.
   - `examples`: for a page for any entities, the check cases shown as examples in the README and the design system.
   - Shared lists in `pages/_shared.yaml`: the links, each URL once, and the integrations (name, URL, and a minimum version only where it matters).
 - **Frozen package:** `lib/golden.py` keeps a released package as data (inputs, description, triggers, conditions, variables and actions, formatting ignored), so a later package can be compared with it.

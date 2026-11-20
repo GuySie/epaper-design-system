@@ -1,6 +1,6 @@
 page: entities
 description:
-  shows: Up to 12 entities in two columns, each with its label, state and unit; empty slots are skipped.
+  shows: Up to {n:entity} entities in one or two columns, each with its label, state and unit; empty slots are skipped.
   needs_also:
   - The entities to show (any domain).
   trigger_advice: A time pattern every 15 minutes, or a state trigger on the entities that matter most.

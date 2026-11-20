@@ -1,7 +1,6 @@
 page: tiles
 description:
-  shows: Up to 12 entities as tiles, each with an icon, its state and its label. How many fit depends on the screen; with fewer
-    entities the tiles grow.
+  shows: Up to {n:entity} entities as tiles, each with an icon, its state and its label; with fewer entities the tiles grow.
   needs_also:
   - The entities to show (any domain).
   trigger_advice: 'A state trigger on the entities that matter most, or a time pattern every 15 minutes: every redraw costs battery.'
@@ -119,6 +118,7 @@ examples:
 layouts:
   '14':
     spec: tiles_14
+    shows_instead: One entity as a single tile, with an icon, its state and its label.
     drop_inputs:
     - entity_2
     - entity_2_label

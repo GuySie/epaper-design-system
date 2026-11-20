@@ -4,7 +4,7 @@ blueprint:
   description: |
     # E-paper Weather 2.7" landscape
 
-    Current weather with the temperature as the hero, its details, the coming hours and the coming days, with warnings and pollen as chips.
+    Current weather with the temperature as the hero, its details and the coming hours, with warnings and pollen as chips.
 
     ## Works with
 
@@ -437,7 +437,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'gpdsms'
+  ds_set: 'bsyrvk'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'

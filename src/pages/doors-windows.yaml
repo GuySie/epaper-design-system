@@ -29,7 +29,7 @@ inputs:
 - name: severe_openings
   section: thresholds
   label: Doors that are severe when open
-  help: Any open door or window is a warning (yellow chip). These ones are severe (red chip) when open, for example the front
+  help: Any open door or window is a warning chip. These ones are a severe chip when open, for example the front
     door. Leave empty for warnings only.
   selector:
     entity:

@@ -102,7 +102,7 @@ blueprint:
             boolean: {}
         warning_co2:
           name: 'CO2: warning at or above'
-          description: CO2 level drawn as the lower dashed line. Spans above it are filled yellow on BWRY panels, and the
+          description: CO2 level drawn as the lower dashed line. Spans above it are filled in the warning colour, and the
             footer turns into a warning chip.
           default: 1000
           selector:
@@ -230,7 +230,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'gpdsms'
+  ds_set: 'bsyrvk'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'

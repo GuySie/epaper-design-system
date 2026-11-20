@@ -77,8 +77,8 @@ blueprint:
       input:
         severe_openings:
           name: Doors that are severe when open
-          description: Any open door or window is a warning (yellow chip). These ones are severe (red chip) when open, for
-            example the front door. Leave empty for warnings only.
+          description: Any open door or window is a warning chip. These ones are a severe chip when open, for example the
+            front door. Leave empty for warnings only.
           default: []
           selector:
             entity:
@@ -172,7 +172,7 @@ trigger:
   id: redraw
 conditions: !input 'automation_conditions'
 variables:
-  ds_set: 'gpdsms'
+  ds_set: 'bsyrvk'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'

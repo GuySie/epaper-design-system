@@ -6,7 +6,7 @@ A blueprint = its page definition (pages/<page>.yaml) + the layout for its scree
 reads) + the shared parts (pages/_shared.yaml, lib/shared.py). The macro files (custom_templates) are built separately
 by lib/build_lib.py. After writing, lib/inputs_std.py puts the inputs in the input scheme's order.
 """
-import glob, os, sys
+import glob, os, re, sys
 LIB = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(LIB)
 sys.path.insert(0, LIB); sys.path.insert(0, ROOT); sys.path.insert(0, os.path.join(ROOT, 'specs'))
@@ -282,7 +282,14 @@ def description(p, lay, scr):
         return lay.get('old_description', '')
     L = SH['links']
     integ = SH['integrations']
-    out = [f"# {lay['name']}", '', d['shows'].strip()]
+    # what it shows: the page's sentence, or the layout's own (`shows_instead`); `{n:<name>}` is the number of numbered
+    # inputs `<name>_<n>` this layout offers, so a count is never typed per screen
+    drop = set(lay.get('drop_inputs') or [])
+
+    def count(m):
+        n = sum(1 for i in p.get('inputs', []) if re.fullmatch(m.group(1) + r'_\d+', i['name']) and i['name'] not in drop)
+        return ('zero one two three four five six seven eight nine ten'.split() + [str(n)])[min(n, 11)]
+    out = [f"# {lay['name']}", '', re.sub(r'\{n:(\w+)\}', count, (lay.get('shows_instead') or d['shows']).strip())]
     if lay.get('shows'):
         out[-1] += ' ' + lay['shows'].strip()
     out += ['', '## Works with', '', SH['screens'][scr]]

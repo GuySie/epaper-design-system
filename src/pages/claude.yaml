@@ -179,8 +179,7 @@ inputs:
 - name: warning_usage
   section: thresholds
   label: Warning threshold
-  help: If a bar's usage is at or above this percentage, its fill and percentage chip switch to the warning colour (yellow
-    on a panel that has it, else black).
+  help: If a bar's usage is at or above this percentage, its fill and percentage chip switch to the warning level.
   selector:
     number:
       min: 0

@@ -19,6 +19,9 @@ Names:
   markerDisc          icon.markerDisc for the inline icon sizes in use
   inputPages:INPUT    the live pages whose definition has that input
   stalePages          the live pages that have a stale state
+  noStalePages        the live pages that have none
+  noThresholdPages    the live pages without a threshold input (flag_, warning_ or severe_)
+  uses:KEY[,KEY]      the live pages that use one of these patterns or versions (registry.yaml `uses`, e.g. uses:glance,glance/footer)
   mm:TIER:SIZE:x|cap[:DECIMALS]   a TRMNL cut's x-height or cap height on a tier, in millimetres (1 decimal unless given)
   dv:WxHxWMMxHMM:PATH a token the generator derives for a screen that has no tier yet (space.pad, type.data, icon.min,
                       line.base, pitch, sizeClass); a type token reads as TRMNL<size>
@@ -113,6 +116,17 @@ def stale_pages():
                      if v.get('blueprints') and (SRC / 'pages' / f'{page}.yaml').exists() and page_def(page).get('stale'))
 
 
+def live_pages():
+    """[(page, registry entry, page definition)] of the pages a blueprint is built from, in the registry's order"""
+    from layouts import registry
+    return [(page, v, page_def(page)) for page, v in registry()['pages'].items()
+            if v.get('blueprints') and (SRC / 'pages' / f'{page}.yaml').exists()]
+
+
+def has_thresholds(d):
+    return any(i['name'].startswith(('flag_', 'warning_', 'severe_')) for i in d.get('inputs') or [])
+
+
 def class_screens(cls):
     keys = [k for k in dt.KNOWN if dt.derive(*dt.KNOWN[k])[0]['sizeClass'] == cls]
     seen = []
@@ -139,6 +153,15 @@ def value(name):
         return f"{dt.TRMNL[int(size)][part] * pitch:.{int(dec[0]) if dec else 1}f}"
     if kind == 'stalePages':
         return stale_pages()
+    if kind == 'noStalePages':
+        return ', '.join(v['name'] for _, v, d in live_pages() if not d.get('stale'))
+    if kind == 'noThresholdPages':
+        return ', '.join(v['name'] for _, v, d in live_pages() if not has_thresholds(d))
+    if kind == 'uses':
+        got = ', '.join(v['name'] for _, v, _ in live_pages() if v.get('uses') in arg.split(','))
+        if not got:
+            raise KeyError(arg)
+        return got
     if kind == 'shared':
         import pages
         i = pages.shared()['inputs'][arg]

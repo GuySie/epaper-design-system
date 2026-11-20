@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_MONTHS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'gpdsms' -%}
+{%- set EP_SET = 'bsyrvk' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -1628,6 +1628,15 @@
 {%- endif -%}{%- endfor -%}
 {%- for r in nt.l0 -%}{{- L(ns, r[0], lines[0][1], r[1], lines[0][1], 1, color.paper) -}}{%- endfor -%}
 {%- for r in nt.l1 -%}{{- L(ns, r[0], lines[1][1], r[1], lines[1][1], 1, color.paper) -}}{%- endfor -%}
+{#- a low threshold line runs under a high fill over the span's whole width: the same notch -#}
+{%- if opt.low -%}{%- for k in [0, 1] -%}
+{%- set yl = ys(opt.low[k]) | int -%}{%- set nl = namespace(l=[]) -%}
+{%- for s in segs.list -%}{%- if s.c and s.c != 'yellow' and s.xb > s.xa -%}
+{%- set pv = nl.l[-1] if nl.l else none -%}
+{%- set nl.l = (nl.l[:-1] + [[pv[0], [pv[1], s.xb] | max]]) if (pv and s.xa <= pv[1]) else (nl.l + [[s.xa, s.xb]]) -%}
+{%- endif -%}{%- endfor -%}
+{%- for r in nl.l -%}{{- L(ns, r[0], yl, r[1], yl, 1, color.paper) -}}{%- endfor -%}
+{%- endfor -%}{%- endif -%}
 {#- the line: 2 px ink, broken where samples are missing -#}
 {#- flat neighbouring segments are drawn as one (identical pixels, fewer elements) -#}
 {%- set lm = namespace(list=[]) -%}
@@ -1688,7 +1697,7 @@
 {#- azimuth -> x: a time track that runs left to right; north hemisphere centres south, south hemisphere centres north -#}
 {%- macro AX(az) -%}{%- set a = (az | float(0)) if north else (((540 - (az | float(0))) % 360)) -%}{{ (x0 + a / 360 * (x1 - x0)) | round | int }}{%- endmacro -%}
 {%- macro EY(el) -%}{{ (hy - ([[el | float(0), 0] | max, emax] | min) / emax * scale) | round | int }}{%- endmacro -%}
-{#- positions first, so markers below the horizon can push a compass letter aside -#}
+{#- positions first: a compass letter is left out for a marker below the horizon -#}
 {%- set sx = AX(saz) | int -%}
 {%- set mpos = namespace(x=-99, up=false) -%}
 {%- set mc = 2 * EP_TK.icon.markerDisc -%}
@@ -1696,17 +1705,17 @@
 {%- set mal = moon.alt | float(0) -%}
 {%- set mpos.x = AX(moon.az) | int -%}
 {%- set mpos.up = mal >= 0 -%}
-{%- if not mpos.up and sel < 0 and ((mpos.x - sx) | abs) < mc -%}{%- set mpos.x = mpos.x + mc -%}{%- endif -%}
-{#- above the horizon the moon also steps aside when it meets the sun (new moon): two marker discs (2 x icon.markerDisc) to the side it is already on,
-     flipped when that would leave the track -#}
-{%- if mpos.up and sel >= 0 and ((mpos.x - sx) | abs) < mc and (((EY(mal) | int) - (EY(sel) | int)) | abs) < mc -%}
+{#- the moon steps aside when it meets the sun, below the horizon and above it (new moon): two marker discs (2 x icon.markerDisc)
+     from the sun, on the side it is already on, flipped when that would leave the track -#}
+{%- set meet = ((mpos.x - sx) | abs) < mc and ((not mpos.up and sel < 0) or (mpos.up and sel >= 0 and (((EY(mal) | int) - (EY(sel) | int)) | abs) < mc)) -%}
+{%- if meet -%}
 {%- set dir = 1 if mpos.x >= sx else -1 -%}
 {%- if sx + dir * mc < x0 or sx + dir * mc > x1 -%}{%- set dir = 0 - dir -%}{%- endif -%}
 {%- set mpos.x = sx + dir * mc -%}
 {%- endif -%}
 {%- endif -%}
 {%- set below = ([sx] if sel < 0 else []) + ([mpos.x] if (mpos.x > -99 and not mpos.up) else []) -%}
-{#- horizon + compass ticks; a letter steps aside for a marker under the line -#}
+{#- horizon + compass ticks; a letter is left out for a marker under the line -#}
 {{- L(ns, xa, hy, xb, hy) -}}
 {%- set tk = namespace(l=[]) -%}
 {%- for az in [90, 180, 270] -%}

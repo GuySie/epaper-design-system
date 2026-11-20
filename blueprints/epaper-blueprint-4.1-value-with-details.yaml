@@ -4,7 +4,7 @@ blueprint:
   description: |
     # E-paper Value with details 4.1"
 
-    One sensor's value, large, with up to four other values beside it and a graph of its last hours under it.
+    One sensor's value, large, with up to three other values beside it and a graph of its last hours under it.
 
     ## Works with
 
@@ -274,7 +274,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'gpdsms'
+  ds_set: 'bsyrvk'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'
