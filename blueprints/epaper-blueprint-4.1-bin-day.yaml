@@ -4,7 +4,7 @@ blueprint:
   description: |
     # E-paper Bin day 4.1"
 
-    The bin that is collected next, as a word large enough to read across the room, with the day under it. Two bins on the same day are both shown.
+    The bin that is collected next, as one large word, with the day under it. Two bins on the same day are both shown.
 
     ## Works with
 
@@ -117,25 +117,25 @@ blueprint:
             text: {}
         bin_1_icon:
           name: Bin 1 - icon
-          description: Optional icon shown after the word.
+          description: Optional icon shown after the word. A long word, or two bins on one day, leaves no room for it.
           default: ''
           selector:
             icon: {}
         bin_2_icon:
           name: Bin 2 - icon
-          description: Optional icon shown after the word.
+          description: Optional icon shown after the word. A long word, or two bins on one day, leaves no room for it.
           default: ''
           selector:
             icon: {}
         bin_3_icon:
           name: Bin 3 - icon
-          description: Optional icon shown after the word.
+          description: Optional icon shown after the word. A long word, or two bins on one day, leaves no room for it.
           default: ''
           selector:
             icon: {}
         bin_4_icon:
           name: Bin 4 - icon
-          description: Optional icon shown after the word.
+          description: Optional icon shown after the word. A long word, or two bins on one day, leaves no room for it.
           default: ''
           selector:
             icon: {}
@@ -163,7 +163,7 @@ blueprint:
             text: {}
         time_format:
           name: Time format
-          description: 12-hour (AM/PM) or 24-hour clock for the times on the display.
+          description: 12-hour (AM/PM) or 24-hour clock for the update time.
           default: 24h
           selector:
             select:
@@ -245,7 +245,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'mlaygv'
+  ds_set: 'lnixbv'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'

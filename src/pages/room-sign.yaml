@@ -1,0 +1,79 @@
+page: room-sign
+description:
+  shows: The state of one entity as one large word, with an optional line under it. Free, busy, do not disturb.
+  trigger_advice: 'A state trigger on the entity, and on the second entity when you use one: the screen redraws when either changes.'
+  title_default: the entity's area, or its name
+  times: the update time
+redraw: trigger
+inputs:
+- name: entity
+  section: content
+  label: Status entity
+  help: The entity whose state is the word, in Home Assistant's own wording (a dropdown helper, a sensor, a switch).
+  selector:
+    entity: {}
+  required: true
+- name: secondary_entity
+  section: content
+  label: Second entity (optional)
+  help: Its state is shown on one line under the word, for example the time the room is free again. Leave blank for none.
+  selector:
+    entity: {}
+  default: ''
+- name: icon
+  section: content
+  label: Icon (optional)
+  help: Shown beside the word. Leave blank for none. A long word, or a status on two lines, leaves no room for it.
+  selector:
+    icon: {}
+  default: ''
+- name: warning_states
+  section: thresholds
+  label: States that are a warning
+  help: The word is a warning chip while the entity is in one of these states, written as shown or as Home Assistant stores them (case doesn't matter). Leave empty for none.
+  selector:
+    text:
+      multiple: true
+  default: []
+- name: severe_states
+  section: thresholds
+  label: States that are severe
+  help: The word is a severe chip while the entity is in one of these states, written as shown or as Home Assistant stores them (case doesn't matter). Leave empty for none.
+  selector:
+    text:
+      multiple: true
+  default: []
+bind:
+- entity
+- secondary_entity
+- icon: ds_icon
+- warning_states
+- severe_states
+data:
+  variables:
+  - ds_title: '{{ header_title if header_title else (area_name(entity) or entity_name(entity) or device_name(entity) or entity) }}'
+  - ds_room: |
+      {% set raw = states(entity) %} {% set ok = raw not in ['unknown', 'unavailable', 'none', ''] %}
+      {% set word = (state_translated(entity) if raw | float(none) is none else raw) if ok else '' %}
+      {% set keys = [raw | lower, word | lower] %}
+      {% set sev = severe_states | default([]) | map('lower') | list %} {% set warn = warning_states | default([]) | map('lower') | list %}
+      {% set lvl = ('sev' if (keys[0] in sev or keys[1] in sev) else ('warn' if (keys[0] in warn or keys[1] in warn) else '')) if ok else '' %}
+      {% set se = secondary_entity | default('') %} {% set s2 = states(se) if se else '' %}
+      {% set ok2 = s2 not in ['unknown', 'unavailable', 'none', ''] %} {% set num2 = ok2 and s2 | float(none) is not none %}
+      {{ {'word': word, 'level': lvl, 'second': (s2 if num2 else state_translated(se)) if ok2 else '', 'second_num': num2,
+          'second_unit': (state_attr(se, 'unit_of_measurement') or '') if (se and ok2) else ''} }}
+  draw:
+    kind: single
+layouts:
+  '14':
+    spec: room_sign_14
+    shows: A short status reads best on this small screen; a long one is cut.
+  27l:
+    spec: room_sign_27l
+  '35':
+    spec: room_sign_35
+thresholds:
+- data: "The entity's state"
+  warning: "a state in `warning_states`"
+  severe: "a state in `severe_states`"
+footer: "none (Glance)"

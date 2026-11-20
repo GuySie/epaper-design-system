@@ -99,7 +99,7 @@ blueprint:
       input:
         header_title:
           name: Header title
-          description: Shown in capitals at the top left. Leave blank for the list's name in your language.
+          description: Shown in capitals at the top left. Leave blank for the list's name.
           default: ''
           selector:
             text: {}
@@ -187,7 +187,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'mlaygv'
+  ds_set: 'lnixbv'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'

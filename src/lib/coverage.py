@@ -66,6 +66,9 @@ COVERAGE = {
     'bin_day_27l': pg('bd', 'bd_cut', 'bd_long', 'bd_today', 'bd_g', 'bd_y', 'bd_title', NOSTALE, 'bd_err', 'bd_unav', NODATE),
     'bin_day_35': pg('bd', 'bd_cut', 'bd_long', 'bd_today', 'bd_g', 'bd_y', 'bd_title', NOSTALE, 'bd_err', 'bd_unav', NODATE),
     'bin_day_41': pg('bd', 'bd_cut', 'bd_long', 'bd_today', 'bd_g', 'bd_y', 'bd_title', NOSTALE, 'bd_err', 'bd_unav', NODATE),
+    'room_sign_14': pg('rs', 'rs_long', 'rs_call', 'rs_busy', 'rs_g', 'rs_y', 'rs_title', NOSTALE, NOERRV, 'rs_unav', NOEMPTY),
+    'room_sign_27l': pg('rs', 'rs_long', 'rs_call', 'rs_busy', 'rs_g', 'rs_y', 'rs_title', NOSTALE, NOERRV, 'rs_unav', NOEMPTY),
+    'room_sign_35': pg('rs', 'rs_long', 'rs_call', 'rs_busy', 'rs_g', 'rs_y', 'rs_title', NOSTALE, NOERRV, 'rs_unav', NOEMPTY),
     'doors_windows_14': pg('openings_1', 'openings_3', 'openings_1', 'openings_3', 'openings_3_g', 'openings_3', 'openings_1_title', NOSTALE, 'openings_err', 'openings_unav', 'openings_0'),
     # appointment and calendar: no thresholds. An event in progress (NOW) is an ink chip, not a severity (*Severity*, *Now is
     # not a severity*); it is drawn by a35_1now, a41_1now, a426_1now, cal42 and cal426

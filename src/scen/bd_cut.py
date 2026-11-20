@@ -1,4 +1,4 @@
-# Bin day: a word too long for the smallest rung: cut with an ellipsis
+# Bin day: two words too long for one line: they break over two
 import datetime as dt
 TZ = dt.timezone(dt.timedelta(hours=1))
 NOW = dt.datetime(2026, 8, 1, 14, 10, tzinfo=TZ)

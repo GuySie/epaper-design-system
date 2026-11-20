@@ -188,6 +188,9 @@ What each font measures on each tier (x-height / cap height):
 | Next appointment | 3.5" | beside other content | 104 px | 88 | — | 75 px | 15.5 |
 | Next appointment | 4.1" | beside other content | 128 px | 112 | — | 93 px | 19.5 |
 | Next appointment | 4.26" | beside other content | 256 px | 224 | — | 187 px | 21.7 |
+| Room sign | 1.4" | on its own | 56 px | 56 → 40 | — | 41 px | 5.3 |
+| Room sign | 2.7" L | on its own | 88 px | 88 → 56 | — | 64 px | 10.7 |
+| Room sign | 3.5" | on its own | 104 px | 104 → 64 | — | 75 px | 15.5 |
 | Single value | 1.4" | on its own | 72 px | 72 → 48 | — | 53 px | 6.9 |
 | Single value | 2.7" L | on its own | 88 px | 88 → 56 | — | 64 px | 10.7 |
 | Single value | 3.5" | on its own | 104 px | 104 → 64 | — | 75 px | 15.5 |
@@ -325,7 +328,7 @@ The same on every screen. Each one could be different; this is why it is what it
 
 | Token | Value | Why | A change touches |
 |---|---|---|---|
-| Fonts | TRMNL 12 / 16 / 21 and their exact 2× cuts (Bold; Regular for units, and for `type.primary`, `type.fieldLabel` and strip lines where its stems clear `stroke.min`), Space Grotesk Bold for heroes | pixel fonts drawn for 1-bit: no anti-aliasing, so no grey edges that turn red on BWR panels; a geometric hero face for numbers only | every metric table (`ep_metrics.jinja`) |
+| Fonts | TRMNL 12 / 16 / 21 and their exact 2× cuts (Bold; Regular for units, and for `type.primary`, `type.fieldLabel` and strip lines where its stems clear `stroke.min`), Space Grotesk Bold for heroes | pixel fonts drawn for 1-bit: no anti-aliasing, so no grey edges that turn red on BWR panels; a geometric hero face for numbers, and for the word of a *Glance with a word* | every metric table (`ep_metrics.jinja`) |
 | `space.xs`, `space.s` | <!-- v:xs.12 -->2<!-- /v --> / <!-- v:s.12 -->4<!-- /v --> px around TRMNL12/16; <!-- v:xs.21 -->3<!-- /v --> / <!-- v:s.21 -->6<!-- /v --> px around TRMNL21; a 2× cut doubles its base (<!-- v:xs.24 -->4<!-- /v --> / <!-- v:s.24 -->8<!-- /v --> around 24 and 32, <!-- v:xs.42 -->6<!-- /v --> / <!-- v:s.42 -->12<!-- /v --> around 42) | XS is the smallest gap that reads as a gap; S = 2 × XS; around TRMNL21 both scale × 1.5 with the type | chips, every line gap, rows, footer, title row |
 | Row air steps | the steps of the fixed-row ladder (*Fixed rows*, *Space*) | detail rows sit beside a hero and must stay compact; lists are scanned and get the most air | row heights, row budgets |
 | `type.title` base | TRMNL<!-- v:dt:TITLE_BASE -->16<!-- /v --> Bold, never below `type.label`'s size | the title is chrome: it names the screen and never outranks the data | title row height |
@@ -525,7 +528,7 @@ Blueprints only ever use these drawcustom names. In the templates a token is rea
      - the label words in footers (PEAK, DAY LENGTH)
      - error messages
    - As written: everything that comes from the user's data. That covers:
-     - entity and plant names, event titles
+     - entity and plant names, event titles (the one exception: the word of a *Glance with a word*, drawn in capitals because the hero face is)
      - values with their units, everywhere, footers included (`PEAK 2.6 mm/h`, `9°/7°`). A unit is never uppercased: `MM` reads as megametres.
      - reset captions and other small inline captions next to data
    - Width budgets for uppercase strings are measured in uppercase, which runs about 15 % wider.
@@ -636,7 +639,7 @@ Three levels, the same on every module:
 
 **Every value that has a bad direction gets a warning and a severe input**, with a default, on every blueprint that shows it. The same data has the same inputs, names and defaults everywhere.
 
-**Every reading that can be flagged has a switch**, `flag_<what>`, on by default, in front of its `warning_<what>` and `severe_<what>`. The switches of Single value, Value with details, Levels and History graph are off by default: no value fits every sensor. Off, the reading is never flagged, on any part of the page. Every number is a real threshold, 0 included: no number means "off". Without a switch: the lists (conditions, the doors and windows that count as severe), where an empty list flags nothing, and an open door or window, which is always a warning. The To-do list's switch (`flag_due`) has no numbers: the due day decides (*Checklist*, Flagged). A chart with its switch off: *Bar chart with thresholds, Line chart with thresholds*, Switched off. Pollen's two count inputs are empty by default: empty, the sensor's own level decides (*Weather thresholds*); a count overrides it.
+**Every reading that can be flagged has a switch**, `flag_<what>`, on by default, in front of its `warning_<what>` and `severe_<what>`. The switches of Single value, Value with details, Levels and History graph are off by default: no value fits every sensor. Off, the reading is never flagged, on any part of the page. Every number is a real threshold, 0 included: no number means "off". Without a switch: the lists (conditions, the doors and windows that count as severe, Room sign's states), where an empty list flags nothing, and an open door or window, which is always a warning. Two switches have no numbers, because a day decides: the To-do list's `flag_due` (*Checklist*, Flagged) and Bin day's `flag_soon`. A chart with its switch off: *Bar chart with thresholds, Line chart with thresholds*, Switched off. Pollen's two count inputs are empty by default: empty, the sensor's own level decides (*Weather thresholds*); a count overrides it.
 
 <!-- registry:thresholds -->
 | Page | Data | Warning | Severe |
@@ -651,6 +654,7 @@ Three levels, the same on every module:
 | Medication | Hours since the last press | ≥ 24 h | ≥ 36 h |
 | Plant moisture | Soil moisture | ≤ 25 % | ≤ 14 % |
 | Rain forecast, Rain forecast (Netherlands) | Rain per hour | ≥ 2.5 mm/h | ≥ 10 mm/h |
+| Room sign | The entity's state | a state in `warning_states` | a state in `severe_states` |
 | To-do list | An item's due day | due today | overdue |
 | Value with details | The value, high and low, as on Single value | the user's value | the user's value |
 | Weather, Weather and calendar, Weather at a glance | Cold (`*_temp_low`) | ≤ 3° | ≤ 0° |
@@ -690,11 +694,11 @@ A component is one drawn building block with a fixed job; it can contain other c
 | **Value** | A number with its unit and degree sign, measured and placed by ink | value, anchor, role | `type.data`, `type.unit`, `space.unitGap` | `T`, `VALUE_W`, `SEGS`, `UGAP` |
 | **Chip** | A flagged value or word: inline, centred, or as a band over a whole row | text (and label), level | `chip.*`, `space.xs`, `space.s` | `RCHIP`, `CCHIP`, `DCHIP`, `LEVEL_FILL` / `LEVEL_TEXT` / `LEVEL_MARK` |
 | **Icon** | An MDI glyph drawn as text, pixel-exact | name, size | `icon.ladder`, `color.ink` | `I` |
-| **Hero chip** | The chip behind a flagged hero number: the digits' ink plus `space.s` on every side | number, level | `space.s` of `type.data`, digit ink (`HUP` / `HDN`, measured) | `HERO_CHIP` |
+| **Hero chip** | The chip behind a flagged hero number: the digits' ink plus `space.s` on every side; behind a word, the word's ink, an accent above and a tail below included | number, level | `space.s` of `type.data`, digit ink (`HUP` / `HDN`, measured) | `HERO_CHIP` |
 | **QR code** | A QR code with its quiet zone, QR modules on whole pixels | data | `tier.pitch`, `space.l` | — (mock-up; drawcustom's `qrcode` element) |
 | **Empty statement** | One centred text line where a module has nothing to say | message | `type.primary` (strong), one step down to `type.data` when it doesn't fit | `EMPTY` (reads its tokens) |
 | **Moon badge** | The moon phase on a weather hero icon | icon box | `icon.moonBadge` | `MOON_BADGE` |
-| **Hero group** | Number then icon, centred by ink in the space it owns. Two versions: *on its own* (in the hero block) and *beside other content* (in the hero band, the event hero); see *Hero group* | number, icon, area, level | `type.hero*`, `icon.hero*`, `space.heroGap` | `HERO_ALONE` on its own, `HERO_SHARED` beside other content; `HERO_LEFT`, `HERO_INK_X` |
+| **Hero group** | Number (on a Glance also a word) then icon, centred by ink in the space it owns. Two versions: *on its own* (in the hero block) and *beside other content* (in the hero band, the event hero); see *Hero group* | number, icon, area, level | `type.hero*`, `icon.hero*`, `space.heroGap` | `HERO_ALONE` on its own, `HERO_SHARED` beside other content; `HERO_LEFT`, `HERO_INK_X` |
 | **Glance secondary** | The one text line under the hero on a Glance: a value as plain text, or a chip at a level; its box is a chip's height. What goes there is the page's rule (the weather's: today's high/low, *Glance with a footer*) | text, level | `type.secondary`, `chip.*` | drawn in `HBLOCK`; the weather's is `SECOND` |
 | **Hour cell / Day cell** | One column of a strip: label, optional icon, values. Rules: *Hour cell / Day cell*, below the table | hour or day | `type.data`, `space.xs`, `icon.strip*`, `chip.*` | `HCELL`, `DCELL`, `DATA_REGULAR` |
 | **Forecast row** | One row of the 2.7" portrait's forecast table: label, mm, temperature. Rules: *Forecast row*, below the table | hour or day | `type.data`, `space.row`, `space.l`, `chip.*` | `RROW`, `RCHIP` |
@@ -719,17 +723,17 @@ Wherever a hero numeral and a hero icon appear together, the **number comes firs
 - **A unit beside the number:** a hero whose reading has a unit (Single value) draws it after the number on the number's baseline, in `type.secondary`'s size and the Regular cut, a space apart (*Units and numbers*, *A space separates a value from its unit*). The number and its unit are one reading, centred as a whole. Flagged, a hero on its own takes one chip around both; beside other content the chip is the number's alone and the unit starts past its reach, so the unit keeps its place when the chip appears. A unit is never drawn in the hero face.
 - **One group:** the icon comes **directly** after the number, at a gap of hero size ÷ <!-- v:dt:HERO_GAP_DIV -->7<!-- /v --> (the hero gap, `space.heroGap`), with nothing in between. Details and other modules come after the group, never between number and icon. The same gap separates the hero from what is stacked under it (the Glance secondary, *Glance*).
 - **Hero centring (one rule, both versions):** a hero group is centred by ink, on both axes, **in the space it owns**. A stacked hero group (the number over its icon, on portrait screens) counts the icon at its nominal ink height, the same for every icon of that size, so the number keeps its height when the icon changes. Its number is centred as a whole reading, degree sign included (*Spacing (internal)*, *A number on a centre axis is centred as a whole reading*). On Glance that space is the canvas between the paddings, below the title line, shared with the Glance secondary as one block. In the Hero dashboard it is the **hero column** (from P to the details minus the gutter L) and the band between the title line and the strip line, which it shares with the details (*Spacing (internal)*, the hero band). Widths are measured ink: the numeral's from its advances and side bearings (`HERO_INK_W`), the icon's from its box less its blank margins (`ICB`, measured per glyph), never a per-digit estimate and never the advance width, which drops the icon on readings that fit (`HERO_ALONE` on its own, `HERO_LEFT` beside other content). The icon is *fitted* by its full box, so the size it gets doesn't change with the condition, but *centred* by its ink. The hero therefore doesn't share the title's left edge in the Hero dashboard: it is its own block. A wide reading (`-12°`) fills its column and lands near the edges; that is the same rule, not an exception.
-- **Hero clearance:** a hero numeral's digits stay at least the hero gap (`space.heroGap`) from any line, above or below. This replaces M when a hero is the first thing under the title line; text, labels and icons keep M, and so does a word as the hero (*Glance with a word*).
+- **Hero clearance:** a hero numeral's digits stay at least the hero gap (`space.heroGap`) from any line, above or below. This replaces M when a hero is the first thing under the title line; text, labels and icons keep M. One word as the hero keeps the hero clearance as a numeral does (its chip needs the room); two stacked words keep M (*Glance with a word*).
 
 The group is sized as one block from one value: the **hero size *h*** (a rung of the hero ladder). The tokens `type.heroAlone` / `type.heroShared` are *h*; `icon.heroAloneSteps` / `icon.heroShared` follow from it.
 
 - **Measured, not estimated.** A hero's **digit height** is its measured digit ink (`HUP + HDN + 1`). An icon's **glyph height** is the median ink of the weather glyphs the blueprints draw, measured per rung (0.83 of the box). `lib/hero_metrics.py --pairs` prints the icon for every hero size. A string's ink width (`HERO_INK_W`) is its advance (`HWR`, measured per character) less the first character's left and the last one's right side bearing (`SGB`, `SGR`, per rung); an icon's blank margins are `ICB`. All of them are generated by `lib/hero_metrics.py --write`.
 - **Icon from *h*:** the largest icon rung whose glyph height is at most **k × the digit height**: **k = <!-- v:dt:HERO_ICON_K -->1<!-- /v -->** beside other content (the icon never outweighs the number), **k = <!-- v:dt:HERO_ICON_K_ALONE -->1.2<!-- /v -->** on its own (the icon box about the hero size: one picture read from across the room, where the condition icon carries as much as the number).
 - **Smallest icon on its own:** the smallest rung whose glyph height is at least <!-- v:heroIconMin -->2/3<!-- /v --> of the digit height. Below it the icon drops out rather than shrink to a dot.
-- **Wide readings:** beside other content nothing gives: *h* is chosen so the widest reading the layout must show (`-12°`, `20:00`) fits with its icon. On its own the icon steps down, then drops out. **The number never shrinks** for a reading the layout was fitted for; a page for any sensor may step it down for a longer one (*Single value*, Widest reading), and never cuts it. A word as the hero steps down the same way and is cut only at the smallest rung (*Glance with a word*).
+- **Wide readings:** beside other content nothing gives: *h* is chosen so the widest reading the layout must show (`-12°`, `20:00`) fits with its icon. On its own the icon steps down, then drops out. **The number never shrinks** for a reading the layout was fitted for; a page for any sensor may step it down for a longer one (*Single value*, Widest reading), and never cuts it. A word as the hero: *Glance with a word*.
 - **Choosing *h*** (fill before you float): the largest rung for which
   - **Beside other content:** the whole group fits its space for the widest reading, keeps `space.l` from the detail column and the hero clearance from every line;
-  - **On its own:** the ordinary reading (a two-digit temperature, a clock time, a one-digit count) still keeps an icon, and the block fits between the title line and the bottom padding; never below the `type.heroAlone` floor.
+  - **On its own:** the ordinary reading (a two-digit temperature, a clock time, a one-digit count) still keeps an icon, and the block fits between the title line and the bottom padding; never below the `type.heroAlone` floor (its exceptions: *Measured*, `type.heroAlone`).
 - **The moon badge is part of the icon** (*When to use an icon*), so part of the group for fit, centring and the `space.l` gap.
 - **Checked:** `check.py` tests the widest reading and the moon badge on every weather layout, the group's `space.l` gap and the badge ring against lines.
 
@@ -764,7 +768,7 @@ A module is one block of content on a screen, built from components (and other m
 | **Checkbox rows** | Checkbox rows in one or two columns, open items first. Rules: *Checklist* under *Patterns*. | items, done, due, level | `type.data`, `type.label`, `space.row`, `space.s`, `space.l`, `line.base` | `CHECKROWS` |
 | **Tiles** | Repeated icon–state–label unit in a grid. Rules: *Tiles* under *Patterns*. | icon, state, label | `type.data`, `type.label`, `space.m`, `line.base` | `TILEGRID` |
 | **Level meter** | *Reserved: no blueprint uses it.* A level in four segments. Rules: *Level meter*, below the table. | level | — | `METER` |
-| **Hero block** | The hero group *on its own* and the Glance secondary under it, centred as one block (*Hero group*, hero centring; the secondary's chip box is reserved, so nothing moves when a chip appears). The Glance's one module under the title row; see *Glance*. | hero, icon, levels, Glance secondary | `type.heroAlone`, `icon.heroAloneSteps`, `type.secondary`, `space.heroGap` | `HBLOCK`, `HERO_BLOCK_Y` |
+| **Hero block** | The hero group *on its own* and the Glance secondary under it, centred as one block (*Hero group*, hero centring; the secondary's chip box is reserved, so nothing moves when a chip appears). The Glance's one module under the title row; see *Glance*. | hero, icon, levels, Glance secondary | `type.heroAlone`, `icon.heroAloneSteps`, `type.secondary`, `space.heroGap` | `HBLOCK`, `HERO_BLOCK_Y`; two stacked words: `WORD_STACK`, `WORD_SPLIT` |
 | **Hero band** | The hero group *beside other content* and the detail rows, **centred by ink between the title line and the next line** (the strip's, or the module's). Rules: *Hero dashboard* under *Patterns*. | hero, icon, rows | `type.heroShared`, `icon.heroShared`, `space.l` | `HBAND` |
 | **Forecast table** | The 2.7" portrait's strips: forecast rows for the hours, the days and the pollen, stacked bottom up as one block of fixed rows; see *Forecast row*. | hours, days, pollen | `type.data`, `space.row`, `space.l` | `RROW` |
 | **Code block** | The code with its quiet zone and the label/value text lines beside it (under it on a portrait screen); see *Code*. | data, text lines | `tier.pitch`, `space.l` | — (mock-up) |
@@ -795,7 +799,7 @@ The label left in `type.fieldLabel`, the value right on the padding in the data 
   - **Every blueprint has a *Header title* input.** Left blank, the title is a translated default that names what the screen shows (`WEATHER`, `CALENDAR`, `PLANTS`). One qualifier may follow after ` · ` when it tells devices of the same kind apart (`CO2 · BEDROOM` from the sensor's area, `WEATHER · AMSTERDAM` on the 7.5", `MEDICATION · LAST TAKEN` so the hero time reads as the last dose); a typed title replaces the whole default.
   - **Width:** the title gets what is left after the stamp: the canvas minus both paddings, the stamp's measured width (its chip included when stale) and a gap of L. A longer title is cut with "..." (*A label never overlaps its value*).
 - **Update stamp:** quieter than the title, because it is a check, not data: `type.stamp` (*Derived*). Never TRMNL16 Regular: its 1 px strokes are under `stroke.min`, and unlike a unit the stamp has to be read exactly. Right-aligned, ink ending at W − P − 1, on the title's baseline (a TRMNL12 stamp sits 2 px below a TRMNL16 title's middle anchor). The title's width is measured against this smaller stamp. It is **weekday + time** (`SU 17:58`, `FR 6:05 PM`), a 2-letter weekday in capitals (the `STAMP` macro), on every layout except Medication (see *Medication*). A device that stops updating keeps its last image, so a date-less time can't tell you the image is from yesterday; the weekday can.
-- **Stale chip:** when the data source stops reporting while the automation still runs, the stamp shows the source's last report (weekday + time) in an ink chip with "!" (`chip.stale`: fill `color.ink`, text `color.paper`, prefix `! `; an outline with ink text and "!" where warnings are outlines). It is not a warning chip: old data is not an alarm about the world, and the mark and its place in the title row tell it apart. The chip goes back to the title's font and size (`type.title`), so a stale screen is louder than a healthy one (the *Mark data as stale after* input, default <!-- v:shared:stale_after -->60 min<!-- /v -->, 0 turns it off). It reads `last_reported`, not `last_updated`: a value that stays the same for hours is not stale as long as the source keeps reporting it. With several sources (entity list, plants, pollen next to weather) the newest report counts: one quiet door sensor doesn't mark the whole screen stale. Every blueprint whose data comes from reporting entities has the input. Exempt are the blueprints whose data Home Assistant computes or fetches at the moment it redraws, so there is nothing to go stale, and the two that redraw only on a change of their own (Medication, which has no stamp; Doors & windows, where there is no redraw at which old data could be marked), and Bin day, whose date sensors report only when a date changes (a date that has passed is what old data looks like there, and such a bin is left out): <!-- v:noStalePages -->Bin day, Calendar, Doors & windows, Energy price (EnergyZero), Medication, Next appointment, Sun & moon, To-do list<!-- /v -->.
+- **Stale chip:** when the data source stops reporting while the automation still runs, the stamp shows the source's last report (weekday + time) in an ink chip with "!" (`chip.stale`: fill `color.ink`, text `color.paper`, prefix `! `; an outline with ink text and "!" where warnings are outlines). It is not a warning chip: old data is not an alarm about the world, and the mark and its place in the title row tell it apart. The chip goes back to the title's font and size (`type.title`), so a stale screen is louder than a healthy one (the *Mark data as stale after* input, default <!-- v:shared:stale_after -->60 min<!-- /v -->, 0 turns it off). It reads `last_reported`, not `last_updated`: a value that stays the same for hours is not stale as long as the source keeps reporting it. With several sources (entity list, plants, pollen next to weather) the newest report counts: one quiet door sensor doesn't mark the whole screen stale. Every blueprint whose data comes from reporting entities has the input. Exempt are the blueprints whose data Home Assistant computes or fetches at the moment it redraws, so there is nothing to go stale, and the two that redraw only on a change of their own (Medication, which has no stamp; Doors & windows, where there is no redraw at which old data could be marked), and the two whose entities report only when their state changes: Bin day (a date that has passed is what old data looks like there, and such a bin is left out) and Room sign (a status stays for hours without a report): <!-- v:noStalePages -->Bin day, Calendar, Doors & windows, Energy price (EnergyZero), Medication, Next appointment, Room sign, Sun & moon, To-do list<!-- /v -->.
 - The title row has no icons.
 - **Line:** the row ends in the screen's standard line.
 - **Height (`space.titleRow`, *Derived*):** the title caps start at P (accents above them hang, *Text rules*, *Accents hang*), and the line sits S under the caps, as the footer's line sits S above its caps.
@@ -819,7 +823,7 @@ The footer is an **optional single text line at the bottom of a screen**. It say
 <!-- registry:footers -->
 | Page and screens | Footer |
 |---|---|
-| Bin day 2.7" L, 3.5", 4.1"; Doors & windows 1.4"; Medication 2.7" L; Single value 1.4", 2.7" L, 3.5" | none (Glance) |
+| Bin day 2.7" L, 3.5", 4.1"; Doors & windows 1.4"; Medication 2.7" L; Room sign 1.4", 2.7" L, 3.5"; Single value 1.4", 2.7" L, 3.5" | none (Glance) |
 | Calendar 4.1", 4.26"; Entities 3.5"; Levels 2.7" L, 3.5", 4.1"; Tiles 1.4", 2.7" P, 2.7" L, 3.5", 4.1", 7.5" L, 7.5" P; Value with details 4.1", 7.5" L, 7.5" P; Weather and calendar 7.5" P | none |
 | Claude usage 3.5" | (a) on schedule / furthest ahead, when it fits |
 | CO2 graph 3.5"; Rain forecast 3.5", 2.7" L; Rain forecast (Netherlands) 3.5", 2.7" L | (a) chart summary; none when there's nothing to show |
@@ -928,15 +932,16 @@ For a Glance whose alerts would otherwise take the place of a value you always n
 
 #### Glance with a word
 
-The hero is a word: the bin that is collected next, a room's status. Everything the Glance rules say holds; what differs is written here. Used by <!-- v:uses:glance/word -->Bin day<!-- /v -->.
+The hero is a word: the bin that is collected next, a room's status. Everything the Glance rules say holds; what differs is written here. Used by <!-- v:uses:glance/word -->Bin day, Room sign<!-- /v -->.
 
 - **The word is the hero**, in Space Grotesk Bold capitals, at the layout's size *h* for a hero group on its own; the icon follows *h* (*Hero group*) and comes after the word. The word is content and is never abbreviated by the layout.
-- **Fitted on an ordinary word:** five capitals with its icon (`PAPER`).
+- **Fitted on its ordinary reading:** a word of five capitals with its icon (`PAPER`); where the words vary (Room sign), on a flat-topped and a round-topped one (`FREE`, `BUSY`), since a round capital rises a pixel above a flat one (on the 1.4" on the short one alone: *Room sign*, Fit).
 - **A longer word steps down:** the icon steps down and drops out first (*Glance*, *Too wide*); then the word steps down the hero ladder, one rung at a time, to its smallest rung (*Style choices*, Hero ladder). A word that doesn't fit at the smallest rung starts at the padding and is cut with an ellipsis, like any text.
 - **Below the floor:** a word may go below the `type.heroAlone` floor: it is read from closer by, which a label allows and a measurement doesn't. The floor still holds for numbers.
-- **Two words stack:** one line each, the first on top, a hero gap (`space.heroGap`) apart by ink, at the largest rung at which the wider word fits the width and the block, with its Glance secondary, fits between the title line and the bottom padding with M to spare above and below. A stacked hero has no icon. Each word is centred by ink; the block is centred like every hero block.
-- **The Glance secondary** is plain text, or a chip at its level (`TOMORROW`).
-- Widest readings: a word of seven capitals that steps down (`PLASTIC`), a word too long for the smallest rung (`RESIDUAL WASTE`, cut), two words stacked (`PAPER` over `PLASTIC`).
+- **Two words stack:** one line each, the first on top, a hero gap (`space.heroGap`) apart by ink, at the largest rung, never above the layout's *h*, at which the wider word fits the width and the block, with its Glance secondary, fits between the title line and the bottom padding, keeping M (*Hero group*, hero clearance). Where no rung fits the height with the Glance secondary under the words, the secondary is left out (the words are the message) and the fit is made without it; where even that doesn't fit, the smallest rung is used. Two stacked words have no icon. Each word is centred by ink; the block is centred like every hero block.
+- **A reading of several words** that doesn't fit one line at the smallest rung breaks over two lines, at the space that makes the lines most equal in width (`DO NOT` over `DISTURB`), and is then drawn as two stacked words; only a line that still doesn't fit is cut.
+- **Flagged:** the word sits in the hero chip at its level (*Hero chip*). The chip covers the word's ink, so it rises for an accent (`OCCUPÉ`) and drops for a tail (`QUIET`); two lines share one chip, whose room is part of their fit. The chip keeps `space.xs` of paper under the title line: a flagged word steps down a rung where its chip would come closer. A chip around a cut word ends with the content width.
+- Widest readings: a word of seven capitals that loses its icon (`PLASTIC`) or steps down a rung (`ORGANIC`); one word too long for the smallest rung, cut (`MAINTENANCE`: about ten capitals fit the 2.7" and 3.5", five the 1.4"); two words stacked (`PAPER` over `PLASTIC`); three words on two lines in a chip (`DO NOT DISTURB`, whole on the 2.7" and 3.5", both lines cut on the 1.4").
 
 ### Hero dashboard
 
@@ -1067,7 +1072,7 @@ Progress bars and the footer.
 
 Equal tiles, each a centred stack: the icon, the state in `type.data`, the label in `type.label`. The stack is centred in its tile.
 
-- Tiles per screen: one on the 1.4", 1 × 3 on the 2.7" portrait, 3 × 2 on the 2.7" landscape, the 3.5" and the 4.1", 4 × 3 on the 7.5", 3 × 4 on the 7.5" portrait. With fewer entities the grid is the smallest one that holds them (of two equally small, the one whose tiles are closest to square), filled row by row; a tile left over stays empty.
+- Tiles per screen (columns × rows): <!-- v:tilesGrids -->one tile on the 1.4"; 1 × 3 on the 2.7" P; 3 × 2 on the 2.7" L, the 3.5", the 4.1"; 4 × 3 on the 7.5" L; 3 × 4 on the 7.5" P<!-- /v -->. With fewer entities the grid is the smallest one that holds them (of two equally small, the one whose tiles are closest to square), filled row by row; a tile left over stays empty.
 - Lines between two tiles that both hold an entity, centred in the gutter, each stopping `space.m` short of where it would cross another; none around the outside.
 - The icon is the largest ladder size that leaves room for the state and label under it, and at most four times the size of `type.data`; a single tile's icon has no such limit. All tiles on a screen share one icon size.
 - A tile without an icon centres its state and label alone (where the icon comes from: *the Tiles page*).
@@ -1142,7 +1147,7 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | Page | Uses | Status | Widest reading | 1.4" | 2.7" L | 2.7" P | 3.5" | 4.1" | 4.26" | 7.5" L | 7.5" P | 7.09" (no tier yet) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | **Appliance run** | Glance with a progress bar | mock | 20:00 | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
-| **Bin day** | Glance with a word | live | — | ○ | ● | ○ | ● | ● | ○ | ○ | ○ | ○ |
+| **Bin day** | Glance with a word | live | PLASTIC | ○ | ● | ○ | ● | ● | ○ | ○ | ○ | ○ |
 | **Calendar** | Grouped list | live | — | — | ○ | ○ | ○ | ● | ● | ○ | ○ | ○ |
 | **Claude usage** | Meters | live | — | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **CO2 graph** | Line chart with thresholds | live | 4000 | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
@@ -1161,7 +1166,7 @@ A page is a pattern filled with real content for one use. Each page names the pa
 | **Plant moisture** | Key-value list | live | — | — | ○ | ○ | ○ | ● | ○ | ○ | ○ | ○ |
 | **Rain forecast** | Bar chart with thresholds | live | 50 mm/h | — | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Rain forecast (Netherlands)** | Bar chart with thresholds | live | 50 mm/h | — | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
-| **Room sign** | Glance with a word | mock | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Room sign** | Glance with a word | live | DO NOT DISTURB | ● | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Single value** | Glance | live | -12.5 | ● | ● | ○ | ● | ○ | ○ | ○ | ○ | ○ |
 | **Solar & battery** | Meters both ways | mock | 100% | — | ○ | ○ | ○ | ○ | ○ | ○ | ○ | ○ |
 | **Sun & moon** | Timeline | live | 10:44am | — | ○ | — | ● | ○ | ○ | ○ | ○ | ○ |
@@ -1185,11 +1190,11 @@ A page is a pattern filled with real content for one use. Each page names the pa
 A Glance *with a word*: the bin that is collected next.
 
 - **Shows:** the next bin's word as the hero with its icon, and the day under it: today's or tomorrow's word (`TOMORROW`), else the weekday and the date as the update stamp writes a weekday (`WE 5 AUG`).
-- **Tested with:** an ordinary word with its icon; a longer word that steps down; a word cut at the smallest rung; two bins on one day (stacked) and three (a count); tomorrow as a warning and today as a severe chip, on a colour, a yellow and a grey panel; the switch off; a bin whose sensor is unavailable and one whose date has passed; no date to come (the error state); a sensor that reports a date and time in UTC; Dutch; a long title.
+- **Tested with:** an ordinary word with its icon; a longer word that loses its icon, and one that steps down a rung; two words that break over two lines; one word cut at the smallest rung; two bins on one day (stacked) and three (a count); tomorrow as a warning and today as a severe chip, on a colour, a yellow and a grey panel; the switch off; a bin whose sensor is unavailable, one whose date has passed and one whose state is no date; no words given (the sensors' names); no date to come (the error state); a sensor that reports a date and time in UTC; Dutch; a long title.
 - **Bins:** up to four, each a sensor whose state is its next collection date (a date, or a date and time, read in local time), a word (the sensor's name when blank) and an optional icon. The bin with the nearest date is shown.
-- **Several bins on one day:** two stack (*Glance with a word*, two words stack); with three or more the first two stack and the day adds the count of the rest (`TOMORROW · +1`).
+- **Several bins on one day:** two stack, in the order of the inputs (*Glance with a word*, two words stack); with three or more the first two stack and the day adds the count of the rest (`TOMORROW · +1`).
 - **Flagged:** the day is a warning chip the day before a collection and a severe chip on the day itself; `flag_soon` turns both off.
-- **Left out:** a bin whose sensor is unavailable, or whose date has passed. With no bin left the page is the error state.
+- **Left out:** a bin whose sensor is unavailable, whose state is no date, or whose date has passed. Bins collected later than the next one are not shown. With no bin left the page is the error state.
 - **No stale state:** *Title row*, stale chip.
 
 <!-- registry:inputs-bin-day -->
@@ -1201,9 +1206,9 @@ A Glance *with a word*: the bin that is collected next.
 <!-- registry:layouts-bin-day -->
 | Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
 |---|---|---|---|---|---|
-| 2.7" L | 96 px | 96 → 64 px | normal, widest, warning, severe, gray, colour, title, error, unavailable | stale, empty | 16 |
-| 3.5" | 96 px | 96 → 64 px | normal, widest, warning, severe, gray, colour, title, error, unavailable | stale, empty | 16 |
-| 4.1" | 96 px | 96 → 64 px | normal, widest, warning, severe, gray, colour, title, error, unavailable | stale, empty | 16 |
+| 2.7" L | 96 px | 96 → 64 px | normal, widest, warning, severe, gray, colour, title, error, unavailable | stale, empty | 19 |
+| 3.5" | 96 px | 96 → 64 px | normal, widest, warning, severe, gray, colour, title, error, unavailable | stale, empty | 19 |
+| 4.1" | 96 px | 96 → 64 px | normal, widest, warning, severe, gray, colour, title, error, unavailable | stale, empty | 19 |
 <!-- /registry:layouts-bin-day -->
 
 ### Calendar
@@ -1506,6 +1511,33 @@ A Bar chart *with thresholds*: the next two hours in 5-minute bars on a log scal
 | 2.7" L | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable, empty | — | 14 |
 <!-- /registry:layouts-rain -->
 
+### Room sign
+
+A Glance *with a word*: one entity's state as the word.
+
+- **Shows:** the entity's state in Home Assistant's own wording, in capitals, with an optional icon; as the Glance secondary, optionally, a second entity's state as written (`Until 15:30`), a number with its unit.
+- **Tested with:** a short status with its icon; a status in the severe list, with a second line, on a colour, a yellow, a grey and a black/white panel; one in the warning list, longer, that steps down; a status of three words on two lines in one chip, alone and with a Glance secondary under it; one word too long for the smallest rung (cut); a flagged word with an accent and one with a tail; a state in both lists; a number as the state; an unavailable entity (`—`); a number as the Glance secondary; Dutch wording; a long title.
+- **Flagged:** two lists name the states that are a warning and the states that are severe, as shown or as Home Assistant stores them, whatever their case; severe wins where a state is in both. The word then sits in the hero chip (*Glance with a word*, Flagged). The Glance secondary is never flagged, and is left out while its entity is unavailable.
+- **Title:** the entity's area, else its name, unless a header title is given.
+- **Unavailable:** the word is `—`, without the icon.
+- **A number as the state** is drawn as Home Assistant reports it, without a unit: a reading belongs on *Single value*.
+- **Fit:** on the 1.4" the hero is fitted on the short word alone (`FREE`); `BUSY` loses its icon there, as a wider reading may (*Hero group*, *Wide readings*).
+- **No stale state:** *Title row*, stale chip.
+
+<!-- registry:inputs-room-sign -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `entity`, `secondary_entity`, `icon`, `warning_states`, `severe_states` |
+<!-- /registry:inputs-room-sign -->
+
+<!-- registry:layouts-room-sign -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 1.4" | 56 px | 56 → 40 px | normal, widest, warning, severe, gray, colour, title, unavailable | stale, error, empty | 18 |
+| 2.7" L | 88 px | 88 → 56 px | normal, widest, warning, severe, gray, colour, title, unavailable | stale, error, empty | 18 |
+| 3.5" | 104 px | 104 → 64 px | normal, widest, warning, severe, gray, colour, title, unavailable | stale, error, empty | 18 |
+<!-- /registry:layouts-room-sign -->
+
 ### Single value
 
 A Glance for any sensor: its number, large, with its unit.
@@ -1517,7 +1549,7 @@ A Glance for any sensor: its number, large, with its unit.
 <!-- /registry:examples-single-value -->
 - **Unit:** after the number, on its baseline, as *Hero group*, *A unit beside the number* says. On the 1.4" the unit is the Glance secondary instead: a four-digit number needs the screen's width.
 - **Widest reading:** four characters and a three-letter unit (`1240 ppm`, `-12.5 °C`). A longer reading steps down the hero ladder one rung at a time until it fits, as a word-hero does (*Glance with a word*); it is never cut.
-- **The 1.4" has one size.** Its hero is fitted on the widest four digits (`4000`) and never steps, so the number keeps its size whatever the value; that size is under the Glance floor, the one exception to it (*Physical size minimums*). A reading too wide for it is the error state: "Value too long for this screen."
+- **The 1.4" has one size.** Its hero is fitted on the widest four digits (`4000`) and never steps, so the number keeps its size whatever the value; that size is under the Glance floor, an exception to it (*Measured*, `type.heroAlone`). A reading too wide for it is the error state: "Value too long for this screen."
 - **Icon:** optional, from the `icon` input, beside the number as in every hero group (*Glance*, *Too wide*). An icon the kit has no glyph for is drawn by the renderer's own icon element, a little smaller.
 - **Second value:** optional, from the `secondary_entity` input: its number and unit as the Glance secondary. Not on the 1.4", where the unit has that line.
 - **Flagged:** the number sits in a hero chip at its level, its unit with it, as a flagged temperature does. Two readings can be flagged: high (`*_high`, at or above) and low (`*_low`, at or below). Both switches are off by default (*Thresholds*).
@@ -1763,7 +1795,7 @@ Where it applies:
 
 ### Mocked-up pages
 
-Room sign, Appliance run, Departures, Solar & battery, Month overview, Message board, Now playing and Guest Wi-Fi: their patterns and layouts are in the table above, their rules with the pattern versions they use.
+Appliance run, Departures, Solar & battery, Month overview, Message board, Now playing and Guest Wi-Fi: their patterns and layouts are in the table above, their rules with the pattern versions they use.
 
 ## Blueprint mechanics
 
@@ -1829,6 +1861,7 @@ Proven: TRMNL text and Space Grotesk heroes on BWRY ESLs (1.4", 2.7", 3.5", 4.1"
 18. Weather at a glance and Weather on the 2.7" portrait, on a panel without a warning colour: the outlined footer chip under an outlined high/low chip and an outlined hero (three outlines on the 1.4"), and under the outlined pollen row on the 2.7" portrait, where touching outlines join into one box.
 19. To-do list: not yet run against a real `todo` entity. To prove there: `todo.get_items` gives the open and the done items, and `due` as a date or as a date and time.
 20. Bin day: a word in Space Grotesk Bold capitals at hero size reads as well as the numerals do; and the date sensors of real waste-collection integrations (the form of their state, how often they report).
+21. Room sign: a status of two words on two lines in one chip (`IN A CALL`) at the smallest hero size on the 1.4" still reads from where the device hangs; a longer one is cut there.
 
 ## Open items
 
@@ -1905,7 +1938,7 @@ Every named part of the design system, with its kind (`—` when it is a region,
 | **Month grid** | module | — | see *Modules* |
 | **Moon badge** | component | — | see *Components* (not: moon-phase badge) |
 | **now-marker** | component | Progress bar | the line across a progress bar for "now in the period" (not: now marker) |
-| **ordinary reading** | — | Page | the reading a hero on its own is fitted on: a two-digit temperature, a clock time, a one-digit count |
+| **ordinary reading** | — | Page | the reading a hero on its own is fitted on: a two-digit temperature, a clock time, a one-digit count, a word of five capitals |
 | **Page** | vocabulary | — | see *Vocabulary* |
 | **page definition** | — | Page | everything a page's blueprints are generated from besides its layouts: inputs, data, texts, description (pages/<page>.yaml) |
 | **Panel** | vocabulary | — | see *Vocabulary* |

@@ -14,6 +14,7 @@ Names:
   layout:KEY:PATH     a measured token of one layout (ep_tokens.jinja EP_LAYOUT), e.g. layout:weather_41:icon.stripDay
   const:PAGE:SCREEN:NAME   a constant a page definition gives one of its layouts
   spec:LAYOUT:NAME    a constant of specs/LAYOUT.py (or specs/_wx.py as spec:_wx:NAME)
+  tilesGrids          the grid of each Tiles layout (its spec's COLS and ROWS), by screen
   order:LAYOUT        the order in which a weather layout's detail rows make way (its spec's ROW_NAMES and ORDER), in words
   color:PATH          a colour role value (lib/derive_tokens.py COLOR, a dotted path), in backticks
   heroMinUsed, heroStepPct, heroStepPctUp   the smallest hero any tier uses (the tokens), the ladder's step below 160 and above it
@@ -178,6 +179,23 @@ def value(name):
     if kind == 'const':
         page, screen, n = arg.split(':')
         return num(page_def(page)['layouts'][screen]['constants'][n])
+    if kind == 'tilesGrids':
+        import importlib.util
+        from layouts import layouts, registry
+        sys.path.insert(0, str(SRC / 'specs'))
+        names, groups = registry()['screen_names'], []
+        for lay in layouts():
+            if lay['page'] != 'tiles':
+                continue
+            sp = importlib.util.spec_from_file_location(lay['spec'], SRC / 'specs' / f"{lay['spec']}.py")
+            m = importlib.util.module_from_spec(sp); sp.loader.exec_module(m)
+            g = 'one tile' if (m.COLS, m.ROWS) == (1, 1) else f'{m.COLS} × {m.ROWS}'
+            for grp in groups:
+                if grp[0] == g:
+                    grp[1].append(names[str(lay['screen'])]); break
+            else:
+                groups.append((g, [names[str(lay['screen'])]]))
+        return '; '.join(f"{g} on the {', the '.join(s)}" for g, s in groups)
     if kind == 'order':
         import importlib.util
         sys.path.insert(0, str(SRC / 'specs'))

@@ -1,4 +1,4 @@
-# Bin day: plastic tomorrow: a longer word, the day as a warning chip
+# Bin day: plastic tomorrow: a longer word that loses its icon, the day as a warning chip
 import datetime as dt
 TZ = dt.timezone(dt.timedelta(hours=1))
 NOW = dt.datetime(2026, 8, 1, 14, 10, tzinfo=TZ)

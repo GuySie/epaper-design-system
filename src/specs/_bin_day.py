@@ -11,7 +11,7 @@ PAYLOAD_MAIN = r"""
 {%- set when = when ~ ((' · +' ~ ((same | length) - 2)) if (same | length) > 2 else '') -%}
 {#- pattern 'Glance', version 'with a word': the word steps down the hero ladder when it is longer than the layout was fitted
      on; two bins on one day stack (hero2) -#}
-{{- GLANCE(ns, header_title_display, right, first.word | upper, first.icon, false, sec=('chip' if lvl else 'text'), txt=when, llevel=lvl, step=true,
+{{- GLANCE(ns, header_title_display, right, first.word | upper, first.icon, false, sec=('chip' if lvl else 'text'), txt=when, llevel=lvl, step=true, wrap=true,
      hero2=((same[1].word | upper) if (same | length) > 1 else '')) -}}
 """
 PAYLOAD_ERR = r"""

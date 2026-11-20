@@ -38,6 +38,7 @@ def main():
     ap.add_argument('--fit-strips', action='store_true')
     ap.add_argument('--out')
     ap.add_argument('--keep', action='store_true', help='keep the temporary copy (to inspect a draft)')
+    ap.add_argument('--gap', default='skip', help="the gap rule the pixel check uses under the title line: M, M+, C or skip (a Glance, a chart)")
     ap.add_argument('scen', nargs='+')
     a = ap.parse_args()
     draft = pathlib.Path(a.spec).resolve()
@@ -164,11 +165,26 @@ def main():
         except (SystemExit, Exception) as e:
             print(f'{s}: not drawn: {e}')
 
+    # the pixel check on every scenario (check.py's rules for one case; not the comparison between states, the coverage
+    # or the reference): what it rejects, the build can't reproduce, so it is printed on the sheet
+    import json
+    code = ('import sys, json; sys.path[:0] = ["lib", "."]; import check; '
+            f'print("@@" + json.dumps({{s: check.check({str(pkg)!r}, s, "mock", {a.gap!r}, "free") for s in {[s for s, _ in pngs]!r}}}))')
+    rc = subprocess.run([sys.executable, '-c', code], cwd=T, env=dict(env, EP_CT=str(pkg / 'custom_templates')), capture_output=True, text=True)
+    line = next((l for l in rc.stdout.splitlines() if l.startswith('@@')), None)
+    failed = json.loads(line[2:]) if line else None
+    if failed is None:
+        checked = ['pixel check: could not run (' + (rc.stderr.strip().splitlines() or ['no output'])[-1][:120] + ')']
+    else:
+        bad = {s: e for s, e in failed.items() if e}
+        checked = [f'pixel check ({a.gap}): passes on {len(failed) - len(bad)} of {len(failed)}'] + [f'  FAILS {s}: {e[0]}' for s, e in bad.items()]
+    for l in checked:
+        print(l)
     # the sheet: the label, what it is, and the renders side by side
     ims = [(s, Image.open(p).convert('RGB')) for s, p in pngs]
     if ims:
         font = ImageFont.truetype(str(SRC / 'fonts' / 'TRMNL16-Bold.ttf'), 16)
-        head = [f'MOCK-UP, NOT CHECKED: {stem} on {a.page}, screen {a.screen} ({tier}, {W} x {H})']
+        head = [f'MOCK-UP, NOT CHECKED: {stem} on {a.page}, screen {a.screen} ({tier}, {W} x {H})'] + checked
         head += [(l if l.startswith('measured') else f'provisional: {l}') for l in provisional] or ['tokens: the current ones for this tier']
         gap, top = 16, 24 * len(head) + 16
         sheet = Image.new('RGB', (sum(i.width for _, i in ims) + gap * (len(ims) + 1),

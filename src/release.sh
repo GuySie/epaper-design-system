@@ -40,6 +40,7 @@ if [ -n "$REF" ]; then python3 lib/baseline.py cmp "$OUT" "$REF"; lap compare; f
 # the document's generated tables and values follow this build; then the document, the code comments and the package are linted
 python3 lib/registry.py write ../docs/design-system.md "$OUT"
 python3 lib/registry.py lint ../docs/design-system.md "$OUT"
+python3 lib/rules.py lint ../docs/design-system.md   # the code cites rules the document has, and none of them changed unconfirmed
 lap document
 mkdir -p ../blueprints ../custom_templates
 rm -f ../blueprints/epaper-blueprint-*.yaml     # generated output only: a renamed blueprint must not leave its old file behind

@@ -50,6 +50,92 @@ def tier_vals(bp):
     return (e['space']['pad'], e['space']['titleRow'], e['space']['m'], e['line']['base']), S_OF[e['type']['data'][1]]
 
 
+def tier_tokens(bp):
+    """every token of the layout's tier (the package being checked)"""
+    from registry import screen_of
+    from derive_tokens import SCREEN_OF
+    tier_vals(bp)
+    path = pathlib.Path(os.environ.get('EP_CT') or ROOT / 'lib') / 'ep_tokens.jinja'
+    return _TOKENS[path][{v: k for k, v in SCREEN_OF.items()}[screen_of(B[bp])]]
+
+
+FONT_FILES = {'TRMNL12-Regular.ttf': 12, 'TRMNL12-Bold.ttf': 12, 'TRMNL16-Regular.ttf': 16, 'TRMNL16-Bold.ttf': 16,
+              'TRMNL21-Regular.ttf': 21, 'TRMNL21-Bold.ttf': 21}
+FILLS = {'black', 'white', 'red', 'yellow', '#555555', '#aaaaaa'}
+
+
+def universal(bp, payload):
+    """The rules that hold on every screen of every page, each written from its sentence in the design system (named in
+    brackets). They are checked on every case, so a new page can't break them unseen."""
+    import re
+    from derive_tokens import HERO_SIZES, ICON_LADDER
+    e = tier_tokens(bp)
+    P, TH = e['space']['pad'], e['space']['titleRow']
+    base = e['line']['base']
+    dashes = {tuple(e['line'][k]) for k in ('dash', 'dot', 'forecastDash')}
+    errs = set()
+    for el in payload:
+        ty = el.get('type')
+        if any(isinstance(el.get(k), str) and el[k].strip().endswith('%') for k in ('x', 'y', 'x_start', 'y_start', 'x_end', 'y_end')):
+            errs.add(f'a position in percent ({ty}) [*Positioning*]')
+        if ty == 'text':
+            font = str(el.get('font') or '').split('/')[-1]
+            size, val = el.get('size'), str(el.get('value', ''))
+            if not font:
+                errs.add(f'text {val[:12]!r} has no font [*Blueprint mechanics*]')
+            elif font in FONT_FILES:
+                if size not in (FONT_FILES[font], 2 * FONT_FILES[font]):
+                    errs.add(f'{font} drawn at {size} px [*Typography*, Never scale off-size]')
+                if 'Regular' in font and FONT_FILES[font] < 21 and not re.fullmatch(r'[A-Za-zµΩ°%][A-Za-zµΩ°%0-9/·-]{0,9}', val):
+                    errs.add(f'{font} for {val[:14]!r}, which is no unit [*Physical size minimums*: TRMNL12 and TRMNL16 text is always Bold, a unit excepted]')
+            elif font == 'SpaceGrotesk-Bold.ttf':
+                if size not in HERO_SIZES:
+                    errs.add(f'hero text at {size} px, off the hero ladder [*Style choices*, Hero ladder]')
+            elif font == 'materialdesignicons-webfont.ttf':
+                if size not in ICON_LADDER:
+                    errs.add(f'icon at {size} px, off the icon ladder [*How to draw them*, Size ladder]')
+            else:
+                errs.add(f'font {font} [*Typography*, No other fonts]')
+            if el.get('color') not in ('black', 'white'):
+                errs.add(f"text {val[:12]!r} in {el.get('color')} [*Values per panel*, Warning and severe are fills only; gray is never text]")
+            # the update stamp: the right-aligned text of the title row
+            y = el.get('y')
+            if isinstance(y, (int, float)) and y < P + TH and str(el.get('anchor', '')).startswith('r') and font in FONT_FILES:
+                if not re.fullmatch(r'(! )?[^\W\d_]{2} \d{1,2}:\d{2}( [AP]M)?', val):
+                    errs.add(f'update stamp {val!r} [*Title row*, Update stamp]')
+        elif ty == 'line':
+            if el.get('fill') not in ('black', 'white'):
+                errs.add(f"a line in {el.get('fill')} [*Values per panel*, Gray is a fill, never text or a line]")
+            if int(el.get('width', 1)) not in (1, base, e['line']['heavy']):
+                errs.add(f"a line {el.get('width')} px wide [*Lines and strokes*: every stroke follows line.base]")
+            if el.get('dashed') and (el.get('dash_length'), el.get('space_length')) not in dashes:
+                errs.add(f"a dash of {el.get('dash_length')} on / {el.get('space_length')} off [*Lines and strokes*: line.dash, line.dot, line.forecastDash]")
+        elif ty in ('rectangle', 'polygon', 'circle', 'ellipse'):
+            for k in ('fill', 'outline'):
+                if el.get(k) is not None and el[k] not in FILLS:
+                    errs.add(f"a {ty} {k} of {el[k]} [*Values per panel*: only the panel's colours]")
+            if ty == 'rectangle' and el.get('fill') is None and int(el.get('width', 1)) not in (base, 2 * base, 2 * base + 1):
+                errs.add(f"an outline {el.get('width')} px wide [*Chips*: an outline of 2 x line.base; *Spacing (internal)*, Chips hang outward: a hero's inside its box]")
+    return sorted(errs)
+
+
+def universal_selftest(bp):
+    """each system-wide rule fires on a drawing that breaks it: a check that can't fail proves nothing"""
+    good = {'type': 'text', 'font': 'TRMNL16-Bold.ttf', 'size': 16, 'color': 'black', 'value': 'OK', 'x': 50, 'y': 100, 'anchor': 'lm'}
+    bad = {'no font': dict(good, font=''), 'off-size': dict(good, size=17), 'no unit': dict(good, font='TRMNL16-Regular.ttf', value='Kitchen 21'),
+           'hero ladder': dict(good, font='SpaceGrotesk-Bold.ttf', size=100), 'icon ladder': dict(good, font='materialdesignicons-webfont.ttf', size=30),
+           'other fonts': dict(good, font='Arial.ttf'), 'gray is never text': dict(good, color='red'), 'Update stamp': dict(good, value='Sat 14:10', y=5, anchor='rm'),
+           'in percent': dict(good, x='50%'),
+           'never text or a line': {'type': 'line', 'fill': '#aaaaaa', 'width': 1, 'x_start': 0, 'x_end': 9, 'y_start': 5, 'y_end': 5},
+           'follows line.base': {'type': 'line', 'fill': 'black', 'width': 7, 'x_start': 0, 'x_end': 9, 'y_start': 5, 'y_end': 5},
+           'line.dash': {'type': 'line', 'fill': 'black', 'width': 1, 'dashed': True, 'dash_length': 5, 'space_length': 2, 'x_start': 0, 'x_end': 9, 'y_start': 5, 'y_end': 5},
+           "only the panel's colours": {'type': 'rectangle', 'fill': 'blue', 'outline': 'blue', 'x_start': 0, 'x_end': 9, 'y_start': 5, 'y_end': 9},
+           'an outline': {'type': 'rectangle', 'outline': 'black', 'width': 9, 'x_start': 0, 'x_end': 9, 'y_start': 5, 'y_end': 9}}
+    if universal(bp, [good]):
+        return [f'the system-wide rules reject a correct text: {universal(bp, [good])}']
+    return [f'the system-wide rule "{k}" does not fire on a drawing that breaks it' for k, el in bad.items() if not any(k in e for e in universal(bp, [el]))]
+
+
 def footer_height(bp):
     """space.footer of the layout's tier (the footer's line is that far above the bottom padding)"""
     import os
@@ -154,7 +240,7 @@ def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
         payload = harness.run(str(pathlib.Path(out_dir) / B[bp]), str(sf), CHECK_PNG)
     W, H = Image.open(CHECK_PNG).size
     (P, TH, M, rw), S = tier_vals(bp)      # from the tokens: a canvas can belong to two tiers (800 x 480: the 7.5" and the 4.26")
-    errs = []
+    errs = universal(bp, payload)
     items = [(el, kind(el), ink_box(el, W, H)) for el in payload]
     items = [(el, k, b) for el, k, b in items if b]
     # title
@@ -170,8 +256,8 @@ def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
     stamp = [b for b in texts if b[0] > W // 2]
     if stamp and max(b[2] for b in stamp) != W - 1 - P:
         errs.append(f'update stamp ends at x={max(b[2] for b in stamp)}, not W-P-1={W - 1 - P}')
-    # edges: ink stays inside the padding; a fill reaches into it at most S + XS of the text it holds (*Spacing (internal)*,
-    # *Chips hang outward*; a hero: of type.data), a warning outline one line.base more (outside the chip's box); a fill with no text stays inside
+    # edges: ink stays inside the padding; a fill reaches into it at most S + XS of the text it holds
+    # (*Spacing (internal)*, Chips hang outward; a hero: of type.data), a warning outline one line.base more (outside the chip's box); a fill with no text stays inside
     from derive_tokens import XS as XS_OF, S as S_OF
     tboxes = [(el, b) for el, k, b in items if el.get('type') == 'text']
     for el, k, b in items:
@@ -225,9 +311,15 @@ def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
                     errs.append(f'hero band not centred: {gt} px above, {gb} px below (M={M})')
     # hero clearance from every full-width rule (above and below)
     rules_h = [b for el, k, b in items if el.get('type') == 'line' and b[1] == b[3] - (int(el.get('width', 1)) - 1) and b[2] - b[0] > W * 0.4]
+    if bp in WORD:                # a hero chip around a word rises for an accent: it keeps paper under the title line (*Glance with a word*, Flagged)
+        for el, k, b in items:
+            if el.get('type') == 'rectangle' and el.get('fill') != 'white' and b[2] - b[0] > 40:
+                for r in rules_h:
+                    if r[3] < b[3] and b[1] - r[3] - 1 < 2:
+                        errs.append(f'hero chip only {b[1] - r[3] - 1} px below a rule (min 2)')
     for el, b in heroes:
-        # the hero clearance is the numerals'; a word as the hero is text and keeps M (*Hero group*, hero clearance)
-        want = (int(el['size']) // HERO_GAP_DIV) if any(c.isdigit() for c in str(el['value'])) else M
+        # one word keeps the hero clearance as a numeral does; two stacked words keep M (*Hero group*, hero clearance)
+        want = M if (bp in WORD and len(heroes) > 1) else (int(el['size']) // HERO_GAP_DIV)
         for r in rules_h:
             if r[3] < b[1] and b[1] - r[3] - 1 < want:
                 errs.append(f'hero {el["value"]!r} only {b[1] - r[3] - 1} px below a rule (min {want})')
@@ -390,6 +482,16 @@ def same_layout():
                 h = [e['y'] for e in p if e.get('type') == 'text' and 'SpaceGrotesk' in str(e.get('font', ''))]
                 if h:
                     ys.setdefault(h[0], []).append(s.split('@')[0])
+        if bp in WORD:            # the size follows the word, so cases are compared per word: nothing moves when a chip appears
+            per = {}
+            for s, (b, p, _) in PAYLOADS.items():
+                if b == bp and 'err' not in s:
+                    hh = [(e['value'], e['size'], e['y']) for e in p if e.get('type') == 'text' and 'SpaceGrotesk' in str(e.get('font', ''))]
+                    if hh:
+                        per.setdefault(tuple(v for v, _, _ in hh), {}).setdefault(tuple((z, y) for _, z, y in hh), []).append(s.split('@')[0])
+            for words, places in per.items():
+                if len(places) > 1:
+                    errs.append(f'{B[bp]}: the hero {" / ".join(words)} moves between states: ' + '; '.join(f'{k} in {", ".join(v[:4])}' for k, v in places.items()))
         if len(ys) > 1:
             most = max(ys, key=lambda y: len(ys[y]))
             errs.append(f'{B[bp]}: the hero moves between states: at y={most} in {len(ys[most])} cases, but ' +
@@ -510,6 +612,8 @@ if __name__ == '__main__':
     out = sys.argv[1]
     bad = 0
     ALL = [c + (False,) for c in CASES] + [c + (True,) for c in EXTRA_CASES]
+    for e in universal_selftest(CASES[0][1]):
+        print('SELFTEST', e); bad += 1
     only = only_keys()                      # check a few layouts while building
     if only:
         ALL = [c for c in ALL if c[1] in only]

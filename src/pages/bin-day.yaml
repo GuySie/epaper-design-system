@@ -1,8 +1,9 @@
 page: bin-day
 description:
-  shows: The bin that is collected next, as a word large enough to read across the room, with the day under it. Two bins on the same day are both shown.
+  shows: The bin that is collected next, as one large word, with the day under it. Two bins on the same day are both shown.
   trigger_advice: 'A time trigger a few times a day (for example at 00:05, 07:00 and 18:00): the screen only changes with the date.'
   title_default: '"Waste"'
+  times: the update time
 redraw: trigger
 inputs:
 - name: bin_1
@@ -45,7 +46,7 @@ inputs:
     - name: bin_{n}_icon
       section: content
       label: Bin {n} - icon
-      help: Optional icon shown after the word.
+      help: Optional icon shown after the word. A long word, or two bins on one day, leaves no room for it.
       selector:
         icon: {}
       default: ''

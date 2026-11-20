@@ -213,7 +213,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'mlaygv'
+  ds_set: 'lnixbv'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'

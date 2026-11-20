@@ -115,7 +115,7 @@ def build(out, keys):
 
 # sources that never reach a render or the fit: the document's tables, the reference tools, the case lists (a layout's
 # own cases are hashed by layout_hash) and the release script
-NOT_FIT = {'lib/coverage.py', 'lib/doc_values.py', 'lib/tier_tables.py', 'lib/baseline.py', 'lib/golden.py', 'lib/preview.py',
+NOT_FIT = {'lib/coverage.py', 'lib/doc_values.py', 'lib/tier_tables.py', 'lib/baseline.py', 'lib/golden.py', 'lib/preview.py', 'lib/impact.py', 'lib/rules.py', 'lib/rules.lock.json',
            'lib/pixcmp_cases.py', 'release.sh', 'lib/ep_tokens.fit.json'}
 
 

@@ -107,7 +107,8 @@ def help_text(n, p, lay, d):
         if not t:
             en = ((p.get('texts') or {}).get('en') or {})
             t = '"' + (en.get('default_title') or en.get('title')) + '"' if (en.get('default_title') or en.get('title')) else "the page's name"
-        return f"Shown in capitals at the top left. Leave blank for {t} in your language."
+        # a quoted default is a text that is translated; a described one (the sensor's name) is not
+        return f"Shown in capitals at the top left. Leave blank for {t}{' in your language' if t.startswith(chr(34)) else ''}."
     if n == 'time_format':
         return f"12-hour (AM/PM) or 24-hour clock for {desc.get('times', 'the times on the display')}."
     return None

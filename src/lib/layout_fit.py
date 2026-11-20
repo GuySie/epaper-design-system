@@ -46,7 +46,8 @@ FIT = {
 STRIP = ['weather_41', 'weather_75', 'weather_75p', 'weather_426']
 # layout -> its ordinary readings (scenarios; a one-digit count is every digit the cases have): the hero on its own is the
 # largest rung at which they pass and keep their icon
-GLANCE = {'bin_day_27l': ['bd'], 'bin_day_35': ['bd'], 'bin_day_41': ['bd'], 'weather_glance_14': ['wxp16'], 'doors_windows_14': ['openings_0', 'openings_1', 'openings_2en', 'openings_3'], 'medication_27l': ['med29'], 'weather_glance_35': ['wx35'],
+GLANCE = {'room_sign_14': ['rs'], 'room_sign_27l': ['rs', 'rs_busy'], 'room_sign_35': ['rs', 'rs_busy'],   # a flat-topped and a round-topped word
+          'bin_day_27l': ['bd'], 'bin_day_35': ['bd'], 'bin_day_41': ['bd'], 'weather_glance_14': ['wxp16'], 'doors_windows_14': ['openings_0', 'openings_1', 'openings_2en', 'openings_3'], 'medication_27l': ['med29'], 'weather_glance_35': ['wx35'],
           # Single value: a reading with an icon (a short one on the 1.4", where the unit has the line below)
           'single_value_14': ['sv_wide4'], 'single_value_27l': ['sv_icon'], 'single_value_35': ['sv_icon']}
 # of those, the layouts whose hero is fitted on its widest reading instead: the largest rung at which that reading is
@@ -160,7 +161,7 @@ class Fitter:
         cases = [c[:4] for c in check.CASES if c[1] == key and c[0] in GLANCE[key]]
         why = ''
         widest = key in WIDEST_HERO
-        if widest:
+        if widest or key in check.WORD:      # a word as the hero may go below the Glance floor (*Glance with a word*)
             floor = min(HERO_LADDER)
         for h in sorted((h for h in HERO_LADDER if floor <= h <= self.top), reverse=True):
             w = self._try(name, cases, icon_of=None if widest else h, hero_of=h if widest else None, type_heroAlone=h, icon_heroAloneSteps=PAIRS[h][2])
