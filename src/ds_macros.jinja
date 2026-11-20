@@ -943,6 +943,8 @@
 {%- for it in open -%}{%- set rows.l = rows.l + [[it, 0]] -%}{%- endfor -%}
 {%- for it in done[:room - no] -%}{%- set rows.l = rows.l + [[it, 1]] -%}{%- endfor -%}
 {%- endif -%}
+{#- two columns are of equal length: the first takes the odd row -#}
+{%- if two -%}{%- set per = ((rows.l | length) + 1) // 2 -%}{%- endif -%}
 {%- set cw = ((x1 + 1 - x0 - g) // 2) if two else (x1 + 1 - x0) -%}
 {#- the divider ends with the last row's box or at the content's bottom, whichever comes first -#}
 {%- if two -%}{{- L(ns, x0 + cw + g // 2, top, x0 + cw + g // 2, [top + per * rh - 2, yb - 1] | min) -}}{%- endif -%}

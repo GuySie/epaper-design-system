@@ -636,13 +636,13 @@ Three levels, the same on every module:
 
 **Every value that has a bad direction gets a warning and a severe input**, with a default, on every blueprint that shows it. The same data has the same inputs, names and defaults everywhere.
 
-**Every reading that can be flagged has a switch**, `flag_<what>`, on by default, in front of its `warning_<what>` and `severe_<what>`. The switches of Single value, Value with details, Levels and History graph are off by default: no value fits every sensor. Off, the reading is never flagged, on any part of the page. Every number is a real threshold, 0 included: no number means "off". Without a switch: the lists (conditions, the doors and windows that count as severe), where an empty list flags nothing. The To-do list's switch (`flag_due`) has no numbers: the due day decides (*Checklist*, Flagged). A chart with its switch off: *Bar chart with thresholds, Line chart with thresholds*, Switched off. Pollen's two count inputs are empty by default: empty, the sensor's own level decides (*Weather thresholds*); a count overrides it.
+**Every reading that can be flagged has a switch**, `flag_<what>`, on by default, in front of its `warning_<what>` and `severe_<what>`. The switches of Single value, Value with details, Levels and History graph are off by default: no value fits every sensor. Off, the reading is never flagged, on any part of the page. Every number is a real threshold, 0 included: no number means "off". Without a switch: the lists (conditions, the doors and windows that count as severe), where an empty list flags nothing, and an open door or window, which is always a warning. The To-do list's switch (`flag_due`) has no numbers: the due day decides (*Checklist*, Flagged). A chart with its switch off: *Bar chart with thresholds, Line chart with thresholds*, Switched off. Pollen's two count inputs are empty by default: empty, the sensor's own level decides (*Weather thresholds*); a count overrides it.
 
 | Page | Data | Warning | Severe |
 |---|---|---|---|
 | <!-- v:inputPages:warning_temp_low -->Weather at a glance, Weather, Weather and calendar<!-- /v --> | Cold (`*_temp_low`) | ≤ <!-- v:input:weather:warning_temp_low -->3°<!-- /v --> | ≤ <!-- v:input:weather:severe_temp_low -->0°<!-- /v --> |
 | | Heat (`*_temp_high`) | ≥ <!-- v:input:weather:warning_temp_high -->27°<!-- /v --> | ≥ <!-- v:input:weather:severe_temp_high -->35°<!-- /v --> |
-| | Wind (`*_wind_high`) | ≥ <!-- v:input:weather:warning_wind_high -->50 km/h<!-- /v --> | ≥ <!-- v:input:weather:severe_wind_high -->75 km/h<!-- /v --> |
+| | Wind, in the weather entity's own wind unit; the defaults suit km/h (`*_wind_high`) | ≥ <!-- v:input:weather:warning_wind_high -->50<!-- /v --> | ≥ <!-- v:input:weather:severe_wind_high -->75<!-- /v --> |
 | | Rain per hour (`*_rain_hour`) | ≥ <!-- v:input:weather:warning_rain_hour -->2.5 mm/h<!-- /v --> | ≥ <!-- v:input:weather:severe_rain_hour -->10 mm/h<!-- /v --> |
 | | Rain per day, today's total included (`*_rain_day`) | ≥ <!-- v:input:weather:warning_rain_day -->10 mm<!-- /v --> | ≥ <!-- v:input:weather:severe_rain_day -->25 mm<!-- /v --> |
 | | Pollen (`*_pollen_high`, where a pollen sensor is an input) | sensor level *high* | sensor level *very high* |
@@ -658,7 +658,7 @@ Three levels, the same on every module:
 | Value with details | The value, high and low, as on Single value | the user's value | the user's value |
 | To-do list | An item's due day | due today | overdue |
 | Medication | Hours since the last press | ≥ <!-- v:input:medication:warning_late -->24 h<!-- /v --> | ≥ <!-- v:input:medication:severe_late -->36 h<!-- /v --> |
-| Doors & windows | An opening is open | — | the openings in `severe_openings` |
+| Doors & windows | An opening is open | any opening | the openings in `severe_openings` |
 
 - **No thresholds** where nothing can be bad: Calendar, Next appointment, Sun & moon. The Entities list has none either: one pair can't fit up to 12 arbitrary sensors; it shows "—" and its error state instead; Tiles has none for the same reason.
 - **Page-specific threshold rules** are with their page: weather (pollen levels, conditions, official warnings, high/low, the *Override order*) in *Weather at a glance and Weather*, the redraw at a deadline in *Medication*.
@@ -714,7 +714,7 @@ A hero group is a number and its icon. It has two versions (a third, *with a wor
 
 Wherever a hero numeral and a hero icon appear together, the **number comes first and the icon second**: left then right on landscape layouts, above then below on portrait ones where they don't fit side by side. The value is the point; the icon qualifies it. This applies to every pattern.
 
-- **A unit beside the number:** a hero whose reading has a unit (Single value) draws it after the number on the number's baseline, in `type.secondary`'s size and the Regular cut, a space apart (*Units and numbers*, *A space separates a value from its unit*). The number and its unit are one reading: centred as a whole, and flagged in one chip. The hero face has numbers only, so the unit is never in it.
+- **A unit beside the number:** a hero whose reading has a unit (Single value) draws it after the number on the number's baseline, in `type.secondary`'s size and the Regular cut, a space apart (*Units and numbers*, *A space separates a value from its unit*). The number and its unit are one reading, centred as a whole. Flagged, a hero on its own takes one chip around both; beside other content the chip is the number's alone and the unit starts past its reach, so the unit keeps its place when the chip appears. The hero face has numbers only, so the unit is never in it.
 - **One group:** the icon comes **directly** after the number, at a gap of hero size ÷ <!-- v:dt:HERO_GAP_DIV -->7<!-- /v --> (the hero gap, `space.heroGap`), with nothing in between. Details and other modules come after the group, never between number and icon. The same gap separates the hero from what is stacked under it (the Glance secondary, *Glance*).
 - **Hero centring (one rule, both versions):** a hero group is centred by ink, on both axes, **in the space it owns**. A stacked hero group (the number over its icon, on portrait screens) counts the icon at its nominal ink height, the same for every icon of that size, so the number keeps its height when the icon changes. Its number is centred as a whole reading, degree sign included (*Spacing (internal)*, *A number on a centre axis is centred as a whole reading*). On Glance that space is the canvas between the paddings, below the title line, shared with the Glance secondary as one block. In the Hero dashboard it is the **hero column** (from P to the details minus the gutter L) and the band between the title line and the strip line, which it shares with the details (*Spacing (internal)*, the hero band). Widths are measured ink: the numeral's from its advances and side bearings (`HERO_INK_W`), the icon's from its box less its blank margins (`ICB`, measured per glyph), never a per-digit estimate and never the advance width, which drops the icon on readings that fit (`HERO_ALONE` on its own, `HERO_LEFT` beside other content). The icon is *fitted* by its full box, so the size it gets doesn't change with the condition, but *centred* by its ink. The hero therefore doesn't share the title's left edge in the Hero dashboard: it is its own block. A wide reading (`-12°`) fills its column and lands near the edges; that is the same rule, not an exception.
 - **Hero clearance:** a hero numeral's digits stay at least the hero gap (`space.heroGap`) from any line, above or below. This replaces M when a hero is the first thing under the title line; text, labels and icons keep M.
@@ -735,7 +735,7 @@ The group is sized as one block from one value: the **hero size *h*** (a rung of
 
 ### Hour cell / Day cell
 
-Every text line is `type.data`, the regular text lines in its Regular cut where that clears `stroke.min`. A text line's box is rowMin; stacked items are `space.xs` apart (text lines `space.detailRow` apart, chips on them as in *Spacing (internal)*, *Chips hang outward*); an icon sits `space.xs` from its text lines.
+Every text line is `type.data`. Every value is Bold, a dry `0 mm` and the day's high/low too (*Severity*, *Weight is not a severity level or a role marker*); the hour label is in the Regular cut where that clears `stroke.min`. A text line's box is rowMin; stacked items are `space.xs` apart (text lines `space.detailRow` apart, chips on them as in *Spacing (internal)*, *Chips hang outward*); an icon sits `space.xs` from its text lines.
 
 ### Forecast row
 
@@ -793,7 +793,7 @@ The label left in `type.fieldLabel`, the value right on the padding in the data 
   - **Every blueprint has a *Header title* input.** Left blank, the title is a translated default that names what the screen shows (`WEATHER`, `CALENDAR`, `PLANTS`). One qualifier may follow after ` · ` when it tells devices of the same kind apart (`CO2 · BEDROOM` from the sensor's area, `WEATHER · AMSTERDAM` on the 7.5", `MEDICATION · LAST TAKEN` so the hero time reads as the last dose); a typed title replaces the whole default.
   - **Width:** the title gets what is left after the stamp: the canvas minus both paddings, the stamp's measured width (its chip included when stale) and a gap of L. A longer title is cut with "..." (*A label never overlaps its value*).
 - **Update stamp:** quieter than the title, because it is a check, not data: `type.stamp` (*Derived*). Never TRMNL16 Regular: its 1 px strokes are under `stroke.min`, and unlike a unit the stamp has to be read exactly. Right-aligned, ink ending at W − P − 1, on the title's baseline (a TRMNL12 stamp sits 2 px below a TRMNL16 title's middle anchor). The title's width is measured against this smaller stamp. It is **weekday + time** (`SU 17:58`, `FR 6:05 PM`), a 2-letter weekday in capitals (the `STAMP` macro), on every layout except Medication (see *Medication*). A device that stops updating keeps its last image, so a date-less time can't tell you the image is from yesterday; the weekday can.
-- **Stale chip:** when the data source stops reporting while the automation still runs, the stamp shows the source's last report (weekday + time) in an ink chip with "!" (`chip.stale`: fill `color.ink`, text `color.paper`, prefix `! `; an outline with ink text and "!" where warnings are outlines). It is not a warning chip: old data is not an alarm about the world, and the mark and its place in the title row tell it apart. The chip goes back to the title's font and size (`type.title`), so a stale screen is louder than a healthy one (the *Mark data as stale after* input, default <!-- v:shared:stale_after -->60 min<!-- /v -->, 0 turns it off). It reads `last_reported`, not `last_updated`: a value that stays the same for hours is not stale as long as the source keeps reporting it. With several sources (entity list, plants, pollen next to weather) the newest report counts: one quiet door sensor doesn't mark the whole screen stale. Every blueprint whose data comes from reporting entities has the input. Exempt are the blueprints whose data Home Assistant computes or fetches at the moment it redraws, so there is nothing to go stale: Sun & moon, Calendar, Next appointment, Energy price (EnergyZero), To-do list, and Medication (no stamp).
+- **Stale chip:** when the data source stops reporting while the automation still runs, the stamp shows the source's last report (weekday + time) in an ink chip with "!" (`chip.stale`: fill `color.ink`, text `color.paper`, prefix `! `; an outline with ink text and "!" where warnings are outlines). It is not a warning chip: old data is not an alarm about the world, and the mark and its place in the title row tell it apart. The chip goes back to the title's font and size (`type.title`), so a stale screen is louder than a healthy one (the *Mark data as stale after* input, default <!-- v:shared:stale_after -->60 min<!-- /v -->, 0 turns it off). It reads `last_reported`, not `last_updated`: a value that stays the same for hours is not stale as long as the source keeps reporting it. With several sources (entity list, plants, pollen next to weather) the newest report counts: one quiet door sensor doesn't mark the whole screen stale. Every blueprint whose data comes from reporting entities has the input. Exempt are the blueprints whose data Home Assistant computes or fetches at the moment it redraws, so there is nothing to go stale: Sun & moon, Calendar, Next appointment, Energy price (EnergyZero), To-do list, and Medication (no stamp). Doors & windows is exempt too: it redraws only when the count changes, so there is no redraw at which old data could be marked.
 - The title row has no icons.
 - **Line:** the row ends in the screen's standard line.
 - **Height (`space.titleRow`, *Derived*):** the title caps start at P (accents above them hang, *Text rules*, *Accents hang*), and the line sits S under the caps, as the footer's line sits S above its caps.
@@ -811,7 +811,7 @@ The footer is an **optional single text line at the bottom of a screen**. It say
 - **Room:** a footer takes `space.footer` at the bottom (above the padding), and every module above it keeps **M** clear of its line. A layout checks this with the same sum everywhere (`FNEED` = M + `space.footer`); the footer is drawn only when it fits.
 - **Look:** one text line in `type.data`, ink ending P from the bottom, a base line S above the caps. At most two items, one left-aligned and one right-aligned. Interface words as uppercase labels, values as written. No icons: whatever an icon could show belongs in a module.
 - **Severity:** when the conclusion is a warning or severe fact, the whole text line becomes the chip (`WEEK 7% AHEAD` in a warning chip), which takes the footer line's place.
-- **Priority:** fill → footer → spread (fill before you float, *Spacing (internal)*, *Fill before you float*, with the footer between fill and spread). The footer gives way to content (one more event, one more plant) but takes precedence over extra white space (Claude bars move from L to M apart to make room).
+- **Priority:** fill → footer → spread (fill before you float, *Spacing (internal)*, *Fill before you float*, with the footer between fill and spread). The footer gives way to content (one more event, one more plant; the Checklist's footer is the exception, *Checklist*, Footer) but takes precedence over extra white space (Claude bars move from L to M apart to make room).
 - **Never on Glance:** a Glance layout's bottom is its Glance secondary. The one exception is the version *Glance with a footer*.
 
 | Page and screens | Footer |
@@ -889,7 +889,7 @@ A pattern is what a kind of screen looks like: which modules, in which order, an
 | **Note** | Title row, Text block | *with a progress bar* (mock) | mock | — |
 <!-- /registry:patterns -->
 
-Bar chart and Line chart share the chart frame; the Timeline shares its clock-time axis (a Timeline is a Line chart on a compass axis). The lists (Key-value list, Grouped list, Event list, Checklist) share how they fill first and when they show a footer and differ in their rows and how they are grouped. Meters, the Glance *with a progress bar* and the Note *with a progress bar* use the one progress bar.
+Bar chart and Line chart share the chart frame; the Timeline shares its clock-time axis (a Timeline is a Line chart on a compass axis). The lists (Key-value list, Grouped list, Event list, Checklist) share how they fill first and when they show a footer (the Checklist always shows its own) and differ in their rows and how they are grouped. Meters, the Glance *with a progress bar* and the Note *with a progress bar* use the one progress bar.
 
 ### Glance
 
@@ -942,7 +942,7 @@ The weather page: the hour strip and the day strip under the hero band; on the 2
 
 Any module that can be drawn at the size the hero band leaves: a bar or line chart, a list, meters, the timeline, the month. *Weather and calendar* uses it with the date-grouped list on the 7.5" portrait, *Value with details* with a chart of one line on the 4.1" and the 7.5".
 
-- **The module in a Hero dashboard** has no title row of its own and three axis labels; where space runs out, it is drawn **without axis labels**. It is at least two rows (`space.row`) of plot or list, 1.5 without axis labels.
+- **The module in a Hero dashboard** has no title row of its own and keeps its axis labels (*Style choices*, Axis ticks); where space runs out, it is drawn **without axis labels**. It is at least two rows (`space.row`) of plot or list, 1.5 without axis labels.
 - **What gives way** is settled when a layout is made, never at redraw: a blueprint knows its screen, so only the values change. It holds for every Hero dashboard, in two steps:
   1. **The arrangement is the layout's**, chosen at the mock-up for the page's widest reading, in this order of preference: the detail rows beside the hero group, then under it (portrait screens), then no detail rows; the module with axis labels, then without.
   2. **The build fits the sizes** (*Token register*, *Measured*): the largest hero rung at which the layout's widest readings pass, then the largest strip icons that pass with that hero. The hero never goes below the hero ladder's smallest rung (*Style choices*, Hero ladder); where even that doesn't fit, the page isn't offered on that screen (*Pages*, *One page, one pattern*).
@@ -1063,8 +1063,8 @@ A list of to-do items: checkbox rows, filled first, and the footer.
 
 - **Checkbox row:** a square as high as the caps of `type.data`, outlined at `line.base`, ink-filled when done; `space.s` after it, the item in `type.data` as written, its due day right in `type.label`, in fixed rows of `space.row`. The due day is today's word (`TODAY`), the weekday as the update stamp writes it within six days either way (`SA`), else the day and the month (`13 AUG`).
 - **Order:** open items first, done items after them. The open items keep the order the list has in Home Assistant; a switch puts the ones with a due day first, earliest first. Done is the filled box only: weight and colour never mark it. A switch leaves the done items out.
-- **Fill first:** one column while the open items fit, with the done ones in the rows left over and one line between open and done. When they don't fit, a landscape screen takes two columns of equal length (no lines; the column divider and the row rhythm carry it) and a portrait screen stays at one. When the open items still don't fit, the done ones are left out and the last row reads `+N more`.
-- **Footer:** the count (`14 OPEN · 4 DONE`, `14 OPEN` where narrow or where the done items are left out by the switch).
+- **Fill first:** one column while the open items fit, with the done ones in the rows left over and one line between open and done. When they don't fit, a landscape screen takes two columns of equal length (the first takes the odd row; no lines; the column divider and the row rhythm carry it) and a portrait screen stays at one. When the open items still don't fit, the done ones are left out and the last row reads `+N more`.
+- **Footer:** the count (`14 OPEN · 4 DONE`, `14 OPEN` where narrow or where the done items are left out by the switch). It is always shown and never gives way to one more item: when the list overflows, the count says how much is hidden.
 - **Flagged:** an overdue item is a severe row chip, one due today a warning chip; the chip spans box, item and due day like a key-value row chip, and a row keeps its place when it is flagged. A switch turns the flagging off.
 - **Nothing to show:** no open items and no done ones to show is one empty statement.
 - Widest readings: an item of 40 characters (cut with an ellipsis before its due day), the due day `VANDAAG`, the footer `99 OPEN · 99 DONE`.
@@ -1279,7 +1279,8 @@ A Glance: the time of the last press of the device's button is the hero.
 A Glance, redrawn only when the count changes.
 
 - **Shows:** the number of open doors and windows as the hero, the first open one as the chip.
-- **Tested with:** nothing open, one, three, and English texts.
+- **Tested with:** nothing open, one (warning), three with a severe one, and English texts.
+- **Flagged:** an open door or window is a warning; one of `severe_openings` is severe. The chip names the first open one, the severe ones first, at the highest level open.
 
 <!-- registry:inputs-doors-windows -->
 | Screen | Inputs of this page |
@@ -1290,7 +1291,7 @@ A Glance, redrawn only when the count changes.
 <!-- registry:layouts-doors-windows -->
 | Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
 |---|---|---|---|---|---|
-| 1.4" | 112 px | 112 → 72 px | normal, widest, severe, gray, colour, title, error, unavailable, empty | warning, stale | 9 |
+| 1.4" | 112 px | 112 → 72 px | normal, widest, warning, severe, gray, colour, title, error, unavailable, empty | stale | 9 |
 <!-- /registry:layouts-doors-windows -->
 
 ### Single value
@@ -1630,9 +1631,9 @@ A Checklist of the items of one `todo` entity in Home Assistant.
 <!-- registry:layouts-todo -->
 | Screen | Checked in | Not applicable | Cases |
 |---|---|---|---|
-| 2.7" L | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |
+| 2.7" L | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 13 |
 | 2.7" P | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |
-| 3.5" | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 13 |
+| 3.5" | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 14 |
 | 4.1" | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 13 |
 | 7.5" L | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |
 | 7.5" P | normal, widest, warning, severe, gray, colour, title, error, empty | stale, unavailable | 12 |

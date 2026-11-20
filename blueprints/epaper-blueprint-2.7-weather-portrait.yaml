@@ -203,19 +203,19 @@ blueprint:
             boolean: {}
         warning_wind_high:
           name: 'Wind: warning at or above'
-          description: Wind speeds at or above this get a warning chip (in the weather entity's wind unit).
+          description: Wind speeds at or above this get a warning chip. In the weather entity's own wind unit; the default
+            suits km/h.
           default: 50
           selector:
             number:
-              unit_of_measurement: km/h
               mode: box
         severe_wind_high:
           name: 'Wind: severe at or above'
-          description: Wind speeds at or above this get a severe chip (in the weather entity's wind unit).
+          description: Wind speeds at or above this get a severe chip. In the weather entity's own wind unit; the default
+            suits km/h.
           default: 75
           selector:
             number:
-              unit_of_measurement: km/h
               mode: box
         flag_rain_hour:
           name: 'Rain per hour: flag it'
@@ -449,7 +449,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'pebhki'
+  ds_set: 'jpxwty'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'

@@ -24,7 +24,6 @@ def pg(normal, widest, warning, severe, gray, colour, title, stale, error, unav,
 
 
 NOTHR = 'n/a: the page has no thresholds (*Thresholds*)'
-NOWARN = 'n/a: the page has no warning level, only severe (*Thresholds*)'
 NOCHIP = 'n/a: no thresholds, so no warning or severe chips to show on a panel'
 NOSTALE = 'n/a: the page has no stale state (*Title row*, stale chip)'
 NOERR = 'n/a: the page has no error view'
@@ -63,7 +62,7 @@ COVERAGE = {
     'sun_moon_35':    pg('sun35', 'sun_widest', NOTHR, NOTHR, NOCHIP, NOCHIP, 'sun35_title', NOSTALE, 'sun_err', 'sun_nomoon', NOEMPTY),
     'entities_35':    pg('entities35', 'ent12', NOTHR, NOTHR, NOCHIP, NOCHIP, 'entities35_title', 'ent_stale', 'ent_err', 'ent_unav', REQ),
     'plants_41': pg('plants42', 'plants20', 'plants42_y', 'plants42', 'plants42_g', 'plants42_y', 'plants42_title', 'plants_stale', 'plants_unav', 'plants42', REQ),
-    'doors_windows_14': pg('openings_1', 'openings_3', NOWARN, 'openings_3', 'openings_3_g', 'openings_3', 'openings_1_title', NOSTALE, 'openings_err', 'openings_unav', 'openings_0'),
+    'doors_windows_14': pg('openings_1', 'openings_3', 'openings_1', 'openings_3', 'openings_3_g', 'openings_3', 'openings_1_title', NOSTALE, 'openings_err', 'openings_unav', 'openings_0'),
     # appointment and calendar: no thresholds. An event in progress (NOW) is an ink chip, not a severity (*Severity*, *Now is
     # not a severity*); it is drawn by a35_1now, a41_1now, a426_1now, cal42 and cal426
     # Single value: any sensor; its other configurations (an icon, a second value, a longer reading) are extra cases

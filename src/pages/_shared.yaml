@@ -791,19 +791,17 @@ groups:
   - name: warning_wind_high
     section: thresholds
     label: 'Wind: warning at or above'
-    help: Wind speeds at or above this get a warning chip (in the weather entity's wind unit).
+    help: Wind speeds at or above this get a warning chip. In the weather entity's own wind unit; the default suits km/h.
     selector:
       number:
-        unit_of_measurement: km/h
         mode: box
     default: 50
   - name: severe_wind_high
     section: thresholds
     label: 'Wind: severe at or above'
-    help: Wind speeds at or above this get a severe chip (in the weather entity's wind unit).
+    help: Wind speeds at or above this get a severe chip. In the weather entity's own wind unit; the default suits km/h.
     selector:
       number:
-        unit_of_measurement: km/h
         mode: box
     default: 75
   - name: flag_rain_hour

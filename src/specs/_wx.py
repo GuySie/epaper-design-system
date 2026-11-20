@@ -30,7 +30,7 @@ WXM = r'''
 {%- if k -%}{{- CCHIP(ns, LEVEL_MARK(k) ~ v, cx, cy, fb, s, cw, LEVEL_FILL(k), LEVEL_TEXT(k), p) -}}
 {%- else -%}{{- T(ns, v, cx, cy, fb if bold else f, s, color.ink, 'mm') -}}{%- endif -%}
 {%- endmacro -%}
-{#- Strip cells (component 'Hour cell / Day cell'): every text line is type.data, the regular text lines (hour, high/low, a dry 0 mm)
+{#- Strip cells (component 'Hour cell / Day cell'): every text line is type.data, every value Bold (a dry 0 mm too), the hour label
      in its Regular cut where that cut's stems clear stroke.min (DATA_REGULAR), else Bold. A text line's box is rowMin of type.data
      (cap height + 2 x space.xs + 1); stacked items are space.xs apart, so text lines are space.detailRow apart and a chip on a text line is that pitch - 1 high (a 1 px paper gap to a chip next to it); an icon sits space.xs from the text lines around it. -#}
 {%- macro CELL_ROW_H() -%}{%- set ds = EP_TK.type.data[1] -%}{{ (CAPH(ds) | int) + 2 * (SPACE_XS(ds) | int) + 1 }}{%- endmacro -%}
@@ -44,7 +44,7 @@ WXM = r'''
 {%- set yy = y + r + xs -%}
 {%- if ic -%}{{- I(ns, h.icon, cx, yy + ic // 2, ic) -}}{%- set yy = yy + ic + xs -%}{%- endif -%}
 {{- CELL_VALUE(ns, (h.temp | string) ~ '°', cx, yy + xs + CAPUP[ds], rf, df, ds, 0, h.temp_k, true, p) -}}
-{{- CELL_VALUE(ns, MM(h.mm), cx, yy + p + xs + CAPUP[ds], rf, df, ds, 0, h.mm_k, h.mm > 0, p) -}}
+{{- CELL_VALUE(ns, MM(h.mm), cx, yy + p + xs + CAPUP[ds], rf, df, ds, 0, h.mm_k, true, p) -}}
 {%- endmacro -%}
 {#- day cell: day / icon / hi/lo / mm -#}
 {%- macro DCELL(ns, d, cx, y, ic) -%}
@@ -54,8 +54,8 @@ WXM = r'''
 {%- set yy = y + r + xs -%}
 {{- I(ns, d.icon, cx, yy + ic // 2, ic) -}}
 {%- set yy = yy + ic + xs -%}
-{{- CELL_VALUE(ns, (d.hi | string) ~ '°/' ~ (d.lo | string) ~ '°', cx, yy + xs + CAPUP[ds], rf, df, ds, 0, d.t_k, false, p) -}}
-{{- CELL_VALUE(ns, MM(d.mm), cx, yy + p + xs + CAPUP[ds], rf, df, ds, 0, d.mm_k, d.mm > 0, p) -}}
+{{- CELL_VALUE(ns, (d.hi | string) ~ '°/' ~ (d.lo | string) ~ '°', cx, yy + xs + CAPUP[ds], rf, df, ds, 0, d.t_k, true, p) -}}
+{{- CELL_VALUE(ns, MM(d.mm), cx, yy + p + xs + CAPUP[ds], rf, df, ds, 0, d.mm_k, true, p) -}}
 {%- endmacro -%}
 {#- Strips (a line, space.s, a row of cells). STRIPY: the line's y for a strip whose last text line's ink ends just above yb (the
      bottom of the content, the footer's M, or space.s above the next strip's line): the cells' box ends space.xs + 1 lower -#}
