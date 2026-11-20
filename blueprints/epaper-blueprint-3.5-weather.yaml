@@ -436,7 +436,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'jejovg'
+  ds_set: 'gpdsms'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'

@@ -948,7 +948,7 @@ groups:
     en:
       today: Today
       more: +{e} more
-      title: Agenda
+      title: Calendar
       all_day_prefix: 'All day: '
       no_events: No appointments
       no_calendars: No calendar chosen

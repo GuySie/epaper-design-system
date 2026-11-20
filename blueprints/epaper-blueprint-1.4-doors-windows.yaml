@@ -172,7 +172,7 @@ trigger:
   id: redraw
 conditions: !input 'automation_conditions'
 variables:
-  ds_set: 'jejovg'
+  ds_set: 'gpdsms'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'
@@ -183,17 +183,17 @@ variables:
   severe_openings: !input 'severe_openings'
   ds_otxt: |
     {% set m = {
-      "en": {"title": "Open", "all": "All closed", "door": "door", "window": "window", "none": "No doors or windows selected"},
-      "nl": {"title": "Open", "all": "Alles dicht", "door": "deur", "window": "raam", "none": "Geen deuren of ramen gekozen"},
-      "de": {"title": "Offen", "all": "Alles zu", "door": "Tür", "window": "Fenster", "none": "Keine Türen oder Fenster gewählt"},
-      "fr": {"title": "Ouvert", "all": "Tout fermé", "door": "porte", "window": "fenêtre", "none": "Aucune porte ou fenêtre choisie"},
-      "es": {"title": "Abierto", "all": "Todo cerrado", "door": "puerta", "window": "ventana", "none": "Ninguna puerta o ventana elegida"},
-      "pl": {"title": "Otwarte", "all": "Zamknięte", "door": "drzwi", "window": "okno", "none": "Nie wybrano drzwi ani okien"},
-      "hr": {"title": "Otvoreno", "all": "Sve zatvoreno", "door": "vrata", "window": "prozor", "none": "Nisu odabrana vrata ni prozori"},
-      "sv": {"title": "Öppet", "all": "Allt stängt", "door": "dörr", "window": "fönster", "none": "Inga dörrar eller fönster valda"}
+      "en": {"title": "Open", "all": "All closed", "door": "door", "window": "window", "none": "No doors or windows selected", "most": "Most values unavailable."},
+      "nl": {"title": "Open", "all": "Alles dicht", "door": "deur", "window": "raam", "none": "Geen deuren of ramen gekozen", "most": "Meeste waarden niet beschikbaar."},
+      "de": {"title": "Offen", "all": "Alles zu", "door": "Tür", "window": "Fenster", "none": "Keine Türen oder Fenster gewählt", "most": "Die meisten Werte nicht verfügbar."},
+      "fr": {"title": "Ouvert", "all": "Tout fermé", "door": "porte", "window": "fenêtre", "none": "Aucune porte ou fenêtre choisie", "most": "La plupart des valeurs indisponibles."},
+      "es": {"title": "Abierto", "all": "Todo cerrado", "door": "puerta", "window": "ventana", "none": "Ninguna puerta o ventana elegida", "most": "La mayoría de los valores no disponibles."},
+      "pl": {"title": "Otwarte", "all": "Zamknięte", "door": "drzwi", "window": "okno", "none": "Nie wybrano drzwi ani okien", "most": "Większość wartości niedostępna."},
+      "hr": {"title": "Otvoreno", "all": "Sve zatvoreno", "door": "vrata", "window": "prozor", "none": "Nisu odabrana vrata ni prozori", "most": "Većina vrijednosti nedostupna."},
+      "sv": {"title": "Öppet", "all": "Allt stängt", "door": "dörr", "window": "fönster", "none": "Inga dörrar eller fönster valda", "most": "De flesta värden otillgängliga."}
     } %} {{ m[weekday_lang] if weekday_lang in m else m['en'] }}
   ds_open: |
-    {% set ns = namespace(sev=[], warn=[]) %} {% for e in openings %}{% if is_state(e, 'on') %} {% set dc = state_attr(e, 'device_class') | default('', true) %} {% set nm = ((e ~ ' ' ~ (entity_name(e) or '') ~ ' ' ~ (device_name(e) or '')) | lower) %} {% set win = dc == 'window' or (dc != 'door' and ('window' in nm or 'raam' in nm or 'fenster' in nm)) %} {% set area = area_name(e) or e.split('.')[1].split('_')[0] %} {% set item = {'label': (area ~ ' ' ~ (ds_otxt['window'] if win else ds_otxt['door'])), 'area': area, 'win': win} %} {% if e in severe_openings %}{% set ns.sev = ns.sev + [item] %}{% else %}{% set ns.warn = ns.warn + [item] %}{% endif %} {% endif %}{% endfor %} {{ {'items': ns.sev + ns.warn, 'sev': ns.sev | count} }}
+    {% set ns = namespace(sev=[], warn=[]) %} {% for e in openings %}{% if is_state(e, 'on') %} {% set dc = state_attr(e, 'device_class') | default('', true) %} {% set nm = ((e ~ ' ' ~ (entity_name(e) or '') ~ ' ' ~ (device_name(e) or '')) | lower) %} {% set win = dc == 'window' or (dc != 'door' and ('window' in nm or 'raam' in nm or 'fenster' in nm)) %} {% set area = area_name(e) or e.split('.')[1].split('_')[0] %} {% set item = {'label': (area ~ ' ' ~ (ds_otxt['window'] if win else ds_otxt['door'])), 'area': area, 'win': win} %} {% if e in severe_openings %}{% set ns.sev = ns.sev + [item] %}{% else %}{% set ns.warn = ns.warn + [item] %}{% endif %} {% endif %}{% endfor %} {% set b = namespace(n=0) %}{% for e in openings %}{% if states(e) in ['unavailable', 'unknown'] %}{% set b.n = b.n + 1 %}{% endif %}{% endfor %} {{ {'items': ns.sev + ns.warn, 'sev': ns.sev | count, 'n': openings | count, 'bad': b.n} }}
 action:
 - condition: template
   value_template: '{{ trigger.platform != ''state'' or trigger.from_state.state != trigger.to_state.state }}'

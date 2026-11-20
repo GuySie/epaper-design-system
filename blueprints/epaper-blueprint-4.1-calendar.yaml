@@ -89,7 +89,7 @@ blueprint:
       input:
         header_title:
           name: Header title
-          description: Shown in capitals at the top left. Leave blank for "Agenda" in your language.
+          description: Shown in capitals at the top left. Leave blank for "Calendar" in your language.
           default: ''
           selector:
             text: {}
@@ -177,7 +177,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'jejovg'
+  ds_set: 'gpdsms'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'

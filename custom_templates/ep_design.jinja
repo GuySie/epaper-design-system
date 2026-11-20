@@ -28,7 +28,7 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_MONTHS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'jejovg' -%}
+{%- set EP_SET = 'gpdsms' -%}
 {%- set EP_LAYOUTS = {
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
@@ -2231,7 +2231,10 @@
 {%- set items = ds_open['items'] -%}
 {%- set n = items | count -%}
 {%- set icon = 'mdi:home-lock' if n == 0 else ('mdi:window-open' if items[0].win else 'mdi:door-open') -%}
-{%- if n == 0 -%}
+{#- more than half of the sensors unavailable, or the only one: the error state (*Doors & windows*, Unavailable) -#}
+{%- if ds_open['bad'] * 2 > ds_open['n'] -%}
+{{- ERRPAGE(ns, title, ds_otxt['most']) -}}
+{%- elif n == 0 -%}
 {{- GLANCE(ns, title, as_timestamp(now()), n | string, icon, txt=ds_otxt['all'] | upper) -}}
 {%- else -%}
 {#- the first open one names the chip (severe ones first); "+N" for the rest. Too wide: the area alone, then cut -#}

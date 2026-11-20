@@ -6,7 +6,10 @@ PAYLOAD_MAIN = WXM + r'''
 {%- set items = ds_open['items'] -%}
 {%- set n = items | count -%}
 {%- set icon = 'mdi:home-lock' if n == 0 else ('mdi:window-open' if items[0].win else 'mdi:door-open') -%}
-{%- if n == 0 -%}
+{#- more than half of the sensors unavailable, or the only one: the error state (*Doors & windows*, Unavailable) -#}
+{%- if ds_open['bad'] * 2 > ds_open['n'] -%}
+{{- ERRPAGE(ns, title, ds_otxt['most']) -}}
+{%- elif n == 0 -%}
 {{- GLANCE(ns, title, as_timestamp(now()), n | string, icon, txt=ds_otxt['all'] | upper) -}}
 {%- else -%}
 {#- the first open one names the chip (severe ones first); "+N" for the rest. Too wide: the area alone, then cut -#}

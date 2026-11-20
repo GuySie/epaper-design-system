@@ -183,7 +183,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'jejovg'
+  ds_set: 'gpdsms'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'

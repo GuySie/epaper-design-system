@@ -49,7 +49,6 @@ layouts:
   '14':
     spec: weather_glance_14
     defaults:
-      time_format: 12h
       rotate: '0'
   '35':
     spec: weather_glance_35

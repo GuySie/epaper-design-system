@@ -340,7 +340,7 @@ blueprint:
         time_format:
           name: Time format
           description: 12-hour (AM/PM) or 24-hour clock for the times on the display.
-          default: 12h
+          default: 24h
           selector:
             select:
               options:
@@ -431,7 +431,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'jejovg'
+  ds_set: 'gpdsms'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'

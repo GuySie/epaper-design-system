@@ -323,5 +323,3 @@ texts:
 layouts:
   '35':
     spec: claude_35
-    defaults:
-      time_format: 12h

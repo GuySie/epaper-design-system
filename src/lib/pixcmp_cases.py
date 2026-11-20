@@ -52,7 +52,7 @@ CASES = [
     ('plants_unav', 'plants_41', 'skip', 'free'),   # plants' error state when most values are unavailable
     # unavailable values and empty states where a layout had no case (coverage kinds 'unavailable', 'empty')
     ('w426_unav', 'weather_426', 'C', 'free'), ('wxag_unav', 'weather_calendar_75p', 'C', 'free'), ('med_unav', 'medication_27l', 'skip', 'free'), ('sun_nomoon', 'sun_moon_35', 'skip', 'fill'),
-    ('openings_unav', 'doors_windows_14', 'skip', 'free'), ('rain168_radar', 'rain_27l', 'skip', 'fill'), ('rain168_dry', 'rain_27l', 'skip', 'free'),
+    ('openings_unav', 'doors_windows_14', 'skip', 'free'), ('openings_err_unav', 'doors_windows_14', 'skip', 'free'), ('rain168_radar', 'rain_27l', 'skip', 'fill'), ('rain168_dry', 'rain_27l', 'skip', 'free'),
     # a blueprint and templates from different releases (Blueprint mechanics, One set), on the tightest, a medium and a large screen
     ('set_err_14', 'weather_glance_14', 'skip', 'free'), ('set_err_35', 'co2_35', 'skip', 'free'), ('set_err_75', 'weather_75', 'skip', 'free'),
     # the event hero's widest reading (20:00) on each screen, and the 3.5" event hero before it starts
