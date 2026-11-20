@@ -49,7 +49,7 @@ inputs:
 - name: warning_co2
   section: thresholds
   label: 'CO2: warning at or above'
-  help: CO2 level drawn as the lower dashed line. Spans above it are filled yellow on BWRY panels, and the summary line turns
+  help: CO2 level drawn as the lower dashed line. Spans above it are filled yellow on BWRY panels, and the footer turns
     into a warning chip.
   selector:
     number:
@@ -62,7 +62,7 @@ inputs:
 - name: severe_co2
   section: thresholds
   label: 'CO2: severe at or above'
-  help: CO2 level drawn as the upper dashed line. Spans above it are filled in the severe colour, and the summary line turns
+  help: CO2 level drawn as the upper dashed line. Spans above it are filled in the severe colour, and the footer turns
     into a severe chip. The graph runs from 400 ppm (outdoor air) up to 1.5 x this value.
   selector:
     number:
@@ -134,7 +134,7 @@ texts:
     default_title: CO2
     now: ACTUEL
     peak: PIC
-    no_data: Aucun historique pour ce capteur.
+    no_data: Pas d'historique pour ce capteur.
   es:
     default_title: CO2
     now: AHORA
@@ -144,7 +144,7 @@ texts:
     default_title: CO2
     now: TERAZ
     peak: SZCZYT
-    no_data: Brak historii dla tego czujnika.
+    no_data: Brak historii tego czujnika.
   hr:
     default_title: CO2
     now: SADA
@@ -154,7 +154,7 @@ texts:
     default_title: CO2
     now: NU
     peak: TOPP
-    no_data: Ingen historik för denna sensor.
+    no_data: Ingen historik för den här sensorn.
 layouts:
   '35':
     spec: co2_35

@@ -4,7 +4,7 @@ blueprint:
   description: |
     # E-paper Sun & moon 3.5"
 
-    Today's dawn, sunrise, noon, sunset and dusk, with the sun (and optionally the moon) on a horizon track.
+    Today's dawn, sunrise, noon, sunset and dusk, with the sun (and optionally the moon) on a timeline.
 
     ## Works with
 
@@ -71,7 +71,7 @@ blueprint:
           name: Moon azimuth sensor
           description: Optional sensor reporting the moon's azimuth in degrees, e.g. the "Moon Azimuth" sensor from the Lunar
             Phase integration. Home Assistant's core Moon integration doesn't provide this. Leave blank to omit the moon from
-            the horizon strip.
+            the timeline.
           default: ''
           selector:
             entity:
@@ -79,7 +79,7 @@ blueprint:
         moon_altitude_sensor:
           name: Moon altitude sensor
           description: Optional sensor reporting the moon's altitude (elevation) in degrees, e.g. the "Moon Altitude" sensor
-            from the Lunar Phase integration. Leave blank to omit the moon from the horizon strip.
+            from the Lunar Phase integration. Leave blank to omit the moon from the timeline.
           default: ''
           selector:
             entity:
@@ -98,7 +98,7 @@ blueprint:
           name: Hemisphere
           description: Your hemisphere. At solar noon the sun sits due south (azimuth 180°) in the Northern Hemisphere but
             due north (azimuth 0°/360°) in the Southern Hemisphere. This is used to correctly center the sun/moon position
-            on the horizon strip so it sweeps left-to-right without jumping.
+            on the timeline so it sweeps left-to-right without jumping.
           default: northern
           selector:
             select:
@@ -202,7 +202,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'otxyin'
+  ds_set: 'pebhki'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'

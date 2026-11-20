@@ -26,10 +26,6 @@ blueprint:
 
     You can add a device's button to the trigger (an "Entity event received" trigger on its `event.*` entity, e.g. `event.<your_device>_button_1`). A press then flashes that device's LED straight away, so you know it registered before the ~30 second redraw. Time-based and other triggers don't flash. If the flash fails, the display is still updated.
 
-    ## Notes
-
-    - Leave the weather entity empty to use the first working weather entity.
-
     ## Links
 
     - [E-paper design system repository](https://github.com/GuySie/epaper-design-system)
@@ -436,7 +432,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'otxyin'
+  ds_set: 'pebhki'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'

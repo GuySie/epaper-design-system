@@ -36,7 +36,7 @@ This project is not affiliated with OpenDisplay, but intended for use with devic
 | [`epaper-blueprint-3.5-rain-forecast-netherlands.yaml`](blueprints/epaper-blueprint-3.5-rain-forecast-netherlands.yaml) | Rain forecast (Netherlands) 3.5" | The next two hours of rain in 5-minute bars, from Buienalarm and Buienradar (the higher of the two for each bar), on a log scale so drizzle stays visible next to a downpour. |
 | [`epaper-blueprint-3.5-rain-forecast.yaml`](blueprints/epaper-blueprint-3.5-rain-forecast.yaml) | Rain forecast 3.5" | The next 24 hours of rain in hourly bars, from the hourly forecast of any weather entity, on a log scale so drizzle stays visible next to a downpour. |
 | [`epaper-blueprint-3.5-single-value.yaml`](blueprints/epaper-blueprint-3.5-single-value.yaml) | Single value 3.5" | One sensor's value, large enough to read across the room, with its unit beside it. An icon and a second value under it are optional. |
-| [`epaper-blueprint-3.5-sun-moon.yaml`](blueprints/epaper-blueprint-3.5-sun-moon.yaml) | Sun & moon 3.5" | Today's dawn, sunrise, noon, sunset and dusk, with the sun (and optionally the moon) on a horizon track. |
+| [`epaper-blueprint-3.5-sun-moon.yaml`](blueprints/epaper-blueprint-3.5-sun-moon.yaml) | Sun & moon 3.5" | Today's dawn, sunrise, noon, sunset and dusk, with the sun (and optionally the moon) on a timeline. |
 | [`epaper-blueprint-3.5-tiles.yaml`](blueprints/epaper-blueprint-3.5-tiles.yaml) | Tiles 3.5" | Up to 12 entities as tiles, each with an icon, its state and its label. How many fit depends on the screen; with fewer entities the tiles grow. |
 | [`epaper-blueprint-3.5-to-do-list.yaml`](blueprints/epaper-blueprint-3.5-to-do-list.yaml) | To-do list 3.5" | A to-do list: the open items first, each with its box and its due day, then the done ones while there is room. An overdue item and one due today are flagged. |
 | [`epaper-blueprint-3.5-weather-at-a-glance.yaml`](blueprints/epaper-blueprint-3.5-weather-at-a-glance.yaml) | Weather at a glance 3.5" | The weather at a glance: the temperature large, with the condition icon, and one more reading under it. |
@@ -416,7 +416,7 @@ A blueprint whose templates are missing fails with `TemplateNotFound: ep_design.
 
 Replace the four templates, run `homeassistant.reload_custom_templates`, then re-import the blueprints. Always update the templates and the blueprints together: they are built as one set. A device that shows `UPDATE TEMPLATES AND BLUEPRINT` with two ids has a blueprint and templates from different releases: update whichever is older.
 
-To redraw a device after changing an automation's settings, open the automation and choose **Run actions**. Devices also redraw when Home Assistant starts.
+To redraw a device after changing an automation's settings, open the automation and choose **Run actions**. Medication and Doors & windows also redraw when Home Assistant starts.
 
 ## How it's built
 

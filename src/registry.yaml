@@ -192,7 +192,7 @@ terms:
   hero numeral:        {level: component,     of: Hero group, what: 'the number of a hero group, in Space Grotesk Bold at the hero size', aliases: []}
   warning chip:        {level: component,     of: Chip, what: 'a chip at the warning level (an outline where the panel has no warning colour)', aliases: [warn chip]}
   severe chip:         {level: component,     of: Chip, what: 'a chip at the severe level', aliases: []}
-  ink chip:            {level: component,     of: Chip, what: 'a chip filled with ink: the stale chip, an event in progress, and severe on black/white panels', aliases: []}
+  ink chip:            {level: component,     of: Chip, what: 'a chip filled with ink: the stale chip (an outline where warnings are outlines), an event in progress, and severe on black/white panels', aliases: []}
   row chip:            {level: component,     of: Chip, what: 'one chip spanning the label and the value of a row', aliases: []}
   track:               {level: component,     of: Progress bar, what: 'the outlined bar a progress bar fills', aliases: []}
   now-marker:          {level: component,     of: Progress bar, what: 'the line across a progress bar for "now in the period"', aliases: [now marker]}

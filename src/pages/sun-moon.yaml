@@ -1,6 +1,6 @@
 page: sun-moon
 description:
-  shows: Today's dawn, sunrise, noon, sunset and dusk, with the sun (and optionally the moon) on a horizon track.
+  shows: Today's dawn, sunrise, noon, sunset and dusk, with the sun (and optionally the moon) on a timeline.
   needs:
   - sun
   optional:
@@ -16,7 +16,7 @@ inputs:
   section: content
   label: Moon azimuth sensor
   help: Optional sensor reporting the moon's azimuth in degrees, e.g. the "Moon Azimuth" sensor from the Lunar Phase integration.
-    Home Assistant's core Moon integration doesn't provide this. Leave blank to omit the moon from the horizon strip.
+    Home Assistant's core Moon integration doesn't provide this. Leave blank to omit the moon from the timeline.
   selector:
     entity:
       domain: sensor
@@ -25,7 +25,7 @@ inputs:
   section: content
   label: Moon altitude sensor
   help: Optional sensor reporting the moon's altitude (elevation) in degrees, e.g. the "Moon Altitude" sensor from the Lunar
-    Phase integration. Leave blank to omit the moon from the horizon strip.
+    Phase integration. Leave blank to omit the moon from the timeline.
   selector:
     entity:
       domain: sensor
@@ -44,7 +44,7 @@ inputs:
   section: content
   label: Hemisphere
   help: Your hemisphere. At solar noon the sun sits due south (azimuth 180°) in the Northern Hemisphere but due north (azimuth
-    0°/360°) in the Southern Hemisphere. This is used to correctly center the sun/moon position on the horizon strip so it
+    0°/360°) in the Southern Hemisphere. This is used to correctly center the sun/moon position on the timeline so it
     sweeps left-to-right without jumping.
   selector:
     select:

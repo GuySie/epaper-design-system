@@ -27,7 +27,7 @@ Our hierarchy follows **Atomic Design** (Brad Frost): small parts combine into l
 | Pattern | **Line chart**, the version *with thresholds* |
 | Page | **CO2 graph**: ppm over the last hours, warning at 1000, severe at 1400, the footer's conclusion; tested with 4000 ppm, unavailable and stale |
 | Layouts | 2.7" to 7.09": Line chart · 1.4": not offered |
-| Blueprint | `epaper-blueprint-3.5-co2-graph.yaml`, inputs: period, thresholds, scale |
+| Blueprint | `epaper-blueprint-3.5-co2-graph.yaml`, inputs: period, thresholds |
 
 **How things vary.** Three kinds of variation, none of them a new kind of part:
 
@@ -102,7 +102,7 @@ The tokens are not tied to the devices above. A screen is described by four numb
 | *Medium* | <!-- v:dt:MEDIUM_SHORT_MM -->35<!-- /v -->–<!-- v:dt:LARGE_SHORT_MM -->80<!-- /v --> mm | <!-- v:classScreens.medium -->3.5", 4.1", 4.26"<!-- /v --> | a list item's main text line steps up to `type.primary` |
 | *Large* | above <!-- v:dt:LARGE_SHORT_MM -->80<!-- /v --> mm | <!-- v:classScreens.large -->7.5"<!-- /v --> (and the 7.09", 10.3", 13.3" when they join) | `type.primary`, and the steps up (*Step up (large screens)*) |
 
-**Two kinds of tokens** are computed for a new screen here: floors and steps up. The *Token register* lists every token with its kind; derived and measured tokens follow from these, and style choices are copied unchanged.
+**Two things** are computed for a new screen here: floors and steps up. The *Token register* lists every token with its kind; derived and measured tokens follow from these, and style choices are copied unchanged.
 
 1. **Floors**, derived from the pitch alone: the rules in *Floors and their thresholds*, and they are exact.
 
@@ -304,7 +304,7 @@ A *large* screen (*Deriving tokens for any screen*) is read from further away an
 |---|---|
 | `type.data`, `type.label`, `type.unit` | one TRMNL step above the floor |
 | `type.title` | one TRMNL step above its base (*Style choices*, `type.title` base) |
-| `type.fieldLabel` | TRMNL21 Regular beside the hero (Bold where Regular stems are under `stroke.min`) |
+| `type.fieldLabel` | one TRMNL step above `type.label`, Regular (Bold where Regular stems are under `stroke.min`) |
 | `line.series` | one more pixel (`line.base` + 2) |
 
 #### Measured
@@ -314,9 +314,9 @@ A *large* screen (*Deriving tokens for any screen*) is read from further away an
 | detail column | *Space* (the detail column, `DCOLW`) |
 | time columns | widest time + `space.l` |
 | chart label margin | widest scale label + `space.s` |
-| `type.heroShared`, `icon.heroShared` | per layout: the hero beside other content (*Hero group*), the largest hero rung for which this layout's widest readings pass the pixel check, fitted first, with its strip icons at their smallest (no hour icon, the day icon at `icon.min`); the icon follows by the *Hero group* rule |
+| `type.heroShared` | per layout: the hero beside other content (*Hero group*), the largest hero rung for which this layout's widest readings pass the pixel check, fitted first, with its strip icons at their smallest (no hour icon, the day icon at `icon.min`); `icon.heroShared` follows by the *Hero group* rule (*Derived*) |
 | `icon.stripHour`, `icon.stripDay` | per layout, fitted after its hero: the hour icon one ladder step below the day icon, the pair as large as every case of the layout passes; when no pair passes, the hour icon drops out and the day icon is as large as passes; never below `icon.min` |
-| `type.heroAlone`, `icon.heroAloneSteps` | per layout: the hero on its own (*Hero group*), the largest hero rung for which this layout's ordinary reading passes and keeps its icon, never below the tier's floor; the steps follow by the *Hero group* rule |
+| `type.heroAlone` | per layout: the hero on its own (*Hero group*), the largest hero rung for which this layout's ordinary reading passes and keeps its icon, never below the tier's floor (the one exception: *Single value*, the 1.4"); `icon.heroAloneSteps` follows by the *Hero group* rule (*Derived*) |
 
 Measured tokens are fitted in the build (`lib/layout_fit.py`, run by `lib/gen_tokens.py`), **each layout on its own**, in this order: its hero, then its strip icons, so strip icons give way before the hero does (*Hero dashboard with a chart or list*, *What gives way*). So a new page never changes another page's hero, and two pages on one screen may have different hero sizes. The templates lay a layout's measured tokens over its tier's (`EP_LAYOUT` over `EP_TIER`). What each layout has: the table in *Physical size minimums*.
 
@@ -329,7 +329,7 @@ The same on every screen. Each one could be different; this is why it is what it
 | Fonts | TRMNL 12 / 16 / 21 and their exact 2× cuts (Bold; Regular for units, and for `type.primary`, `type.fieldLabel` and strip lines where its stems clear `stroke.min`), Space Grotesk Bold for heroes | pixel fonts drawn for 1-bit: no anti-aliasing, so no grey edges that turn red on BWR panels; a geometric hero face for numbers only | every metric table (`ep_metrics.jinja`) |
 | `space.xs`, `space.s` | <!-- v:xs.12 -->2<!-- /v --> / <!-- v:s.12 -->4<!-- /v --> px around TRMNL12/16; <!-- v:xs.21 -->3<!-- /v --> / <!-- v:s.21 -->6<!-- /v --> px around TRMNL21; a 2× cut doubles its base (<!-- v:xs.24 -->4<!-- /v --> / <!-- v:s.24 -->8<!-- /v --> around 24 and 32, <!-- v:xs.42 -->6<!-- /v --> / <!-- v:s.42 -->12<!-- /v --> around 42) | XS is the smallest gap that reads as a gap; S = 2 × XS; around TRMNL21 both scale × 1.5 with the type | chips, every line gap, rows, footer, title row |
 | Row air steps | the steps of the fixed-row ladder (*Fixed rows*, *Space*) | detail rows sit beside a hero and must stay compact; lists are scanned and get the most air | row heights, row budgets |
-| `type.title` base | TRMNL<!-- v:dt:TITLE_BASE -->16<!-- /v --> Bold | the title is chrome: it names the screen and never outranks the data | title row height |
+| `type.title` base | TRMNL<!-- v:dt:TITLE_BASE -->16<!-- /v --> Bold, never below `type.label`'s size | the title is chrome: it names the screen and never outranks the data | title row height |
 | Hero ladder | <!-- v:heroLadder -->multiples of 8 from 56 to 160, then multiples of 32 to 320<!-- /v --> | Space Grotesk is an outline font, so in 1-bit every size is equally crisp; what matters is that the floor and *fill before you float* find a close fit. Below 160 steps of 8 px are <!-- v:heroStepPct -->5–14 %<!-- /v -->; above it 32 px steps are as fine as anyone can see. <!-- v:heroMinUsed -->56<!-- /v --> is the smallest hero of any layout today; 320 fills the 7.09" Glance | every hero; the measured tables (`SGB`, `HUP`, `HDN`) are generated for every rung by `lib/hero_metrics.py` |
 | Icon ladder | <!-- v:iconLadder -->16 · 20, then multiples of 8 to 160, then multiples of 32 to 320<!-- /v --> | the hero ladder's steps, so an icon can follow its hero; 16, 20 and 24 stay because the stroke floor picks them (`icon.min`). An icon's size is compared through its glyph height: the median ink of the weather glyphs, measured per rung (`lib/hero_metrics.py`) | `icon.heroShared`, `icon.heroAloneSteps`, every icon slot |
 | Stroke multiples | `line.*` in *Lines and strokes* (multiples of `line.base`) | a heavy divider works without other lines; a tick reads as a tick without touching the axis labels' `space.s`; an even dash reads as "a level", the longer forecast dash never reads as a threshold; dots are the quietest line; a data line outweighs the other lines without filling in. Multiples of `line.base` keep all of it in proportion on dense screens | every line and data stroke, `space.axis` |
@@ -423,7 +423,7 @@ Values per panel type are in *Values per panel* below. Layouts only ever name th
 | `color.onWarning` | Text and icons on a warning fill |
 | `color.severe` | Severe fill, error block |
 | `color.onSevere` | Text and icons on a severe fill |
-| `color.stale` | Stale chip fill: `color.ink` (*Title row*) |
+| `color.stale` | Stale chip fill: `color.ink`, an outline where warnings are outlines (*Title row*) |
 
 ### Type tokens
 
@@ -526,7 +526,7 @@ Blueprints only ever use these drawcustom names. In the templates a token is rea
      - error messages
    - As written: everything that comes from the user's data. That covers:
      - entity and plant names, event titles
-     - values with their units, everywhere, footers included (`PEAK 2.6mm/h`, `9°/7°`). A unit is never uppercased: `MM` reads as megametres.
+     - values with their units, everywhere, footers included (`PEAK 2.6 mm/h`, `9°/7°`). A unit is never uppercased: `MM` reads as megametres.
      - reset captions and other small inline captions next to data
    - Width budgets for uppercase strings are measured in uppercase, which runs about 15 % wider.
 
@@ -575,8 +575,8 @@ TRMNL12 and TRMNL16 text is always Bold (*Physical size minimums*), so weight ca
    | %, ppm, ppb, lx, W, hPa | whole numbers |
    | Anything else | at most one decimal |
 
-   No trailing `,0` / `.0`; zero is `0mm`. Entity values are rounded to this before they are shown, never shown raw (`57.41 %` → `57%`).
-6. **Decimal separator follows the device's language:** a comma for nl, de, fr, es, pl, hr and sv (`0,6mm`), a point for en (`0.6mm`). Clock times keep their colon.
+   No trailing `,0` / `.0`; zero is `0 mm`. Entity values are rounded to this before they are shown, never shown raw (`57.41 %` → `57%`).
+6. **Decimal separator follows the device's language:** a comma for nl, de, fr, es, pl, hr and sv (`0,6 mm`), a point for en (`0.6 mm`). Clock times keep their colon.
 7. **Unit symbols are international:** `mm/h`, `km/h`, `lx` are the same in every language (never a translated `mm/u`). Only words are translated.
 8. **Missing values:** `—`, without a unit.
 9. **Every measured value shows its unit**, taken from the sensor's `unit_of_measurement` (normalised as above). Counts without a unit stay bare. Pollen counts carry their sensor's unit (`ppm`) like any value.
@@ -597,7 +597,7 @@ Every icon does one of three jobs. If it does none of them, leave it out.
 
 ### How to draw them
 
-1. **Source:** MDI glyphs, drawn as text in `materialdesignicons-webfont.ttf`, never drawcustom's `icon` element (*Blueprint mechanics*). TRMNL's own glyphs are not used.
+1. **Source:** MDI glyphs, drawn as text in `materialdesignicons-webfont.ttf`, not drawcustom's `icon` element, which only draws an icon the kit has no glyph for (*Blueprint mechanics*, Icons are drawn as text). TRMNL's own glyphs are not used.
 2. **Size ladder:** `icon.ladder` (*Style choices*, Icon ladder; a hero's icon follows from the hero size, see *Hero group*). Nothing in between. Each tier's inline size is in *Icon tokens*, each layout's hero and strip icons in *Physical size minimums*; when space is short, an icon steps **down to a smaller ladder size** (on its own: `icon.heroAloneSteps`) and drops out after its smallest allowed step. An icon never stretches to fit.
 3. **Stroke ≥ `stroke.min`,** as for text: the smallest allowed icon per tier is `icon.min` (*Floors and their thresholds*; per tier: *Icon tokens*).
    Outline icons (most MDI weather icons) are fine once they meet this.
@@ -621,13 +621,13 @@ Three levels, the same on every module:
 - The label and value change **together**. Never highlight just one. On a label/value row (detail rows, plant and entity rows) **one chip spans the label and the value**, as a band. In a table (hour and day cells, the 2.7" portrait's forecast rows) the column header is shared by several values, so each flagged value gets its own chip and a flagged condition chips the header.
 - **Colour is the level, the label is the source.** Our own thresholds and official warnings use the same two chips; the text says which is which (`NOW · THUNDERSTORM` against `CODE YELLOW · FOG`). Only a measured value past a severe threshold or an official orange / red warning is severe by default.
 - **Chip text is in capitals**, like labels, including warning subjects taken from a sensor (`CODE ORANGE THUNDERSTORM`).
-- **A warning or severe chip names its subject or its problem.** A value alone is only enough when a label sits next to it (detail rows). Otherwise the chip carries the word: the condition (`FOG`), the subject (`BIRCH 96ppm`), or a status. Medication: the press date followed by the status, `SU 8 NOV · OVERDUE` (warning) / `SU 8 NOV · MISSED` (severe), so the date stays with the hero time it belongs to. The stale chip is the one exception (fixed place, `!`). A glance chip without a row label carries its word: `MAX/MIN 11°/3°`, or the crossed side alone where that doesn't fit (`MIN 3°`). Chip widths are measured (`VALUE_W`), never estimated per character.
+- **A warning or severe chip names its subject or its problem.** A value alone is only enough when a label sits next to it (detail rows). Otherwise the chip carries the word: the condition (`FOG`), the subject (`BIRCH 96 ppm`), or a status. Medication: the press date followed by the status, `SU 8 NOV · OVERDUE` (warning) / `SU 8 NOV · MISSED` (severe), so the date stays with the hero time it belongs to. The stale chip is the one exception (fixed place, `!`). A glance chip without a row label carries its word: `MAX/MIN 11°/3°`, or the crossed side alone where that doesn't fit (`MIN 3°`). Chip widths are measured (`VALUE_W`), never estimated per character.
 - **Charts on BWRY:** bars (or line spans) between the warning and severe thresholds are yellow; at or above severe, red. Threshold notches across a yellow bar are black instead of paper.
 - **Stale is not a warning:** the stale chip (*Title row*) is not a warning chip.
-- **Now is not a severity.** An event in progress is marked with an ink chip (fill `color.ink`, text `color.paper`): it is current, not bad. It has the shape and place a flagged value would have: the row in a date-grouped list, the start time in an event list, the `NOW` label of an event hero. It is told apart from the stale chip, also ink, by its place and by the stale chip's `!`. On a black/white panel a severe chip is an ink chip too, so there the two look alike.
+- **Now is not a severity.** An event in progress is marked with an ink chip (fill `color.ink`, text `color.paper`): it is current, not bad. It has the shape and place a flagged value would have: the row in a date-grouped list, the start time in an event list, the `NOW` label of an event hero. It is told apart from the stale chip, also ink on a panel with a warning colour, by its place and by the stale chip's `!`. On a black/white panel a severe chip is an ink chip too, so there the two look alike.
 - **Weight is not a severity level or a role marker.** TRMNL12 and TRMNL16 text is always bold (see *Physical size minimums*), so:
   - Labels and values are told apart by **case, size and position**: labels are uppercase on the left, values sit on the right.
-  - Zero values (`0mm`) look like any other value.
+  - Zero values (`0 mm`) look like any other value.
   - Nothing ever changes weight *because* it crossed a threshold. Only the warning and severe chips signal state.
   - Only TRMNL21 has two weights; there, bold marks the value. (Units are Regular at every size, but that is part of how a value is drawn, not a role marker.)
 - **Bars and other fills** follow the same three levels: ink normally, the warning colour at the warning threshold, severe colour at severe, and the value next to them gets the matching chip (Claude usage).
@@ -636,7 +636,7 @@ Three levels, the same on every module:
 
 **Every value that has a bad direction gets a warning and a severe input**, with a default, on every blueprint that shows it. The same data has the same inputs, names and defaults everywhere.
 
-**Every reading that can be flagged has a switch**, `flag_<what>`, on by default, in front of its `warning_<what>` and `severe_<what>`. The switches of Single value, Levels and History graph are off by default: no value fits every sensor. Off, the reading is never flagged, on any part of the page. Every number is a real threshold, 0 included: no number means "off". Without a switch: the lists (conditions, the doors and windows that count as severe), where an empty list flags nothing. A chart with its switch off: *Bar chart with thresholds, Line chart with thresholds*, Switched off. Pollen's two count inputs are empty by default: empty, the sensor's own level decides (*Weather thresholds*); a count overrides it.
+**Every reading that can be flagged has a switch**, `flag_<what>`, on by default, in front of its `warning_<what>` and `severe_<what>`. The switches of Single value, Value with details, Levels and History graph are off by default: no value fits every sensor. Off, the reading is never flagged, on any part of the page. Every number is a real threshold, 0 included: no number means "off". Without a switch: the lists (conditions, the doors and windows that count as severe), where an empty list flags nothing. The To-do list's switch (`flag_due`) has no numbers: the due day decides (*Checklist*, Flagged). A chart with its switch off: *Bar chart with thresholds, Line chart with thresholds*, Switched off. Pollen's two count inputs are empty by default: empty, the sensor's own level decides (*Weather thresholds*); a count overrides it.
 
 | Page | Data | Warning | Severe |
 |---|---|---|---|
@@ -655,10 +655,12 @@ Three levels, the same on every module:
 | Single value | The value, high (`*_high`, at or above) and low (`*_low`, at or below) | the user's value | the user's value |
 | Levels | Each row's share of its maximum, high and low | the user's value | the user's value |
 | History graph | The value, high (`*_high`, at or above) and low (`*_low`, at or below) | the user's value | the user's value |
+| Value with details | The value, high and low, as on Single value | the user's value | the user's value |
+| To-do list | An item's due day | due today | overdue |
 | Medication | Hours since the last press | ≥ <!-- v:input:medication:warning_late -->24 h<!-- /v --> | ≥ <!-- v:input:medication:severe_late -->36 h<!-- /v --> |
 | Doors & windows | An opening is open | — | the openings in `severe_openings` |
 
-- **No thresholds** where nothing can be bad: Calendar, Next appointment, Sun & moon. The Entities list has none either: one pair can't fit up to 12 arbitrary sensors; it shows "—" and its error state instead.
+- **No thresholds** where nothing can be bad: Calendar, Next appointment, Sun & moon. The Entities list has none either: one pair can't fit up to 12 arbitrary sensors; it shows "—" and its error state instead; Tiles has none for the same reason.
 - **Page-specific threshold rules** are with their page: weather (pollen levels, conditions, official warnings, high/low, the *Override order*) in *Weather at a glance and Weather*, the redraw at a deadline in *Medication*.
 
 ### Unavailable, stale, empty and error
@@ -687,7 +689,7 @@ A component is one drawn building block with a fixed job; it can contain other c
 | **Chip** | A flagged value or word: inline, centred, or as a band over a whole row | text (and label), level | `chip.*`, `space.xs`, `space.s` | `RCHIP`, `CCHIP`, `DCHIP`, `LEVEL_FILL` / `LEVEL_TEXT` / `LEVEL_MARK` |
 | **Icon** | An MDI glyph drawn as text, pixel-exact | name, size | `icon.ladder`, `color.ink` | `I` |
 | **Hero chip** | The chip behind a flagged hero number: the digits' ink plus `space.s` on every side | number, level | `space.s` of `type.data`, digit ink (`HUP` / `HDN`, measured) | `HERO_CHIP` |
-| **QR code** | A QR code with its quiet zone, QR modules on whole pixels | data | `tier.pitch`, `space.l` | — (mockup; drawcustom's `qrcode` element) |
+| **QR code** | A QR code with its quiet zone, QR modules on whole pixels | data | `tier.pitch`, `space.l` | — (mock-up; drawcustom's `qrcode` element) |
 | **Empty statement** | One centred text line where a module has nothing to say | message | `type.primary` (strong), one step down to `type.data` when it doesn't fit | `EMPTY` (reads its tokens) |
 | **Moon badge** | The moon phase on a weather hero icon | icon box | `icon.moonBadge` | `MOON_BADGE` |
 | **Hero group** | Number then icon, centred by ink in the space it owns. Two versions: *on its own* (in the hero block) and *beside other content* (in the hero band, the event hero); see *Hero group* | number, icon, area, level | `type.hero*`, `icon.hero*`, `space.heroGap` | `HERO_ALONE` on its own, `HERO_SHARED` beside other content; `HERO_LEFT`, `HERO_INK_X`, `HERO_ADVANCE` |
@@ -763,9 +765,9 @@ A module is one block of content on a screen, built from components (and other m
 | **Hero block** | The hero group *on its own* and the Glance secondary under it, centred as one block (*Hero group*, hero centring; the secondary's chip box is reserved, so nothing moves when a chip appears). The Glance's one module under the title row; see *Glance*. | hero, icon, levels, Glance secondary | `type.heroAlone`, `icon.heroAloneSteps`, `type.secondary`, `space.heroGap` | `HBLOCK`, `HERO_BLOCK_Y` |
 | **Hero band** | The hero group *beside other content* and the detail rows, **centred by ink between the title line and the next line** (the strip's, or the module's). Rules: *Hero dashboard* under *Patterns*. | hero, icon, rows | `type.heroShared`, `icon.heroShared`, `space.l` | `HBAND` |
 | **Forecast table** | The 2.7" portrait's strips: forecast rows for the hours, the days and the pollen, stacked bottom up as one block of fixed rows; see *Forecast row*. | hours, days, pollen | `type.data`, `space.row`, `space.l` | `RROW` |
-| **Code block** | The code with its quiet zone and the label/value text lines beside it (under it on a portrait screen); see *Code*. | data, text lines | `tier.pitch`, `space.l` | — (mockup) |
-| **Month grid** | Weekday labels over seven columns of day numbers; today boxed, event dots; see *Month*. | month, events | `type.label`, `type.data`, `space.row`, `line.base` | — (mockup) |
-| **Text block** | Wrapped text and the sender text line; see *Note*. | text, sender | `type.primary`, `type.data`, `type.label`, `space.s` | — (mockup) |
+| **Code block** | The code with its quiet zone and the label/value text lines beside it (under it on a portrait screen); see *Code*. | data, text lines | `tier.pitch`, `space.l` | — (mock-up) |
+| **Month grid** | Weekday labels over seven columns of day numbers; today boxed, event dots; see *Month*. | month, events | `type.label`, `type.data`, `space.row`, `line.base` | — (mock-up) |
+| **Text block** | Wrapped text and the sender text line; see *Note*. | text, sender | `type.primary`, `type.data`, `type.label`, `space.s` | — (mock-up) |
 
 Charts: see *Bar chart and Line chart* under *Patterns*. Key-value rows (the component) are described with the *Key-value list*.
 
@@ -788,10 +790,10 @@ The label left in `type.fieldLabel`, the value right on the padding in the data 
 
 - The title row is the layout's first row: text on paper above a line, never a filled bar. It is drawn by one macro (`TITLE`) on every layout, medication included.
 - **Title:** `type.title` (its base in *Style choices*, one step up on a large screen, *Step up (large screens)*), never below the label floor, left-aligned, in capitals. The title names the screen; it is chrome, so it never outranks the data below it.
-  - **Every blueprint has a *Header title* input.** Left blank, the title is a translated default that names what the screen shows (`WEATHER`, `CALENDAR`, `PLANTS`). One qualifier may follow after ` · ` when it tells devices of the same kind apart (`CO2 · BEDROOM` from the sensor's area, `WEATHER · AMSTERDAM` on the 7.5", `MEDICATION · LAST TAKEN AT` so the hero time reads as the last dose); a typed title replaces the whole default.
+  - **Every blueprint has a *Header title* input.** Left blank, the title is a translated default that names what the screen shows (`WEATHER`, `CALENDAR`, `PLANTS`). One qualifier may follow after ` · ` when it tells devices of the same kind apart (`CO2 · BEDROOM` from the sensor's area, `WEATHER · AMSTERDAM` on the 7.5", `MEDICATION · LAST TAKEN` so the hero time reads as the last dose); a typed title replaces the whole default.
   - **Width:** the title gets what is left after the stamp: the canvas minus both paddings, the stamp's measured width (its chip included when stale) and a gap of L. A longer title is cut with "..." (*A label never overlaps its value*).
 - **Update stamp:** quieter than the title, because it is a check, not data: `type.stamp` (*Derived*). Never TRMNL16 Regular: its 1 px strokes are under `stroke.min`, and unlike a unit the stamp has to be read exactly. Right-aligned, ink ending at W − P − 1, on the title's baseline (a TRMNL12 stamp sits 2 px below a TRMNL16 title's middle anchor). The title's width is measured against this smaller stamp. It is **weekday + time** (`SU 17:58`, `FR 6:05 PM`), a 2-letter weekday in capitals (the `STAMP` macro), on every layout except Medication (see *Medication*). A device that stops updating keeps its last image, so a date-less time can't tell you the image is from yesterday; the weekday can.
-- **Stale chip:** when the data source stops reporting while the automation still runs, the stamp shows the source's last report (weekday + time) in an ink chip with "!" (`chip.stale`: fill `color.ink`, text `color.paper`, prefix `! `; an outline with ink text and "!" where warnings are outlines). It is not a warning chip: old data is not an alarm about the world, and the mark and its place in the title row tell it apart. The chip goes back to the title's font and size (`type.title`), so a stale screen is louder than a healthy one (the *Mark data as stale after* input, default <!-- v:shared:stale_after -->60 min<!-- /v -->, 0 turns it off). It reads `last_reported`, not `last_updated`: a value that stays the same for hours is not stale as long as the source keeps reporting it. With several sources (entity list, plants, pollen next to weather) the newest report counts: one quiet door sensor doesn't mark the whole screen stale. Every blueprint whose data comes from reporting entities has the input. Exempt are the blueprints whose data Home Assistant computes or fetches at the moment it redraws, so there is nothing to go stale: Sun & moon, Calendar, Next appointment, and Medication (no stamp).
+- **Stale chip:** when the data source stops reporting while the automation still runs, the stamp shows the source's last report (weekday + time) in an ink chip with "!" (`chip.stale`: fill `color.ink`, text `color.paper`, prefix `! `; an outline with ink text and "!" where warnings are outlines). It is not a warning chip: old data is not an alarm about the world, and the mark and its place in the title row tell it apart. The chip goes back to the title's font and size (`type.title`), so a stale screen is louder than a healthy one (the *Mark data as stale after* input, default <!-- v:shared:stale_after -->60 min<!-- /v -->, 0 turns it off). It reads `last_reported`, not `last_updated`: a value that stays the same for hours is not stale as long as the source keeps reporting it. With several sources (entity list, plants, pollen next to weather) the newest report counts: one quiet door sensor doesn't mark the whole screen stale. Every blueprint whose data comes from reporting entities has the input. Exempt are the blueprints whose data Home Assistant computes or fetches at the moment it redraws, so there is nothing to go stale: Sun & moon, Calendar, Next appointment, Energy price (EnergyZero), To-do list, and Medication (no stamp).
 - The title row has no icons.
 - **Line:** the row ends in the screen's standard line.
 - **Height (`space.titleRow`, *Derived*):** the title caps start at P (accents above them hang, *Text rules*, *Accents hang*), and the line sits S under the caps, as the footer's line sits S above its caps.
@@ -801,7 +803,7 @@ The label left in `type.fieldLabel`, the value right on the padding in the data 
 The footer is an **optional single text line at the bottom of a screen**. It says what the screen adds up to.
 
 - **What goes in it**, one of two things:
-  - **(a) the conclusion of the main module**: what the chart, list or forecast adds up to, in words and clock times. Examples: Rain forecast (Netherlands) `HEAVY RAIN 14:50–15:00 · PEAK 13mm/h`, CO2 `NOW 495ppm · PEAK 2703ppm · 09:15`, Sun & moon `DAY LENGTH 9h09min`, Claude usage `ON PACE` / `WEEK 7% AHEAD`, Next appointment `FREE UNTIL TOMORROW 09:00` / `FREE FROM 11:30`, Plant moisture `7 PLANTS NEED WATER`, Weather `RAIN UNTIL 17:00` / `DRY UNTIL 16:00` / `DRY`.
+  - **(a) the conclusion of the main module**: what the chart, list or forecast adds up to, in words and clock times. Examples: Rain forecast (Netherlands) `HEAVY RAIN 14:50–15:00 · PEAK 13 mm/h`, CO2 `NOW 495 ppm · PEAK 2703 ppm · 09:15`, Sun & moon `DAY LENGTH 9h09min`, Claude usage `ON PACE` / `WEEK 7% AHEAD`, Next appointment `FREE UNTIL TOMORROW 09:00` / `FREE FROM 11:30`, Plant moisture `7 PLANTS NEED WATER`, Weather `RAIN UNTIL 17:00` / `DRY UNTIL 16:00` / `DRY`.
   - **(b) context for the whole screen** that belongs to no module and needs no action (sunrise/sunset).
 
   (a) beats (b). A layout has a footer only when there is such a conclusion or context **that isn't shown anywhere else on the screen**; otherwise it has none.
@@ -826,7 +828,9 @@ The footer is an **optional single text line at the bottom of a screen**. It say
 | Claude usage 3.5" | (a) on schedule / furthest ahead, when it fits |
 | Next appointment 3.5", 4.1", 4.26" | (a) free until / free from, when it fits |
 | Plant moisture 4.1" | (a) number to water, when any and when it fits |
-| Entities 3.5"; Calendar 4.1", 4.26"; Weather and calendar 7.5" portrait | none |
+| History graph 2.7" landscape, 3.5", 4.1" | (a) the current value, and the period's lowest and highest |
+| To-do list, every screen | (a) the count of open and done items |
+| Entities 3.5"; Calendar 4.1", 4.26"; Weather and calendar 7.5" portrait; Levels; Tiles; Value with details | none |
 
 ## Composition
 
@@ -982,6 +986,18 @@ The chart frame with a warning and a severe input (*Thresholds*); its scale is t
 - **Switched off** (`flag_<what>` off, *Thresholds*): the chart is drawn without its thresholds. No threshold lines and no values beside them, no severe fill, no warning colour, and the footer states its facts without a chip. The scale and the plot stay as they are: the scale is still built from the severe value (*Chart frame (all charts)*, *Fixed y-scale*) and keeps its top value where it shows one, and the label margin keeps the width it has with the switch on, so switching off never rescales or moves the chart.
 - **Severe flags the time slot.** Whatever represents a time slot that reaches severe is filled with the severe colour over its full extent: the whole bar, or the area under the line for that span. Where a threshold line crosses a filled area, a 1 px paper notch keeps it visible, and keeps the meaning on black/white panels.
 
+#### Bar chart for prices
+
+The chart frame with a warning and a severe input, as *Bar chart with thresholds, Line chart with thresholds*, for the hours of a day. What differs is written here. Energy price (EnergyZero) uses it.
+
+- **Bars:** today from midnight to midnight, one bar per hour. Hours gone are outlined and never coloured. The current hour and the hours to come are filled: in the warning colour at or above warning, in the severe colour at or above severe.
+- **Scale:** the one with thresholds (*Chart frame (all charts)*, *Fixed y-scale*). On a day with a negative price its bottom is the lowest price, rounded down to a whole 10, and that value is labelled in the margin. The label margin is sized for `-10` on every day, so the plot never moves.
+- **Baseline:** the zero line. Negative bars hang under it; the time axis keeps its ticks and labels at the bottom of the plot, without a second line.
+- **Thresholds:** both lines run across the hours that have a price.
+- **Hours without a price:** nothing is drawn. When they are the last hours of the day the fact is stated once, centred in their part of the plot (`EMPTY`: `NO PRICES`). No price at all is the error view.
+- **Footer:** the current price at the left (`NOW 19 ct`), the cheapest run of hours still to come at the right (`CHEAPEST 21:00–00:00`); the length of the run is an input. The footer is a chip at the current hour's level, not at the highest level in the plot: the chart is read for what to do now. With fewer hours left than the run, the right side stays empty.
+- **Worst case:** `NOW -10 ct` beside `CHEAPEST 21:00–00:00`; in 12-hour time `CHEAPEST 9:00pm–12:00am`.
+
 #### Bar charts
 
 - Bars are whole pixels, with `line.barGap` of paper between them.
@@ -1038,7 +1054,7 @@ Equal tiles, each a centred stack: the icon, the state in `type.data`, the label
 - Lines between two tiles that both hold an entity, centred in the gutter, each stopping `space.m` short of where it would cross another; none around the outside.
 - The icon is the largest ladder size that leaves room for the state and label under it, and at most four times the size of `type.data`; a single tile's icon has no such limit. All tiles on a screen share one icon size.
 - A tile without an icon centres its state and label alone (where the icon comes from: *the Tiles page*).
-- *Mockup, no blueprint flags a tile yet:* a flagged tile chips its state; the icon and the label never change, and nothing moves.
+- *Mock-up, no blueprint flags a tile yet:* a flagged tile chips its state; the icon and the label never change, and nothing moves.
 - Widest state: 9 characters (`Triggered`): the room a tile has less `space.s` on both sides, where the chip goes. A longer state, and a label wider than its tile, is cut with an ellipsis.
 
 ### Checklist
@@ -1059,7 +1075,7 @@ Patterns and versions that exist as mock-ups only: no blueprint is built from th
 
 #### Glance with a word
 
-*Mockup (Bin day, Room sign).* The hero is a word (bin day, room sign, a status). Everything the Glance rules say holds; what differs:
+*Mock-up (Bin day, Room sign).* The hero is a word (bin day, room sign, a status). Everything the Glance rules say holds; what differs:
 
 - **The word is the hero**, in Space Grotesk Bold capitals, at the layout's size *h* for a hero group on its own; the icon follows *h* (*Hero group*) and comes after the word. The word is content and is never abbreviated by the layout.
 - **A long word steps down** the hero ladder to its smallest rung (*Style choices*, Hero ladder) until its ink fits the content width; the icon drops out first. A word that doesn't fit at the smallest rung is cut with an ellipsis, like any text. Below the `type.heroAlone` floor the word is read from closer by, which a label allows and a measurement doesn't: the floor still holds for numbers.
@@ -1067,46 +1083,34 @@ Patterns and versions that exist as mock-ups only: no blueprint is built from th
 
 #### Glance with a progress bar
 
-*Mockup.* An appliance run, a print, a charge.
+*Mock-up.* An appliance run, a print, a charge.
 
 - **The hero is the clock time it ends** (`14:32`), never the time left; the icon names the appliance.
 - **The bar** sits a hero gap (`space.heroGap`) under the hero group and is as wide as the group (the progress bar; its track as high as the caps of `type.secondary` less `space.xs`), filled to the share done; the Glance secondary under it names the programme (`ECO 40° · 62%`).
 - **The hero steps down** one rung at a time when the group, bar and Glance secondary don't keep the hero clearance (*Hero group*) from the title line.
 - **Done and not emptied:** the bar fills in the warning colour and the Glance secondary becomes a warning chip (`DONE · DOOR STILL CLOSED`).
 
-#### Bar chart for prices
-
-The chart frame with a warning and a severe input, as *Bar chart with thresholds, Line chart with thresholds*, for the hours of a day. What differs is written here. Energy price (EnergyZero) uses it.
-
-- **Bars:** today from midnight to midnight, one bar per hour. Hours gone are outlined and never coloured. The current hour and the hours to come are filled: in the warning colour at or above warning, in the severe colour at or above severe.
-- **Scale:** the one with thresholds (*Chart frame (all charts)*, *Fixed y-scale*). On a day with a negative price its bottom is the lowest price, rounded down to a whole 10, and that value is labelled in the margin. The label margin is sized for `-10` on every day, so the plot never moves.
-- **Baseline:** the zero line. Negative bars hang under it; the time axis keeps its ticks and labels at the bottom of the plot, without a second line.
-- **Thresholds:** both lines run across the hours that have a price.
-- **Hours without a price:** nothing is drawn. When they are the last hours of the day the fact is stated once, centred in their part of the plot (`EMPTY`: `NO PRICES`). No price at all is the error view.
-- **Footer:** the current price at the left (`NOW 19 ct`), the cheapest run of hours still to come at the right (`CHEAPEST 21:00–00:00`); the length of the run is an input. The footer is a chip at the current hour's level, not at the highest level in the plot: the chart is read for what to do now. With fewer hours left than the run, the right side stays empty.
-- **Worst case:** `NOW -10 ct` beside `CHEAPEST 21:00–00:00`; in 12-hour time `CHEAPEST 9:00pm–12:00am`.
-
 #### Event list with line numbers
 
-*Mockup (Departures).* Event rows whose title starts with the line number in a `line.base` outline (`space.xs` inside); the time column is the departure clock time; a delay chips the new time in warning with `GEPLAND 14:07 · +6` as the label; a cancelled ride chips `VERVALT` in severe.
+*Mock-up (Departures).* Event rows whose title starts with the line number in a `line.base` outline (`space.xs` inside); the time column is the departure clock time; a delay chips the new time in warning with `SCHEDULED 14:07 · +6` as the label; a cancelled ride chips `CANCELLED` in severe.
 
 #### Meters both ways
 
-*Mockup (Solar & battery).* A bar whose track runs both ways from a centre tick (taking power left, sending it back right); a battery's bar is its charge, the direction in the caption at the right.
+*Mock-up (Solar & battery).* A bar whose track runs both ways from a centre tick (taking power left, sending it back right); a battery's bar is its charge, the direction in the caption at the right.
 
 #### Code
 
-*Mockup (Guest Wi-Fi).* A QR code people scan with a phone: guest Wi-Fi, a link to a manual, an inventory label. Drawn with drawcustom's `qrcode` element (error correction H).
+*Mock-up (Guest Wi-Fi).* A QR code people scan with a phone: guest Wi-Fi, a link to a manual, an inventory label. Drawn with drawcustom's `qrcode` element (error correction H).
 
 - **QR modules on whole pixels**, each at least **<!-- v:dt:QR_MODULE_MM -->0.4<!-- /v --> mm** (a phone camera at arm's length): the code takes the largest whole-pixel QR module that fits.
 - **Quiet zone:** 4 QR modules of paper around the code (ISO/IEC 18004), from any other ink and from the canvas edge; the padding counts as paper. Where 4 don't fit (the Wi-Fi code on the 1.4") 2 are allowed **[verify]**.
 - **What it encodes is also written:** the network and password as label/value text lines beside the code (under it on a portrait screen; left out only where they don't fit, the 1.4"), so a person can type them.
-- **Off:** no code, one empty statement (`GASTENNETWERK UIT`): the network being off is a fact, not a problem.
-- **Checked:** every mockup decodes with a standard QR reader.
+- **Off:** no code, one empty statement (`GUEST NETWORK OFF`): the network being off is a fact, not a problem.
+- **Checked:** every mock-up decodes with a standard QR reader.
 
 #### Month
 
-*Mockup (Month overview).* A calendar month.
+*Mock-up (Month overview).* A calendar month.
 
 - Weekday labels in `type.label` over seven equal columns; they shorten to one letter where two don't fit with `space.s`.
 - Day numbers in `type.data`, centred; **today boxed** at `line.base`; a day with events gets a dot under its number (a square of 2 × `line.base`).
@@ -1115,11 +1119,11 @@ The chart frame with a warning and a severe input, as *Bar chart with thresholds
 
 #### Note
 
-*Mockup (Message board).* Wrapped text in the regular cut of `type.primary` (`type.data` on small screens), text line height the text size + `space.s`; as many lines as fit, the last one cut with an ellipsis when there is more. The sender and time in a `type.label` text line in the next text line's place. Important: a severe chip line above the text.
+*Mock-up (Message board).* Wrapped text in the regular cut of `type.primary` (`type.data` on small screens), text line height the text size + `space.s`; as many lines as fit, the last one cut with an ellipsis when there is more. The sender and time in a `type.label` text line in the next text line's place. Important: a severe chip line above the text.
 
 ##### Note with a progress bar
 
-*Mockup (Now playing).* The title in the bold cut of `type.primary`, artist · album in `type.label`, the progress bar, then the track count left and the clock time it ends right (`EINDE 14:35`). Unreachable: the error block (`SPEAKER OFFLINE`).
+*Mock-up (Now playing).* The title in the bold cut of `type.primary`, artist · album in `type.label`, the progress bar, then the track count left and the clock time it ends right (`END 14:35`). Unreachable: the error block (`SPEAKER OFFLINE`).
 
 ## Pages
 
@@ -1173,12 +1177,12 @@ Two pages with the same content: Weather at a glance, on the 1.4" and the 3.5", 
 
 - **Shows:** the current temperature as the hero, with the condition icon (and the moon badge, day and night: *When to use an icon*); on the Hero dashboard the detail rows (today's rain, wind, high/low; humidity, pressure, sunrise and sunset where there is room; the pollen row), the hour strip and the day strip; on the Glance today's high/low as the Glance secondary and the footer (*Glance with a footer*; *Override order*, Footer).
 - **Tested with:** −12° (the widest reading), a negative temperature with the moon badge, an official warning (KNMI code orange), a current condition alert, pollen at 0 and high, stale data, no data (the error block), a black/white panel, a 4-gray panel, 12-hour English, a long title.
-- **Detail rows:** On 800 × 480 the labels are written out (`PRESSURE`, `HUMIDITY`, `SUNRISE`, `SUNSET`; the `*_l` keys in `ds_wtxt`), and pressure carries its unit (`1012hPa`, from the weather entity's `pressure_unit`). Next to a weather hero, as the *Detail rows* module (flagged: `CODE YELLOW … FOG`, `NOW … THUNDERSTORM`). Order: **today's rain, wind**, then humidity / pressure / sunrise / sunset, **high/low**, then the pollen row last (high/low beats humidity: the 7.5" shows rain, wind, pressure, sunrise, sunset, max/min). Which row makes way for the alert row or the pollen row: *Override order*. The 2.7" portrait has room for one text line under its icon: high/low · today's rain, or wind with the *Rain or wind* input (*Override order*).
+- **Detail rows:** On 800 × 480 the labels are written out (`PRESSURE`, `HUMIDITY`, `SUNRISE`, `SUNSET`; the `*_l` keys in `ds_wtxt`), and pressure carries its unit (`1012 hPa`, from the weather entity's `pressure_unit`). Next to a weather hero, as the *Detail rows* module (flagged: `CODE YELLOW … FOG`, `NOW … THUNDERSTORM`). Order: **today's rain, wind**, then humidity / pressure / sunrise / sunset, **high/low**, then the pollen row last (high/low beats humidity: the 7.5" shows rain, wind, pressure, sunrise, sunset, max/min). Which row makes way for the alert row or the pollen row: *Override order*. The 2.7" portrait has room for one text line under its icon: high/low · today's rain, or wind with the *Rain or wind* input (*Override order*).
 - **Sunrise and sunset** are detail rows, labelled with words (`SUNRISE` / `SUNSET`).
 
 #### Pollen
 
-Pollen is information you act on (taking allergy medication), so it **has priority** and is never moved by other content: **the pollen row**, the last detail row on every Hero dashboard; a block above the footer (2.7" portrait); and on Glance, which has no rows, the right of the footer whenever it is above zero and nothing is flagged, alone where the conclusion doesn't fit beside it (flagged pollen joins the *Override order*). It is footer material nowhere else. **Every weather layout has the pollen inputs.** It shows **the type and the count, nothing else**: no level graphic. The level only decides the fill: plain text below warning, a warning chip at the sensor's *high*, a severe chip at *very high*; with count inputs, a warning chip from the warning count and a severe chip from the severe count (*Weather thresholds*). In the pollen row the type is the label and the count the value (`BIRCH … 96ppm`); flagged, it is one chip spanning both, like any detail row. The detail column is wide enough for a 3-digit count (*Space*); a 4-digit count cuts the type short, as any label gives way to its value (*A label never overlaps its value*). On the 2.7" portrait it is one row (type, count), without an icon. At level 0 the pollen row is left out and the row that made way for it is back; on the 2.7" portrait one more day row takes its place (*fill before you float*).
+Pollen is information you act on (taking allergy medication), so it **has priority** and is never moved by other content: **the pollen row**, the last detail row on every Hero dashboard; a block above the footer (2.7" portrait); and on Glance, which has no rows, the right of the footer whenever it is above zero and nothing is flagged, alone where the conclusion doesn't fit beside it (flagged pollen joins the *Override order*). It is footer material nowhere else. **Every weather layout has the pollen inputs.** It shows **the type and the count, nothing else**: no level graphic. The level only decides the fill: plain text below warning, a warning chip at the sensor's *high*, a severe chip at *very high*; with count inputs, a warning chip from the warning count and a severe chip from the severe count (*Weather thresholds*). In the pollen row the type is the label and the count the value (`BIRCH … 96 ppm`); flagged, it is one chip spanning both, like any detail row. The detail column is wide enough for a 3-digit count (*Space*); a 4-digit count cuts the type short, as any label gives way to its value (*A label never overlaps its value*). On the 2.7" portrait it is one row (type, count), without an icon. At level 0 the pollen row is left out and the row that made way for it is back; on the 2.7" portrait one more day row takes its place (*fill before you float*).
 
 #### Weather thresholds
 
@@ -1207,7 +1211,7 @@ Where it applies:
   - 3.5": both: humidity, wind, high/low, rain.
   - 4.1": both: humidity, wind, rain.
   - 2.7" landscape: both: wind, high/low, rain.
-- **Footer:** keeps its conclusion; it becomes the chip when the rain it is about is flagged (the most severe of today's total and the forecast hours; never when the whole forecast is dry). Alerts never move to the footer: you read a screen from the top, and not every layout has one. **The exception is a layout without detail rows** (Weather at a glance, the 2.7" portrait): there the footer is the alert's place, so the alert never takes a value's. The picked item is the footer chip and goes before the conclusion and its rain chip; high/low is left out of the pick (it is flagged on its own line), and on the 2.7" portrait pollen too (it has its row). An official warning follows *Weather thresholds* (whole or not at all: `CODE ORANGE THUNDERSTORM`, else `THUNDERSTORM`, else `CODE ORANGE`). With no alert: the conclusion where it fits whole (`RAIN UNTIL 17:00`), and on Glance pollen at the right (`BIRCH 96ppm`, *Pollen*).
+- **Footer:** keeps its conclusion; it becomes the chip when the rain it is about is flagged (the most severe of today's total and the forecast hours; never when the whole forecast is dry). Alerts never move to the footer: you read a screen from the top, and not every layout has one. **The exception is a layout without detail rows** (Weather at a glance, the 2.7" portrait): there the footer is the alert's place, so the alert never takes a value's. The picked item is the footer chip and goes before the conclusion and its rain chip; high/low is left out of the pick (it is flagged on its own line), and on the 2.7" portrait pollen too (it has its row). An official warning follows *Weather thresholds* (whole or not at all: `CODE ORANGE THUNDERSTORM`, else `THUNDERSTORM`, else `CODE ORANGE`). With no alert: the conclusion where it fits whole (`RAIN UNTIL 17:00`), and on Glance pollen at the right (`BIRCH 96 ppm`, *Pollen*).
 - **Title row:** the stale chip replaces the stamp. **Error state:** replaces everything below the title.
 
 #### Weather inputs
@@ -1682,6 +1686,7 @@ An Event list, or the event hero when there is one event.
 - **Shows:** the next events (start time, title, the label text line), or the event hero for one event, and the free time in the footer.
 - **Tested with:** 9, 6, 3, 1 and no events, an event in progress (`NOW`), a grey panel.
 - **In progress:** an event in progress (`NOW`) has its start time in an ink chip, and on the event hero its `NOW` label (*Severity*, *Now is not a severity*).
+- **All-day events** are left out.
 
 <!-- registry:inputs-appointment -->
 | Screen | Inputs of this page |
@@ -1731,7 +1736,7 @@ What every blueprint does the same way; where it can, through a shared part that
   3. **Thresholds** (collapsed): `flag_<what>`, `warning_<what>`, `severe_<what>` for each reading (*Thresholds*). The page sets its chart scale; it is not an input.
   4. **Appearance** (collapsed): `header_title` (blank for the translated default), `location_string`, `time_format` (12h/24h), `weekday_format` (en/de/nl/fr/es/pl/hr/sv) and `rotate` (0/90/180/270, all four always offered; the description explains native vs upright).
   5. **Advanced** (collapsed): `stale_after`, `led_color`, `led_flash_delay` and `font_dir`. The LED inputs are there wherever a button can start the redraw: the LED confirms the press. A blueprint that redraws on a change (Doors & windows) has none.
-- **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button, the EnergyZero integration). Every other input has a default, and an optional entity left empty removes its part of the page. Rain forecast (Netherlands) has no main entity: it needs one of its two sources.
+- **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button, the EnergyZero integration). Every other input has a default, and an optional entity left empty removes its part of the page. Rain forecast (Netherlands) has no main entity: it needs one of its two sources. Sun & moon has none either: it reads Home Assistant's own sun.
 - **Input names:** the device input is always `displays`, also where it takes one device (Medication). Numbered entries are `<name>_<n>` with `<name>_<n>_label` (`entity_1`, `plant_1`, `bar_1`). Thresholds are `warning_<what>` and `severe_<what>`, their switch `flag_<what>`. A blueprint's variables keep the names its drawing reads, so renaming an input never changes the drawing.
   - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Weather at a glance, Single value, Weather, Rain forecast (Netherlands), Rain forecast, CO2 graph, History graph, Claude usage, Levels, Entities, Plant moisture, Weather and calendar, Tiles, Value with details<!-- /v -->); see *Title row* for the exempt blueprints.
   - The panel is never an input: a page drawn on two screens is two blueprints (Rain forecast on the 3.5" and on the 2.7" landscape).
@@ -1774,7 +1779,7 @@ Proven: TRMNL text and Space Grotesk heroes on BWRY ESLs (1.4", 2.7", 3.5", 4.1"
 7. The 7.5" portrait: a 480 × 800 payload drawn with `rotate` 90 or 270 on a panel whose firmware reports 800 × 480 lands upright and uncropped, and which of the two is upright for the usual mounting.
 8. The 4.1" weather's day icons at <!-- v:layout:weather_41:icon.stripDay -->32<!-- /v --> px (fitted; were 24): the day strip reads at arm's length without crowding the cells.
 9. Warning outlines in the padding: on the 7.5" and 4.26" a detail-row outline reaches 7 and 8 px into the padding (S + `line.base`); it stays inside the visible area, clear of the bezel.
-10. Lines on the 1.4": every component draws its lines at `line.base`, but no 1.4" layout uses footers, lists or charts yet; the first one is the test.
+10. Lines on the 1.4": every component draws its lines at `line.base`, and the first to draw one there is the footer of Weather at a glance (its line and its outlined chip, item 18); no 1.4" layout has a list or a chart yet.
 11. The history `plot` element: whether OpenDisplay draws a series with it (*Blueprint mechanics*); until then a series is runs of `line` segments.
 12. Single value: the unit beside a large number (`type.secondary`'s size next to an 88 or 104 px numeral) reads as part of the reading; an icon the kit has no glyph for (drawn by the renderer's icon element) sits acceptably beside the number.
 13. Single value on the 1.4": the number at its one size (under the Glance floor) still reads from where the label is used.
@@ -1783,6 +1788,7 @@ Proven: TRMNL text and Space Grotesk heroes on BWRY ESLs (1.4", 2.7", 3.5", 4.1"
 16. Rain forecast: the hourly forecast of real weather entities (one whose forecast starts at the next hour leaves the first bar dry; one that reports rain in inches is read as mm).
 17. Energy price (EnergyZero): not yet run against a real EnergyZero entry. To prove there: the price arrives in euros per kWh, an hour's start is read as the right hour of the day, and the day the clock changes (23 or 25 hours).
 18. Weather at a glance and Weather on the 2.7" portrait, on a panel without a warning colour: the outlined footer chip under an outlined high/low chip and an outlined hero (three outlines on the 1.4"), and under the outlined pollen row on the 2.7" portrait, where touching outlines join into one box.
+19. To-do list: not yet run against a real `todo` entity. To prove there: `todo.get_items` gives the open and the done items, and `due` as a date or as a date and time.
 
 ## Open items
 
@@ -1841,7 +1847,7 @@ Every named part of the design system, with its kind (`—` when it is a region,
 | **hour strip** | module | Strip | the strip of hour cells |
 | **Icon** | component | — | see *Components* |
 | **icon ladder** | token | — | the icon sizes (`icon.ladder`; *Style choices*, Icon ladder) |
-| **ink chip** | component | Chip | a chip filled with ink: the stale chip, an event in progress, and severe on black/white panels |
+| **ink chip** | component | Chip | a chip filled with ink: the stale chip (an outline where warnings are outlines), an event in progress, and severe on black/white panels |
 | **Input** | vocabulary | — | see *Vocabulary* |
 | **Key-value list** | module, pattern | — | see *Modules*, *Patterns* |
 | **Key-value row** | component | — | see *Components* |

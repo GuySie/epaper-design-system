@@ -103,7 +103,7 @@ blueprint:
         warning_co2:
           name: 'CO2: warning at or above'
           description: CO2 level drawn as the lower dashed line. Spans above it are filled yellow on BWRY panels, and the
-            summary line turns into a warning chip.
+            footer turns into a warning chip.
           default: 1000
           selector:
             number:
@@ -114,8 +114,8 @@ blueprint:
               mode: box
         severe_co2:
           name: 'CO2: severe at or above'
-          description: CO2 level drawn as the upper dashed line. Spans above it are filled in the severe colour, and the summary
-            line turns into a severe chip. The graph runs from 400 ppm (outdoor air) up to 1.5 x this value.
+          description: CO2 level drawn as the upper dashed line. Spans above it are filled in the severe colour, and the footer
+            turns into a severe chip. The graph runs from 400 ppm (outdoor air) up to 1.5 x this value.
           default: 1400
           selector:
             number:
@@ -230,7 +230,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'otxyin'
+  ds_set: 'pebhki'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'

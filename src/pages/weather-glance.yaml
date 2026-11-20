@@ -9,7 +9,6 @@ description:
   - kleenex_pollen
   trigger_advice: A time pattern every 15 or 30 minutes.
   notes:
-  - Leave the weather entity empty to use the first working weather entity.
   based_on:
   - name: Weatherman blueprint by Chunkysteveo
     url: https://github.com/chunkysteveo/OpenEPaperLink-HA-Weatherman/

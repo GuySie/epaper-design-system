@@ -28,7 +28,6 @@ blueprint:
 
     ## Notes
 
-    - Leave the weather entity empty to use the first working weather entity.
     - A weather warning sensor (e.g. KNMI or Meteoalarm) turns the official warning level into a chip.
 
     ## Links
@@ -437,7 +436,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'otxyin'
+  ds_set: 'pebhki'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'

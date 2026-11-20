@@ -134,8 +134,9 @@ def value(name):
         return input_default(page, inp)
     if kind == 'mm':           # a cut's x-height or cap height on one tier, in millimetres
         tier, size, part, *dec = arg.split(':')
-        W, _, wmm, _ = dt.KNOWN[tier][:4]
-        return f"{dt.TRMNL[int(size)][part] * wmm / W:.{int(dec[0]) if dec else 1}f}"
+        W, H, wmm, hmm = dt.KNOWN[tier][:4]
+        pitch = (wmm / W + hmm / H) / 2      # as the tier tables: both axes averaged (derive_tokens)
+        return f"{dt.TRMNL[int(size)][part] * pitch:.{int(dec[0]) if dec else 1}f}"
     if kind == 'stalePages':
         return stale_pages()
     if kind == 'shared':

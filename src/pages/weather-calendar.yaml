@@ -11,7 +11,6 @@ description:
   - kleenex_pollen
   trigger_advice: A time pattern every 15 or 30 minutes.
   notes:
-  - Leave the weather entity empty to use the first working weather entity.
   - A weather warning sensor (e.g. KNMI or Meteoalarm) turns the official warning level into a chip.
   title_default: '"Weather"'
 redraw: trigger

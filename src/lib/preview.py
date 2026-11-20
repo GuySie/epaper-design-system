@@ -46,6 +46,9 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
 
     tmp = pathlib.Path(tempfile.mkdtemp(prefix='preview_'))
+    if not a.keep:
+        import atexit
+        atexit.register(shutil.rmtree, tmp, ignore_errors=True)     # also when a step stops the run
     T = tmp / 'src'
     shutil.copytree(SRC, T, ignore=shutil.ignore_patterns('baseline', 'build', '__pycache__'))
     sys.path[:0] = [str(T / 'lib'), str(T)]

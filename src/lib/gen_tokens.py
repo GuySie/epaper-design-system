@@ -141,7 +141,7 @@ def common_hash():
     files = []
     for f in SRC.rglob('*'):
         rel = f.relative_to(SRC).as_posix()
-        if not f.is_file() or rel.split('/')[0] in ('baseline', 'build', 'specs', 'scen') or '__pycache__' in rel or f.suffix == '.pyc':
+        if not f.is_file() or rel.split('/')[0] in ('baseline', 'build', 'specs', 'scen') or '__pycache__' in rel or f.suffix == '.pyc' or any(s.startswith('.') for s in rel.split('/')):
             continue
         if rel in NOT_FIT or (rel.startswith('pages/') and rel != 'pages/_shared.yaml'):
             continue

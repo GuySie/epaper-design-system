@@ -9,6 +9,7 @@
 #   The blueprints and templates are output only: change the sources and run this again.
 set -eo pipefail
 SRC="$(cd "$(dirname "$0")" && pwd)"; cd "$SRC"
+unset EP_KEYS                                     # a release checks every layout, whatever the shell was left with
 REF=$1; OUT="$SRC/build"; TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT                         # the second build, the previous build and the kept renders
 T0=$SECONDS; TL=$SECONDS
