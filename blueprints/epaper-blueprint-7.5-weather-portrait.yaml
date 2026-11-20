@@ -134,6 +134,13 @@ blueprint:
           default: ''
           selector:
             text: null
+        start_with_today:
+          name: Start the daily forecast with today
+          description: On, the daily forecast starts with today. Off, it starts with tomorrow, since today's rain and high/low
+            are already shown above it.
+          default: false
+          selector:
+            boolean: {}
     thresholds:
       name: Thresholds
       icon: "mdi:alert-outline"
@@ -443,7 +450,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'jpxwty'
+  ds_set: 'jejovg'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'
@@ -457,6 +464,7 @@ variables:
     weather_warning_sensor: !input 'weather_warning_sensor'
     weather_warning_text_sensor: !input 'weather_warning_text_sensor'
     pollen_type: !input 'pollen_type'
+    start_with_today: !input 'start_with_today'
     flag_temp_low: !input 'flag_temp_low'
     warning_temp_low: !input 'warning_temp_low'
     severe_temp_low: !input 'severe_temp_low'

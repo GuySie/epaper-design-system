@@ -134,7 +134,8 @@ blueprint:
             text: null
         start_with_today:
           name: Start the daily forecast with today
-          description: Show today as the first day in daily forecast (default is tomorrow)
+          description: On, the daily forecast starts with today. Off, it starts with tomorrow, since today's rain and high/low
+            are already shown above it.
           default: false
           selector:
             boolean: {}
@@ -441,7 +442,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'jpxwty'
+  ds_set: 'jejovg'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'

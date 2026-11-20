@@ -621,7 +621,7 @@ Three levels, the same on every module:
 - The label and value change **together**. Never highlight just one. On a label/value row (detail rows, plant and entity rows) **one chip spans the label and the value**, as a band. In a table (hour and day cells, the 2.7" portrait's forecast rows) the column header is shared by several values, so each flagged value gets its own chip and a flagged condition chips the header.
 - **Colour is the level, the label is the source.** Our own thresholds and official warnings use the same two chips; the text says which is which (`NOW · THUNDERSTORM` against `CODE YELLOW · FOG`). Only a measured value past a severe threshold or an official orange / red warning is severe by default.
 - **Chip text is in capitals**, like labels, including warning subjects taken from a sensor (`CODE ORANGE THUNDERSTORM`).
-- **A warning or severe chip names its subject or its problem.** A value alone is only enough when a label sits next to it (detail rows). Otherwise the chip carries the word: the condition (`FOG`), the subject (`BIRCH 96 ppm`), or a status. Medication: the press date followed by the status, `SU 8 NOV · OVERDUE` (warning) / `SU 8 NOV · MISSED` (severe), so the date stays with the hero time it belongs to. The stale chip is the one exception (fixed place, `!`). A glance chip without a row label carries its word: `MAX/MIN 11°/3°`, or the crossed side alone where that doesn't fit (`MIN 3°`). Chip widths are measured (`VALUE_W`), never estimated per character.
+- **A warning or severe chip names its subject or its problem.** A value alone is only enough when a label sits next to it (detail rows). Otherwise the chip carries the word: the condition (`FOG`), the subject (`BIRCH 96 ppm`), or a status. Medication: the press date followed by the status, `SU 8 NOV · OVERDUE` (warning) / `SU 8 NOV · MISSED` (severe), so the date stays with the hero time it belongs to. The stale chip is the one exception (fixed place, `!`). A glance chip without a row label carries its word: `MAX/MIN 11°/3°`, or the values alone where that doesn't fit (`11°/3°`). Chip widths are measured (`VALUE_W`), never estimated per character.
 - **Charts on BWRY:** bars (or line spans) between the warning and severe thresholds are yellow; at or above severe, red. Threshold notches across a yellow bar are black instead of paper.
 - **Stale is not a warning:** the stale chip (*Title row*) is not a warning chip.
 - **Now is not a severity.** An event in progress is marked with an ink chip (fill `color.ink`, text `color.paper`): it is current, not bad. It has the shape and place a flagged value would have: the row in a date-grouped list, the start time in an event list, the `NOW` label of an event hero. It is told apart from the stale chip, also ink on a panel with a warning colour, by its place and by the stale chip's `!`. On a black/white panel a severe chip is an ink chip too, so there the two look alike.
@@ -731,7 +731,7 @@ The group is sized as one block from one value: the **hero size *h*** (a rung of
 - **The moon badge is part of the icon** (*When to use an icon*), so part of the group for fit, centring and the `space.l` gap.
 - **Checked:** `check.py` tests the widest reading and the moon badge on every weather layout, the group's `space.l` gap and the badge ring against lines.
 
-*h* and the icon of each layout: the table in *Physical size minimums*. The event hero is its layout's hero beside other content.
+*h* and the icon of each layout: the table in *Physical size minimums*. The event hero is its layout's hero beside other content, and the one exception to hero centring: it is a block of text lines (the label line, the time, the title) at the list's left edge, the time `space.l` under the label line and the title `space.l` under the time.
 
 ### Hour cell / Day cell
 
@@ -932,7 +932,7 @@ The hero band (the hero group *beside other content* and its detail rows, centre
 
 The weather page: the hour strip and the day strip under the hero band; on the 2.7" portrait the strips are a forecast table (see *Detail rows*, *Strip*, *Forecast row* and *Weather*).
 
-- **Strips:** Strips stack bottom up from the content's bottom (or the footer's M); the last text line's ink ends there, the next strip's line follows `space.s` above the cells. Hour or day label / strip icon (`icon.stripHour`, `icon.stripDay`, fitted per layout: *Measured*; hour cells have none where the hour icon drops out) / values, drawn as in *Hour cell / Day cell*. How many cells: *Style choices* (Forecast horizon). Not used on 1.4".
+- **Strips:** Strips stack bottom up from the content's bottom (or the footer's M); the last text line's ink ends there, the next strip's line follows `space.s` above the cells. Hour or day label / strip icon (`icon.stripHour`, `icon.stripDay`, fitted per layout: *Measured*; hour cells have none where the hour icon drops out) / values, drawn as in *Hour cell / Day cell*. How many cells: *Style choices* (Forecast horizon). The days start with tomorrow, since today is in the detail rows; the `start_with_today` input starts them with today (every layout with day cells or day rows has it). Not used on 1.4".
 - **Portrait screens (7.5" portrait).** Bottom up: the footer (the forecast conclusion), the day strip (<!-- v:spec:weather_75p:DAYS -->5<!-- /v --> days), the hour strip (<!-- v:spec:weather_75p:HOURS -->5<!-- /v --> hours), the detail rows, the hero group. The 2.7" portrait keeps its forecast table: strip cells there would be too narrow.
   - **The hero group stacks**, as the *Hero group* allows on portrait screens: the number, then the icon under it, a hero gap (`space.heroGap`) apart by ink. It is centred by ink between the title line and the line above the detail rows (the `C` rule, *Hero dashboard*). Its size is the largest hero rung for which the widest reading (−12° with the moon badge) passes (`lib/layout_fit.py`); the icon follows the *Hero group* rule.
   - **Detail rows** under it (*Hero dashboard*, *Portrait screens*), with M above and below the block.
@@ -1233,11 +1233,11 @@ Where it applies:
 | Screen | Inputs of this page |
 |---|---|
 | every screen | `weather_entity`, `current_temp_sensor`, `pollen_sensor`, `moon_phase_sensor`, `weather_warning_sensor`, `weather_warning_text_sensor`, `pollen_type`, `flag_temp_low`, `warning_temp_low`, `severe_temp_low`, `flag_temp_high`, `warning_temp_high`, `severe_temp_high`, `flag_wind_high`, `warning_wind_high`, `severe_wind_high`, `flag_rain_hour`, `warning_rain_hour`, `severe_rain_hour`, `flag_rain_day`, `warning_rain_day`, `severe_rain_day`, `flag_pollen_high`, `warning_pollen_high`, `severe_pollen_high`, `warning_conditions`, `severe_conditions` |
-| 2.7" P | also `wind_or_precipitation` |
+| 2.7" P | also `wind_or_precipitation`, `start_with_today` |
 | 4.1" | also `start_with_today` |
-| 4.26" | also `location_string` |
-| 7.5" L | also `location_string` |
-| 7.5" P | also `location_string` |
+| 4.26" | also `start_with_today`, `location_string` |
+| 7.5" L | also `start_with_today`, `location_string` |
+| 7.5" P | also `start_with_today`, `location_string` |
 <!-- /registry:inputs-weather -->
 
 <!-- registry:layouts-weather -->

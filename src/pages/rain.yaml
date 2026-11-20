@@ -1,5 +1,6 @@
 page: rain
 description:
+  title_default: '"Rain"'
   shows: The next two hours of rain in 5-minute bars, from Buienalarm and Buienradar (the higher of the two for each bar),
     on a log scale so drizzle stays visible next to a downpour.
   needs:
@@ -107,28 +108,20 @@ data:
 texts:
   en:
     no_data: No rain forecast data available.
-    default_title: Rain (next 2h)
   de:
     no_data: Keine Regenvorhersagedaten verfügbar.
-    default_title: Regen (nächste 2 Std.)
   nl:
     no_data: Geen regenvoorspellingsgegevens beschikbaar.
-    default_title: Regen (komende 2u)
   fr:
     no_data: Aucune donnée de prévision de pluie disponible.
-    default_title: Pluie (2 prochaines h)
   es:
     no_data: No hay datos de previsión de lluvia disponibles.
-    default_title: Lluvia (próximas 2h)
   pl:
     no_data: Brak dostępnych danych prognozy opadów.
-    default_title: Deszcz (najbliższe 2h)
   hr:
     no_data: Nema dostupnih podataka o prognozi kiše.
-    default_title: Kiša (sljedeća 2h)
   sv:
     no_data: Ingen nederbördsprognosdata tillgänglig.
-    default_title: Regn (nästa 2h)
 layouts:
   '35':
     spec: rain_35

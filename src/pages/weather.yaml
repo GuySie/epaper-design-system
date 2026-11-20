@@ -22,7 +22,7 @@ inputs:
 - name: start_with_today
   section: content
   label: Start the daily forecast with today
-  help: Show today as the first day in daily forecast (default is tomorrow)
+  help: On, the daily forecast starts with today. Off, it starts with tomorrow, since today's rain and high/low are already shown above it.
   selector:
     boolean: {}
   default: false
@@ -63,8 +63,6 @@ layouts:
     - 'Button devices sold as 2.9": configure the firmware for 168 x 384, or the top 16 px are cut off.'
   27p:
     spec: weather_27p
-    drop_inputs:
-    - start_with_today
     defaults:
       rotate: '0'
     inputs:
@@ -106,8 +104,6 @@ layouts:
     spec: weather_426
     defaults:
       rotate: '0'
-    drop_inputs:
-    - start_with_today
     inputs:
     - name: weather_entity
       section: content
@@ -145,8 +141,6 @@ layouts:
     spec: weather_75
     defaults:
       rotate: '0'
-    drop_inputs:
-    - start_with_today
     inputs:
     - name: weather_entity
       section: content
@@ -182,8 +176,6 @@ layouts:
     title_default: '"Weather" plus the location'
   75p:
     spec: weather_75p
-    drop_inputs:
-    - start_with_today
     inputs:
     - name: weather_entity
       section: content
