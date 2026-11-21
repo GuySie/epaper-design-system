@@ -85,27 +85,27 @@ def universal(bp, payload):
                 errs.add(f'text {val[:12]!r} has no font [*Blueprint mechanics*]')
             elif font in FONT_FILES:
                 if size not in (FONT_FILES[font], 2 * FONT_FILES[font]):
-                    errs.add(f'{font} drawn at {size} px [*Typography*, Never scale off-size]')
-                if 'Regular' in font and FONT_FILES[font] < 21 and not re.fullmatch(r'[A-Za-zµΩ°%][A-Za-zµΩ°%0-9/·-]{0,9}', val):
+                    errs.add(f'{font} drawn at {size} px [*Typography*, *Never scale off-size*]')
+                if 'Regular' in font and FONT_FILES[font] < 21 and not re.fullmatch(r'[A-Za-zµΩ°%€$£][A-Za-zµΩ°%€$£0-9/·-]{0,9}', val):
                     errs.add(f'{font} for {val[:14]!r}, which is no unit [*Physical size minimums*: TRMNL12 and TRMNL16 text is always Bold, a unit excepted]')
             elif font == 'SpaceGrotesk-Bold.ttf':
                 if size not in HERO_SIZES:
-                    errs.add(f'hero text at {size} px, off the hero ladder [*Style choices*, Hero ladder]')
+                    errs.add(f'hero text at {size} px, off the hero ladder [*Style choices*, *Hero ladder*]')
             elif font == 'materialdesignicons-webfont.ttf':
                 if size not in ICON_LADDER:
-                    errs.add(f'icon at {size} px, off the icon ladder [*How to draw them*, Size ladder]')
+                    errs.add(f'icon at {size} px, off the icon ladder [*How to draw them*, *Size ladder*]')
             else:
-                errs.add(f'font {font} [*Typography*, No other fonts]')
+                errs.add(f'font {font} [*Typography*, *No other fonts*]')
             if el.get('color') not in ('black', 'white'):
-                errs.add(f"text {val[:12]!r} in {el.get('color')} [*Values per panel*, Warning and severe are fills only; gray is never text]")
+                errs.add(f"text {val[:12]!r} in {el.get('color')} [*Values per panel*, *Warning and severe are fills only*, and gray is never text]")
             # the update stamp: the right-aligned text of the title row
             y = el.get('y')
             if isinstance(y, (int, float)) and y < P + TH and str(el.get('anchor', '')).startswith('r') and font in FONT_FILES:
                 if not re.fullmatch(r'(! )?[^\W\d_]{2} \d{1,2}:\d{2}( [AP]M)?', val):
-                    errs.add(f'update stamp {val!r} [*Title row*, Update stamp]')
+                    errs.add(f'update stamp {val!r} [*Title row*, *Update stamp*]')
         elif ty == 'line':
             if el.get('fill') not in ('black', 'white'):
-                errs.add(f"a line in {el.get('fill')} [*Values per panel*, Gray is a fill, never text or a line]")
+                errs.add(f"a line in {el.get('fill')} [*Values per panel*, *Gray is a fill, never text or a line*]")
             if int(el.get('width', 1)) not in (1, base, e['line']['heavy']):
                 errs.add(f"a line {el.get('width')} px wide [*Lines and strokes*: every stroke follows line.base]")
             if el.get('dashed') and (el.get('dash_length'), el.get('space_length')) not in dashes:
@@ -114,8 +114,14 @@ def universal(bp, payload):
             for k in ('fill', 'outline'):
                 if el.get(k) is not None and el[k] not in FILLS:
                     errs.add(f"a {ty} {k} of {el[k]} [*Values per panel*: only the panel's colours]")
-            if ty == 'rectangle' and el.get('fill') is None and int(el.get('width', 1)) not in (base, 2 * base, 2 * base + 1):
-                errs.add(f"an outline {el.get('width')} px wide [*Chips*: an outline of 2 x line.base; *Spacing (internal)*, Chips hang outward: a hero's inside its box]")
+            if ty in ('rectangle', 'circle', 'ellipse') and el.get('outline') is not None and el.get('outline') != el.get('fill') \
+                    and int(el.get('width', 1)) not in (base, 2 * base, 2 * base + 1):
+                errs.add(f"an outline {el.get('width')} px wide [*Chips*: an outline of 2 x line.base; *Spacing (internal)*, *Chips hang outward*: a hero's inside its box]")
+        elif ty == 'icon':            # the renderer's own icon element, for an icon the kit has no glyph for (*Blueprint mechanics*)
+            if el.get('color', 'black') not in ('black', 'white'):
+                errs.add(f"an icon in {el.get('color')} [*How to draw them*, *Colour*]")
+        else:
+            errs.add(f'an element of type {ty!r}, which the kit does not draw with [*Blueprint mechanics*]')
     return sorted(errs)
 
 
@@ -130,7 +136,9 @@ def universal_selftest(bp):
            'follows line.base': {'type': 'line', 'fill': 'black', 'width': 7, 'x_start': 0, 'x_end': 9, 'y_start': 5, 'y_end': 5},
            'line.dash': {'type': 'line', 'fill': 'black', 'width': 1, 'dashed': True, 'dash_length': 5, 'space_length': 2, 'x_start': 0, 'x_end': 9, 'y_start': 5, 'y_end': 5},
            "only the panel's colours": {'type': 'rectangle', 'fill': 'blue', 'outline': 'blue', 'x_start': 0, 'x_end': 9, 'y_start': 5, 'y_end': 9},
-           'an outline': {'type': 'rectangle', 'outline': 'black', 'width': 9, 'x_start': 0, 'x_end': 9, 'y_start': 5, 'y_end': 9}}
+           'an outline': {'type': 'rectangle', 'outline': 'black', 'width': 9, 'x_start': 0, 'x_end': 9, 'y_start': 5, 'y_end': 9},
+           'an icon in': {'type': 'icon', 'value': 'mdi:home', 'color': 'red', 'x': 5, 'y': 5, 'size': 24},
+           'does not draw with': {'type': 'multiline', 'value': 'a|b', 'x': 5, 'y': 5}}
     if universal(bp, [good]):
         return [f'the system-wide rules reject a correct text: {universal(bp, [good])}']
     return [f'the system-wide rule "{k}" does not fire on a drawing that breaks it' for k, el in bad.items() if not any(k in e for e in universal(bp, [el]))]
@@ -239,8 +247,20 @@ def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
     with contextlib.redirect_stdout(io.StringIO()):
         payload = harness.run(str(pathlib.Path(out_dir) / B[bp]), str(sf), CHECK_PNG)
     W, H = Image.open(CHECK_PNG).size
+    want_ns = {}
+    exec(sf.read_text(), want_ns)
     (P, TH, M, rw), S = tier_vals(bp)      # from the tokens: a canvas can belong to two tiers (800 x 480: the 7.5" and the 4.26")
     errs = universal(bp, payload)
+    # what the case's rule says the screen shows (below the title row) or must not show (anywhere): the drawing instructions,
+    # not whether the text is legible
+    said = [str(el.get('value', '')) for el in payload if el.get('type') in ('text', 'multiline')]
+    body = [str(el.get('value', '')) for el in payload if el.get('type') in ('text', 'multiline') and (el.get('y') or 0) >= P + TH]
+    for w in want_ns.get('EXPECT') or []:
+        if not any(w in v for v in body):
+            errs.append(f'the screen does not show {w!r}, which this case is there to show')
+    for w in want_ns.get('EXPECT_NOT') or []:
+        if any(w in v for v in said):
+            errs.append(f'the screen shows {w!r}, which this case is there to rule out')
     items = [(el, kind(el), ink_box(el, W, H)) for el in payload]
     items = [(el, k, b) for el, k, b in items if b]
     # title
@@ -257,7 +277,7 @@ def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
     if stamp and max(b[2] for b in stamp) != W - 1 - P:
         errs.append(f'update stamp ends at x={max(b[2] for b in stamp)}, not W-P-1={W - 1 - P}')
     # edges: ink stays inside the padding; a fill reaches into it at most S + XS of the text it holds
-    # (*Spacing (internal)*, Chips hang outward; a hero: of type.data), a warning outline one line.base more (outside the chip's box); a fill with no text stays inside
+    # (*Spacing (internal)*, *Chips hang outward*; a hero: of type.data), a warning outline one line.base more (outside the chip's box); a fill with no text stays inside
     from derive_tokens import XS as XS_OF, S as S_OF
     tboxes = [(el, b) for el, k, b in items if el.get('type') == 'text']
     for el, k, b in items:
@@ -311,12 +331,40 @@ def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
                     errs.append(f'hero band not centred: {gt} px above, {gb} px below (M={M})')
     # hero clearance from every full-width rule (above and below)
     rules_h = [b for el, k, b in items if el.get('type') == 'line' and b[1] == b[3] - (int(el.get('width', 1)) - 1) and b[2] - b[0] > W * 0.4]
-    if bp in WORD:                # a hero chip around a word rises for an accent: it keeps paper under the title line (*Glance with a word*, Flagged)
-        for el, k, b in items:
-            if el.get('type') == 'rectangle' and el.get('fill') != 'white' and b[2] - b[0] > 40:
-                for r in rules_h:
-                    if r[3] < b[3] and b[1] - r[3] - 1 < 2:
-                        errs.append(f'hero chip only {b[1] - r[3] - 1} px below a rule (min 2)')
+    if bp in WORD:                # a flagged word fills the hero block (*Glance with a word*, *Flagged*): a fill behind a hero word is that
+        from derive_tokens import S as S_ALL                # block, M below the title line and space.s of the title into the padding sideways
+        sx = S_ALL[tier_tokens(bp)['type']['title'][1]]
+        block = [P - sx, P + TH + M, W - P - 1 + sx, H - P - 1]
+        b0 = tier_tokens(bp)['line']['base']
+        ring = [block[0] - b0, block[1] - b0, block[2] + b0, block[3] + b0]        # the warning outline, one line.base outside the box
+        blocks = [el for el in payload if el.get('type') == 'rectangle' and [el.get('x_start'), el.get('y_start'), el.get('x_end'), el.get('y_end')] in (block, ring)]
+        if want_ns.get('EXPECT_BLOCK') is True and not blocks:
+            errs.append('no hero block: this case is flagged, so the hero block is the chip')
+        if want_ns.get('EXPECT_FILL') and not any(bl.get('fill') == want_ns['EXPECT_FILL'] for bl in blocks):
+            errs.append(f"the hero block's fill is not {want_ns['EXPECT_FILL']}: {[bl.get('fill') for bl in blocks]}")
+        if want_ns.get('EXPECT_BLOCK') is False and blocks:
+            errs.append('a hero block on a case that is not flagged')
+        for bl in blocks:          # everything in the block takes the on-colour (*Glance with a word*, *Flagged*)
+            on = 'black' if bl.get('fill') in (None, 'yellow') else 'white'
+            for el in payload:
+                x, y = el.get('x'), el.get('y')
+                if el.get('type') in ('text', 'icon') and isinstance(x, (int, float)) and isinstance(y, (int, float)) and y >= P + TH \
+                        and bl['x_start'] <= x <= bl['x_end'] and bl['y_start'] <= y <= bl['y_end'] and el.get('color', 'black') != on:
+                    errs.append(f"{str(el.get('value'))[:16]!r} in {el.get('color')} on the hero block, not {on}")
+            if bl.get('fill') is None:
+                inner = bl['x_start'] + int(bl.get('width', 1))
+                for hel, hb in heroes:
+                    if hb[0] < inner + 1:
+                        errs.append(f"the block's outline touches the word {hel['value']!r} (ink from x={hb[0]}, outline to {inner - 1})")
+        for hel, hb in heroes:
+            behind = [el for el, k, b in items if el.get('type') == 'rectangle' and el.get('fill') != 'white'
+                      and el['x_start'] <= hb[0] and el['x_end'] >= hb[2] and el['y_start'] <= hb[1] and el['y_end'] >= hb[3]]
+            for el in behind:
+                got = [el['x_start'], el['y_start'], el['x_end'], el['y_end']]
+                if got not in (block, ring):
+                    errs.append(f'a fill behind the hero word at {got}, not the hero block {block}')
+            if hel.get('color') != 'black' and not behind:
+                errs.append(f"hero word {hel['value']!r} in {hel.get('color')} without the block behind it")
     for el, b in heroes:
         # one word keeps the hero clearance as a numeral does; two stacked words keep M (*Hero group*, hero clearance)
         want = M if (bp in WORD and len(heroes) > 1) else (int(el['size']) // HERO_GAP_DIV)
@@ -486,9 +534,10 @@ def same_layout():
             per = {}
             for s, (b, p, _) in PAYLOADS.items():
                 if b == bp and 'err' not in s:
-                    hh = [(e['value'], e['size'], e['y']) for e in p if e.get('type') == 'text' and 'SpaceGrotesk' in str(e.get('font', ''))]
-                    if hh:
-                        per.setdefault(tuple(v for v, _, _ in hh), {}).setdefault(tuple((z, y) for _, z, y in hh), []).append(s.split('@')[0])
+                    hh = [(e['value'], e['size'], e['x'], e['y']) for e in p if e.get('type') == 'text' and 'SpaceGrotesk' in str(e.get('font', ''))]
+                    icons = tuple((e['size'], e['x']) for e in p if (e.get('type') == 'text' and 'materialdesign' in str(e.get('font', '')) or e.get('type') == 'icon') and e.get('size', 0) >= 24)
+                    if hh:          # the word, where it is, and its icon: nothing moves or changes size when a chip appears
+                        per.setdefault(tuple(v for v, _, _, _ in hh), {}).setdefault(tuple((z, x, y) for _, z, x, y in hh) + icons, []).append(s.split('@')[0])
             for words, places in per.items():
                 if len(places) > 1:
                     errs.append(f'{B[bp]}: the hero {" / ".join(words)} moves between states: ' + '; '.join(f'{k} in {", ".join(v[:4])}' for k, v in places.items()))

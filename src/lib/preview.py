@@ -38,6 +38,7 @@ def main():
     ap.add_argument('--fit-strips', action='store_true')
     ap.add_argument('--out')
     ap.add_argument('--keep', action='store_true', help='keep the temporary copy (to inspect a draft)')
+    ap.add_argument('--uses', default=None, help='a page the registry does not know yet: the pattern it uses (glance/word, bar-chart/thresholds, ...), so the fit and the pixel check judge it by that pattern')
     ap.add_argument('--gap', default='skip', help="the gap rule the pixel check uses under the title line: M, M+, C or skip (a Glance, a chart)")
     ap.add_argument('scen', nargs='+')
     a = ap.parse_args()
@@ -95,7 +96,9 @@ def main():
     import yaml
     rf = T / 'registry.yaml'
     reg = yaml.safe_load(rf.read_text())
-    pg = reg['pages'].setdefault(a.page, {'name': page.get('page', a.page), 'uses': 'hero-dashboard/module', 'status': 'mock'})
+    if a.page not in reg['pages'] and not a.uses:
+        sys.exit(f'{a.page} is no page in the registry yet: pass --uses <pattern/version>, so the fit and the pixel check judge it by its pattern')
+    pg = reg['pages'].setdefault(a.page, {'name': page.get('page', a.page), 'uses': a.uses, 'status': 'mock'})
     rf.write_text(yaml.safe_dump(reg, allow_unicode=True, sort_keys=False))
 
     def scen_file(s):
@@ -177,7 +180,7 @@ def main():
         checked = ['pixel check: could not run (' + (rc.stderr.strip().splitlines() or ['no output'])[-1][:120] + ')']
     else:
         bad = {s: e for s, e in failed.items() if e}
-        checked = [f'pixel check ({a.gap}): passes on {len(failed) - len(bad)} of {len(failed)}'] + [f'  FAILS {s}: {e[0]}' for s, e in bad.items()]
+        checked = [f'pixel check ({a.gap}): passes on {len(failed) - len(bad)} of {len(failed)}'] + [f'  FAILS {s}: {x}' for s, e in bad.items() for x in e]
     for l in checked:
         print(l)
     # the sheet: the label, what it is, and the renders side by side

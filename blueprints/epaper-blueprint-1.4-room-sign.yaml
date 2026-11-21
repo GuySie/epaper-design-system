@@ -4,7 +4,7 @@ blueprint:
   description: |
     # E-paper Room sign 1.4"
 
-    The state of one entity as one large word, with an optional line under it. Free, busy, do not disturb. A short status reads best on this small screen; a long one is cut.
+    The state of one entity as a large word, on two lines when it is longer, with an optional line under it. Free, busy, do not disturb. A short status reads best on this small screen; a long one is cut.
 
     ## Works with
 
@@ -87,16 +87,16 @@ blueprint:
       input:
         warning_states:
           name: States that are a warning
-          description: The word is a warning chip while the entity is in one of these states, written as shown or as Home
-            Assistant stores them (case doesn't matter). Leave empty for none.
+          description: The word's block takes the warning level while the entity is in one of these states, written as shown
+            or as Home Assistant stores them (case doesn't matter). Leave empty for none.
           default: []
           selector:
             text:
               multiple: true
         severe_states:
           name: States that are severe
-          description: The word is a severe chip while the entity is in one of these states, written as shown or as Home Assistant
-            stores them (case doesn't matter). Leave empty for none.
+          description: The word's block takes the severe level while the entity is in one of these states, written as shown
+            or as Home Assistant stores them (case doesn't matter). Leave empty for none.
           default: []
           selector:
             text:
@@ -195,7 +195,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'lnixbv'
+  ds_set: 'houpas'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'
@@ -206,18 +206,22 @@ variables:
   ds_icon: !input 'icon'
   warning_states: !input 'warning_states'
   severe_states: !input 'severe_states'
-  ds_title: '{{ header_title if header_title else (area_name(entity) or entity_name(entity) or device_name(entity) or entity)
-    }}'
+  text_strip_pattern: '[^ -ɏ‐-‧‰-※€™]'
+  ds_title: '{{ header_title if header_title else ((area_name(entity) or entity_name(entity) or device_name(entity) or entity)
+    | string | regex_replace(text_strip_pattern, '''') | regex_replace('' {2,}'', '' '') | trim) }}'
   ds_room: |
     {% set raw = states(entity) %} {% set ok = raw not in ['unknown', 'unavailable', 'none', ''] %}
-    {% set word = (state_translated(entity) if raw | float(none) is none else raw) if ok else '' %}
+    {# follows *Text rules*, *Sanitise all user text*; *Room sign*, *Flagged* #}
+    {% set num = raw | float(none) is not none %}
+    {% set word = ((raw if num else state_translated(entity)) | string | regex_replace(text_strip_pattern, '') | regex_replace(' {2,}', ' ') | trim) if ok else '' %}
     {% set keys = [raw | lower, word | lower] %}
     {% set sev = severe_states | default([]) | map('lower') | list %} {% set warn = warning_states | default([]) | map('lower') | list %}
     {% set lvl = ('sev' if (keys[0] in sev or keys[1] in sev) else ('warn' if (keys[0] in warn or keys[1] in warn) else '')) if ok else '' %}
     {% set se = secondary_entity | default('') %} {% set s2 = states(se) if se else '' %}
     {% set ok2 = s2 not in ['unknown', 'unavailable', 'none', ''] %} {% set num2 = ok2 and s2 | float(none) is not none %}
-    {{ {'word': word, 'level': lvl, 'second': (s2 if num2 else state_translated(se)) if ok2 else '', 'second_num': num2,
-        'second_unit': (state_attr(se, 'unit_of_measurement') or '') if (se and ok2) else ''} }}
+    {% set name = ((entity_name(entity) or device_name(entity) or entity) | string | regex_replace(text_strip_pattern, '') | regex_replace(' {2,}', ' ') | trim) %}
+    {{ {'word': word, 'name': name, 'level': lvl, 'second': (s2 if num2 else (state_translated(se) | string | regex_replace(text_strip_pattern, '') | regex_replace(' {2,}', ' ') | trim)) if ok2 else '', 'second_num': num2,
+        'second_unit': ((state_attr(se, 'unit_of_measurement') or '') | string | regex_replace(text_strip_pattern, '') | trim) if (se and ok2) else ''} }}
 trigger: !input 'automation_trigger'
 conditions: !input 'automation_conditions'
 action:

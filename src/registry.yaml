@@ -160,7 +160,7 @@ components:
   Progress bar:         {macros: [PBAR]}
 modules:
   Title row:         {macros: [TITLE]}
-  Hero block:        {macros: [HBLOCK, HERO_BLOCK_Y, WORD_STACK, WORD_SPLIT]}
+  Hero block:        {macros: [HBLOCK, HERO_BLOCK_Y, WORD_STACK, WORD_SPLIT, WORD_BLOCK]}
   Hero band:         {macros: [HBAND]}
   Footer:            {macros: [FOOT, WXFOOT]}
   Error block:       {macros: [ERRBLOCK, ERRPAGE]}
@@ -221,7 +221,7 @@ terms:
   widest reading:      {level: '—',      of: Page, what: 'the widest value a page''s entity can show; layouts and fitted sizes are chosen for it (*Pages*, the widest reading decides the layout)', aliases: []}
   ordinary reading:    {level: '—',      of: Page, what: 'the reading a hero on its own is fitted on: a two-digit temperature, a clock time, a one-digit count, a word of five capitals', aliases: []}
   hero gap:            {level: token,    of: Hero group, what: 'hero size ÷ 7 (`space.heroGap`): between the number and its icon, and between the hero and what is stacked under it', aliases: []}
-  hero clearance:      {level: '—',      of: Hero group, what: 'the hero gap a hero numeral''s digits keep from any line', aliases: []}
+  hero clearance:      {level: '—',      of: Hero group, what: 'the hero gap a hero numeral''s digits, or one word as the hero, keep from any line', aliases: []}
   footer chip:         {level: component, of: Footer, what: 'the footer''s text line as a chip: its conclusion when flagged, or the alert on a layout without detail rows', aliases: []}
   make-way order:      {level: '—',      of: Detail rows, what: 'the order in which a layout''s detail rows give their place to the alert row and the pollen row (*Override order*)', aliases: []}
 

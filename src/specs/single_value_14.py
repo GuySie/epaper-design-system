@@ -1,6 +1,7 @@
 """Single value on the 1.4": the number as the hero at one size, its unit as the Glance secondary (the screen is too
 narrow for a unit beside a four-digit number); no second value. A reading too wide for the screen is the error view."""
 PAYLOAD_MAIN = r'''
+{#- follows *Single value*, *The 1.4" has one size* -#}
 {%- set W, P = EP_TK.width, EP_TK.space.pad -%}
 {%- set right = STAMP_AT(ds_last_ts, ds_stale) | float -%}
 {%- set v = ds_value -%}

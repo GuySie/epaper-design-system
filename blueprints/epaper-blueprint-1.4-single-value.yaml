@@ -4,7 +4,7 @@ blueprint:
   description: |
     # E-paper Single value 1.4"
 
-    One sensor's value, large enough to read across the room, with its unit beside it. An icon and a second value under it are optional.
+    One sensor's value, large enough to read across the room, with its unit under it. An icon is optional.
 
     ## Works with
 
@@ -227,7 +227,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'lnixbv'
+  ds_set: 'houpas'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'
@@ -243,7 +243,9 @@ variables:
   warning_low: !input 'warning_low'
   severe_low: !input 'severe_low'
   language_map: "{%- from 'ep_i18n.jinja' import EP_TXT -%}{{ EP_TXT['single-value'] }}"
-  ds_title: '{{ header_title if header_title else (entity_name(entity) or device_name(entity) or entity) }}'
+  text_strip_pattern: '[^ -ɏ‐-‧‰-※€™]'
+  ds_title: '{{ header_title if header_title else ((entity_name(entity) or device_name(entity) or entity) | string | regex_replace(text_strip_pattern,
+    '''') | regex_replace('' {2,}'', '' '') | trim) }}'
   ds_value: |
     {% set raw = states(entity) %} {% set ok = raw not in ['unknown', 'unavailable', 'none', ''] %} {% set n = raw | float(none) %}
     {% set lvl = '' %}

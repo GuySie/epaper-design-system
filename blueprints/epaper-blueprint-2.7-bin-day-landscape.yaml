@@ -4,7 +4,7 @@ blueprint:
   description: |
     # E-paper Bin day 2.7" landscape
 
-    The bin that is collected next, as one large word, with the day under it. Two bins on the same day are both shown.
+    The bin that is collected next, as a large word (on two lines when it is longer), with the day under it. Two bins on the same day are both shown.
 
     ## Works with
 
@@ -94,24 +94,28 @@ blueprint:
         bin_1_label:
           name: Bin 1 - word
           description: The word shown for this bin, in capitals. Short words stay large. Leave blank to use the sensor's name.
+            Signs and letters the display font has no measure for are left out.
           default: ''
           selector:
             text: {}
         bin_2_label:
           name: Bin 2 - word
           description: The word shown for this bin, in capitals. Short words stay large. Leave blank to use the sensor's name.
+            Signs and letters the display font has no measure for are left out.
           default: ''
           selector:
             text: {}
         bin_3_label:
           name: Bin 3 - word
           description: The word shown for this bin, in capitals. Short words stay large. Leave blank to use the sensor's name.
+            Signs and letters the display font has no measure for are left out.
           default: ''
           selector:
             text: {}
         bin_4_label:
           name: Bin 4 - word
           description: The word shown for this bin, in capitals. Short words stay large. Leave blank to use the sensor's name.
+            Signs and letters the display font has no measure for are left out.
           default: ''
           selector:
             text: {}
@@ -245,7 +249,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'lnixbv'
+  ds_set: 'houpas'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   weekday_lang: !input 'weekday_format'
@@ -266,6 +270,7 @@ variables:
   flag_soon: !input 'flag_soon'
   language_map: "{%- from 'ep_i18n.jinja' import EP_TXT -%}{{ EP_TXT['bin-day'] }}"
   header_title_display: '{{ header_title if header_title else language_map[weekday_lang][''default_title''] }}'
+  text_strip_pattern: '[^ -ɏ‐-‧‰-※€™]'
   ds_bins: |
     {% set ns = namespace(l=[]) %} {% set slots = [
             {'e': bin_1 | default(''), 'label': bin_1_label | default(''), 'icon': bin_1_icon | default('')},
@@ -278,7 +283,7 @@ variables:
               {% set dt = as_datetime(raw, none) if raw | length > 10 else none %}
               {% set d = as_local(dt) if dt is not none else strptime(raw[:10], '%Y-%m-%d', none) %}
               {% if d is not none %}{% set n = (d.date() - now().date()).days %}
-                {% if n >= 0 %}{% set ns.l = ns.l + [{'word': s.label if s.label else (entity_name(s.e) or device_name(s.e) or s.e), 'icon': s.icon, 'd': n, 'wd': d.weekday(), 'day': d.day, 'mon': d.month}] %}{% endif %}
+                {% if n >= 0 %}{% set ns.l = ns.l + [{'word': ((s.label if s.label else (entity_name(s.e) or device_name(s.e) or s.e)) | string | regex_replace(text_strip_pattern, '') | regex_replace(' {2,}', ' ') | trim), 'name': ((entity_name(s.e) or device_name(s.e) or s.e) | string | regex_replace(text_strip_pattern, '') | trim), 'icon': s.icon, 'd': n, 'wd': d.weekday(), 'day': d.day, 'mon': d.month}] %}{% endif %}
               {% endif %}
             {% endif %}
           {% endif %}{% endfor %} {{ ns.l | sort(attribute='d') }}

@@ -1,6 +1,6 @@
 page: bin-day
 description:
-  shows: The bin that is collected next, as one large word, with the day under it. Two bins on the same day are both shown.
+  shows: The bin that is collected next, as a large word (on two lines when it is longer), with the day under it. Two bins on the same day are both shown.
   trigger_advice: 'A time trigger a few times a day (for example at 00:05, 07:00 and 18:00): the screen only changes with the date.'
   title_default: '"Waste"'
   times: the update time
@@ -35,7 +35,7 @@ inputs:
     - name: bin_{n}_label
       section: content
       label: Bin {n} - word
-      help: The word shown for this bin, in capitals. Short words stay large. Leave blank to use the sensor's name.
+      help: The word shown for this bin, in capitals. Short words stay large. Leave blank to use the sensor's name. Signs and letters the display font has no measure for are left out.
       selector:
         text: {}
       default: ''
@@ -69,6 +69,7 @@ bind:
 data:
   variables:
   - include: default_title
+  - include: event_text_pattern
   - ds_bins: |
       {% set ns = namespace(l=[]) %} {% set slots = [
               {'e': bin_1 | default(''), 'label': bin_1_label | default(''), 'icon': bin_1_icon | default('')},
@@ -81,7 +82,7 @@ data:
                 {% set dt = as_datetime(raw, none) if raw | length > 10 else none %}
                 {% set d = as_local(dt) if dt is not none else strptime(raw[:10], '%Y-%m-%d', none) %}
                 {% if d is not none %}{% set n = (d.date() - now().date()).days %}
-                  {% if n >= 0 %}{% set ns.l = ns.l + [{'word': s.label if s.label else (entity_name(s.e) or device_name(s.e) or s.e), 'icon': s.icon, 'd': n, 'wd': d.weekday(), 'day': d.day, 'mon': d.month}] %}{% endif %}
+                  {% if n >= 0 %}{% set ns.l = ns.l + [{'word': ((s.label if s.label else (entity_name(s.e) or device_name(s.e) or s.e)) | string | regex_replace(text_strip_pattern, '') | regex_replace(' {2,}', ' ') | trim), 'name': ((entity_name(s.e) or device_name(s.e) or s.e) | string | regex_replace(text_strip_pattern, '') | trim), 'icon': s.icon, 'd': n, 'wd': d.weekday(), 'day': d.day, 'mon': d.month}] %}{% endif %}
                 {% endif %}
               {% endif %}
             {% endif %}{% endfor %} {{ ns.l | sort(attribute='d') }}

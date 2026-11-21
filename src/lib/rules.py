@@ -2,8 +2,9 @@
 """The words are the source: which code follows which rule of the design system, and whether it still does.
 
 Code that decides what is drawn cites the rule it implements, in a comment or a check's message, as the document refers
-to a rule itself: `*Section*`, or `*Section*, Rule name` (the rule's name is the bold lead of a list item, or the first
-cell of a table row, in that section).
+to a rule itself: `*Section*`, or `*Section*, *Rule name*` (the rule's name is the bold lead of a list item, or the first
+cell of a table row, in that section). Words after a section that are not in italics are a remark, not a citation.
+A citation of a section alone follows the whole section: any change in it reopens the code.
 
   rules.py lint DOC     every citation names a section, and a rule in it, that the document has (a rule that is renamed or
                         removed stops the build until the code follows); and no cited rule's text has changed since the
@@ -19,9 +20,12 @@ import hashlib, json, pathlib, re, sys
 LIB = pathlib.Path(__file__).resolve().parent
 SRC = LIB.parent
 LOCK = LIB / 'rules.lock.json'
-CODE = ['ds_macros.jinja', 'check.py', 'lib/layout_fit.py', 'lib/derive_tokens.py', 'lib/hero_metrics.py', 'lib/build_lib.py',
-        'wx_steps.yaml'] + sorted(f'specs/{f.name}' for f in (SRC / 'specs').glob('*.py'))
-CITE = re.compile(r'\*([A-Z][^*\n]{1,60})\*(?:, \*?([A-Za-z`][^*\n.;:)\]]{2,60}?)\*?(?=[.;:)\]\n]|$| and | or |, \*))?')
+CODE = (['ds_macros.jinja', 'ink.jinja', 'check.py', 'lib/layout_fit.py', 'lib/derive_tokens.py', 'lib/hero_metrics.py', 'lib/build_lib.py',
+         'lib/shared.py', 'lib/gen_tokens.py', 'lib/coverage.py', 'lib/pixcmp_cases.py', 'wx_steps.yaml', 'wx_txt.yaml'] + sorted(f'specs/{f.name}' for f in (SRC / 'specs').glob('*.py'))
+        + sorted(f'pages/{f.name}' for f in (SRC / 'pages').glob('*.yaml')))
+CITE = re.compile(r'(?<![*\w])\*([A-Z][A-Za-z0-9 &()".\'/–-]{1,60})\*(?!\*)(?:, \*([^*\n]{2,60})\*)?')
+# italic words in code comments that are emphasis, not a section of the document
+NOT_SECTIONS = set()
 BLOCK = re.compile(r'<!-- registry:([a-z0-9-]+) -->\n.*?<!-- /registry:\1 -->', re.S)
 INLINE = re.compile(r'<!-- v:[^>]*-->.*?<!-- /v -->')
 
@@ -30,15 +34,20 @@ def norm(s):
     return re.sub(r'\s+', ' ', re.sub(r'[`*]', '', s)).strip().lower().rstrip('.:,')
 
 
+LEVEL, ORDER = {}, []        # each section's heading level, and the sections in order
+
+
 def document(path):
     """{section: {'': its own text, rule name: that rule's text}}; a rule is a list item with a bold lead, or a table row"""
     text = INLINE.sub('', BLOCK.sub('', pathlib.Path(path).read_text()))
     out, sec, cur = {}, None, None
+    LEVEL.clear(); ORDER.clear()
     for line in text.split('\n'):
-        h = re.match(r'#+ (.+)', line)
+        h = re.match(r'(#+) (.+)', line)
         if h:
-            sec, cur = h.group(1).strip(), None
+            sec, cur = h.group(2).strip(), None
             out[sec] = {'': ''}
+            LEVEL[sec] = len(h.group(1)); ORDER.append(sec)
             continue
         if sec is None:
             continue
@@ -69,34 +78,43 @@ def citations():
     out = []
     for rel in CODE:
         for n, line in enumerate((SRC / rel).read_text().split('\n'), 1):
-            if rel.endswith('.jinja') and '{#' not in line and '#}' not in line and not line.lstrip().startswith(('the ', 'a ', '(', '*')) and '*' not in line[:3] and '-#}' not in line:
-                if '{{' in line or '{%' in line:
-                    continue
             for m in CITE.finditer(line):
                 out.append((rel, n, m.group(1).strip(), (m.group(2) or '').strip() or None))
     return out
 
 
 def resolve(doc):
-    """(good, problems): good = {(section, rule key or ''): [(file, line)]}"""
+    """(good, problems): good = {(section, rule key or ''): [(file, line)]}; a citation that names no section, or no rule
+    in its section, is a problem: the rule was renamed or removed, or never existed"""
     good, bad = {}, []
     for rel, n, sec, rule in citations():
+        if sec in NOT_SECTIONS:
+            continue
         if sec not in doc:
-            if re.fullmatch(r'[A-Z][a-z]+( [a-z&]+)*', sec) and len(sec.split()) <= 6:
-                bad.append(f'{rel}:{n}: *{sec}* is no section of the design system')
+            bad.append(f'{rel}:{n}: *{sec}* is no section of the design system')
             continue
         key = ''
         if rule:
             key = find(doc, sec, rule)
             if key is None:
-                # words after a section that name no rule are a remark, unless they are written as a rule name (italic)
-                key = ''
+                bad.append(f'{rel}:{n}: *{sec}* has no rule *{rule}*')
+                continue
         good.setdefault((sec, key), []).append((rel, n))
     return good, bad
 
 
 def prints(doc, good):
-    return {f'{s} / {k}' if k else s: hashlib.sha1(norm(doc[s][k]).encode()).hexdigest()[:12] for (s, k) in good}
+    # a rule: its own text; a section cited as a whole: all of it, its named rules included
+    def whole(s):           # a section and its subsections
+        i = ORDER.index(s)
+        out = [s]
+        for x in ORDER[i + 1:]:
+            if LEVEL[x] <= LEVEL[s]:
+                break
+            out.append(x)
+        return ''.join(doc[x][k] for x in out for k in sorted(doc[x]))
+    return {f'{s} / {k}' if k else s: hashlib.sha1(norm(doc[s][k] if k else whole(s)).encode()).hexdigest()[:12]
+            for (s, k) in good}
 
 
 def main():

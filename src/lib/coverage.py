@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Case coverage: every layout names a check case for every kind of state it must be tested in (CLAUDE.md, *How a change goes*, step 7).
+"""Case coverage: every layout names a check case for every kind of state it must be tested in (CLAUDE.md, How a change goes, step 7).
 
   coverage.py        lint: every layout (pixcmp_cases.B) has every kind, each a check case of that layout (or a weather extra
                      for the layouts baseline.py renders them on), 'n/a: <why>', or 'GAP'. A missing kind, an unknown or
@@ -74,8 +74,8 @@ COVERAGE = {
     # not a severity*); it is drawn by a35_1now, a41_1now, a426_1now, cal42 and cal426
     # Single value: any sensor; its other configurations (an icon, a second value, a longer reading) are extra cases
     'single_value_14': pg('sv', 'sv_wide4', 'sv_warn', 'sv_sev', 'sv_g', 'sv_y', 'sv_title', 'sv_stale', 'sv_err_long', 'sv_unav', NOEMPTY),
-    'single_value_27l': pg('sv', 'sv_widest', 'sv_warn', 'sv_sev', 'sv_g', 'sv_y', 'sv_title', 'sv_stale', NOERRV, 'sv_unav', NOEMPTY),
-    'single_value_35': pg('sv', 'sv_widest', 'sv_warn', 'sv_sev', 'sv_g', 'sv_y', 'sv_title', 'sv_stale', NOERRV, 'sv_unav', NOEMPTY),
+    'single_value_27l': pg('sv', 'sv_widest', 'sv_warn', 'sv_sev', 'sv_g', 'sv_y', 'sv_title', 'sv_stale', 'sv_err_toolong', 'sv_unav', NOEMPTY),
+    'single_value_35': pg('sv', 'sv_widest', 'sv_warn', 'sv_sev', 'sv_g', 'sv_y', 'sv_title', 'sv_stale', 'sv_err_toolong', 'sv_unav', NOEMPTY),
     # Levels: the first row is required, so the page is never empty
     'levels_27l': pg('lv', 'lv_widest', 'lv_warn', 'lv_sev', 'lv_g', 'lv_y', 'lv_title', 'lv_stale', 'lv_err', 'lv_unav', REQ),
     'levels_35': pg('lv', 'lv_widest', 'lv_warn', 'lv_sev', 'lv_g', 'lv_y', 'lv_title', 'lv_stale', 'lv_err', 'lv_unav', REQ),

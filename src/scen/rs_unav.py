@@ -9,3 +9,4 @@ TRANSLATED = {E: 'unavailable', E2: ''}
 AREAS = {E: 'Study', E2: 'Study'}
 DEVICE_NAMES = {E: 'Study status', E2: 'Study free at'}
 INPUTS = dict({'entity': E, 'displays': ['dev1'], 'weekday_format': 'en', 'warning_states': ['In a call'], 'severe_states': ['Busy', 'Do not disturb']}, **{'icon': 'mdi:door-open'})
+EXPECT_BLOCK = False      # the hero block is the chip (*Glance with a word*, *Flagged*)

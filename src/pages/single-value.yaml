@@ -96,7 +96,8 @@ bind:
 - severe_low
 data:
   variables:
-  - ds_title: '{{ header_title if header_title else (entity_name(entity) or device_name(entity) or entity) }}'
+  - include: event_text_pattern
+  - ds_title: '{{ header_title if header_title else ((entity_name(entity) or device_name(entity) or entity) | string | regex_replace(text_strip_pattern, '''') | regex_replace('' {2,}'', '' '') | trim) }}'
   - ds_value: |
       {% set raw = states(entity) %} {% set ok = raw not in ['unknown', 'unavailable', 'none', ''] %} {% set n = raw | float(none) %}
       {% set lvl = '' %}
@@ -137,6 +138,7 @@ examples:
 layouts:
   '14':
     spec: single_value_14
+    shows_instead: One sensor's value, large enough to read across the room, with its unit under it. An icon is optional.
     drop_inputs:
     - secondary_entity
   27l:

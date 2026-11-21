@@ -236,7 +236,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'lnixbv'
+  ds_set: 'houpas'
   font_dir: !input 'font_dir'
   ds_devs: !input 'displays'
   stale_after: !input 'stale_after'
@@ -253,7 +253,9 @@ variables:
   warning_low: !input 'warning_low'
   severe_low: !input 'severe_low'
   language_map: "{%- from 'ep_i18n.jinja' import EP_TXT -%}{{ EP_TXT['single-value'] }}"
-  ds_title: '{{ header_title if header_title else (entity_name(entity) or device_name(entity) or entity) }}'
+  text_strip_pattern: '[^ -ɏ‐-‧‰-※€™]'
+  ds_title: '{{ header_title if header_title else ((entity_name(entity) or device_name(entity) or entity) | string | regex_replace(text_strip_pattern,
+    '''') | regex_replace('' {2,}'', '' '') | trim) }}'
   ds_value: |
     {% set raw = states(entity) %} {% set ok = raw not in ['unknown', 'unavailable', 'none', ''] %} {% set n = raw | float(none) %}
     {% set lvl = '' %}
@@ -299,7 +301,7 @@ action:
     rotate: !input 'rotate'
     payload: '{%- from ''ep_design.jinja'' import ep_draw -%} {{- (ep_draw | as_function)(''single_value_35'', ''main'', {''ds_set'':
       ds_set, ''ds_devs'': ds_devs, ''font_dir'': font_dir, ''ds_icon'': ds_icon, ''ds_last_ts'': ds_last_ts, ''ds_stale'':
-      ds_stale, ''ds_title'': ds_title, ''ds_value'': ds_value, ''time_format'': time_format, ''weekday_lang'': weekday_lang})
-      -}}'
+      ds_stale, ''ds_title'': ds_title, ''ds_value'': ds_value, ''language_map'': language_map, ''time_format'': time_format,
+      ''weekday_lang'': weekday_lang}) -}}'
 mode: single
 max_exceeded: silent
