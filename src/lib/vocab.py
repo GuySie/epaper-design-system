@@ -111,7 +111,10 @@ def lint_code_rules(comments):
     """in code comments a rule is a principle only as 'by rule' or 'rule N'; anything else is a drawn line"""
     out = []
     for i, line in enumerate(comments.split('\n'), 1):
+        cited = [c.span() for c in re.finditer(r'(?<!\*)\*[A-Z][^*\n]{1,60}\*(?!\*)', line)]     # a section's name in a citation (*Text rules*)
         for m in re.finditer(r'\b[Rr]ules?\b', line):
+            if any(a0 <= m.start() < a1 for a0, a1 in cited):
+                continue
             ctx = line[max(0, m.start() - 6):m.end() + 3]
             if not re.search(r'by rule|rule \d', ctx):
                 out.append((i, 'rule (a drawn line is a line)', line.strip()[:110]))

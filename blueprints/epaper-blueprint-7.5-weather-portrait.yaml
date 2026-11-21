@@ -449,7 +449,7 @@ blueprint:
           selector:
             text: {}
 variables:
-  ds_set: 'houpas'
+  ds_set: 'hznzts'
   ds_in:
     font_dir: !input 'font_dir'
     ds_devs: !input 'displays'

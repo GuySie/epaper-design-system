@@ -1,0 +1,204 @@
+page: appliance
+description:
+  shows: When a run of an appliance ends (a washing machine, a dryer, a dishwasher) and how far it is; with a door sensor, whether it still waits to be emptied.
+  trigger_advice: 'None to set: the page redraws by itself when the status changes, the door opens or closes, the end time moves 5 minutes or more, the run passes another tenth, and at the two not-emptied times.'
+  title_default: the appliance's device name
+  times: the update time
+redraw: change
+inputs:
+- name: status_entity
+  section: content
+  label: Status entity
+  help: The appliance's status (its operation state or machine state). Which of its states mean running and done is set below.
+  selector:
+    entity: {}
+  required: true
+- name: end_entity
+  section: content
+  label: End time or time left
+  help: A sensor with the time the run ends (a timestamp), or the time left (a duration in seconds, minutes, hours or days). The device redraws when one report moves the end 5 minutes or more.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  required: true
+- name: progress_entity
+  section: content
+  label: Progress (optional)
+  help: A sensor with the share of the run done, in percent, written under the bar. Leave blank and the bar follows the time since the status last changed; an appliance whose status steps through several running states (wash, rinse, spin) needs this sensor.
+  selector:
+    entity:
+      filter:
+        domain: sensor
+  default: ''
+- name: programme_entity
+  section: content
+  label: Programme (optional)
+  help: Its state is written under the bar, cut short when it is long. Leave blank for none.
+  selector:
+    entity: {}
+  default: ''
+- name: door_entity
+  section: content
+  label: Door (optional)
+  help: The door's sensor. A run that is done with the door closed is flagged as not emptied after the times under Thresholds; while the door is open, the page shows that nothing is running. An appliance that stays done after it is emptied is flagged again once its door is shut. Leave blank for none.
+  selector:
+    entity:
+      filter:
+        domain: binary_sensor
+  default: ''
+- name: icon
+  section: content
+  label: Icon
+  help: Shown after the end time, when there is one. A wide time leaves less room for it.
+  selector:
+    icon: {}
+  default: mdi:washing-machine
+- name: running_states
+  section: content
+  label: States that mean running
+  help: The status's states while a run is on, written as shown or as Home Assistant stores them (case doesn't matter). A paused run counts as running when its state is here.
+  selector:
+    text:
+      multiple: true
+  default: [run, running, in_use, wash, washing, rinse, rinsing, spin, spinning, dry, drying, pause, paused]
+- name: done_states
+  section: content
+  label: States that mean done
+  help: The status's states when a run has ended, written as shown or as Home Assistant stores them (case doesn't matter). Any other state shows that nothing is running; an unavailable status shows an error.
+  selector:
+    text:
+      multiple: true
+  default: [finished, end, complete, completed, done]
+- name: flag_unemptied
+  section: thresholds
+  label: 'Not emptied: flag it'
+  help: Off, a run that is done is never flagged, and the device doesn't redraw at the two times below.
+  selector:
+    boolean: {}
+  default: true
+- name: warning_unemptied
+  section: thresholds
+  label: 'Not emptied: warning after'
+  help: Minutes after the status turned done, with the door closed, at which the line under the bar turns into a warning chip and the bar takes the warning level (yellow or grey where the panel has it). The device redraws by itself at that moment.
+  selector:
+    number: {min: 0, max: 1440, unit_of_measurement: min, mode: box}
+  default: 15
+- name: severe_unemptied
+  section: thresholds
+  label: 'Not emptied: severe after'
+  help: Minutes after the status turned done, with the door closed, at which the chip and the bar turn severe. The device redraws by itself at that moment.
+  selector:
+    number: {min: 0, max: 1440, unit_of_measurement: min, mode: box}
+  default: 120
+bind:
+- status_entity
+- end_entity
+- progress_entity
+- programme_entity
+- door_entity
+- icon: ds_icon
+- running_states
+- done_states
+- flag_unemptied
+- warning_unemptied
+- severe_unemptied
+data:
+  variables:
+  - include: event_text_pattern
+  - ds_title: '{{ header_title if header_title else ((device_name(status_entity) or entity_name(status_entity) or status_entity) | string | regex_replace(text_strip_pattern, '''') | regex_replace('' {2,}'', '' '') | trim) }}'
+  - ds_run: |
+      {# follows *Appliance run*; *Text rules*, *Sanitise all user text* #}
+      {% set raw = states(status_entity) %} {% set ok = raw not in ['unknown', 'unavailable', 'none', ''] %}
+      {% set keys = [raw | lower, (state_translated(status_entity) | string | lower)] %}
+      {% set rl = running_states | default([]) | map('lower') | list %} {% set dl = done_states | default([]) | map('lower') | list %}
+      {% set st = 'err' if not ok else ('run' if (keys[0] in rl or keys[1] in rl) else ('done' if (keys[0] in dl or keys[1] in dl) else 'idle')) %}
+      {% set since = as_timestamp((expand(status_entity) | first).last_changed) if ok else 0 %}
+      {% set er = states(end_entity) %} {% set en = er | float(none) %}
+      {% set ets = none %}
+      {% if er not in ['unknown', 'unavailable', 'none', ''] %}
+        {% if en is not none %}{% set u = state_attr(end_entity, 'unit_of_measurement') %}{% set mult = 1 if u == 's' else (3600 if u == 'h' else (86400 if u == 'd' else 60)) %}{% set eo = expand(end_entity) | first %}{% set ets = as_timestamp(eo.last_reported | default(eo.last_updated, true)) + en * mult %}
+        {% else %}{% set ets = as_timestamp(er, none) %}{% endif %}
+      {% endif %}
+      {% set pr = states(progress_entity) | float(none) if progress_entity else none %} {% set pr = ([0, [100, pr] | min] | max) if pr is not none else none %}
+      {% set share = 100 if st == 'done' else (pr if pr is not none else (([0, [100, (as_timestamp(now()) - since) / (ets - since) * 100] | min] | max) if (ets is not none and ets > since) else 0)) %}
+      {% set pg = (state_translated(programme_entity) | string | regex_replace(text_strip_pattern, '') | regex_replace(' {2,}', ' ') | trim) if (programme_entity and states(programme_entity) not in ['unknown', 'unavailable', 'none', '']) else '' %}
+      {% set door = expand(door_entity) | first if door_entity else none %}
+      {# a door that is unavailable or unknown counts as none; not emptied is done with the door closed now #}
+      {% set door = door if (door is not none and door.state in ['on', 'off']) else none %}
+      {% set closed = door is not none and door.state == 'off' %}
+      {% set mins = (as_timestamp(now()) - since) / 60 %}
+      {% set st = 'idle' if (st == 'done' and door is not none and not closed) else st %}
+      {% set lvl = ('sev' if mins >= severe_unemptied | float(120) else ('warn' if mins >= warning_unemptied | float(15) else '')) if (st == 'done' and closed and flag_unemptied) else '' %}
+      {{ {'st': st, 'end': (since if st == 'done' else ets), 'share': share | round(1), 'pct': (pr | round | int) if pr is not none else none, 'prog': pg, 'level': lvl, 'closed': closed} }}
+  steps:
+  - condition: template
+    value_template: >-
+      {% if trigger.id == 'status' %}{{ trigger.from_state is none or trigger.to_state is none or trigger.from_state.state != trigger.to_state.state }}
+      {% elif trigger.id == 'end' %}{% set ss = [trigger.from_state, trigger.to_state] %}{% set e = namespace(l=[]) %}{% for s in ss %}{% set n = (s.state | float(none)) if s else none %}{% set u = s.attributes.get('unit_of_measurement') if s else '' %}{% set m = 1 if u == 's' else (3600 if u == 'h' else (86400 if u == 'd' else 60)) %}{% set e.l = e.l + [((as_timestamp(s.last_reported | default(s.last_updated, true)) + n * m) if n is not none else as_timestamp(s.state, none)) if s else none] %}{% endfor %}{{ none in e.l or ((e.l[1] - e.l[0]) | abs) >= 300 }}
+      {% else %}true{% endif %}
+  draw:
+    kind: single
+  triggers:
+  - trigger: state
+    entity_id: !input 'status_entity'
+    id: status
+  - trigger: state
+    entity_id: !input 'end_entity'
+    id: end
+  - trigger: template
+    id: door
+    value_template: '{{ ds_door_t != '''' and is_state(ds_door_t, ''on'') }}'
+  - trigger: template
+    id: door
+    value_template: '{{ ds_door_t != '''' and is_state(ds_door_t, ''off'') }}'
+  - repeat:
+      from: 1
+      to: 9
+      items:
+      - trigger: template
+        id: tenth
+        value_template: '{% set p = states(ds_prog_t) | float(none) if ds_prog_t else none %}{% set so = expand(ds_status_t) | first %}{% set s0 = as_timestamp(so.last_changed, 0) if so else 0 %}{% set er = states(ds_end_t) %}{% set n = er | float(none) %}{% set u = state_attr(ds_end_t, ''unit_of_measurement'') %}{% set m = 1 if u == ''s'' else (3600 if u == ''h'' else (86400 if u == ''d'' else 60)) %}{% set eo = expand(ds_end_t) | first %}{% set e = (as_timestamp(eo.last_reported | default(eo.last_updated, true), 0) + n * m) if (n is not none and eo) else as_timestamp(er, 0) %}{{ (p if p is not none else (((as_timestamp(now()) - s0) / (e - s0) * 100) if e > s0 else 0)) >= {n}0 }}'
+  - trigger: template
+    id: unemptied
+    value_template: '{% set so = expand(ds_status_t) | first %}{% set dl = ds_done_t | map(''lower'') | list %}{{ ds_flag_t and so is not none and ds_door_t != '''' and is_state(ds_door_t, ''off'') and ((so.state | lower) in dl or (state_translated(ds_status_t) | lower) in dl) and as_timestamp(now()) - as_timestamp(so.last_changed, 0) >= (ds_warn_t | float(15)) * 60 }}'
+  - trigger: template
+    id: unemptied
+    value_template: '{% set so = expand(ds_status_t) | first %}{% set dl = ds_done_t | map(''lower'') | list %}{{ ds_flag_t and so is not none and ds_door_t != '''' and is_state(ds_door_t, ''off'') and ((so.state | lower) in dl or (state_translated(ds_status_t) | lower) in dl) and as_timestamp(now()) - as_timestamp(so.last_changed, 0) >= (ds_sev_t | float(120)) * 60 }}'
+  - trigger: homeassistant
+    event: start
+    id: redraw
+  trigger_variables:
+    ds_status_t: !input 'status_entity'
+    ds_end_t: !input 'end_entity'
+    ds_prog_t: !input 'progress_entity'
+    ds_door_t: !input 'door_entity'
+    ds_done_t: !input 'done_states'
+    ds_flag_t: !input 'flag_unemptied'
+    ds_warn_t: !input 'warning_unemptied'
+    ds_sev_t: !input 'severe_unemptied'
+  mode:
+    mode: queued
+    max_exceeded: silent
+    max: 3
+texts:
+  en: {idle: Not running, done: Done, closed: Door still closed, unavailable: Appliance unavailable.}
+  nl: {idle: Niet actief, done: Klaar, closed: Deur nog dicht, unavailable: Apparaat niet beschikbaar.}
+  de: {idle: Nicht aktiv, done: Fertig, closed: Tür noch zu, unavailable: Gerät nicht verfügbar.}
+  fr: {idle: À l'arrêt, done: Terminé, closed: Porte toujours fermée, unavailable: Appareil indisponible.}
+  es: {idle: Parado, done: Listo, closed: Puerta aún cerrada, unavailable: Aparato no disponible.}
+  pl: {idle: Nie pracuje, done: Gotowe, closed: Drzwi nadal zamknięte, unavailable: Urządzenie niedostępne.}
+  hr: {idle: Ne radi, done: Gotovo, closed: Vrata još zatvorena, unavailable: Uređaj nedostupan.}
+  sv: {idle: Inte igång, done: Klar, closed: Luckan fortfarande stängd, unavailable: Apparaten otillgänglig.}
+layouts:
+  27l:
+    spec: appliance_27l
+  '35':
+    spec: appliance_35
+  '41':
+    spec: appliance_41
+thresholds:
+- data: "Minutes a run is done with the door still closed"
+  what: "unemptied"
+  at: "≥"
+footer: "none (Glance)"

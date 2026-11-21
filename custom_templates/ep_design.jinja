@@ -28,8 +28,11 @@
 {%- from 'ep_metrics.jinja' import ADV, KRN, LSB, CAPUP, CAPDN, SGB, SGR, HUP, HDN, HWR, ICH, ICB, MDI -%}
 {%- from 'ep_i18n.jinja' import EP_WTXT, EP_DAYS_SHORT, EP_MONTHS_SHORT, EP_TXT, EP_SETTXT -%}
 {#- the set id: a hash of the four templates, written by lib/set_id.py; every blueprint of the same release carries it -#}
-{%- set EP_SET = 'houpas' -%}
+{%- set EP_SET = 'hznzts' -%}
 {%- set EP_LAYOUTS = {
+  'appliance_27l': {'kit': 'other', 'tier': '384x168-0.17', 'page': 'appliance'},
+  'appliance_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appliance'},
+  'appliance_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appliance'},
   'appointment_35': {'kit': 'other', 'tier': '384x184-0.21', 'page': 'appointment'},
   'appointment_41': {'kit': 'other', 'tier': '400x300-0.21', 'page': 'appointment'},
   'appointment_426': {'kit': 'other', 'tier': '800x480-0.12', 'page': 'appointment'},
@@ -149,9 +152,12 @@
 {%- set detail_4 = c.detail_4 -%}
 {%- set detail_4_label = c.detail_4_label -%}
 {%- set displays = c.displays -%}
+{%- set done_states = c.done_states -%}
+{%- set door_entity = c.door_entity -%}
 {%- set ds_btn = c.ds_btn -%}
 {%- set ds_icon = c.ds_icon -%}
 {%- set due_first = c.due_first -%}
+{%- set end_entity = c.end_entity -%}
 {%- set entity = c.entity -%}
 {%- set entity_1 = c.entity_1 -%}
 {%- set entity_10 = c.entity_10 -%}
@@ -202,6 +208,7 @@
 {%- set flag_soon = c.flag_soon -%}
 {%- set flag_temp_high = c.flag_temp_high -%}
 {%- set flag_temp_low = c.flag_temp_low -%}
+{%- set flag_unemptied = c.flag_unemptied -%}
 {%- set flag_usage = c.flag_usage -%}
 {%- set flag_wind_high = c.flag_wind_high -%}
 {%- set font_dir = c.font_dir -%}
@@ -259,6 +266,9 @@
 {%- set plant_9_label = c.plant_9_label -%}
 {%- set pollen_sensor = c.pollen_sensor -%}
 {%- set pollen_type = c.pollen_type -%}
+{%- set programme_entity = c.programme_entity -%}
+{%- set progress_entity = c.progress_entity -%}
+{%- set running_states = c.running_states -%}
 {%- set secondary_entity = c.secondary_entity -%}
 {%- set severe_co2 = c.severe_co2 -%}
 {%- set severe_conditions = c.severe_conditions -%}
@@ -274,12 +284,14 @@
 {%- set severe_states = c.severe_states -%}
 {%- set severe_temp_high = c.severe_temp_high -%}
 {%- set severe_temp_low = c.severe_temp_low -%}
+{%- set severe_unemptied = c.severe_unemptied -%}
 {%- set severe_usage = c.severe_usage -%}
 {%- set severe_wind_high = c.severe_wind_high -%}
 {%- set show_done = c.show_done -%}
 {%- set sort_driest_first = c.sort_driest_first -%}
 {%- set stale_after = c.stale_after -%}
 {%- set start_with_today = c.start_with_today -%}
+{%- set status_entity = c.status_entity -%}
 {%- set time_format = c.time_format -%}
 {%- set todo_entity = c.todo_entity -%}
 {%- set warning_co2 = c.warning_co2 -%}
@@ -295,6 +307,7 @@
 {%- set warning_states = c.warning_states -%}
 {%- set warning_temp_high = c.warning_temp_high -%}
 {%- set warning_temp_low = c.warning_temp_low -%}
+{%- set warning_unemptied = c.warning_unemptied -%}
 {%- set warning_usage = c.warning_usage -%}
 {%- set warning_wind_high = c.warning_wind_high -%}
 {%- set weather_entity = c.weather_entity -%}
@@ -776,6 +789,15 @@
      CHIPW: the width of a chip around v -#}
 {%- macro CHIP_PAD(s) -%}{{ 2 * (SPACE_S(s) | int) - (TAIL(s) | int) }}{%- endmacro -%}
 {%- macro CHIPW(v, s, f) -%}{{ (VALUE_W(v, s, f) | int) + (CHIP_PAD(s) | int) }}{%- endmacro -%}
+{#- follows *Text rules*, *Cut, never shrink* -#}
+{#- CUT: v as it fits in w px: whole, or cut short and ending in '...' as the renderer's own cut does, for text that more text
+     follows on its line (the renderer's cut, T's mw, can't say how wide it left the text) -#}
+{%- macro CUT(v, s, f, w) -%}
+{%- set c = namespace(t=v | string) -%}
+{%- if (VALUE_W(c.t, s, f) | int) > w -%}
+{%- for n in range((v | string | length) - 1, -1, -1) -%}{%- if (VALUE_W(c.t, s, f) | int) > w -%}{%- set c.t = ((v | string)[:n] | trim) ~ '...' -%}{%- endif -%}{%- endfor -%}
+{%- endif -%}{{ c.t }}
+{%- endmacro -%}
 {%- macro CCHIP(ns, v, cx, cy, f, s, cw, bg, fg, p=0) -%}
 {%- set xs = SPACE_XS(s) | int -%}
 {%- set w = CHIPW(v, s, f) | int -%}
@@ -1175,23 +1197,29 @@
 
 {#- HERO_BLOCK_Y: Glance vertical layout. The hero group and its Glance secondary are ONE block, centred between the title line and the
      bottom padding (foot: the footer's room, FNEED). Gap: hero size / 7 from the hero's ink to the secondary's chip box (the box is reserved even without a chip,
-     so nothing moves when a chip appears). Returns "hero_cy,second_cy". Mirrors HERO_ALONE's icon fit. -#}
+     so nothing moves when a chip appears). Returns "hero_cy,second_cy,bar_top". Mirrors HERO_ALONE's icon fit.
+     bar: the rows a progress bar's track takes (the version 'with a progress bar'), a hero gap under the hero group and a
+     hero gap above the secondary's box; 0 for none -#}
 {#- follows *Glance*, *One structure, three zones* -#}
-{%- macro HERO_BLOCK_Y(t, hs, ics, W, P, TH, H, uw=0, icon=true, foot=false) -%}
+{%- macro HERO_BLOCK_Y(t, hs, ics, W, P, TH, H, uw=0, icon=true, foot=false, bar=0) -%}
 {%- set tin = (HERO_INK_W(t, hs) | int) + uw -%}
 {%- set gap = hs // EP_SPACE.heroGapDiv -%}
 {%- set fit = namespace(ic=0) -%}
 {%- for c in ics -%}{%- if fit.ic == 0 and icon and tin + gap + c <= W - 2 * P -%}{%- set fit.ic = c -%}{%- endif -%}{%- endfor -%}
 {#- measured: the digits' ink above and below the anchor (HUP, HDN), the icon's typical glyph height (ICH) -#}
+{#- with a bar the block is sized for the largest hero icon whatever the reading, so nothing moves when the reading changes
+     (*Glance with a progress bar*, *One block*) -#}
+{%- if bar -%}{%- set fit.ic = ics | first -%}{%- endif -%}
 {%- set ih = (ICH[fit.ic] if fit.ic in ICH else 0) / 2 -%}
 {%- set up, dn = [HUP[hs], ih] | max, [HDN[hs], ih] | max -%}
 {#- the line under the hero (type.secondary) takes a chip's height: its size + 2 x space.xs -#}
 {%- set lb = EP_TK.type.secondary[1] + 2 * (SPACE_XS(EP_TK.type.secondary[1]) | int) -%}
-{%- set block = up + dn + gap + lb -%}
+{%- set bh = (gap + bar) if bar else 0 -%}
+{%- set block = up + dn + bh + gap + lb -%}
 {%- set z0, z1 = P + TH, H - P - ((FNEED() | int) if foot else 0) -%}
 {%- set top = z0 + (z1 - z0 - block) / 2 -%}
 {%- set cy = (top + up) | round | int -%}
-{{ cy }},{{ (cy + dn + gap + lb // 2) | round | int }}
+{{ cy }},{{ (cy + dn + bh + gap + lb // 2) | round | int }},{{ (cy + dn + gap) | round | int }}
 {%- endmacro -%}
 {#- HBLOCK: the hero block (module 'Hero block'): the hero group on its own and the Glance secondary under it, centred
      as one block between the title line and the bottom padding (HERO_BLOCK_Y). hlevel ('warn' / 'sev') puts the hero in a chip;
@@ -1261,16 +1289,25 @@
 {%- elif txt -%}{{- T(ns, txt, W // 2, sy, sf, ss, LEVEL_TEXT(hlevel) if hlevel else color.ink, 'mm', W - 2 * P) -}}{%- endif -%}
 {%- endmacro -%}
 {#- follows *Glance*, *One structure, three zones*; *Modules*, *Hero block* -#}
-{%- macro HBLOCK(ns, hero, icon, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true, unit='', step=false, foot=false, word=false) -%}
+{%- macro HBLOCK(ns, hero, icon, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true, unit='', step=false, foot=false, word=false, bar=none, blevel='', bwide='') -%}
 {%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
 {%- set hs, ics = EP_TK.type.heroAlone, EP_TK.icon.heroAloneSteps -%}
 {%- set uw = HERO_UNIT_W(unit) | int -%}
 {%- if step -%}{%- set pick = namespace(hs=0) -%}{%- for h in (HUP.keys() | list | sort(reverse=true)) -%}{%- if pick.hs == 0 and h <= hs and (HERO_INK_W(hero, h) | int) + uw <= W - 2 * P -%}{%- set pick.hs = h -%}{%- endif -%}{%- endfor -%}
 {%- set hs = pick.hs if pick.hs else (HUP.keys() | list | sort | first) -%}{%- endif -%}
-{%- set gl = HERO_BLOCK_Y(hero, hs, ics, W, P, TH, H, uw, (icon | string | trim) != '', foot).split(',') | map('int') | list -%}
+{%- set sf, ss = FONT[EP_TK.type.secondary[0]], EP_TK.type.secondary[1] -%}
+{#- the progress bar's track: as high as the caps of type.secondary less space.xs (*Glance with a progress bar*, *The bar*) -#}
+{%- set th = (CAPH(ss) | int) - (SPACE_XS(ss) | int) -%}
+{%- set gl = HERO_BLOCK_Y(hero, hs, ics, W, P, TH, H, uw, (icon | string | trim) != '', foot, (th + 1) if bar is not none else 0).split(',') | map('int') | list -%}
 {%- if word and hlevel -%}{{- WORD_BLOCK(ns, hlevel) -}}{%- endif -%}
 {{- HERO_ALONE(ns, hero, icon, W, P, gl[0], gl[0], hs, ics, hlevel != '', LEVEL_FILL(hlevel), LEVEL_TEXT(hlevel), moon, unit, word) -}}
-{%- set sf, ss = FONT[EP_TK.type.secondary[0]], EP_TK.type.secondary[1] -%}
+{%- if bar is not none -%}
+{#- as wide as the hero group of the widest reading (bwide) with the largest hero icon, centred, never wider than the content;
+     flagged, it fills in the level's colour as a flagged bar does in *Meters* (*Glance with a progress bar*) -#}
+{%- set bw = [(HERO_INK_W(bwide, hs) | int) + hs // EP_SPACE.heroGapDiv + (ics | first), W - 2 * P] | min -%}
+{%- set bx = ((W - bw) / 2) | round | int -%}
+{{- PBAR(ns, bx, bx + bw - 1, gl[2], th, [[bar | float(0), 0] | max, 100] | min, none, color.severe if blevel == 'sev' else (color.warning if blevel == 'warn' else color.ink)) -}}
+{%- endif -%}
 {%- if sec == 'caller' -%}{{- caller(gl[1]) -}}
 {%- elif sec == 'chip' -%}{{- CCHIP(ns, txt, W // 2, gl[1], sf, ss, 0, LEVEL_FILL(llevel), LEVEL_TEXT(llevel)) -}}
 {%- elif txt -%}{{- T(ns, txt, W // 2, gl[1], sf, ss, LEVEL_TEXT(hlevel) if (word and hlevel) else color.ink, 'mm', (W - 2 * P) if cut else 0) -}}
@@ -1280,9 +1317,10 @@
      row (module 'Title row'; stamp `right`, '' for none; `stale` makes it a chip) and the hero block (module 'Hero block').
      The other arguments go to HBLOCK; with sec='caller' the page's call block draws the Glance secondary. foot: the
      version 'with a footer' (the page draws the footer itself). hero2: a second word, stacked under the first (the
-     version 'with a word'; WORD_STACK). -#}
+     version 'with a word'; WORD_STACK). bar: the share done, 0 to 100, drawn as a progress bar under the hero (the version
+     'with a progress bar'; HBLOCK), blevel its level, bwide the reading its width is fitted on. -#}
 {#- follows *Glance* -#}
-{%- macro GLANCE(ns, title, right, hero, icon, stale=false, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true, unit='', step=false, foot=false, hero2='', wrap=false) -%}
+{%- macro GLANCE(ns, title, right, hero, icon, stale=false, hlevel='', moon=false, sec='text', txt='', llevel='', cut=true, unit='', step=false, foot=false, hero2='', wrap=false, bar=none, blevel='', bwide='') -%}
 {{- TITLE(ns, title, right, EP_TK.width, EP_TK.space.pad, EP_TK.space.titleRow, stale) -}}
 {#- wrap: the hero is a word (the version 'with a word'): a reading of several words that doesn't fit one line at the smallest
      rung breaks over two (WORD_SPLIT), a line still too wide is cut, and flagged it fills the hero block (WORD_BLOCK) -#}
@@ -1291,9 +1329,9 @@
 {%- elif hero2 -%}{{- WORD_STACK(ns, hero, hero2, sec, txt, llevel) -}}
 {%- elif sec == 'caller' -%}
 {%- set outer = caller -%}
-{%- call(y) HBLOCK(ns, hero, icon, hlevel, moon, 'caller', foot=foot) -%}{{- outer(y) -}}{%- endcall -%}
+{%- call(y) HBLOCK(ns, hero, icon, hlevel, moon, 'caller', unit=unit, foot=foot, bar=bar, blevel=blevel, bwide=bwide) -%}{{- outer(y) -}}{%- endcall -%}
 {%- else -%}
-{{- HBLOCK(ns, hero, icon, hlevel, moon, sec, txt, llevel, cut, unit, step, foot, wrap) -}}
+{{- HBLOCK(ns, hero, icon, hlevel, moon, sec, txt, llevel, cut, unit, step, foot, wrap, bar, blevel, bwide) -}}
 {%- endif -%}
 {%- endmacro -%}
 {#- ===== Pattern macros: a pattern is one macro that puts its modules on the screen; the page passes its content.
@@ -2150,6 +2188,120 @@
 {%- for s in lines -%}
 {%- set ns.el = ns.el + [{'type': 'text', 'value': s, 'x': W // 2, 'y': yc + loop.index0 * pitch, 'font': FONT[tt[0]], 'size': tt[1], 'color': color.onSevere, 'anchor': 'mm'}] -%}
 {%- endfor -%}
+{%- elif layout == 'appliance_27l' and view == 'main' -%}
+{%- set ds_run = c.ds_run -%}
+{%- set ds_title = c.ds_title -%}
+{%- set language_map = c.language_map -%}
+{%- set v = ds_run -%}
+{%- set tx = language_map[weekday_lang] -%}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{#- follows *Appliance run* -#}
+{%- if v.st == 'err' -%}{{- ERRPAGE(ns, ds_title, tx['unavailable']) -}}
+{%- elif v.st == 'idle' -%}
+{{- TITLE(ns, ds_title, as_timestamp(now()), W, P, TH) -}}
+{{- EMPTY(ns, tx['idle'], P, W - P - 1, P + TH, H - P) -}}
+{%- else -%}
+{%- set h12 = time_format == '12h' -%}
+{#- 12-hour time: the half of the day is the hero's unit (*Appliance run*, *12-hour time*) -#}
+{%- set hero = ((v.end | timestamp_custom('%-I:%M' if h12 else '%H:%M')) if v.end is not none else '—') -%}
+{%- set unit = ((v.end | timestamp_custom('%p') | lower) if (h12 and v.end is not none) else '') -%}
+{%- set sf, ss = FONT[EP_TK.type.secondary[0]], EP_TK.type.secondary[1] -%}
+{%- call(y) GLANCE(ns, ds_title, as_timestamp(now()), hero, ds_icon if v.end is not none else '', sec='caller', unit=unit, bar=v.share, blevel=v.level, bwide='20:00') -%}
+{%- if v.level -%}
+{#- flagged: the Glance secondary is the chip, its text cut where it doesn't fit between the paddings (the chip hangs into them) -#}
+{%- set c = (tx['done'] ~ ' · ' ~ tx['closed']) | upper -%}
+{{- CCHIP(ns, CUT(c, ss, sf, W - 2 * P), W // 2, y, sf, ss, 0, LEVEL_FILL(v.level), LEVEL_TEXT(v.level)) -}}
+{%- elif v.st == 'done' -%}
+{{- T(ns, tx['done'] | upper, W // 2, y, sf, ss, color.ink, 'mm', W - 2 * P) -}}
+{%- else -%}
+{#- the programme gives way: it is cut so the percentage stays whole (*Appliance run*, *A long programme*) -#}
+{%- set tail = ((' · ' if v.prog else '') ~ v.pct ~ '%') if v.pct is not none else '' -%}
+{%- set tw = (VALUE_W(tail, ss, sf) | int) if tail else 0 -%}
+{#- follows *Text rules*, *Case: interface in capitals, content as written*: the programme is the user's data -#}
+{%- set pg = CUT(v.prog, ss, sf, W - 2 * P - tw) if v.prog else '' -%}
+{%- set pw = (VALUE_W(pg, ss, sf) | int) if pg else 0 -%}
+{%- set x0 = ((W - pw - tw) / 2) | round | int -%}
+{%- if pg -%}{{- T(ns, pg, x0, y, sf, ss, color.ink, 'lm') -}}{%- endif -%}
+{%- if tail -%}{{- T(ns, tail, x0 + pw, y, sf, ss, color.ink, 'lm') -}}{%- endif -%}
+{%- endif -%}
+{%- endcall -%}
+{%- endif -%}
+{%- elif layout == 'appliance_35' and view == 'main' -%}
+{%- set ds_run = c.ds_run -%}
+{%- set ds_title = c.ds_title -%}
+{%- set language_map = c.language_map -%}
+{%- set v = ds_run -%}
+{%- set tx = language_map[weekday_lang] -%}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{#- follows *Appliance run* -#}
+{%- if v.st == 'err' -%}{{- ERRPAGE(ns, ds_title, tx['unavailable']) -}}
+{%- elif v.st == 'idle' -%}
+{{- TITLE(ns, ds_title, as_timestamp(now()), W, P, TH) -}}
+{{- EMPTY(ns, tx['idle'], P, W - P - 1, P + TH, H - P) -}}
+{%- else -%}
+{%- set h12 = time_format == '12h' -%}
+{#- 12-hour time: the half of the day is the hero's unit (*Appliance run*, *12-hour time*) -#}
+{%- set hero = ((v.end | timestamp_custom('%-I:%M' if h12 else '%H:%M')) if v.end is not none else '—') -%}
+{%- set unit = ((v.end | timestamp_custom('%p') | lower) if (h12 and v.end is not none) else '') -%}
+{%- set sf, ss = FONT[EP_TK.type.secondary[0]], EP_TK.type.secondary[1] -%}
+{%- call(y) GLANCE(ns, ds_title, as_timestamp(now()), hero, ds_icon if v.end is not none else '', sec='caller', unit=unit, bar=v.share, blevel=v.level, bwide='20:00') -%}
+{%- if v.level -%}
+{#- flagged: the Glance secondary is the chip, its text cut where it doesn't fit between the paddings (the chip hangs into them) -#}
+{%- set c = (tx['done'] ~ ' · ' ~ tx['closed']) | upper -%}
+{{- CCHIP(ns, CUT(c, ss, sf, W - 2 * P), W // 2, y, sf, ss, 0, LEVEL_FILL(v.level), LEVEL_TEXT(v.level)) -}}
+{%- elif v.st == 'done' -%}
+{{- T(ns, tx['done'] | upper, W // 2, y, sf, ss, color.ink, 'mm', W - 2 * P) -}}
+{%- else -%}
+{#- the programme gives way: it is cut so the percentage stays whole (*Appliance run*, *A long programme*) -#}
+{%- set tail = ((' · ' if v.prog else '') ~ v.pct ~ '%') if v.pct is not none else '' -%}
+{%- set tw = (VALUE_W(tail, ss, sf) | int) if tail else 0 -%}
+{#- follows *Text rules*, *Case: interface in capitals, content as written*: the programme is the user's data -#}
+{%- set pg = CUT(v.prog, ss, sf, W - 2 * P - tw) if v.prog else '' -%}
+{%- set pw = (VALUE_W(pg, ss, sf) | int) if pg else 0 -%}
+{%- set x0 = ((W - pw - tw) / 2) | round | int -%}
+{%- if pg -%}{{- T(ns, pg, x0, y, sf, ss, color.ink, 'lm') -}}{%- endif -%}
+{%- if tail -%}{{- T(ns, tail, x0 + pw, y, sf, ss, color.ink, 'lm') -}}{%- endif -%}
+{%- endif -%}
+{%- endcall -%}
+{%- endif -%}
+{%- elif layout == 'appliance_41' and view == 'main' -%}
+{%- set ds_run = c.ds_run -%}
+{%- set ds_title = c.ds_title -%}
+{%- set language_map = c.language_map -%}
+{%- set v = ds_run -%}
+{%- set tx = language_map[weekday_lang] -%}
+{%- set W, H, P, TH = EP_TK.width, EP_TK.height, EP_TK.space.pad, EP_TK.space.titleRow -%}
+{#- follows *Appliance run* -#}
+{%- if v.st == 'err' -%}{{- ERRPAGE(ns, ds_title, tx['unavailable']) -}}
+{%- elif v.st == 'idle' -%}
+{{- TITLE(ns, ds_title, as_timestamp(now()), W, P, TH) -}}
+{{- EMPTY(ns, tx['idle'], P, W - P - 1, P + TH, H - P) -}}
+{%- else -%}
+{%- set h12 = time_format == '12h' -%}
+{#- 12-hour time: the half of the day is the hero's unit (*Appliance run*, *12-hour time*) -#}
+{%- set hero = ((v.end | timestamp_custom('%-I:%M' if h12 else '%H:%M')) if v.end is not none else '—') -%}
+{%- set unit = ((v.end | timestamp_custom('%p') | lower) if (h12 and v.end is not none) else '') -%}
+{%- set sf, ss = FONT[EP_TK.type.secondary[0]], EP_TK.type.secondary[1] -%}
+{%- call(y) GLANCE(ns, ds_title, as_timestamp(now()), hero, ds_icon if v.end is not none else '', sec='caller', unit=unit, bar=v.share, blevel=v.level, bwide='20:00') -%}
+{%- if v.level -%}
+{#- flagged: the Glance secondary is the chip, its text cut where it doesn't fit between the paddings (the chip hangs into them) -#}
+{%- set c = (tx['done'] ~ ' · ' ~ tx['closed']) | upper -%}
+{{- CCHIP(ns, CUT(c, ss, sf, W - 2 * P), W // 2, y, sf, ss, 0, LEVEL_FILL(v.level), LEVEL_TEXT(v.level)) -}}
+{%- elif v.st == 'done' -%}
+{{- T(ns, tx['done'] | upper, W // 2, y, sf, ss, color.ink, 'mm', W - 2 * P) -}}
+{%- else -%}
+{#- the programme gives way: it is cut so the percentage stays whole (*Appliance run*, *A long programme*) -#}
+{%- set tail = ((' · ' if v.prog else '') ~ v.pct ~ '%') if v.pct is not none else '' -%}
+{%- set tw = (VALUE_W(tail, ss, sf) | int) if tail else 0 -%}
+{#- follows *Text rules*, *Case: interface in capitals, content as written*: the programme is the user's data -#}
+{%- set pg = CUT(v.prog, ss, sf, W - 2 * P - tw) if v.prog else '' -%}
+{%- set pw = (VALUE_W(pg, ss, sf) | int) if pg else 0 -%}
+{%- set x0 = ((W - pw - tw) / 2) | round | int -%}
+{%- if pg -%}{{- T(ns, pg, x0, y, sf, ss, color.ink, 'lm') -}}{%- endif -%}
+{%- if tail -%}{{- T(ns, tail, x0 + pw, y, sf, ss, color.ink, 'lm') -}}{%- endif -%}
+{%- endif -%}
+{%- endcall -%}
+{%- endif -%}
 {%- elif layout == 'appointment_35' and view == 'main' -%}
 {%- set events_data = c.events_data -%}
 {%- set header_title_display = c.header_title_display -%}

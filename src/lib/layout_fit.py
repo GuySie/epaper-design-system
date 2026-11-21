@@ -47,6 +47,7 @@ STRIP = ['weather_41', 'weather_75', 'weather_75p', 'weather_426']
 # layout -> its ordinary readings (scenarios; a one-digit count is every digit the cases have): the hero on its own is the
 # largest rung at which they pass and keep their icon
 GLANCE = {'room_sign_14': ['rs'], 'room_sign_27l': ['rs', 'rs_busy'], 'room_sign_35': ['rs', 'rs_busy'],   # a flat-topped and a round-topped word
+          'appliance_27l': ['ap'], 'appliance_35': ['ap'], 'appliance_41': ['ap'],   # a clock time with its icon, the bar and the Glance secondary in the block
           'bin_day_27l': ['bd'], 'bin_day_35': ['bd'], 'bin_day_41': ['bd'], 'weather_glance_14': ['wxp16'], 'doors_windows_14': ['openings_0', 'openings_1', 'openings_2en', 'openings_3'], 'medication_27l': ['med29'], 'weather_glance_35': ['wx35'],
           # Single value: a reading with an icon (a short one on the 1.4", where the unit has the line below)
           'single_value_14': ['sv_wide4'], 'single_value_27l': ['sv_icon'], 'single_value_35': ['sv_icon']}

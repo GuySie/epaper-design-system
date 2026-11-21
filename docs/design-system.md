@@ -180,6 +180,9 @@ What each font measures on each tier (x-height / cap height):
 <!-- registry:tier-hero -->
 | Page | Screen | Hero group | Hero | Hero icon | Strip icons (hour / day) | Digit height | mm |
 |---|---|---|---|---|---|---|---|
+| Appliance run | 2.7" L | on its own | 72 px | 72 → 48 | — | 53 px | 8.9 |
+| Appliance run | 3.5" | on its own | 80 px | 80 → 48 | — | 58 px | 12.0 |
+| Appliance run | 4.1" | on its own | 104 px | 104 → 64 | — | 75 px | 15.8 |
 | Bin day | 2.7" L | on its own | 96 px | 96 → 64 | — | 70 px | 11.7 |
 | Bin day | 3.5" | on its own | 96 px | 96 → 64 | — | 70 px | 14.5 |
 | Bin day | 4.1" | on its own | 96 px | 96 → 64 | — | 70 px | 14.7 |
@@ -534,7 +537,7 @@ Blueprints only ever use these drawcustom names. In the templates a token is rea
    - Width budgets for uppercase strings are measured in uppercase, which runs about 15 % wider.
 
 1. **Value first:** *A label never overlaps its value*.
-2. **Cut, never shrink.** A label over budget is cut (*A label never overlaps its value*) and ends in `...`: the renderer's own truncation (`max_width` + `truncate`), which measures the real glyphs, so a cut label always fits.
+2. **Cut, never shrink.** A label over budget is cut (*A label never overlaps its value*) and ends in `...`: the renderer's own truncation (`max_width` + `truncate`), which measures the real glyphs, so a cut label always fits. Where the cut text's width is needed, because more text follows it on its text line (the percentage after a programme) or a chip is drawn around it, the kit cuts it itself (`CUT`), measured with the same advances the width macros use, and it ends in `...` too.
 3. **One text line** for free text (event titles, entity names). The word of a *Glance with a word* may take two.
 4. **Overflow:** show items in order until the screen is full (*Spacing (internal)*, *Fill before you float*). A day or group that doesn't fit whole shows the items that do, followed by one text line **"+N more"** that counts only that group's remaining items, in the item column directly under them. Later groups are left out without a text line. If the last visible group is complete, there is no overflow text line. For calendar: today and its header are never dropped.
 5. **Sanitise all user text.** Run every label from Home Assistant through `text_strip_pattern` (Latin incl. extended/accented, common punctuation, `€`, `™`), then collapse repeated spaces and trim. This applies to every label, not just calendar summaries.
@@ -644,6 +647,7 @@ Three levels, the same on every module:
 <!-- registry:thresholds -->
 | Page | Data | Warning | Severe |
 |---|---|---|---|
+| Appliance run | Minutes a run is done with the door still closed | ≥ 15 min | ≥ 120 min |
 | Bin day | The next collection day | tomorrow | today |
 | Claude usage | Usage | ≥ 90 % | ≥ 100 % |
 | CO2 graph | Concentration | ≥ 1000 ppm | ≥ 1400 ppm |
@@ -722,7 +726,7 @@ Wherever a hero numeral and a hero icon appear together, the **number comes firs
 
 - **A unit beside the number:** a hero whose reading has a unit (Single value) draws it after the number on the number's baseline, in `type.secondary`'s size and the Regular cut, a space apart (*Units and numbers*, *A space separates a value from its unit*). The number and its unit are one reading, centred as a whole. Flagged, a hero on its own takes one chip around both; beside other content the chip is the number's alone and the unit starts past its reach, so the unit keeps its place when the chip appears. A unit is never drawn in the hero face.
 - **One group:** the icon comes **directly** after the number, at a gap of hero size ÷ <!-- v:dt:HERO_GAP_DIV -->7<!-- /v --> (the hero gap, `space.heroGap`), with nothing in between. Details and other modules come after the group, never between number and icon. The same gap separates the hero from what is stacked under it (the Glance secondary, *Glance*).
-- **Hero centring (one rule, both versions):** a hero group is centred by ink, on both axes, **in the space it owns**. A stacked hero group (the number over its icon, on portrait screens) counts the icon at its nominal ink height, the same for every icon of that size, so the number keeps its height when the icon changes. Its number is centred as a whole reading, degree sign included (*Spacing (internal)*, *A number on a centre axis is centred as a whole reading*). On Glance that space is the canvas between the paddings, below the title line, shared with the Glance secondary as one block. In the Hero dashboard it is the **hero column** (from P to the details minus the gutter L) and the band between the title line and the strip line, which it shares with the details (*Spacing (internal)*, the hero band). Widths are measured ink: the numeral's from its advances and side bearings (`HERO_INK_W`), the icon's from its box less its blank margins (`ICB`, measured per glyph), never a per-digit estimate and never the advance width, which drops the icon on readings that fit (`HERO_ALONE` on its own, `HERO_LEFT` beside other content). The icon is *fitted* by its full box, so the size it gets doesn't change with the condition, but *centred* by its ink. The hero therefore doesn't share the title's left edge in the Hero dashboard: it is its own block. A wide reading (`-12°`) fills its column and lands near the edges; that is the same rule, not an exception.
+- **Hero centring (one rule, both versions):** a hero group is centred by ink, on both axes, **in the space it owns**. A stacked hero group (the number over its icon, on portrait screens) counts the icon at its nominal ink height, the same for every icon of that size, so the number keeps its height when the icon changes; a hero block with a progress bar counts its icon at the largest hero icon's nominal ink height, drawn or not (*Glance with a progress bar*, *One block*). Its number is centred as a whole reading, degree sign included (*Spacing (internal)*, *A number on a centre axis is centred as a whole reading*). On Glance that space is the canvas between the paddings, below the title line, shared with the Glance secondary as one block. In the Hero dashboard it is the **hero column** (from P to the details minus the gutter L) and the band between the title line and the strip line, which it shares with the details (*Spacing (internal)*, the hero band). Widths are measured ink: the numeral's from its advances and side bearings (`HERO_INK_W`), the icon's from its box less its blank margins (`ICB`, measured per glyph), never a per-digit estimate and never the advance width, which drops the icon on readings that fit (`HERO_ALONE` on its own, `HERO_LEFT` beside other content). The icon is *fitted* by its full box, so the size it gets doesn't change with the condition, but *centred* by its ink. The hero therefore doesn't share the title's left edge in the Hero dashboard: it is its own block. A wide reading (`-12°`) fills its column and lands near the edges; that is the same rule, not an exception.
 - **Hero clearance:** a hero numeral's digits stay at least the hero gap (`space.heroGap`) from any line, above or below. This replaces M when a hero is the first thing under the title line; text, labels and icons keep M. One word as the hero keeps the hero clearance as a numeral does; two stacked words keep M (*Glance with a word*).
 
 The group is sized as one block from one value: the **hero size *h*** (a rung of the hero ladder). The tokens `type.heroAlone` / `type.heroShared` are *h*; `icon.heroAloneSteps` / `icon.heroShared` follow from it.
@@ -768,7 +772,7 @@ A module is one block of content on a screen, built from components (and other m
 | **Checkbox rows** | Checkbox rows in one or two columns, open items first. Rules: *Checklist* under *Patterns*. | items, done, due, level | `type.data`, `type.label`, `space.row`, `space.s`, `space.l`, `line.base` | `CHECKROWS` |
 | **Tiles** | Repeated icon–state–label unit in a grid. Rules: *Tiles* under *Patterns*. | icon, state, label | `type.data`, `type.label`, `space.m`, `line.base` | `TILEGRID` |
 | **Level meter** | *Reserved: no blueprint uses it.* A level in four segments. Rules: *Level meter*, below the table. | level | — | `METER` |
-| **Hero block** | The hero group *on its own* and the Glance secondary under it, centred as one block (*Hero group*, hero centring; the secondary's chip box is reserved, so nothing moves when a chip appears; a flagged word fills the block, *Glance with a word*). The Glance's one module under the title row; see *Glance*. | hero, icon, levels, Glance secondary | `type.heroAlone`, `icon.heroAloneSteps`, `type.secondary`, `space.heroGap` | `HBLOCK`, `HERO_BLOCK_Y`; two stacked words: `WORD_STACK`, `WORD_SPLIT`; a flagged word: `WORD_BLOCK` |
+| **Hero block** | The hero group *on its own* and the Glance secondary under it, centred as one block (*Hero group*, hero centring; the secondary's chip box is reserved, so nothing moves when a chip appears; a flagged word fills the block, *Glance with a word*; a progress bar between them, *Glance with a progress bar*). The Glance's one module under the title row; see *Glance*. | hero, icon, levels, Glance secondary | `type.heroAlone`, `icon.heroAloneSteps`, `type.secondary`, `space.heroGap` | `HBLOCK`, `HERO_BLOCK_Y`; two stacked words: `WORD_STACK`, `WORD_SPLIT`; a flagged word: `WORD_BLOCK` |
 | **Hero band** | The hero group *beside other content* and the detail rows, **centred by ink between the title line and the next line** (the strip's, or the module's). Rules: *Hero dashboard* under *Patterns*. | hero, icon, rows | `type.heroShared`, `icon.heroShared`, `space.l` | `HBAND` |
 | **Forecast table** | The 2.7" portrait's strips: forecast rows for the hours, the days and the pollen, stacked bottom up as one block of fixed rows; see *Forecast row*. | hours, days, pollen | `type.data`, `space.row`, `space.l` | `RROW` |
 | **Code block** | The code with its quiet zone and the label/value text lines beside it (under it on a portrait screen); see *Code*. | data, text lines | `tier.pitch`, `space.l` | — (mock-up) |
@@ -796,10 +800,10 @@ The label left in `type.fieldLabel`, the value right on the padding in the data 
 
 - The title row is the layout's first row: text on paper above a line, never a filled bar. It is drawn by one macro (`TITLE`) on every layout, medication included.
 - **Title:** `type.title` (its base in *Style choices*, one step up on a large screen, *Step up (large screens)*), never below the label floor, left-aligned, in capitals. The title names the screen; it is chrome, so it never outranks the data below it.
-  - **Every blueprint has a *Header title* input.** Left blank, the title is a translated default that names what the screen shows (`WEATHER`, `CALENDAR`, `PLANTS`); a page for one entity takes that entity's name instead (Single value, History graph, Value with details, the To-do list), and Room sign its area, else its name; the page's default title is sanitised (*Text rules*, *Sanitise all user text*). One qualifier may follow after ` · ` when it tells devices of the same kind apart (`CO2 · BEDROOM` from the sensor's area, `WEATHER · AMSTERDAM` on the 7.5", `MEDICATION · LAST TAKEN` so the hero time reads as the last dose); a typed title replaces the whole default.
+  - **Every blueprint has a *Header title* input.** Left blank, the title is a translated default that names what the screen shows (`WEATHER`, `CALENDAR`, `PLANTS`); a page for one entity takes that entity's name instead (Single value, History graph, Value with details, the To-do list), Room sign its area, else its name, and Appliance run its status entity's device name, else its name; the page's default title is sanitised (*Text rules*, *Sanitise all user text*). One qualifier may follow after ` · ` when it tells devices of the same kind apart (`CO2 · BEDROOM` from the sensor's area, `WEATHER · AMSTERDAM` on the 7.5", `MEDICATION · LAST TAKEN` so the hero time reads as the last dose); a typed title replaces the whole default.
   - **Width:** the title gets what is left after the stamp: the canvas minus both paddings, the stamp's measured width (its chip included when stale) and a gap of L. A longer title is cut with "..." (*A label never overlaps its value*).
 - **Update stamp:** quieter than the title, because it is a check, not data: `type.stamp` (*Derived*). Never TRMNL16 Regular: its 1 px strokes are under `stroke.min`, and unlike a unit the stamp has to be read exactly. Right-aligned, ink ending at W − P − 1, on the title's baseline (a TRMNL12 stamp sits 2 px below a TRMNL16 title's middle anchor). The title's width is measured against this smaller stamp. It is **weekday + time** (`SU 17:58`, `FR 6:05 PM`), a 2-letter weekday in capitals (the `STAMP` macro), on every layout except Medication (see *Medication*). A device that stops updating keeps its last image, so a date-less time can't tell you the image is from yesterday; the weekday can.
-- **Stale chip:** when the data source stops reporting while the automation still runs, the stamp shows the source's last report (weekday + time) in an ink chip with "!" (`chip.stale`: fill `color.ink`, text `color.paper`, prefix `! `; an outline with ink text and "!" where warnings are outlines). It is not a warning chip: old data is not an alarm about the world, and the mark and its place in the title row tell it apart. The chip goes back to the title's font and size (`type.title`), so a stale screen is louder than a healthy one (the *Mark data as stale after* input, default <!-- v:shared:stale_after -->60 min<!-- /v -->, 0 turns it off). It reads `last_reported`, not `last_updated`: a value that stays the same for hours is not stale as long as the source keeps reporting it. With several sources (entity list, plants, pollen next to weather) the newest report counts: one quiet door sensor doesn't mark the whole screen stale. Every blueprint whose data comes from reporting entities has the input. Exempt are the blueprints whose data Home Assistant computes or fetches at the moment it redraws, so there is nothing to go stale, and the two that redraw only on a change of their own (Medication, which has no stamp; Doors & windows, where there is no redraw at which old data could be marked), and the two whose entities report only when their state changes: Bin day (a date that has passed is what old data looks like there, and such a bin is left out) and Room sign (a status stays for hours without a report): <!-- v:noStalePages -->Bin day, Calendar, Doors & windows, Energy price (EnergyZero), Medication, Next appointment, Room sign, Sun & moon, To-do list<!-- /v -->.
+- **Stale chip:** when the data source stops reporting while the automation still runs, the stamp shows the source's last report (weekday + time) in an ink chip with "!" (`chip.stale`: fill `color.ink`, text `color.paper`, prefix `! `; an outline with ink text and "!" where warnings are outlines). It is not a warning chip: old data is not an alarm about the world, and the mark and its place in the title row tell it apart. The chip goes back to the title's font and size (`type.title`), so a stale screen is louder than a healthy one (the *Mark data as stale after* input, default <!-- v:shared:stale_after -->60 min<!-- /v -->, 0 turns it off). It reads `last_reported`, not `last_updated`: a value that stays the same for hours is not stale as long as the source keeps reporting it. With several sources (entity list, plants, pollen next to weather) the newest report counts: one quiet door sensor doesn't mark the whole screen stale. Every blueprint whose data comes from reporting entities has the input. Exempt are the blueprints whose data Home Assistant computes or fetches at the moment it redraws, so there is nothing to go stale, and the two that redraw only on a change of their own (Medication, which has no stamp; Doors & windows, where there is no redraw at which old data could be marked), and the three whose entities report only when their state changes: Bin day (a date that has passed is what old data looks like there, and such a bin is left out), Room sign and Appliance run (a status stays for hours without a report, and an appliance's other sensors report only during a run): <!-- v:noStalePages -->Appliance run, Bin day, Calendar, Doors & windows, Energy price (EnergyZero), Medication, Next appointment, Room sign, Sun & moon, To-do list<!-- /v -->.
 - The title row has no icons.
 - **Line:** the row ends in the screen's standard line.
 - **Height (`space.titleRow`, *Derived*):** the title caps start at P (accents above them hang, *Text rules*, *Accents hang*), and the line sits S under the caps, as the footer's line sits S above its caps.
@@ -823,7 +827,7 @@ The footer is an **optional single text line at the bottom of a screen**. It say
 <!-- registry:footers -->
 | Page and screens | Footer |
 |---|---|
-| Bin day 2.7" L, 3.5", 4.1"; Doors & windows 1.4"; Medication 2.7" L; Room sign 1.4", 2.7" L, 3.5"; Single value 1.4", 2.7" L, 3.5" | none (Glance) |
+| Appliance run 2.7" L, 3.5", 4.1"; Bin day 2.7" L, 3.5", 4.1"; Doors & windows 1.4"; Medication 2.7" L; Room sign 1.4", 2.7" L, 3.5"; Single value 1.4", 2.7" L, 3.5" | none (Glance) |
 | Calendar 4.1", 4.26"; Entities 3.5"; Levels 2.7" L, 3.5", 4.1"; Tiles 1.4", 2.7" P, 2.7" L, 3.5", 4.1", 7.5" L, 7.5" P; Value with details 4.1", 7.5" L, 7.5" P; Weather and calendar 7.5" P | none |
 | Claude usage 3.5" | (a) on schedule / furthest ahead, when it fits |
 | CO2 graph 3.5"; Rain forecast 3.5", 2.7" L; Rain forecast (Netherlands) 3.5", 2.7" L | (a) chart summary; none when there's nothing to show |
@@ -882,7 +886,7 @@ A pattern is what a kind of screen looks like: which modules, in which order, an
 <!-- registry:patterns -->
 | Pattern | Modules | Versions | Status | Macro |
 |---|---|---|---|---|
-| **Glance** | Title row, Hero block | *with the hero in a chip*<br>*with a footer*<br>*with a word*<br>*with a progress bar* (mock) | live | `GLANCE` |
+| **Glance** | Title row, Hero block | *with the hero in a chip*<br>*with a footer*<br>*with a word*<br>*with a progress bar* | live | `GLANCE` |
 | **Hero dashboard** | Title row, Hero band, Strip, Footer | *with forecast strips*<br>*with a chart or list* | live | `HERODASH`, `WXDASH`, `WXPORT` |
 | **Bar chart** | Title row, Chart, Footer | *with thresholds*<br>*for prices* | live | `BARCHART` |
 | **Line chart** | Title row, Chart, Footer | *with thresholds* | live | `LINECHART` |
@@ -902,16 +906,16 @@ Bar chart and Line chart share the chart frame; the Timeline shares its clock-ti
 
 ### Glance
 
-Every Glance page draws with one macro, `GLANCE`: the title row and the hero block (the hero group on its own and the Glance secondary under it, centred as one block; `HBLOCK`). The page passes the title, the stamp, the hero and its icon, and the Glance secondary: plain text, a chip at a level, or one it draws itself (the weather's high/low, *Glance with a footer*).
+Every Glance page draws with one macro, `GLANCE`: the title row and the hero block (the hero group on its own and the Glance secondary under it, centred as one block; `HBLOCK`). The page passes the title, the stamp, the hero and its icon, in *Glance with a progress bar* the share done, and the Glance secondary: plain text, a chip at a level, or one it draws itself (the weather's high/low, *Glance with a footer*).
 
 - A readout for across the room (<!-- v:uses:glance,glance/footer -->Doors & windows, Medication, Single value, Weather at a glance<!-- /v -->).
   1. **Everything with data is large:** the hero (`type.heroAlone`, the hero group *on its own*) and **at most one secondary value**, in `type.secondary` (TRMNL21 Bold). If a value isn't worth that size, it belongs on another pattern.
   2. **Severity takes the Glance secondary:** the flagged item replaces the secondary value as a chip, at the same large size. Temperature chips the hero itself, and a flagged word fills the hero block (*Glance with a word*). (*Glance with a footer* puts it in the footer instead.)
   3. **The only small text is the title and the update stamp**, in the title row. They are metadata, so they only need the label minimum.
-  4. No footers with extra data: hi/lo, rain totals and similar either become the secondary value or are left out. The version *Glance with a footer* is the stated exception to this and to *at most one secondary value*.
+  4. No footers with extra data: hi/lo, rain totals and similar either become the secondary value or are left out. The version *Glance with a footer* is the stated exception to this and to *at most one secondary value*; *Glance with a progress bar* is one to *at most one secondary value*: its bar, and the programme beside the share done.
   5. **One structure, three zones**, the same on every tier:
      - **Title row**: title left, update stamp right (as on every pattern).
-     - **Hero block**: the hero group (*Hero group*) with its **Glance secondary directly under it**, as one block. The secondary is part of the message, not a footer: it sits a hero gap (`space.heroGap`) below the hero's ink, measured to its chip box (XS around the text's size). The box is reserved even without a chip, so nothing moves when one appears.
+     - **Hero block**: the hero group (*Hero group*) with its **Glance secondary directly under it**, as one block. The secondary is part of the message, not a footer: it sits a hero gap (`space.heroGap`) below the hero's ink (below the bar, in *Glance with a progress bar*), measured to its chip box (XS around the text's size). The box is reserved even without a chip, so nothing moves when one appears.
      - **Secondary**: one `type.secondary` text line, the value or chip centred horizontally. A chip hangs outward like any chip.
 
      The block is **centred** by ink, on both axes, in the space it owns (*Hero group*, hero centring): vertically between the title line and the bottom padding (H − P). It lands slightly above the screen's middle, the usual optical centre. Never pin the secondary to the bottom edge: that is the footer position on other patterns and reads as least important (`HERO_BLOCK_Y` macro).
@@ -943,6 +947,16 @@ The hero is a word: the bin that is collected next, a room's status. Everything 
 - **A reading of several words** that doesn't fit one line at the smallest rung breaks over two lines, at the space that makes the lines most equal in width (`DO NOT` over `DISTURB`), and is then drawn as two stacked words; only a line that still doesn't fit is cut.
 - **Flagged:** the hero block is the chip. Everything under the title row takes the level's fill, as the error block does (M below the title line, `space.s` into the padding sideways); where the panel has no warning colour, the warning outline of *Chips* around that box (one `line.base` outside it), clear of a cut word. The word, its icon and the Glance secondary take the on-colour. Nothing in the block moves or changes size when it is flagged. A word is placed by its capitals, so an accent rises above them as accents hang (*Text rules*, *Accents hang*): it may come near the title line, and on a flagged word the part above the fill is in the on-colour: on a red, black or grey fill (white) it shows as a gap where it crosses the line, on a yellow fill or an outline (black) it joins the line. A tail stays inside the fill.
 - Widest readings: a word of seven capitals that loses its icon (`PLASTIC`) or steps down a rung (`ORGANIC`); one word too long for the smallest rung, cut (`MAINTENANCE`: about ten capitals fit the 2.7" and 3.5", five the 1.4"); two words stacked (`PAPER` over `PLASTIC`); three words on two lines (`DO NOT DISTURB`, whole on the 2.7" and 3.5", both lines cut on the 1.4").
+
+#### Glance with a progress bar
+
+A run with an end: an appliance, a print, a charge. Used by <!-- v:uses:glance/progress -->Appliance run<!-- /v -->.
+
+- **The hero is the clock time it ends** (`14:32`), never the time left; the icon names the appliance.
+- **The bar** is the progress bar without a now-marker (*Meters*): its track as high as the caps of `type.secondary` less `space.xs`, filled to the share done. It is as wide as the widest reading's digits (`20:00`, in 24-hour time), a hero gap and the box of the layout's largest hero icon, centred, never wider than the content, so it doesn't change with the time shown; a 12-hour reading with its unit may reach past its ends.
+- **One block:** the hero group, the bar and the Glance secondary are the hero block, each a hero gap (`space.heroGap`) from the next: from the hero group's ink to the track (its icon counted at the largest hero icon's nominal ink height, as hero centring counts it), and from the track to the Glance secondary's chip box. The block is centred as *Glance*, *One structure, three zones* says, sized for the hero group with the layout's largest hero icon whatever the reading, so neither the hero nor the bar moves when the reading or its icon changes. The bar and the Glance secondary's box are there in every state with a run, running or done, so nothing moves when the run ends or is flagged.
+- **Fitted with the bar:** `type.heroAlone` is fitted on the ordinary reading (`14:32` with its icon) with the bar and the Glance secondary in the block; a wider reading follows *Glance*, *Too wide*: the icon gives way, the number never shrinks.
+- **Flagged:** the bar fills in the level's colour as a flagged bar does in *Meters* (ink at the warning level where the panel has no warning colour), and the Glance secondary is the chip (*Glance*, *Severity takes the Glance secondary*).
 
 ### Hero dashboard
 
@@ -1096,15 +1110,6 @@ A list of to-do items: checkbox rows, filled first, and the footer.
 
 Patterns and versions that exist as mock-ups only: no blueprint is built from them yet, so their rules are proposals. Each moves to its place above when its first page is built (a version to its pattern, a pattern to its own section).
 
-#### Glance with a progress bar
-
-*Mock-up.* An appliance run, a print, a charge.
-
-- **The hero is the clock time it ends** (`14:32`), never the time left; the icon names the appliance.
-- **The bar** sits a hero gap (`space.heroGap`) under the hero group and is as wide as the group (the progress bar; its track as high as the caps of `type.secondary` less `space.xs`), filled to the share done; the Glance secondary under it names the programme (`ECO 40° · 62%`).
-- **The hero steps down** one rung at a time when the group, bar and Glance secondary don't keep the hero clearance (*Hero group*) from the title line.
-- **Done and not emptied:** the bar fills in the warning colour and the Glance secondary becomes a warning chip (`DONE · DOOR STILL CLOSED`).
-
 #### Event list with line numbers
 
 *Mock-up (Departures).* Event rows whose title starts with the line number in a `line.base` outline (`space.xs` inside); the time column is the departure clock time; a delay chips the new time in warning with `SCHEDULED 14:07 · +6` as the label; a cancelled ride chips `CANCELLED` in severe.
@@ -1147,7 +1152,7 @@ A page is a pattern filled with real content for one use. Each page names the pa
 <!-- registry:pages -->
 | Page | Uses | Status | Widest reading | 1.4" | 2.7" L | 2.7" P | 3.5" | 4.1" | 4.26" | 7.5" L | 7.5" P | 7.09" (no tier yet) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Appliance run** | Glance with a progress bar | mock | 20:00 | — | ○ | — | ○ | ○ | ○ | ○ | ○ | ○ |
+| **Appliance run** | Glance with a progress bar | live | 20:00 | — | ● | — | ● | ● | ○ | ○ | ○ | ○ |
 | **Bin day** | Glance with a word | live | PLASTIC | ○ | ● | ○ | ● | ● | ○ | ○ | ○ | ○ |
 | **Calendar** | Grouped list | live | — | — | ○ | ○ | ○ | ● | ● | ○ | ○ | ○ |
 | **Claude usage** | Meters | live | — | — | ○ | ○ | ● | ○ | ○ | ○ | ○ | ○ |
@@ -1185,6 +1190,38 @@ A page is a pattern filled with real content for one use. Each page names the pa
 - **Clock times, never countdowns of minutes** (*Text rules*, *Clock times, never relative times*).
 - **The widest reading decides the layout.** Every size and every layout is chosen for the widest reading the page's entity can show (`100%`, `4000`, `-12°`, day `28`), so a screen keeps its layout from one reading, and one state, to the next. The exceptions are the hero on its own, fitted on its ordinary reading: at a wider one its icon gives way (*Hero group*, *Wide readings*); and a word as the hero, whose size follows the word (*Glance with a word*).
 - **Labels don't change with the state** (`NET`, not `NET IMPORT` / `NET EXPORT`): a direction goes in the value (`-0.4 kW`).
+
+### Appliance run
+
+A Glance *with a progress bar*: when an appliance's run ends.
+
+- **Shows:** the clock time the run ends as the hero, with the appliance's icon; the bar of how far it is; the programme as written and the share done as the Glance secondary (`Eco 40° · 62%`).
+- **Tested with:** a run with its programme and share done; running states written as shown and in capitals; `20:00` (the icon steps down); an end at `11:11` (the bar keeps its width); no progress sensor (the bar from the time, no percentage); no programme; no end time (`—`); 12-hour time (`pm` beside the hero) with a long programme (cut; the percentage whole); done; done with the door open (not running) and with the door unavailable (not flagged); done and not emptied at the warning and at the severe level, on a colour, a yellow, a grey and a black/white panel; the Swedish chip, the longest translation, and the French one (cut on every screen); a door opened and shut again; a percentage above 100; no end time and no progress sensor; 12-hour time when flagged; not running (the empty statement); an unavailable status (the error state); Dutch; a long title.
+- **Entities:** a status entity and two lists of its states, *running* and *done*, as shown or as Home Assistant stores them, whatever their case (a paused run counts as running when its state is in the list); an end entity, either a timestamp of the end or a duration of the time left in seconds, minutes, hours or days (minutes when its unit is another or none; the end is then the time it was last reported plus the time left); optionally a progress sensor (percent), a programme sensor and a door sensor.
+- **Running:** the Glance secondary is the programme, then the percentage, a `·` apart, each only when its sensor gives it. Without a progress sensor the bar is the time since the status last changed as a share of the time from then to the end; that share is drawn, never written. A status that steps through several running states (wash, rinse, spin) starts the bar again at each one: such an appliance needs a progress sensor. The percentage is at most 100%. Without an end time the hero is `—`, without its icon, and the bar is empty unless a progress sensor fills it.
+- **12-hour time:** the hero carries the half of the day as its unit (`2:32 pm`; *Hero group*, *A unit beside the number*), so every state keeps it.
+- **A long programme** is cut with an ellipsis where the Glance secondary doesn't fit, so the percentage stays whole.
+- **Done:** the hero is the time the status turned *done* (after a Home Assistant restart, the restart: Home Assistant then gives that as the status's last change), the bar is full and the Glance secondary reads `DONE`. With a door sensor, a run is not emptied while it is done and the door is closed; flagged, the Glance secondary is the chip `DONE · DOOR STILL CLOSED`, cut with an ellipsis where it doesn't fit (the Swedish and the French chip, on every screen). When the door opens, the page is not running; when the status leaves *done*, the page shows its new state. Not emptied is judged from the door as it is now, which a restart can't change: an appliance that stays *done* after it is emptied is done and not emptied again once its door is shut, and flagged at once when the warning time has passed. A door sensor that is unavailable or unknown counts as none.
+- **Flagged:** not emptied for `warning_unemptied` minutes is a warning, for `severe_unemptied` minutes severe, counted from the status's last change (so from a restart after one); `flag_unemptied` turns both off.
+- **Not running:** a status in neither list is one empty statement (`NOT RUNNING`).
+- **Unavailable:** an unavailable or unknown status entity is the error state.
+- **Title:** the status entity's device name, else its name, sanitised (*Text rules*, *Sanitise all user text*), unless a header title is given.
+- **Redraws by itself**, with no trigger to set: when the status changes, the door opens or closes, one report of the end time moves it 5 minutes or more (smaller moves add up unseen until the next redraw), and the share done passes another tenth; and on Home Assistant start and with Run actions.
+- **No stale state:** *Title row*, stale chip.
+
+<!-- registry:inputs-appliance -->
+| Screen | Inputs of this page |
+|---|---|
+| every screen | `status_entity`, `end_entity`, `progress_entity`, `programme_entity`, `door_entity`, `icon`, `running_states`, `done_states`, `flag_unemptied`, `warning_unemptied`, `severe_unemptied` |
+<!-- /registry:inputs-appliance -->
+
+<!-- registry:layouts-appliance -->
+| Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
+|---|---|---|---|---|---|
+| 2.7" L | 72 px | 72 → 48 px | normal, widest, warning, severe, gray, colour, title, error, unavailable, empty | stale | 30 |
+| 3.5" | 80 px | 80 → 48 px | normal, widest, warning, severe, gray, colour, title, error, unavailable, empty | stale | 30 |
+| 4.1" | 104 px | 104 → 64 px | normal, widest, warning, severe, gray, colour, title, error, unavailable, empty | stale | 30 |
+<!-- /registry:layouts-appliance -->
 
 ### Bin day
 
@@ -1796,7 +1833,7 @@ Where it applies:
 
 ### Mocked-up pages
 
-Appliance run, Departures, Solar & battery, Month overview, Message board, Now playing and Guest Wi-Fi: their patterns and layouts are in the table above, their rules with the pattern versions they use.
+Departures, Solar & battery, Month overview, Message board, Now playing and Guest Wi-Fi: their patterns and layouts are in the table above, their rules with the pattern versions they use.
 
 ## Blueprint mechanics
 
@@ -1807,8 +1844,8 @@ What every blueprint does the same way; where it can, through a shared part that
   2. **Content** (open): the page's main entity first, then its other entities, then the options that change what it shows.
   3. **Thresholds** (collapsed): `flag_<what>`, `warning_<what>`, `severe_<what>` for each reading (*Thresholds*). The page sets its chart scale; it is not an input.
   4. **Appearance** (collapsed): `header_title` (blank for the translated default), `location_string`, `time_format` (12h/24h), `weekday_format` (en/de/nl/fr/es/pl/hr/sv) and `rotate` (0/90/180/270, all four always offered; the description explains native vs upright).
-  5. **Advanced** (collapsed): `stale_after`, `led_color`, `led_flash_delay` and `font_dir`. The LED inputs are there wherever a button can start the redraw: the LED confirms the press. A blueprint that redraws on a change (Doors & windows) has none.
-- **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button, the EnergyZero integration). Every other input has a default, and an optional entity left empty removes its part of the page. Rain forecast (Netherlands) has no main entity: it needs one of its two sources. Sun & moon has none either: it reads Home Assistant's own sun.
+  5. **Advanced** (collapsed): `stale_after`, `led_color`, `led_flash_delay` and `font_dir`. The LED inputs are there wherever a button can start the redraw: the LED confirms the press. A blueprint that redraws on a change (Doors & windows, Appliance run) has none.
+- **Required inputs:** `displays`, the trigger, and the page's main entity (the weather entity, the calendars, the CO2 sensor, the first entry of a list, the doors and windows, the medication button, the EnergyZero integration, an appliance's status and end). Every other input has a default, and an optional entity left empty removes its part of the page. Rain forecast (Netherlands) has no main entity: it needs one of its two sources. Sun & moon has none either: it reads Home Assistant's own sun.
 - **Input names:** the device input is always `displays`, also where it takes one device (Medication). Numbered entries are `<name>_<n>` with `<name>_<n>_label` (`entity_1`, `plant_1`, `bar_1`). Thresholds are `warning_<what>` and `severe_<what>`, their switch `flag_<what>`. A blueprint's variables keep the names its drawing reads, so renaming an input never changes the drawing.
   - `stale_after` wherever the data comes from reporting entities (<!-- v:stalePages -->Claude usage, CO2 graph, Entities, History graph, Levels, Plant moisture, Rain forecast, Rain forecast (Netherlands), Single value, Tiles, Value with details, Weather, Weather and calendar, Weather at a glance<!-- /v -->); see *Title row* for the exempt blueprints.
   - The panel is never an input: a page drawn on two screens is two blueprints (Rain forecast on the 3.5" and on the 2.7" landscape).
@@ -1818,7 +1855,7 @@ What every blueprint does the same way; where it can, through a shared part that
 - **Button feedback (LED flash):** every blueprint with a trigger input confirms a press of the device's own `event.*` button; flash before the ~30 s redraw, using `opendisplay.activate_led` with `continue_on_error: true`, inputs `led_color` (default green) and `led_flash_delay` (default <!-- v:shared:led_flash_delay -->500 ms<!-- /v -->), `flash_count1: 2`, `brightness: 16`.
   - In generic-trigger blueprints, flash only when `trigger.entity_id` is an `event.*` entity belonging to a device.
   - Accept both `button_down` and `button_up`: a sleeping device can deliver either half.
-  - Use `mode: single` + `max_exceeded: silent`. A blueprint that redraws on a change (Doors & windows) is `mode: queued` instead, so a second change during a redraw isn't lost.
+  - Use `mode: single` + `max_exceeded: silent`. A blueprint that redraws on a change (Doors & windows, Appliance run) is `mode: queued` instead, so a second change during a redraw isn't lost.
 - **Board ≠ panel.** On Solum ESLs the button comes with the Pro board, which exists in 1.4", 2.7", 3.5" and 4.1". "Has a button" says nothing about size. The board type and the button entity both come from the firmware configuration too: a Core ESL configured as Pro gets a button entity in Home Assistant without having a button.
 - **Names.** Labels never read the `friendly_name` attribute (deprecated from Home Assistant 2026.11). A label falls back to the part it needs: `device_name()` for things named by their own Home Assistant device (plants), `entity_name()` for a sensor on a shared device (usage bars, entity rows), then the other one, then the entity ID. `entity_name()` is empty for a device's main entity.
 - **Names and files.** A blueprint is named after its page and its screen: `E-paper <Page> <size>"`, with `landscape` or `portrait` for a screen that has both (`E-paper Weather 2.7" landscape`). Its file is `epaper-blueprint-<size>-<page>[-landscape|-portrait].yaml`, the page's name in lowercase with hyphens (`epaper-blueprint-2.7-weather-landscape.yaml`). Both are generated (`lib/layouts.py`), never typed: the page's name and the screen's name come from the registry, the screens a page is drawn on from its page definition (`layouts`); a layout's public name in the templates is its key (`weather_27l`).
@@ -1863,6 +1900,7 @@ Proven: TRMNL text and Space Grotesk heroes on BWRY ESLs (1.4", 2.7", 3.5", 4.1"
 19. To-do list: not yet run against a real `todo` entity. To prove there: `todo.get_items` gives the open and the done items, and `due` as a date or as a date and time.
 20. Bin day: a word in Space Grotesk Bold capitals at hero size reads as well as the numerals do; and the date sensors of real waste-collection integrations (the form of their state, how often they report).
 21. Room sign: a flagged status as a filled block (red; yellow; black on a black/white panel; mid or dark grey with white text on a grey panel) or as an outlined block (a warning on a panel without a warning colour) refreshes cleanly and reads from where the device hangs; an accent above a flagged word's fill leaves an acceptable gap in the title line; a status on two lines at the smallest hero size on the 1.4" (`IN A CALL`) still reads, and a longer one is cut there.
+22. Appliance run: not yet run against real appliances. To prove there: the status states and the finish-time or time-left sensors of common integrations (Home Connect, Miele, LG, SmartThings) and how often they report; how many redraws a run takes (status, end time, every tenth); the bar, at the height of the caps of `type.secondary`, reads from across the room.
 
 ## Open items
 

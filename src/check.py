@@ -258,6 +258,9 @@ def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
     for w in want_ns.get('EXPECT') or []:
         if not any(w in v for v in body):
             errs.append(f'the screen does not show {w!r}, which this case is there to show')
+    if want_ns.get('EXPECT_ICON') is False and [el for el in payload if (el.get('y') or 0) >= P + TH and (el.get('type') == 'icon'
+                                                   or (el.get('type') == 'text' and 'materialdesign' in str(el.get('font', ''))))]:
+        errs.append('an icon below the title row, which this case is there to rule out')
     for w in want_ns.get('EXPECT_NOT') or []:
         if any(w in v for v in said):
             errs.append(f'the screen shows {w!r}, which this case is there to rule out')
@@ -373,6 +376,48 @@ def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
                 errs.append(f'hero {el["value"]!r} only {b[1] - r[3] - 1} px below a rule (min {want})')
             if r[1] > b[3] and r[1] - b[3] - 1 < want:
                 errs.append(f'hero {el["value"]!r} only {r[1] - b[3] - 1} px above a rule (min {want})')
+    if bp in PROGRESS and heroes:
+        # the bar: one track, a hero gap (size / 7) under the hero group's ink, digits and icon (*Glance with a progress bar*, *One block*)
+        tr = tracks(payload, tier_tokens(bp)['line']['base'])
+        hs = max(int(el['size']) for el, _ in heroes)
+        group = [b for el, k, b in items if k == 'ink' and b[1] > rule_y + rw - 1 and (el in [h for h, _ in heroes]
+                 or (el.get('type') == 'text' and 'materialdesign' in str(el.get('font')) and el.get('size', 0) >= hs * 0.4))]
+        if len(tr) != 1:
+            errs.append(f'{len(tr)} progress tracks under the hero, not one')
+        elif not bar_top_ok(heroes, tr[0], hs, layout_icon_steps(bp)):
+            errs.append(f'the bar starts at y={tr[0][1]}, not a hero gap under the hero group counted with its largest icon (y={bar_top_ok(heroes, tr[0], hs, layout_icon_steps(bp), want=True)})')
+        else:
+            x0, y0, x1, y1 = tr[0]
+            base = tier_tokens(bp)['line']['base']
+            inside = [el for el in payload if el.get('type') == 'rectangle' and el.get('fill') and x0 < el['x_start'] and el['x_end'] < x1 and y0 < el['y_start'] and el['y_end'] < y1]
+            # flagged, the bar fills in the level's colour (*Glance with a progress bar*, *Flagged*)
+            if want_ns.get('EXPECT_FILL') and want_ns['EXPECT_FILL'] not in [el.get('fill') for el in inside]:
+                errs.append(f"the bar's fill is not {want_ns['EXPECT_FILL']}: {[el.get('fill') for el in inside]}")
+            # filled to the share done (*Glance with a progress bar*, *The bar*)
+            if want_ns.get('EXPECT_SHARE') is not None:
+                fw = max([el['x_end'] - el['x_start'] + 1 for el in inside if el['y_end'] - el['y_start'] > 1] or [0])
+                want = round((x1 - x0 + 1 - 2 * base) * want_ns['EXPECT_SHARE'] / 100)
+                if abs(fw - want) > 2:
+                    errs.append(f"the bar is filled {fw} px, not {want_ns['EXPECT_SHARE']}% ({want} px)")
+            # the Glance secondary a hero gap under the track, measured to its chip box, which holds its text (*Glance with a progress bar*, *One block*)
+            # the Glance secondary's chip box a hero gap under the track: proven where the box is drawn, on a flagged case (a chip
+            # drawn as an outline sits one line.base outside it)
+            want_y = y1 + 1 + hs // HERO_GAP_DIV
+            for el in payload:
+                if el.get('type') == 'rectangle' and el['y_start'] > y1 and el['x_end'] - el['x_start'] > 40:
+                    out = 'fill' not in el and int(el.get('width', 1)) > base
+                    if not (abs(el['y_start'] - want_y) <= 1 or (out and want_y - 2 * base - 1 <= el['y_start'] <= want_y)):
+                        errs.append(f"the Glance secondary's chip starts at y={el['y_start']}, not a hero gap under the bar (y={want_y})")
+            # as wide as the widest reading's digits, a hero gap and the largest hero icon's box, never wider than the content (*Glance with a progress bar*, *The bar*)
+            want_w = min(W - 2 * P, hero_ink_w(widest_of(bp), hs) + hs // HERO_GAP_DIV + layout_icon_steps(bp)[0])
+            if abs((x1 - x0 + 1) - want_w) > 2 or abs((x0 + x1 + 1) / 2 - W / 2) > 1:
+                errs.append(f'the bar is {x1 - x0 + 1} px wide from x={x0}, not {want_w} px centred')
+            # the chip at the level: its fill, or the warning outline (*Glance*, *Severity takes the Glance secondary*)
+            if want_ns.get('EXPECT_CHIP'):
+                chips = [('outline' if 'fill' not in el and int(el.get('width', 1)) > base else el.get('fill')) for el in payload if el.get('type') == 'rectangle'
+                         and el['y_start'] > y1 and el['x_end'] - el['x_start'] > 40]
+                if want_ns['EXPECT_CHIP'] not in chips:
+                    errs.append(f"the Glance secondary's chip is not {want_ns['EXPECT_CHIP']}: {chips}")
     # the footer's line: whatever is above it keeps M clear of it (*Footer*: room)
     fy = H - P - footer_height(bp)
     # (a footer's line runs from padding to padding; a chart's axis on the same row stops short for its labels)
@@ -458,6 +503,7 @@ WEATHER = _layouts(lambda d, u: any(i.get('name') == 'pollen_sensor' for i in d.
 SAME = _layouts(lambda d, u: u.split('/')[0] in ('glance', 'hero-dashboard', 'bar-chart', 'line-chart', 'timeline'))   # nothing moves between states: a hero, a chart's frame
 MODULE = _layouts(lambda d, u: u == 'hero-dashboard/module')   # two halves (design system: Hero dashboard with a chart or list)
 DASH = _layouts(lambda d, u: u.split('/')[0] == 'hero-dashboard')
+PROGRESS = _layouts(lambda d, u: u == 'glance/progress')   # a bar under the hero (*Glance with a progress bar*)
 WORD = _layouts(lambda d, u: u == 'glance/word')   # the hero is a word: its size and place follow the word (*Glance with a word*)
 CHART = _layouts(lambda d, u: u.split('/')[0] in ('bar-chart', 'line-chart', 'timeline'))   # the frame stays put: title line, baseline, footer line
 ZERO = _layouts(lambda d, u: u == 'bar-chart/prices')   # the baseline is the zero line, so it moves on a day with a negative price (*Bar chart for prices*, Baseline)
@@ -477,10 +523,48 @@ def signature(bp, payload):
         if bp in ZERO:            # its baseline is left out: the title line and the footer's line (in the canvas's last fifth) stay
             lines = [l for i, l in enumerate(lines) if i == 0 or l[0] > 0.8 * SIZES[bp][1]]
     sig = {'hero size': hero, 'lines': lines, '_fills': fills}
+    if bp in PROGRESS:            # the bar doesn't change with the time shown, the state or the level (*Glance with a progress bar*, The bar; One block)
+        sig['bar'] = tracks(payload, tier_tokens(bp)['line']['base'])
     if bp in DASH and hero:
         sig['hero icon'] = sorted({e['size'] for e in payload if e.get('type') == 'text' and 'materialdesign' in str(e.get('font', ''))
                                    and e.get('size', 0) >= hero[-1] * 0.4})
     return sig
+
+
+def hero_ink_w(t, hs):
+    """a hero reading's ink width (the kit measures it from advances and side bearings, HERO_INK_W: up to 2 px apart from
+    the drawn ink, which is kerned)"""
+    b = ImageFont.truetype(str(ROOT / 'fonts' / 'SpaceGrotesk-Bold.ttf'), hs).getmask(t).getbbox()
+    return b[2] - b[0]
+
+
+def widest_of(bp):
+    """the page's widest reading (registry.yaml)"""
+    from registry import load
+    return next(str(v.get('widest')) for v in load()['pages'].values() if bp in (v.get('blueprints') or []))
+
+
+def layout_icon_steps(bp):
+    """the layout's icon.heroAloneSteps (EP_LAYOUT in the tokens of the package being checked)"""
+    import re
+    path = pathlib.Path(os.environ.get('EP_CT') or ROOT / 'lib') / 'ep_tokens.jinja'
+    m = re.search(r"'%s': \{.*?'heroAloneSteps': \[([0-9, ]+)\]" % re.escape(bp), path.read_text(), re.S)
+    return [int(x) for x in m.group(1).split(',')]
+
+
+def bar_top_ok(heroes, track, hs, steps, want=False):
+    """the track a hero gap under the hero group, its icon counted at the largest hero icon's nominal ink height (HERO_BLOCK_Y)"""
+    from hero_metrics import glyph_height, measure
+    el = max((e for e, _ in heroes), key=lambda e: int(e['size']))
+    _, up, dn, _ = measure(hs)
+    y = round(int(el['y']) + max(dn, glyph_height(steps[0]) / 2) + hs // HERO_GAP_DIV)
+    return y if want else abs(track[1] - y) <= 1
+
+
+def tracks(payload, base):
+    """a progress bar's tracks: ink outlines of line.base without a fill, wider than high (a warning outline is 2 x line.base)"""
+    return sorted((e['x_start'], e['y_start'], e['x_end'], e['y_end']) for e in payload if e.get('type') == 'rectangle' and 'fill' not in e
+                  and e.get('outline') == 'black' and int(e.get('width', 1)) == base and e['x_end'] - e['x_start'] > 4 * (e['y_end'] - e['y_start']))
 
 
 def pollen_off(scen):
@@ -501,6 +585,18 @@ def pollen_off(scen):
     return (det[0] if det else float(st[ps].get('state') or 0)) in (0, '0')
 
 
+def scen_flag(scen, name):
+    """a scenario's own setting"""
+    import os
+    os.environ.setdefault('EP_ROOT', str(ROOT))
+    ns = {}
+    try:
+        exec((ROOT / 'scen' / f'{scen}.py').read_text(), ns)
+    except Exception:
+        return None
+    return ns.get(name)
+
+
 def scen_lang(scen):
     """the language a scenario draws in"""
     import os
@@ -519,6 +615,11 @@ def same_layout():
         # states compared: not the error view, and not pollen at 0 or without a pollen sensor (the pollen row makes way)
         sc = [(s, signature(b, p)) for s, (b, p, _) in PAYLOADS.items() if b == bp and 'err' not in s and s.split('@')[0] not in CONFIG_CASES
               and not (bp in WEATHER and pollen_off(s.split('@')[0]))]
+        if bp in PROGRESS:        # not running and the error state have no hero block to keep in place (*Appliance run*); the cases say which
+            for s, sig in sc:
+                if not sig['hero size'] and not scen_flag(s.split('@')[0], 'NO_BLOCK'):
+                    errs.append(f'{bp}: {s} has no hero block, and is no case without one')
+            sc = [(s, sig) for s, sig in sc if not scen_flag(s.split('@')[0], 'NO_BLOCK')]
         if bp in MODULE:          # a Hero dashboard with a module: the hero band and the divider stay put; the module's own lines follow its data
             (P, TH, M, rw), _ = tier_vals(bp)
             ym = (P + TH + SIZES[bp][1] - P) // 2

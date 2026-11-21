@@ -24,7 +24,7 @@ patterns:
       hero-chip:    {name: with the hero in a chip, status: live}
       footer:       {name: with a footer, status: live}
       word:         {name: with a word, status: live}
-      progress:     {name: with a progress bar, status: mock}
+      progress:     {name: with a progress bar, status: live}
   hero-dashboard:
     name: Hero dashboard
     status: live
@@ -106,7 +106,7 @@ patterns:
 # pages: what a blueprint offers (its blueprints are its layouts in pages/<page>.yaml, never listed here). uses = pattern[/version]; layouts per screen: the page's own pattern (default for the
 # rest) or '-' = not offered; the lint fails on another pattern's name
 pages:
-  appliance:      {name: Appliance run, uses: glance/progress, status: mock, default: [glance/progress], '14': ['-'], '27p': ['-'], widest: '20:00'}
+  appliance:      {name: Appliance run, uses: glance/progress, status: live, default: [glance/progress], '14': ['-'], '27p': ['-'], widest: '20:00'}
   bin-day:        {name: Bin day, uses: glance/word, status: live, default: [glance/word], widest: 'PLASTIC'}
   calendar:       {name: Calendar, uses: grouped-list, status: live, default: [grouped-list], '14': ['-']}
   claude:         {name: Claude usage, uses: meters, status: live, default: [meters], '14': ['-']}

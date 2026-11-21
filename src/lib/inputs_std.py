@@ -26,6 +26,15 @@ SECTIONS = [
 ]
 SCALE = []   # the page sets its chart scale; never an input (design system: Chart frame, item 2)
 
+def required_of(fname):
+    """every input the page definition marks `required: true` (the main entity first; Appliance run has two: its status and its
+    end, *Blueprint mechanics*, *Required inputs*)"""
+    import pages
+    from layouts import layouts
+    page = next((l['page'] for l in layouts() if l['blueprint'] == fname), None)
+    return [i['name'] for i in pages.load(page)['inputs'] if i.get('required')] if page else []
+
+
 def main_of(fname):
     """the main entity of the blueprint's page: required, first in Content. It is the page definition's `required: true`
     input, or the button for a page a button redraws (a shared input without a default); a page can have none"""
@@ -187,9 +196,10 @@ def lint(path):
     if th != threshold_order(th):
         errs.append(f'thresholds out of order: {th}')
     main = main_of(fname)
+    req = set(required_of(fname)) | {main}
     for n, blk in items:
         has_def = any(re.match(r'^  default:', l) for l in blk)
-        if n in ('displays', 'automation_trigger', main):
+        if n in ('displays', 'automation_trigger') or n in req:
             if has_def and n != 'automation_trigger':
                 errs.append(f'{n} is required but has a default')
         elif not has_def:
