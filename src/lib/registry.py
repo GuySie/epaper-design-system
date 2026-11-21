@@ -96,6 +96,7 @@ def validate(r):
     for b in B:
         if b not in seen:
             errs.append(f'blueprint {b} ({B[b]}) belongs to no page')
+    errs += showcase_pictures(r)[1]
     return errs
 
 
@@ -282,7 +283,56 @@ BLOCK = re.compile(r'(<!-- registry:([a-z0-9-]+) -->\n)(.*?)(<!-- /registry:\2 -
 
 
 README = pathlib.Path(__file__).resolve().parent.parent.parent / 'README.md'
-README_TABLES = {'blueprints', 'pictures'}
+README_TABLES = {'blueprints', 'pictures', 'showcase'}
+
+
+def showcase_pictures(r):
+    """the README gallery's pictures (registry.yaml `showcase`): [(group, [(case, layout key, picture file, caption)])]; a
+    picture is a layout's picture case (pic_<layout>) or a page's example, so every one is a check case the release renders"""
+    import pictures
+    from pixcmp_cases import B
+    pics = {case: (key, pathlib.Path(f).stem + '.png') for _, f, key, case in pictures.picks()}
+    exs = {case: (key, f, shows) for _, key, case, shows, f in pictures.example_picks()}
+    out, errs, seen = [], [], set()
+    for g in r.get('showcase') or []:
+        row = []
+        for p in g['pictures']:
+            c = p['case']
+            if c in seen:
+                errs.append(f'showcase: {c} is listed twice')
+            seen.add(c)
+            if c in pics:
+                key, f = pics[c]; says = p.get('says')
+                if not says:
+                    errs.append(f'showcase: {c} has no caption (says)')
+            elif c in exs:
+                key, f, says = exs[c]
+                if p.get('says'):
+                    errs.append(f'showcase: {c} is an example, captioned with its shows (no says)')
+            else:
+                errs.append(f'showcase: {c} is neither a picture case nor an example'); continue
+            row.append((c, key, f, B[key], says))
+        out.append((g['group'], row))
+    return out, errs
+
+
+def showcase_rows(r, pkg=PKG):
+    """the README's gallery: per group its pictures side by side, each linked to its blueprint, then one line of captions
+    (what it shows, then the blueprint)"""
+    groups, errs = showcase_pictures(r)
+    if errs:
+        sys.exit('\n'.join(errs))
+    out = []
+    for group, row in groups:
+        caps, imgs = [], []
+        for _, _, f, bpf, says in row:
+            bp = yaml.load((pathlib.Path(pkg) / bpf).read_text(encoding='utf-8'), Loader=_Tagless)['blueprint']
+            name = re.sub(r'^E-paper ', '', bp['name'])
+            cap = f'{says[0].upper()}{says[1:]} ({name})'
+            imgs.append(f'[![{cap}](docs/images/{f})](blueprints/{bpf})')
+            caps.append(cap)
+        out += [f'**{group}**', '', ' '.join(imgs), '', ' · '.join(caps), '']
+    return out[:-1]
 
 
 def blueprint_rows(pkg=PKG):
@@ -344,6 +394,7 @@ def write(doc, pkg=PKG):
     r = load(); T = tables(r, pkg)
     T['blueprints'] = '\n'.join(blueprint_rows(pkg))
     T['pictures'] = '\n'.join(picture_rows(pkg))
+    T['showcase'] = '\n'.join(showcase_rows(r, pkg))
     own = README_TABLES if pathlib.Path(doc).resolve() == README else set(T) - README_TABLES
     T = {k: v for k, v in T.items() if k in own}
     s = open(doc).read()

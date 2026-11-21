@@ -170,7 +170,7 @@ texts:
     no_data: Ingen historik för den här sensorn.
 examples:
 - case: ex_value_details_power
-  screen: '75'
+  screen: '41'
   shows: "the house's power use with solar, battery and grid"
 - case: ex_value_details_outside
   screen: '41'

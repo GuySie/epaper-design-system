@@ -1208,6 +1208,9 @@ A Glance *with a progress bar*: when an appliance's run ends.
 - **Title:** the status entity's device name, else its name, sanitised (*Text rules*, *Sanitise all user text*), unless a header title is given.
 - **Redraws by itself**, with no trigger to set: when the status changes, the door opens or closes, one report of the end time moves it 5 minutes or more (smaller moves add up unseen until the next redraw), and the share done passes another tenth; and on Home Assistant start and with Run actions.
 - **No stale state:** *Title row*, stale chip.
+<!-- registry:examples-appliance -->
+- **Examples:** a dishwasher that is done but not yet emptied. Each is drawn in the README.
+<!-- /registry:examples-appliance -->
 
 <!-- registry:inputs-appliance -->
 | Screen | Inputs of this page |
@@ -1219,7 +1222,7 @@ A Glance *with a progress bar*: when an appliance's run ends.
 | Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
 |---|---|---|---|---|---|
 | 2.7" L | 72 px | 72 → 48 px | normal, widest, warning, severe, gray, colour, title, error, unavailable, empty | stale | 30 |
-| 3.5" | 80 px | 80 → 48 px | normal, widest, warning, severe, gray, colour, title, error, unavailable, empty | stale | 30 |
+| 3.5" | 80 px | 80 → 48 px | normal, widest, warning, severe, gray, colour, title, error, unavailable, empty | stale | 31 |
 | 4.1" | 104 px | 104 → 64 px | normal, widest, warning, severe, gray, colour, title, error, unavailable, empty | stale | 30 |
 <!-- /registry:layouts-appliance -->
 
@@ -1365,7 +1368,7 @@ A Key-value list of up to 12 entities.
 - **Shows:** name and state with its unit, one or two columns.
 - **Tested with:** 12 entities (two columns), unavailable values, more than half unavailable (the error state), stale data, Home Assistant's own unit glyphs (µg/m³, ℃).
 <!-- registry:examples-entities -->
-- **Examples:** packages on their way; a home server. Each is drawn in the README.
+- **Examples:** packages on their way; a home server; the temperature in every room. Each is drawn in the README.
 <!-- /registry:examples-entities -->
 
 <!-- registry:inputs-entities -->
@@ -1377,7 +1380,7 @@ A Key-value list of up to 12 entities.
 <!-- registry:layouts-entities -->
 | Screen | Checked in | Not applicable | Cases |
 |---|---|---|---|
-| 3.5" | normal, widest, title, stale, error, unavailable | warning, severe, gray, colour, empty | 10 |
+| 3.5" | normal, widest, title, stale, error, unavailable | warning, severe, gray, colour, empty | 11 |
 <!-- /registry:layouts-entities -->
 
 ### History graph
@@ -1470,6 +1473,9 @@ An Event list, or the event hero when there is one event.
 - **Tested with:** 9, 6, 3, 1 and no events, an event in progress (`NOW`), a grey panel.
 - **In progress:** an event in progress (`NOW`) has its start time in an ink chip, and on the event hero its `NOW` label (*Severity*, *Now is not a severity*).
 - **All-day events** are left out.
+<!-- registry:examples-appointment -->
+- **Examples:** a working day. Each is drawn in the README.
+<!-- /registry:examples-appointment -->
 
 <!-- registry:inputs-appointment -->
 | Screen | Inputs of this page |
@@ -1480,7 +1486,7 @@ An Event list, or the event hero when there is one event.
 <!-- registry:layouts-appointment -->
 | Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
 |---|---|---|---|---|---|
-| 3.5" | 104 px | 88 px | normal, widest, title, error, empty | warning, severe, gray, colour, stale, unavailable | 11 |
+| 3.5" | 104 px | 88 px | normal, widest, title, error, empty | warning, severe, gray, colour, stale, unavailable | 12 |
 | 4.1" | 128 px | 112 px | normal, widest, gray, title, error, empty | warning, severe, colour, stale, unavailable | 11 |
 | 4.26" | 256 px | 224 px | normal, widest, gray, title, error, empty | warning, severe, colour, stale, unavailable | 12 |
 <!-- /registry:layouts-appointment -->
@@ -1725,8 +1731,8 @@ A Hero dashboard *with a chart or list* for any sensor: its number large, other 
 <!-- registry:layouts-value-details -->
 | Screen | Hero | Hero icon | Checked in | Not applicable | Cases |
 |---|---|---|---|---|---|
-| 4.1" | 56 px | 48 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 15 |
-| 7.5" L | 104 px | 88 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 15 |
+| 4.1" | 56 px | 48 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 16 |
+| 7.5" L | 104 px | 88 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 14 |
 | 7.5" P | 104 px | 88 px | normal, widest, warning, severe, gray, colour, title, stale, error, unavailable | empty | 14 |
 <!-- /registry:layouts-value-details -->
 

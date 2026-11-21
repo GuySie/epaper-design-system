@@ -163,6 +163,10 @@ texts:
     no_events: Inga kommande händelser
     no_calendars: Ingen kalender vald
     default_title: Nästa Möte
+examples:
+- case: ex_appointment_workday
+  screen: '35'
+  shows: "a working day"
 layouts:
   '35':
     spec: appointment_35

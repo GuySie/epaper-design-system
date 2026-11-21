@@ -137,6 +137,9 @@ examples:
   screen: '35'
   shows: "a home server"
   gap: M+
+- case: ex_entities_rooms
+  screen: '35'
+  shows: "the temperature in every room"
 layouts:
   '35':
     spec: entities_35

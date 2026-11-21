@@ -244,3 +244,45 @@ aliases:
   base line:        [base rule]
   strip line:       [strip rule]
   heavy line:       [heavy rule]
+
+# the README's gallery (lib/registry.py `showcase_rows`): popular uses, grouped, each a picture the release renders: a
+# layout's picture case (pic_<layout>) with its caption in `says`, or a page's example (pages/<page>.yaml `examples`),
+# captioned with its `shows`. A picture is listed once.
+showcase:
+- group: Leaving the house
+  pictures:
+  - {case: ex_tiles_leaving}
+  - {case: pic_doors_windows_14, says: "how many doors and windows are open, and which"}
+- group: Around the house
+  pictures:
+  - {case: pic_appliance_35, says: "when the washing machine is done"}
+  - {case: ex_appliance_dishwasher}
+  - {case: pic_bin_day_35, says: "the bin collected next"}
+  - {case: ex_todo_chores}
+  - {case: pic_todo_27p, says: "the shopping list"}
+  - {case: ex_entities_rooms}
+  - {case: ex_entities_packages}
+- group: Weather
+  pictures:
+  - {case: pic_weather_calendar_75p, says: "the weather and the coming days' events"}
+  - {case: pic_weather_27p, says: "the weather now, in the coming hours and days"}
+  - {case: pic_rain_27l, says: "rain in the next two hours"}
+  - {case: pic_weather_glance_14, says: "the weather at a glance"}
+  - {case: pic_sun_moon_35, says: "today's sunrise and sunset"}
+- group: Energy
+  pictures:
+  - {case: pic_energy_price_35, says: "today's electricity price and the cheapest hours"}
+  - {case: ex_value_details_power}
+- group: Your day
+  pictures:
+  - {case: pic_calendar_41, says: "the coming days' events"}
+  - {case: ex_appointment_workday}
+  - {case: pic_room_sign_27l, says: "a room that is busy"}
+  - {case: ex_single_value_countdown}
+  - {case: pic_medication_27l, says: "when the medication was last taken"}
+- group: Keeping an eye on things
+  pictures:
+  - {case: pic_co2_35, says: "the air in a room"}
+  - {case: ex_history_freezer}
+  - {case: pic_plants_41, says: "which plants need water"}
+  - {case: ex_levels_batteries}

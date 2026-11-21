@@ -4,6 +4,48 @@ Home Assistant blueprints for e-paper devices, drawn with one shared design syst
 
 This project is not affiliated with OpenDisplay, but intended for use with devices running OpenDisplay firmware. The blueprints draw through the [OpenDisplay integration](https://github.com/OpenDisplay/Home_Assistant_Integration) for Home Assistant and requires the latest custom integration for its `drawcustom` action.
 
+## What you can make with it
+
+A few of the things people put on an e-paper screen, each drawn by a blueprint in this repository. Every picture is a render from the release, at the panel's own pixels, and links to its blueprint.
+
+<!-- registry:showcase -->
+**Leaving the house**
+
+[![What is still open or on before you leave (Tiles 3.5")](docs/images/example-tiles-leaving.png)](blueprints/epaper-blueprint-3.5-tiles.yaml) [![How many doors and windows are open, and which (Doors & windows 1.4")](docs/images/epaper-blueprint-1.4-doors-windows.png)](blueprints/epaper-blueprint-1.4-doors-windows.yaml)
+
+What is still open or on before you leave (Tiles 3.5") · How many doors and windows are open, and which (Doors & windows 1.4")
+
+**Around the house**
+
+[![When the washing machine is done (Appliance run 3.5")](docs/images/epaper-blueprint-3.5-appliance-run.png)](blueprints/epaper-blueprint-3.5-appliance-run.yaml) [![A dishwasher that is done but not yet emptied (Appliance run 3.5")](docs/images/example-appliance-dishwasher.png)](blueprints/epaper-blueprint-3.5-appliance-run.yaml) [![The bin collected next (Bin day 3.5")](docs/images/epaper-blueprint-3.5-bin-day.png)](blueprints/epaper-blueprint-3.5-bin-day.yaml) [![The week's chores (To-do list 4.1")](docs/images/example-todo-chores.png)](blueprints/epaper-blueprint-4.1-to-do-list.yaml) [![The shopping list (To-do list 2.7" portrait)](docs/images/epaper-blueprint-2.7-to-do-list-portrait.png)](blueprints/epaper-blueprint-2.7-to-do-list-portrait.yaml) [![The temperature in every room (Entities 3.5")](docs/images/example-entities-rooms.png)](blueprints/epaper-blueprint-3.5-entities.yaml) [![Packages on their way (Entities 3.5")](docs/images/example-entities-packages.png)](blueprints/epaper-blueprint-3.5-entities.yaml)
+
+When the washing machine is done (Appliance run 3.5") · A dishwasher that is done but not yet emptied (Appliance run 3.5") · The bin collected next (Bin day 3.5") · The week's chores (To-do list 4.1") · The shopping list (To-do list 2.7" portrait) · The temperature in every room (Entities 3.5") · Packages on their way (Entities 3.5")
+
+**Weather**
+
+[![The weather and the coming days' events (Weather and calendar 7.5" portrait)](docs/images/epaper-blueprint-7.5-weather-and-calendar-portrait.png)](blueprints/epaper-blueprint-7.5-weather-and-calendar-portrait.yaml) [![The weather now, in the coming hours and days (Weather 2.7" portrait)](docs/images/epaper-blueprint-2.7-weather-portrait.png)](blueprints/epaper-blueprint-2.7-weather-portrait.yaml) [![Rain in the next two hours (Rain forecast (Netherlands) 2.7" landscape)](docs/images/epaper-blueprint-2.7-rain-forecast-netherlands-landscape.png)](blueprints/epaper-blueprint-2.7-rain-forecast-netherlands-landscape.yaml) [![The weather at a glance (Weather at a glance 1.4")](docs/images/epaper-blueprint-1.4-weather-at-a-glance.png)](blueprints/epaper-blueprint-1.4-weather-at-a-glance.yaml) [![Today's sunrise and sunset (Sun & moon 3.5")](docs/images/epaper-blueprint-3.5-sun-moon.png)](blueprints/epaper-blueprint-3.5-sun-moon.yaml)
+
+The weather and the coming days' events (Weather and calendar 7.5" portrait) · The weather now, in the coming hours and days (Weather 2.7" portrait) · Rain in the next two hours (Rain forecast (Netherlands) 2.7" landscape) · The weather at a glance (Weather at a glance 1.4") · Today's sunrise and sunset (Sun & moon 3.5")
+
+**Energy**
+
+[![Today's electricity price and the cheapest hours (Energy price (EnergyZero) 3.5")](docs/images/epaper-blueprint-3.5-energy-price-energyzero.png)](blueprints/epaper-blueprint-3.5-energy-price-energyzero.yaml) [![The house's power use with solar, battery and grid (Value with details 4.1")](docs/images/example-value-details-power.png)](blueprints/epaper-blueprint-4.1-value-with-details.yaml)
+
+Today's electricity price and the cheapest hours (Energy price (EnergyZero) 3.5") · The house's power use with solar, battery and grid (Value with details 4.1")
+
+**Your day**
+
+[![The coming days' events (Calendar 4.1")](docs/images/epaper-blueprint-4.1-calendar.png)](blueprints/epaper-blueprint-4.1-calendar.yaml) [![A working day (Next appointment 3.5")](docs/images/example-appointment-workday.png)](blueprints/epaper-blueprint-3.5-next-appointment.yaml) [![A room that is busy (Room sign 2.7" landscape)](docs/images/epaper-blueprint-2.7-room-sign-landscape.png)](blueprints/epaper-blueprint-2.7-room-sign-landscape.yaml) [![A countdown: the days until a date (Single value 3.5")](docs/images/example-single-value-countdown.png)](blueprints/epaper-blueprint-3.5-single-value.yaml) [![When the medication was last taken (Medication 2.7" landscape)](docs/images/epaper-blueprint-2.7-medication-landscape.png)](blueprints/epaper-blueprint-2.7-medication-landscape.yaml)
+
+The coming days' events (Calendar 4.1") · A working day (Next appointment 3.5") · A room that is busy (Room sign 2.7" landscape) · A countdown: the days until a date (Single value 3.5") · When the medication was last taken (Medication 2.7" landscape)
+
+**Keeping an eye on things**
+
+[![The air in a room (CO2 graph 3.5")](docs/images/epaper-blueprint-3.5-co2-graph.png)](blueprints/epaper-blueprint-3.5-co2-graph.yaml) [![A freezer's temperature, flagged when it warms up (History graph 3.5")](docs/images/example-history-freezer.png)](blueprints/epaper-blueprint-3.5-history-graph.yaml) [![Which plants need water (Plant moisture 4.1")](docs/images/epaper-blueprint-4.1-plant-moisture.png)](blueprints/epaper-blueprint-4.1-plant-moisture.yaml) [![The batteries of the devices in the house (Levels 3.5")](docs/images/example-levels-batteries.png)](blueprints/epaper-blueprint-3.5-levels.yaml)
+
+The air in a room (CO2 graph 3.5") · A freezer's temperature, flagged when it warms up (History graph 3.5") · Which plants need water (Plant moisture 4.1") · The batteries of the devices in the house (Levels 3.5")
+<!-- /registry:showcase -->
+
 ## What's in it
 
 <!-- registry:blueprints -->
@@ -93,6 +135,10 @@ Appliance run 4.1"
 ![Appliance run 4.1"](docs/images/epaper-blueprint-4.1-appliance-run.png)
 
 
+Example: a dishwasher that is done but not yet emptied
+
+![Example: a dishwasher that is done but not yet emptied](docs/images/example-appliance-dishwasher.png)
+
 **Bin day**
 
 Bin day 2.7" landscape
@@ -166,6 +212,10 @@ Example: a home server
 
 ![Example: a home server](docs/images/example-entities-server.png)
 
+Example: the temperature in every room
+
+![Example: the temperature in every room](docs/images/example-entities-rooms.png)
+
 **History graph**
 
 History graph 2.7" landscape
@@ -233,6 +283,10 @@ Next appointment 4.26"
 
 ![Next appointment 4.26"](docs/images/epaper-blueprint-4.26-next-appointment.png)
 
+
+Example: a working day
+
+![Example: a working day](docs/images/example-appointment-workday.png)
 
 **Plant moisture**
 

@@ -190,6 +190,10 @@ texts:
   pl: {idle: Nie pracuje, done: Gotowe, closed: Drzwi nadal zamknięte, unavailable: Urządzenie niedostępne.}
   hr: {idle: Ne radi, done: Gotovo, closed: Vrata još zatvorena, unavailable: Uređaj nedostupan.}
   sv: {idle: Inte igång, done: Klar, closed: Luckan fortfarande stängd, unavailable: Apparaten otillgänglig.}
+examples:
+- case: ex_appliance_dishwasher
+  screen: '35'
+  shows: "a dishwasher that is done but not yet emptied"
 layouts:
   27l:
     spec: appliance_27l
