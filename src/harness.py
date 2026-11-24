@@ -305,6 +305,14 @@ def canvas_of(bp_path):
     raise SystemExit(f'{name}: no layout draws this blueprint, and the scenario sets no SIZE')
 
 
+# what the last run did besides drawing: the LED calls' devices and the template triggers that fire in the scenario's state
+LAST = {'led': [], 'fired': []}
+
+
+class NoDraw(SystemExit):
+    """the automation stopped at a condition before it drew anything, as Home Assistant stops it"""
+
+
 def run(bp_path, sc_path, out_png, choose_index=None):
     spec = importlib.util.spec_from_file_location('sc', sc_path)
     sc = importlib.util.module_from_spec(spec); spec.loader.exec_module(sc)
@@ -315,6 +323,13 @@ def run(bp_path, sc_path, out_png, choose_index=None):
     env = make_env(sc)
     ctx = {'trigger': getattr(sc, 'TRIGGER', {'platform': 'time_pattern', 'entity_id': None})}
     ctx.update(getattr(sc, 'EXTRA_CTX', {}))
+    # the template triggers, evaluated with the trigger variables in the scenario's state: which of them fire now
+    LAST['led'], LAST['fired'] = [], []
+    tctx = {k: render_value(env, v, {}) for k, v in (doc.get('trigger_variables') or {}).items()}
+    for t in doc.get('trigger') or doc.get('triggers') or []:
+        if isinstance(t, dict) and t.get('trigger', t.get('platform')) == 'template' and \
+                render_value(env, t['value_template'], dict(tctx)) in (True, 'True', 'true'):
+            LAST['fired'].append(t.get('id'))
     over = getattr(sc, 'OVERRIDE', {})       # a scenario may fix a blueprint variable (ds_set: another release's blueprint)
     for k, v in (doc.get('variables') or {}).items():
         ctx[k] = over[k] if k in over else render_value(env, v, ctx)
@@ -329,6 +344,9 @@ def run(bp_path, sc_path, out_png, choose_index=None):
                         ctx[k] = render_value(env, v, ctx)
                     except Exception as ex:
                         raise SystemExit(f'variable {k} failed: {ex!r}')
+            elif st.get('condition') == 'template':       # a condition step: false stops the automation here
+                if render_value(env, st['value_template'], ctx) not in (True, 'True', 'true'):
+                    raise NoDraw('the automation stops at a condition: nothing is drawn')
             elif 'choose' in st:
                 done = False
                 for opt in st['choose']:
@@ -343,8 +361,11 @@ def run(bp_path, sc_path, out_png, choose_index=None):
                     walk(st['default'])
             elif 'if' in st:
                 conds = st['if'] if isinstance(st['if'], list) else [st['if']]
-                ok = all(render_value(env, c, ctx) in (True, 'True', 'true') for c in conds if isinstance(c, str))
+                ok = all(render_value(env, c if isinstance(c, str) else c['value_template'], ctx) in (True, 'True', 'true')
+                         for c in conds if isinstance(c, str) or (isinstance(c, dict) and c.get('condition') == 'template'))
                 walk(st['then'] if ok else st.get('else', []))
+            elif st.get('action') == 'opendisplay.activate_led':
+                LAST['led'].append(render_value(env, st['data']['device_id'], ctx))
             elif st.get('action') in ('opendisplay.drawcustom',):
                 calls.append(render_value(env, st['data'], ctx))
             elif 'action' in st and st['action'].startswith('calendar.get_events'):

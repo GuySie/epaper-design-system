@@ -1,11 +1,15 @@
 page: medication
 description:
-  shows: 'A medication log on one button: press it after taking your medication, and the device shows the time and date of
-    that press, so a glance answers "did I already take this?"'
-  trigger_advice: 'None to set: pick the device and its button''s `event.*` entity. The page redraws on a press, and by itself
-    when the warning or severe time since the last press is reached.'
+  shows: 'A medication log on one or more buttons: press any of them after taking your medication, and every selected device
+    shows the time and date of that press, so a glance answers "did I already take this?" wherever a device is. Nothing is drawn until a button has been pressed once,
+    and while every button is offline the devices keep their last image.'
+  trigger_advice: 'None to set: pick the devices and their buttons'' `event.*` entities. The page redraws every device on a press
+    of any of the buttons, and by itself when the warning or severe time since the last press is reached.'
   notes:
-  - The LED flashes as soon as a press is registered, before the ~30 second redraw.
+  - A press flashes the LED of the device the pressed button is on, as soon as the press is registered, before the ~30 second
+    redraw.
+  - With several devices, a colour is used only where every device has it, so a black/white device next to a colour one makes
+    both draw in black and white.
   - Both `button_down` and `button_up` count, because a sleeping device sometimes only delivers the release; one press still
     gives one redraw.
   title_default: '"Medication · Last taken"'
@@ -15,14 +19,14 @@ inputs:
 - name: flag_late
   section: thresholds
   label: 'Overdue: flag it'
-  help: Off, the date never turns into a chip and the device doesn't redraw at the two times below.
+  help: Off, the date never turns into a chip and the devices don't redraw at the two times below.
   selector:
     boolean: {}
   default: true
 - name: warning_late
   section: thresholds
   label: 'Overdue: warning at'
-  help: Hours since the last press at which the date turns into a warning chip. The device redraws by itself at that moment.
+  help: Hours since the last press at which the date turns into a warning chip. The devices redraw by themselves at that moment.
   selector:
     number:
       min: 0
@@ -33,7 +37,7 @@ inputs:
 - name: severe_late
   section: thresholds
   label: 'Overdue: severe at'
-  help: Hours since the last press at which the date turns into a severe chip. The device redraws by itself at that moment.
+  help: Hours since the last press at which the date turns into a severe chip. The devices redraw by themselves at that moment.
   selector:
     number:
       min: 0
@@ -48,7 +52,8 @@ bind:
 - button_entity: ds_btn
 data:
   variables:
-  - ds_press_ts: '{{ as_timestamp(states(ds_btn), as_timestamp(now())) }}'
+  # the newest press among the buttons that report one (design system: Medication, Several panels, one log)
+  - ds_press_ts: '{% set t = expand(ds_btn) | map(attribute=''state'') | map(''as_timestamp'', none) | reject(''none'') | list %}{{ t | max if t else 0 }}'
   - header_title_display: '{{ header_title if header_title else (language_map[weekday_lang][''default_title''] ~ '' · '' ~
       language_map[weekday_lang][''last_taken'']) }}'
   - press_time_label: '{{ (ds_press_ts | float(0)) | timestamp_custom(''%-I:%M %p'') if time_format == ''12h'' else (ds_press_ts
@@ -59,31 +64,20 @@ data:
       severe_late | float(0) %} {% set on = flag_late | default(true) %} {{ ''sev'' if (on and h >= sv) else (''warn'' if
       (on and h >= w) else '''') }}'
   steps:
+  # no press, no redraw: the panel keeps the last press it shows (design system: Medication, No press, no redraw)
   - condition: template
-    value_template: '{{ trigger.id != ''press'' or trigger.to_state.attributes.get(''event_type'') in [''button_down'', ''button_up'']
-      }}'
-  - if: '{{ trigger.id == ''press'' }}'
-    then:
-    - action: opendisplay.activate_led
-      continue_on_error: true
-      data:
-        device_id: !input 'displays'
-        color1: !input 'led_color'
-        flash_count1: 2
-        loop_delay1: !input 'led_flash_delay'
-        brightness: 16
-        repeats: 1
+    value_template: '{{ (ds_press_ts | float(0)) > 0 }}'
   draw:
     kind: single
   triggers:
   - trigger: template
     id: overdue
-    value_template: '{{ ds_flag_late and states(ds_btn_t) not in [''unknown'', ''unavailable''] and as_timestamp(now()) -
-      as_timestamp(states(ds_btn_t), 0) >= (ds_warn_h | float(0)) * 3600 }}'
+    value_template: '{% set t = expand(ds_btn_t) | map(attribute=''state'') | map(''as_timestamp'', none) | reject(''none'') | list %}{{ ds_flag_late and t | count > 0 and as_timestamp(now()) - (t | max) >= (ds_warn_h | float(0))
+      * 3600 }}'
   - trigger: template
     id: overdue
-    value_template: '{{ ds_flag_late and states(ds_btn_t) not in [''unknown'', ''unavailable''] and as_timestamp(now()) -
-      as_timestamp(states(ds_btn_t), 0) >= (ds_sev_h | float(0)) * 3600 }}'
+    value_template: '{% set t = expand(ds_btn_t) | map(attribute=''state'') | map(''as_timestamp'', none) | reject(''none'') | list %}{{ ds_flag_late and t | count > 0 and as_timestamp(now()) - (t | max) >= (ds_sev_h | float(0))
+      * 3600 }}'
   - trigger: homeassistant
     event: start
     id: redraw

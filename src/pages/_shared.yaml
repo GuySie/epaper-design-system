@@ -113,19 +113,13 @@ inputs:
     default: ''
     selector:
       text: {}
-  displays@button:
-    name: E-paper display
-    description: The ESL to update when the button is pressed.
-    selector:
-      device:
-        filter:
-          integration: opendisplay
   button_entity:
-    name: Button
-    description: The physical button's event entity, e.g. `event.<your_device>_button_1`. Find it under the device in Settings
-      > Devices & services.
+    name: Buttons
+    description: The physical buttons' event entities, e.g. `event.<your_device>_button_1`. Find them under each device in
+      Settings > Devices & services. A press of any of them redraws every device above.
     selector:
       entity:
+        multiple: true
         filter:
           domain: event
   led_color@button:
@@ -137,6 +131,15 @@ inputs:
     - 0
     selector:
       color_rgb: {}
+# a button page redraws on a press only for its two halves (design system: Blueprint mechanics, Button feedback (LED flash))
+button_press:
+  condition: template
+  value_template: '{{ trigger.id != ''press'' or trigger.to_state.attributes.get(''event_type'') in [''button_down'', ''button_up'']
+    }}'
+# a button page's own triggers: only the press flashes (its template triggers also carry the entity that changed)
+button_flash_press:
+  condition: template
+  value_template: '{{ trigger.id == ''press'' }}'
 button_flash:
   alias: 'Button feedback: flash the pressed device''s LED'
   if:

@@ -1,5 +1,7 @@
-# the button's event entity is unavailable (the device is offline)
+# the button's event entity is unavailable (the device is offline): no redraw, the panel keeps the last press
+# (*Medication*, *No press, no redraw*)
 exec(open(__import__('os').environ['EP_ROOT'] + '/scen/med29.py').read())
 INPUTS['button_entity'] = 'event.x'
 STATES['event.x'] = {'state': 'unavailable', 'attributes': {}}
 MODELS = {'dev1': '2.7" BWRY'}
+EXPECT_NO_DRAW = True

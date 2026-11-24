@@ -95,7 +95,7 @@ def help_text(n, p, lay, d):
     scr = lay['screen']
     f = SH['screen_facts'][scr]
     desc = p.get('description') or {}
-    if n == 'displays' and p['redraw'] != 'button':
+    if n == 'displays':
         return f"The {f['size']} devices to draw on"
     if n == 'rotate':
         up = int(d.get('default', 0))
@@ -254,6 +254,11 @@ def actions(p, lay, varnames):
     layout = LAYOUT_NAMES[lay['spec']]
     data = p['data']
     acts = []
+    # *Blueprint mechanics*, *Button feedback (LED flash)*: a button page acts on a press's two halves only, then flashes the pressed device
+    if p['redraw'] == 'button':
+        acts.append(SH['button_press'])
+        # only a press flashes the LED, never a deadline (*Medication*: the redraw triggers)
+        acts.append({**SH['button_flash'], 'if': SH['button_flash']['if'] + [SH['button_flash_press']]})
     if p['redraw'] == 'trigger':
         acts.append(SH['button_flash'])
     acts += data.get('steps') or []

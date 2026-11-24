@@ -6,3 +6,6 @@ class O: pass
 ts = O(); ts.attributes = {'event_type': 'button_up'}
 TRIGGER = {'to_state': ts}
 INPUTS = {'weekday_format': 'nl', 'displays': 'dev1'}
+# the normal case: the button was pressed just now (the other cases set their own press)
+INPUTS['button_entity'] = 'event.x'
+STATES['event.x'] = {'state': NOW.isoformat(), 'attributes': {'event_type': 'button_up'}}

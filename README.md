@@ -4,6 +4,24 @@ Home Assistant blueprints for e-paper devices, drawn with one shared design syst
 
 This project is not affiliated with OpenDisplay, but intended for use with devices running OpenDisplay firmware. The blueprints draw through the [OpenDisplay integration](https://github.com/OpenDisplay/Home_Assistant_Integration) for Home Assistant and requires the latest custom integration for its `drawcustom` action.
 
+## Install
+
+Unlike most blueprints, these don't work on their own. Every blueprint draws with a set of shared templates and fonts, which you install once, next to the blueprints. A blueprint without the templates draws nothing, so install all three, and always update the templates and the blueprints together.
+
+1. **Templates.** Copy the four files in [`custom_templates/`](custom_templates) (`ep_design.jinja`, `ep_tokens.jinja`, `ep_metrics.jinja`, `ep_i18n.jinja`) into your Home Assistant `config/custom_templates/` folder (create it if needed). Then run **Tools > Actions > `homeassistant.reload_custom_templates`** (named **Developer tools** before Home Assistant 2026.8), or restart Home Assistant.
+2. **Fonts.** Put these in `/config/www/fonts/` (or another drawcustom font folder): `TRMNL12-Regular.ttf`, `TRMNL12-Bold.ttf`, `TRMNL16-Regular.ttf`, `TRMNL16-Bold.ttf`, `TRMNL21-Regular.ttf` and `TRMNL21-Bold.ttf` from the [TRMNL font bundle](https://trmnl.com/font-family), and `SpaceGrotesk-Bold.ttf` (the static Bold file) from [Google Fonts](https://fonts.google.com/specimen/Space+Grotesk). Both are SIL OFL 1.1. The icons use `materialdesignicons-webfont.ttf` ([Material Design Icons](https://pictogrammers.com/library/mdi/)), which the OpenDisplay integration ships with: nothing to install for it.
+3. **Blueprints.** Import the ones you want: open the file on GitHub and use its URL in **Settings > Automations & scenes > Blueprints > Import blueprint**, or copy the files into `config/blueprints/automation/`. Then create an automation from the blueprint.
+
+Each blueprint's description lists what else it needs (a weather, calendar or rain integration, sensors) and how often to redraw it.
+
+A blueprint whose templates are missing fails with `TemplateNotFound: ep_design.jinja` in its trace.
+
+## Updating
+
+Replace the four templates, run `homeassistant.reload_custom_templates`, then re-import the blueprints. Always update the templates and the blueprints together: they are built as one set. A device that shows `UPDATE TEMPLATES AND BLUEPRINT` with two ids has a blueprint and templates from different releases: update whichever is older.
+
+To redraw a device after changing an automation's settings, open the automation and choose **Run actions**. Medication and Doors & windows also redraw when Home Assistant starts.
+
 ## What you can make with it
 
 A few of the things people put on an e-paper screen, each drawn by a blueprint in this repository. Every picture is a render from the release, at the panel's own pixels, and links to its blueprint.
@@ -61,7 +79,7 @@ The air in a room (CO2 graph 3.5") · A freezer's temperature, flagged when it w
 | [`epaper-blueprint-2.7-energy-price-energyzero-landscape.yaml`](blueprints/epaper-blueprint-2.7-energy-price-energyzero-landscape.yaml) | Energy price (EnergyZero) 2.7" landscape | Today's electricity price per hour from EnergyZero, with the current price and the cheapest hours still to come. |
 | [`epaper-blueprint-2.7-history-graph-landscape.yaml`](blueprints/epaper-blueprint-2.7-history-graph-landscape.yaml) | History graph 2.7" landscape | One sensor's recent history as a line graph: the last hours, the current value, and the period's lowest and highest. |
 | [`epaper-blueprint-2.7-levels-landscape.yaml`](blueprints/epaper-blueprint-2.7-levels-landscape.yaml) | Levels 2.7" landscape | Up to four sensors as rows, each with its value and a bar that shows how full it is: batteries, tanks, power, humidity. |
-| [`epaper-blueprint-2.7-medication-landscape.yaml`](blueprints/epaper-blueprint-2.7-medication-landscape.yaml) | Medication 2.7" landscape | A medication log on one button: press it after taking your medication, and the device shows the time and date of that press, so a glance answers "did I already take this?" |
+| [`epaper-blueprint-2.7-medication-landscape.yaml`](blueprints/epaper-blueprint-2.7-medication-landscape.yaml) | Medication 2.7" landscape | A medication log on one or more buttons: press any of them after taking your medication, and every selected device shows the time and date of that press, so a glance answers "did I already take this?" wherever a device is. Nothing is drawn until a button has been pressed once, and while every button is offline the devices keep their last image. |
 | [`epaper-blueprint-2.7-rain-forecast-landscape.yaml`](blueprints/epaper-blueprint-2.7-rain-forecast-landscape.yaml) | Rain forecast 2.7" landscape | The next 24 hours of rain in hourly bars, from the hourly forecast of any weather entity, on a log scale so drizzle stays visible next to a downpour. |
 | [`epaper-blueprint-2.7-rain-forecast-netherlands-landscape.yaml`](blueprints/epaper-blueprint-2.7-rain-forecast-netherlands-landscape.yaml) | Rain forecast (Netherlands) 2.7" landscape | The next two hours of rain in 5-minute bars, from Buienalarm and Buienradar (the higher of the two for each bar), on a log scale so drizzle stays visible next to a downpour. |
 | [`epaper-blueprint-2.7-room-sign-landscape.yaml`](blueprints/epaper-blueprint-2.7-room-sign-landscape.yaml) | Room sign 2.7" landscape | The state of one entity as a large word, on two lines when it is longer, with an optional line under it. Free, busy, do not disturb. |
@@ -509,22 +527,6 @@ Weather at a glance 3.5"
 <!-- /registry:pictures -->
 
 The design itself is written down in [docs/design-system.md](docs/design-system.md): screens and their tokens, colour, type, icons, states, components, modules, patterns and pages.
-
-## Install
-
-1. **Templates.** Copy the four files in [`custom_templates/`](custom_templates) (`ep_design.jinja`, `ep_tokens.jinja`, `ep_metrics.jinja`, `ep_i18n.jinja`) into your Home Assistant `config/custom_templates/` folder (create it if needed). Then run **Developer tools > Actions > `homeassistant.reload_custom_templates`**, or restart Home Assistant.
-2. **Fonts.** Put these in `/config/www/fonts/` (or another drawcustom font folder): `TRMNL12-Regular.ttf`, `TRMNL12-Bold.ttf`, `TRMNL16-Regular.ttf`, `TRMNL16-Bold.ttf`, `TRMNL21-Regular.ttf` and `TRMNL21-Bold.ttf` from the [TRMNL font bundle](https://trmnl.com/font-family), and `SpaceGrotesk-Bold.ttf` (the static Bold file) from [Google Fonts](https://fonts.google.com/specimen/Space+Grotesk). Both are SIL OFL 1.1. The icons use `materialdesignicons-webfont.ttf` ([Material Design Icons](https://pictogrammers.com/library/mdi/)), which the OpenDisplay integration ships with: nothing to install for it.
-3. **Blueprints.** Import the ones you want: open the file on GitHub and use its URL in **Settings > Automations & scenes > Blueprints > Import blueprint**, or copy the files into `config/blueprints/automation/`. Then create an automation from the blueprint.
-
-Each blueprint's description lists what else it needs (a weather, calendar or rain integration, sensors) and how often to redraw it.
-
-A blueprint whose templates are missing fails with `TemplateNotFound: ep_design.jinja` in its trace.
-
-## Updating
-
-Replace the four templates, run `homeassistant.reload_custom_templates`, then re-import the blueprints. Always update the templates and the blueprints together: they are built as one set. A device that shows `UPDATE TEMPLATES AND BLUEPRINT` with two ids has a blueprint and templates from different releases: update whichever is older.
-
-To redraw a device after changing an automation's settings, open the automation and choose **Run actions**. Medication and Doors & windows also redraw when Home Assistant starts.
 
 ## How it's built
 

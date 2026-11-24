@@ -244,13 +244,31 @@ def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
     tf = pathlib.Path(CHECK_PNG).with_name(f'{os.getpid()}_{bp}_{scen}.py')
     tf.write_text(f"exec(open({str(sf)!r}).read())\nSIZE={SIZES[bp]}\n")
     sf = tf
-    with contextlib.redirect_stdout(io.StringIO()):
-        payload = harness.run(str(pathlib.Path(out_dir) / B[bp]), str(sf), CHECK_PNG)
-    W, H = Image.open(CHECK_PNG).size
     want_ns = {}
     exec(sf.read_text(), want_ns)
+    errs0 = []
+
+    def side(errs):
+        # the template triggers that fire in the case's state (a deadline: *Medication*, *Medication redraws by itself*) and the
+        # devices whose LED the run flashes (*Blueprint mechanics*, *Button feedback (LED flash)*)
+        if 'EXPECT_FIRES' in want_ns and sorted(set(harness.LAST['fired'])) != sorted(want_ns['EXPECT_FIRES']):
+            errs.append(f"the template triggers that fire are {sorted(set(harness.LAST['fired']))}, not {sorted(want_ns['EXPECT_FIRES'])}")
+        if 'EXPECT_FLASH' in want_ns and harness.LAST['led'] != want_ns['EXPECT_FLASH']:
+            errs.append(f"the LED flashes on {harness.LAST['led']}, not {want_ns['EXPECT_FLASH']}")
+        return errs
+    # a case whose rule says nothing is drawn: the automation must stop before it draws (*Medication*, *No press, no redraw*)
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            payload = harness.run(str(pathlib.Path(out_dir) / B[bp]), str(sf), CHECK_PNG)
+    except harness.NoDraw:
+        if want_ns.get('EXPECT_NO_DRAW'):
+            return side(errs0)
+        raise
+    if want_ns.get('EXPECT_NO_DRAW'):
+        return side(['the blueprint draws, where this case is there to show it draws nothing'])
+    W, H = Image.open(CHECK_PNG).size
     (P, TH, M, rw), S = tier_vals(bp)      # from the tokens: a canvas can belong to two tiers (800 x 480: the 7.5" and the 4.26")
-    errs = universal(bp, payload)
+    errs = side(universal(bp, payload))
     # what the case's rule says the screen shows (below the title row) or must not show (anywhere): the drawing instructions,
     # not whether the text is legible
     said = [str(el.get('value', '')) for el in payload if el.get('type') in ('text', 'multiline')]
@@ -264,6 +282,11 @@ def check(out_dir, scen, bp, gap_rule, bottom_rule, sized=False):
     for w in want_ns.get('EXPECT_NOT') or []:
         if any(w in v for v in said):
             errs.append(f'the screen shows {w!r}, which this case is there to rule out')
+    # the only colours the case's panels share (*Values per panel*, *Not configurable*: a colour only where every selected panel has it)
+    if want_ns.get('EXPECT_COLOURS'):
+        used = {str(el[k]) for el in payload for k in ('color', 'fill', 'outline') if el.get(k) is not None}
+        if used - set(want_ns['EXPECT_COLOURS']):
+            errs.append(f"colours {sorted(used - set(want_ns['EXPECT_COLOURS']))} that not every panel of this case has")
     items = [(el, kind(el), ink_box(el, W, H)) for el in payload]
     items = [(el, k, b) for el, k, b in items if b]
     # title

@@ -69,7 +69,7 @@ CASES = [
     # the event hero's widest reading (20:00) on each screen, and the 3.5" event hero before it starts
     ('a35_1w', 'appointment_35', 'M', 'fill'), ('a41_1w', 'appointment_41', 'M', 'fill'), ('a426_1w', 'appointment_426', 'M', 'fill'), ('a35_1', 'appointment_35', 'M', 'fill'),
     # a reading's switch off (*Thresholds*): nothing is flagged
-    ('claude35_flagoff', 'claude_35', 'M', 'free'), ('plants42_flagoff', 'plants_41', 'M', 'free'), ('med_flagoff', 'medication_27l', 'skip', 'free'),
+    ('claude35_flagoff', 'claude_35', 'M', 'free'), ('plants42_flagoff', 'plants_41', 'M', 'free'), ('med_flagoff', 'medication_27l', 'skip', 'free'), ('med_two_btn', 'medication_27l', 'skip', 'free'), ('med_two_unav', 'medication_27l', 'skip', 'free'), ('med_two_mixed', 'medication_27l', 'skip', 'free'), ('med_two_none', 'medication_27l', 'skip', 'free'), ('med_two_press', 'medication_27l', 'skip', 'free'), ('med_two_offline', 'medication_27l', 'skip', 'free'),
     ('rain35_flagoff', 'rain_35', 'skip', 'fill'), ('rain168_flagoff', 'rain_27l', 'skip', 'fill'), ('co2_flagoff', 'co2_35', 'M', 'fill'),
     # 12-hour time on a chart (*Chart frame (all charts)*, Clock-time axis): am/pm on every axis label and in the footer
     ('rain35_12h', 'rain_35', 'skip', 'fill'), ('rain35_12h_noon', 'rain_35', 'skip', 'fill'), ('rain35_12h_dry', 'rain_35', 'skip', 'free'),

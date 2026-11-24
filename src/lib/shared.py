@@ -8,8 +8,7 @@ The fragments:
                  `weekday_short_map` and `months_short_map` read EP_DAYS_SHORT and EP_MONTHS_SHORT
   stale          `ds_stale`: the data is stale when the newest report is older than `stale_after` minutes (0 turns it off)
   drawing        the opendisplay.drawcustom step: white background, no dither, the `rotate` input, the `displays` input
-  button flash   the LED step that confirms a button press (two flashes on the pressed device; Medication flashes its
-                 own display, the button's device)
+  button flash   the LED step that confirms a button press (two flashes on the pressed button's device)
   template note  the description's line on installing the design-system templates
 """
 import glob, os, re, sys
@@ -30,7 +29,6 @@ DRAW = {'background': 'white', 'dither': 'none', 'rotate': {'!input': 'rotate'}}
 FLASH = {'action': 'opendisplay.activate_led', 'continue_on_error': True,
          'data': {'brightness': 16, 'color1': {'!input': 'led_color'}, 'device_id': '{{ device_id(trigger.entity_id) }}',
                   'flash_count1': 2, 'loop_delay1': {'!input': 'led_flash_delay'}, 'repeats': 1}}
-FLASH_OWN = {**FLASH, 'data': {**FLASH['data'], 'device_id': {'!input': 'displays'}}}   # Medication: its own display
 NOTE = ("- The design-system templates: copy the four `ep_*.jinja` files from the repository's `custom_templates` folder into "
         "`config/custom_templates/`, then run `homeassistant.reload_custom_templates` (or restart Home Assistant). Update them "
         "together with the blueprints.")
@@ -94,7 +92,7 @@ def lint(path):
         if s.get('action') == 'opendisplay.drawcustom':
             if s.get('target') != {'device_id': {'!input': 'displays'}} or {k: s['data'].get(k) for k in DRAW} != DRAW:
                 errs.append('a drawing step is not the shared drawing fragment')
-        if s.get('action') == 'opendisplay.activate_led' and s not in (FLASH, FLASH_OWN):
+        if s.get('action') == 'opendisplay.activate_led' and s != FLASH:
             errs.append('an LED step is not the shared button-flash fragment')
     desc = d['blueprint'].get('description') or ''
     if NOTE not in desc:
